@@ -49,14 +49,16 @@ sub process_playlist {
 	}
 	close $f_pls;
 	
-	my $threw_error = 0;
+	my $all_ok = 1;
 	if (scalar @songs == 0 && $narrowing) { # stop poking about
 		sleep 1;
 		#$conn->send_error(RC_NOT_FOUND);
 		warn "Desired search $uri was not found - returning 404\n";
-		$threw_error = 1;
+		$all_ok = 0;
 	}
 	@{$self->{'songs'}} = @songs;
+	
+	$all_ok;
 }
 
 sub get_song {

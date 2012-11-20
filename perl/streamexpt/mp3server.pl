@@ -5,14 +5,12 @@ use strict;
 use HTTP::Daemon;
 use HTTP::Status;
 use Data::Dumper;
-use URI::Escape;
-use NetAddr::IP;
 
 use ListPlayer;
+use Playlist;
 use Screener;
 
 use Getopt::Long;
-use File::Find::Rule;
 use sigtrap qw(die INT QUIT);
 
 #get the port to bind to or default to 8000
@@ -42,8 +40,7 @@ my $res = GetOptions("playlist=s" => \$playlist,
 # either playlist or root dir must be specified
 die "Either playlist or rootdir must be specified" 
 	unless (defined $playlist or defined $rootdir);
-
-$playlist = gen_playlist($rootdir, $debug) if defined $rootdir;
+my $plist = Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
 
 #ignore child processes to prevent zombies
 $SIG{CHLD} = 'IGNORE';
@@ -56,13 +53,6 @@ warn "Server ready. Waiting for connections ... \n";
 my $cl = Screener->new(ipfile => $clientlist_file);
 
 #wait for the connections at the accept call
-
-
-# TODO 1: downsampling - done
-# TODO 2: catch request for specific song - done
-# TODO 3: access control
-# TODO 4: modularisation?
-
 
 while (my $conn = $d->accept) {
 	my $child;
@@ -81,9 +71,10 @@ while (my $conn = $d->accept) {
 			my $uri = $conn->get_request->uri; 
 			$uri = uri_unescape($uri);
 			print "Request: $uri\n" if $debug;
+			
 			#call the main child routine
 			my $lp = ListPlayer->new(conn => $conn, 
-									 playlist => $playlist,
+									 playlist => $plist,
 									 random => $random,
 									 debug => $debug);
 			$lp->play_songs($uri, $downsample);
@@ -105,36 +96,11 @@ while (my $conn = $d->accept) {
 }
 exit(0);
 
-# SUBROUTINES
 
-
-sub gen_playlist {
-	my ($rootdir) = @_;
-	
-	my ($fh, $plsname) = tempfile();
-	warn "Generating playlist for given root dir $rootdir\n";
-	
-	open ($fh, ">$plsname") or die "Unable to open temp playlist $plsname for writing: $!";
-	add_delete_list($plsname);
-	
-	my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
-	foreach my $song (@mp3s) {
-		chomp $song;
-		print "  Adding '$song' to temp playlist $plsname\n" if $debug;
-		$fh->print( "$song\n");
-	}
-	close $fh;
-	
-	return $plsname;
-}
-
-sub add_delete_list {
-	my ($dsfilename) = @_;
-	$delete_list{$dsfilename} = $dsfilename;
-}
-
-
-
+#sub add_delete_list {
+#	my ($dsfilename) = @_;
+#	$delete_list{$dsfilename} = $dsfilename;
+#}
 
 END {
 	if ($parent_quit) {

@@ -101,14 +101,12 @@ sub downsample {
 	chomp $safe_songname;
 	$safe_songname =~ s/\"/\\\"/g;
 
-	my $mods = "2 >&1";
-	$mods = "" unless $self->debug;
 	if ($safe_songname =~ /mp3$/i) {
 		warn "Downsampling as MP3";
-		system qq{/usr/local/bin/lame --mp3input -b 32 "$safe_songname" $dsfilename $mods} or warn "Downsampling was not possible: $!";
+		system qq{/usr/local/bin/lame --mp3input -b 32 "$safe_songname" $dsfilename} or warn "Downsampling was not possible: $!";
 	} elsif ($safe_songname =~ /ogg$/i) {
 		warn "Downsampling as OGG";
-		system qq{/usr/local/bin/sox -t ogg "$safe_songname" -t raw - | oggenc --raw --downmix -b 64 -o $dsfilename - $mods} or warn "Downsampling was not possible: $!";
+		system qq{/usr/local/bin/sox -t ogg "$safe_songname" -t raw - | oggenc --raw --downmix -b 64 -o $dsfilename - } or warn "Downsampling was not possible: $!";
 
 	} else {
 		warn "No idea how to downsample this file";

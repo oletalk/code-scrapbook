@@ -16,62 +16,26 @@ sub play_songs {
 	my ($uri, $downsample) = @_;
 		
 	my $conn = $self->{'conn'};
-	my $playlist = $self->{'playlist'};
+	my $plist = $self->{'playlist'}; # is an actual Playlist object as of 20/11/2012
 	my $random = $self->{'random'};
 	my $debug = $self->{'debug'};
 	croak ("Connection not set") unless $conn;
-	croak ("Playlist not given") unless $playlist;
-	croak ("Playlist not readable") unless -r $playlist;
 	
 	# CM 20/11/2012 VVVVV copied from here
 	
-	#get all the possible songs
-	open my $f_pls, $playlist or die "Unable to open playlist $playlist: $!";
-	my @songs = ();
-	
-	my $narrowing = (defined $uri && $uri ne '/');
-	
-	while (<$f_pls>) {
-		my $s = $_;
-		my $acceptsong = 1;
-		chomp $s;
-		
-		# if URI is provided, the client has asked for a specific song/dir
-		# narrow the list down in this case
-		if ($narrowing && index($s, $uri) == -1) {
-			$acceptsong = 0;
-		}
-			#warn "INDEX IS " . index($s, $uri) . "\n";
-		
-		
-		if ($acceptsong) {
-			push @songs, $s;
-			print "   Matching song: $s \n" if $narrowing;			
-		}
-	}
-	close $f_pls;
-	
-	my $threw_error = 0;
-	if (scalar @songs == 0 && $narrowing) { # stop poking about
-		sleep 1;
-		$conn->send_error(RC_NOT_FOUND);
-		warn "Desired search $uri was not found - returning 404\n";
-		$threw_error = 1;
-	}
+	my $all_ok = $plist->process_playlist($uri);
+
 	# CM 20/11/2012 ^^^^^ copied up to here
 	
-	unless ($threw_error) {
+	if ($all_ok) {
 		my $done = 0;
-		#loop forever (or until the client closes the socket) 
-		#seed the random number generator
-		srand(time / $$);
-	
-		my $ctr = 0;
-		while (!$done) {
+		#loop forever (or until the client closes the socket - see SongPlayer) 
+		my $song;
+		
+		while (!$done && ($song = $plist->get_song($random))) {
 			#print the HTTP header
 			print $conn $self->_httpheaders();
-			# get a random song
-			my $song = $random ? $songs[ rand @songs ] : $songs[$ctr];
+
 			warn( "playing song: $song\n") if $debug;
 			my $player = SongPlayer->new(conn => $conn, 
 										 downsample => $downsample, 
@@ -79,12 +43,10 @@ sub play_songs {
 			$player->play($song);
 		
 			$done = 1 unless $conn;
-			$ctr++;
-			if ($ctr >= scalar @songs) {
-				$done = 1;
-			}
 			warn "Finishing after this song" if $done && $debug;
 		}
+	} else {
+		$conn->send_error(RC_NOT_FOUND);
 	}
 	
 	warn "Done playing songs";
