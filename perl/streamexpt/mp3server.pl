@@ -7,9 +7,6 @@ use HTTP::Status;
 use Data::Dumper;
 use URI::Escape;
 use NetAddr::IP;
-use constant ALLOW => 'ALLOW';
-use constant DENY  => 'DENY';
-use constant BLOCK => 'BLOCK';
 
 use ListPlayer;
 use Screener;
@@ -20,7 +17,6 @@ use sigtrap qw(die INT QUIT);
 
 #get the port to bind to or default to 8000
 my $port = 8000;
-our $DEFAULT_ACTION = ALLOW;
 
 our $debug;
 our $playlist;
@@ -77,7 +73,7 @@ while (my $conn = $d->accept) {
 	my $action = $cl->screen($peer);
 	print "Action for this peer is $action \n";
 	
-	if ($action eq ALLOW) {
+	if ($action eq Screener::ALLOW) {
 		# perform the fork or exit
 		die "Can't fork: $!" unless defined ($child = fork());
 		if ($child == 0) {
@@ -99,7 +95,7 @@ while (my $conn = $d->accept) {
 			#close the connection, the parent has already passed it off to a child
 			$conn->close();
 		}
-	} elsif ($action eq DENY) {
+	} elsif ($action eq Screener::DENY) {
 		$conn->send_error(RC_FORBIDDEN);
 		$conn->close();
 	} else { # BLOCK

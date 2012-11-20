@@ -22,7 +22,9 @@ sub play_songs {
 	croak ("Connection not set") unless $conn;
 	croak ("Playlist not given") unless $playlist;
 	croak ("Playlist not readable") unless -r $playlist;
-		
+	
+	# CM 20/11/2012 VVVVV copied from here
+	
 	#get all the possible songs
 	open my $f_pls, $playlist or die "Unable to open playlist $playlist: $!";
 	my @songs = ();
@@ -56,6 +58,7 @@ sub play_songs {
 		warn "Desired search $uri was not found - returning 404\n";
 		$threw_error = 1;
 	}
+	# CM 20/11/2012 ^^^^^ copied up to here
 	
 	unless ($threw_error) {
 		my $done = 0;
