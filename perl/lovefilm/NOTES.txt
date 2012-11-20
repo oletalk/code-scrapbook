@@ -1,0 +1,13 @@
+I have completed Task 1 and made a start on Task 2:
+- Player, Stock and Tile objects.
+- Tests for each.
+- A Player can interact with a Stock by drawing a card.
+
+If I had more time, I would complete Task 2:
+- draw a full 'hand' of 7 tiles ('deal' method of Stock)
+- have more than 1 players
+- randomly play tiles just by checking the match
+- start to implement a simple strategy for playing tiles
+- write a Perldoc
+- clean up my tests!
+

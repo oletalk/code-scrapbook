@@ -1,0 +1,1028 @@
+ ------> card_test.pl <------ 
+#!/opt/local/bin/perl
+
+use Hand;
+use Card;
+
+use strict;
+
+my $c1 = Card->new('8', Card->HEARTS);
+my $c2 = Card->new('9', Card->HEARTS);
+my $c3 = Card->new('8', Card->CLUBS);
+my $c4 = Card->new('10', Card->DIAMONDS);
+my $c5 = Card->new('Jack', Card->SPADES);
+my $c6 = Card->new('Queen', Card->SPADES);
+my $c7 = Card->new('King', Card->SPADES);
+
+my $h = new Hand();
+
+print "Compare card 1 to card 2.\n";
+if ($c1->compare_suit($c2) == 0 ) {
+	print "They are the same suit.\n";
+}
+
+unless ($c1->compare_suit($c3) == 0 ) {
+	print "Card 1 and card 3 are NOT the same suit.\n";
+}
+
+print "Compared ranks for Card 1 and Card 2: ";
+print $c1->compare_rank($c2) . "\n";
+
+my @a = ($c1, $c2, $c3, $c4, $c5, $c6, $c7);
+my @b = sort { $a->combined_val() <=> $b->combined_val() } @a;
+
+foreach (@b) {
+	$h->add_card($_);
+}
+
+$h->check_hand();
+$h->display_want_list();
+
+print "List of cards UNsorted: " . printcards(\@a, $h) . "\n";
+print "List of cards   sorted: " . printcards(\@b, $h) . "\n";
+
+
+my $c8 = Card->new('10', Card->HEARTS);
+print "Here is a 10 of Hearts, which we DO want\n" if $h->wants($c8);
+
+my @eights = $h->all_cards_with_rank('King');
+foreach (@eights) {
+	print $_->long_descr() . "\n";
+}
+
+print "\n\n";
+print $h->card_index("10:D");
+exit(0);
+######################################
+
+sub printcards {
+	my ($arr, $hand) = @_;
+	my $ret = "";
+	foreach (@$arr) {
+		$ret .= "\n   -> " . $_->long_descr(). " ";
+		$ret .= " <- can drop this" if ($h->can_drop($_));
+	}
+	$ret;
+} ------> deck_demo.pl <------ 
+#!/opt/local/bin/perl
+
+# game modules/classes/etc
+
+# This program has Task 1:
+#   It creates a new Deck and shuffles it.
+#   Then it deals 7 cards each to two players (their Hands).
+#   Finally, it prints out the contents of the hands and the deck.
+#   Note: the deck's discard pile is printed out each time (but is not used as Task 2 was not completed).
+
+use strict;
+use Card;
+use Deck;
+use Hand;
+
+my $d = Deck->new();
+$d->shuffle();
+
+print "This new deck contains: ";
+print $d->contents();
+print "\n";
+
+
+my $h1 = Hand->new();
+my $h2 = Hand->new();
+print "Dealing 7 cards out to two hands.\n";
+$d->deal(7, [ $h1, $h2 ]);
+print "\n Each hand now contains:";
+print "Hand 1: " . $h1->contents() . "\n";
+print "Hand 2: " . $h2->contents() . "\n";
+
+
+print "The deck is now       : ";
+print $d->contents();
+print "\n"; ------> deck_test.pl <------ 
+#!/opt/local/bin/perl
+
+use Hand;
+use Deck;
+
+use strict;
+
+my $d = Deck->new();
+
+my $h1 = Hand->new();
+my $h2 = Hand->new();
+
+$d->shuffle();
+$d->deal(7, [ $h1, $h2]);
+
+show_all($d, [ $h1, $h2 ]);
+
+if ($d->discard_pile_empty()) {
+	print "The discard pile is empty.\n";
+}
+
+print "Player 1 draws a card from the deck.\n";
+$h1->draw($d);
+
+print "Player 1 discards the 3rd card.\n";	
+$h1->discard(2, $d);
+
+print "Showing:\n";
+show_all($d, [ $h1, $h2 ]);
+
+print "Top discard is " . $d->top_discard()->descr();
+
+print "\n\nPlayer 2 takes up the discard.\n";
+$h2->take_discard($d);
+
+print "Player 2 discards the 4th card.\n";
+$h2->discard(3, $d);
+
+show_all($d, [$ h1, $h2 ]);
+
+print "\n\n\n";
+foreach (@{Card->RANKS}) { print "$_ \n"};
+exit(0);
+
+##############################################
+# SUBROUTINES
+sub show_all {
+	my ($deck, $hand_list) = @_;
+	
+	print $d->contents();
+	print "\n\nHands:";
+	
+	my $ctr = 0;
+	foreach my $hand (@$hand_list) {
+		$ctr++;
+		print "HAND $ctr : " . $hand->contents() . "\n";
+	}
+
+} ------> hand_test.pl <------ 
+#!/opt/local/bin/perl
+
+use Hand;
+use Card;
+
+use strict;
+
+my $h = Hand->new();
+my $SS = Card->SPADES;
+my $SC = Card->CLUBS;
+my $SH = Card->HEARTS;
+my $SD = Card->DIAMONDS;
+
+$h->add_card(Card->new('2', $SC));
+$h->add_card(Card->new('8', $SC));
+$h->add_card(Card->new('2', $SH));
+$h->add_card(Card->new('Ace', $SD));
+$h->add_card(Card->new('2', $SD));
+$h->add_card(Card->new('3', $SD));
+$h->add_card(Card->new('8', $SD));
+chk($h);
+
+$h = Hand->new();
+$h->add_card(Card->new('2', $SC));
+$h->add_card(Card->new('8', $SC));
+$h->add_card(Card->new('2', $SS));
+$h->add_card(Card->new('8', $SS));
+$h->add_card(Card->new('6', $SH));
+$h->add_card(Card->new('2', $SD));
+$h->add_card(Card->new('8', $SD));
+#$h->add_card(Card->new('Ace', $SD));
+chk($h);
+
+# 6---- 2:C 8:C 2:S 8:S 6:H 2:D 8:D
+exit(0);
+
+#########################
+sub chk {
+	my ($hand) = @_;
+	print "(DEBUG) Hand count is " . $hand->check_hand() . "\n";
+	print "Contents of hand: " . $hand->contents() . "\n";
+	if ($hand->has_won()) {
+		print "This is a winning hand!\n";
+	}	
+}
+ ------> playrummy.pl <------ 
+#!/opt/local/bin/perl
+
+# game modules/classes/etc
+
+# This program has Task 2:
+#   Accepts arguments for the number of rummy players n (2>= n >= 4)
+#   They will be dealt 7 cards each to start.
+
+use strict;
+use Getopt::Long;
+use Card;
+use Deck;
+use Hand;
+
+# Program defaults
+my $debug;     # NO debugging
+my $num_players = 0; # number of players MUST be specified
+my $jokers;    # NO jokers (if yes, 2 jokers added to pack)
+
+# Get arguments
+my $result = GetOptions("players=i" => \$num_players,
+						"withjokers" => \$jokers,
+						"debug"     => \$debug);
+						
+die "Number of players ( -players ) must be between 2 and 4"
+	unless ( $num_players >= 2 && $num_players <= 4);
+
+# Create list of players
+my @players = ();
+my @wait_turns = ();
+for (1..$num_players) {
+	push @players, Hand->new();
+}
+
+# Create new deck
+my $d = Deck->new($jokers);
+$d->shuffle();
+
+print "Dealing out cards to the players.\n" if $debug;
+
+# DEAL CARDS
+$d->deal(7, \@players);
+if ($debug) {
+	print "\n Each player now has a hand:\n";
+	my $ctr = 0;
+	foreach my $hand (@players) {
+		$ctr++;
+		print "Hand $ctr contains: " . $hand->contents() . "\n";
+	}
+}
+
+# BEGIN PLAY
+my $turn = 0;
+my $playing = 1;
+# continue play
+
+while ($playing) {
+	my $current_player = $players[$turn];
+	
+	if ($wait_turns[$turn] == 0) {
+		# check discard pile - if we want what's there, take it
+		my $top = $d->top_discard();
+		$current_player->check_hand();
+		if ($top && $current_player->wants($top)) {
+			print "Player $turn takes the discard " . $top->long_descr() . "\n";
+			$current_player->take_discard($d);
+		} else {
+			# draw
+			my $c = $current_player->draw($d);
+			print "Player $turn drew a " . $c->long_descr() . " from the deck.\n";
+			if ($c->rank() eq Card->JOKER) {
+				print "  ... Player $turn has just lost 2 turns!\n";
+				$wait_turns[$turn] = 2;
+			}
+		}
+	
+		if ($wait_turns[$turn] == 0){
+			# decide
+			my $hc = $current_player->check_hand(1);
+	
+			# discard
+			my $cardnum = $current_player->decide_discard();
+			$current_player->discard($cardnum, $d);
+			print "Player $turn has discarded card #" . ($cardnum+1) .".\n";
+	
+			print "Player $turn has completed their turn. Their hand ($hc): " . $current_player->contents() . "\n\n";
+	
+		}
+	
+		print "The Deck looks like: " . $d->contents(1) . "\n";
+		if ($d->is_empty()) {
+			print " *** The deck is now empty! \n\n";
+			$playing = 0;
+		}
+	} else {
+		print "Player $turn misses this turn.\n\n";
+		$wait_turns[$turn]--;
+	}
+	if ($current_player->has_won()) {
+		print " *** Player $turn has won the game! \n\n";
+		$playing = 0;
+	} else {
+		sleep(5);
+		$turn = ($turn + 1) % $num_players;
+	}
+	
+
+}
+
+=head1 NAME
+
+playrummy.pl - Play a simple rummy game (all-computer players)
+
+=head1 SYNOPSIS
+
+	perl playrummy.pl [ -withjokers ] -players 2|3|4
+
+=head1 DESCRIPTION
+
+This module plays a simple rummy game between 2-4 computer players,
+displaying current progress, including 
+  (a) whether the player draws a card from the deck or picks the
+      top card from the discard pile,
+  (b) the contents of the PLAYER'S HAND, including the number of 
+      cards forming valid melds (e.g. 4 Aces plus 2-3-4 of Clubs
+      gives 7, and a winning hand)
+  (c) the contents of the DISCARD PILE.
+
+There is a pause of 5 seconds between turns.
+
+If -withjokers is specified, then after players' cards are dealt, 
+two Jokers are randomly inserted into the deck.  A player drawing 
+a Joker will immediately discard the Joker and lose 2 turns.
+
+Play halts when either the player has a winning hand, or the deck 
+runs out of cards.
+
+=head1 AUTHOR
+
+Colin Maughan (c_maughan@yahoo.com)
+
+=cut ------> Card.pm <------ 
+package Card;
+$VERSION = 1.00;
+use strict;
+use Carp;
+
+use constant {
+	CLUBS => 'Clubs',
+	SPADES => 'Spades',
+	HEARTS => 'Hearts',
+	DIAMONDS => 'Diamonds', 
+	JOKER    => '*Joker*',
+	
+	SUITS => ['Clubs', 'Spades', 'Hearts', 'Diamonds'],
+	RANKS => ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
+};
+
+
+sub new
+{
+	my $class = shift;
+	my ($rank, $suit) = @_;
+	
+	# valid suit/rank?
+	if ($rank ne Card->JOKER) {
+		croak "Invalid suit '$suit'" unless grep { $_ eq $suit } @{Card->SUITS};
+		croak "Invalid rank '$rank'" unless grep { $_ eq $rank } @{Card->RANKS};
+	}
+	bless { '_suit'	=> $suit,
+			'_rank'	=> $rank
+			}, $class;
+	
+}
+
+sub next_higher_rank_spec {
+	my $self = shift;
+	my $r = $self->find_rank() + 1;
+	my $ret;
+	my @ranks = @{Card->RANKS};
+	if ($r < scalar @ranks) {
+		$ret = a_shortrank($ranks[$r]) . ":" . $self->shortsuit();
+	}
+	
+	$ret;
+}
+
+sub next_lower_rank_spec {
+	my $self = shift;
+	my $r = $self->find_rank() - 1;
+	my $ret;
+	my @ranks = @{Card->RANKS};
+	
+	if ($r >= 0) {
+		$ret = a_shortrank($ranks[$r]) . ":" . $self->shortsuit();
+	}
+	$ret;
+}
+
+sub find_rank {
+	my $self = shift;
+	my $r = $self->rank();
+	
+	my $ctr = 0;
+	my $found;
+	foreach (@{Card->RANKS}) {
+		$found = $ctr if ($_ eq $r);
+		$ctr++;
+	}
+	$found;
+}
+
+# Compares this card with another - if the same suit, returns 0
+sub compare_suit {
+	my $self = shift;
+	my ($other_card) = @_;
+
+	$other_card->suit_val() - $self->suit_val();
+}
+
+# Compares this card's rank with the other card and gives the numerical difference.
+#   E.g., 8 of clubs vs Jack of hearts will give 3.
+sub compare_rank {
+	my $self = shift;
+	my ($other_card) = @_;
+	
+	$other_card->rank_val() - $self->rank_val();
+}
+
+sub combined_val {
+	my $self = shift;
+	
+	$self->suit_val() * 50 + $self->rank_val();
+}
+
+sub suit_val {
+	my $self = shift;
+	my $ctr = 0;
+	my $ret = -1;
+	
+	foreach my $suit (@{Card->SUITS}) {
+		$ctr++;
+		$ret = $ctr if $self->suit() eq $suit;
+	}
+	
+	$ret;
+}
+
+sub rank_val {
+	my $self = shift;
+	my $ctr = 0;
+	my $ret = -1;
+	
+	foreach my $rank (@{Card->RANKS}) {
+		$ctr++;
+		$ret = $ctr if $self->rank() eq $rank;
+	}
+	
+	$ret;
+}
+
+sub suit {
+	my ($self) = @_;
+	$self->{'_suit'};
+}
+
+sub rank {
+	my ($self) = @_;
+	$self->{'_rank'};	
+}
+
+sub shortrank
+{
+	my $self = shift;
+	my $rank = $self->rank();
+	a_shortrank($rank);
+}
+
+sub a_shortrank
+{
+	my $rank = shift;
+	($rank eq '10') ? $rank : 
+	($rank eq 'JOKER') ? ':-)' :
+	substr($rank, 0, 1);
+}
+
+sub shortsuit
+{
+	my $self = shift;
+	my $suit = $self->suit();
+	substr($suit, 0, 1);
+}
+
+# Returns a very short description of the card (e.g. 8C for 8 of Clubs)
+# ARGUMENTS: none
+sub descr
+{
+	my ($self) = @_;
+	$self->shortrank() . ":" . $self->shortsuit();
+}
+
+# Returns the regular description of the card (e.g. 10 of Hearts)
+# ARGUMENTS: none
+sub long_descr
+{
+	my ($self) = @_;
+	$self->rank() . " of " . $self->suit();
+}
+ ------> Deck.pm <------ 
+package Deck;
+$VERSION = 1.00;
+use Card;
+use strict;
+
+sub new
+{
+	my $class = shift;
+	my ($jokers) = @_;
+	# create a new unshuffled deck
+	my @deck = ();
+	my @pile = ();
+	foreach my $suit (@{Card->SUITS}) {
+		foreach my $rank (@{Card->RANKS}) {
+			push @deck, Card->new($rank, $suit);
+		}
+	}
+	
+	bless {
+		'_cards' => \@deck,
+		'_discardpile' => \@pile,
+		'_jokers' => \$jokers
+	}, $class;
+}
+
+sub is_empty {
+	my ($self) = shift;
+	
+	my $ret = 0;
+	$ret = 1 if scalar @{$self->{'_cards'}} == 0;
+}
+
+sub discard_pile_empty {
+	my ($self) = shift;
+	my $ret = 0;
+	
+	$ret = 1 if scalar @{$self->{'_discardpile'}} == 0;
+}
+
+sub top_discard {
+	my ($self) = shift;
+	my $ret;
+	if ($self->discard_pile_empty) {
+		# do nothing
+	} else {
+		my $discard = $self->{'_discardpile'};
+		$ret = $discard->[0];
+	}
+	
+	$ret;
+}
+
+sub give_discard
+{
+	my ($self) = shift;
+	my $ret = pop @{$self->{'_discardpile'}};
+	
+	$ret;
+}
+sub take_discard
+{
+	my ($self) = shift;
+	my ($discarded) = @_;
+	
+	#print "Taking a discard of $discarded.";
+	push @{$self->{'_discardpile'}}, $discarded;
+}
+
+# Draw a card from the top of the deck.
+# ARGUMENTS: none
+# RETURNS: the card (type Card) from the top of the deck.
+sub draw_card
+{
+	my ($self) = shift;
+	my $ret = shift @{$self->{'_cards'}};
+	$ret;
+}
+
+# Shuffle the deck.
+# ARGUMENTS: none
+sub shuffle
+{
+	my ($self) = shift;
+	my @deck = @{$self->{'_cards'}};
+	
+	my $s = scalar @deck;
+	for (0..$s) {
+		my ($lo, $hi) = (int(rand($s)), int(rand($s)));
+		($deck[$lo], $deck[$hi]) = ($deck[$hi], $deck[$lo]);
+	}
+	$self->{'_cards'} = \@deck;
+}
+
+# Deal cards to players.
+# ARGUMENTS:
+#    num_cards_start - number of cards to deal to each player to start off
+#    players         - a ref to a list of Hands (e.g. [$p1, $p2])
+sub deal
+{
+	my ($self) = shift;
+	my ($num_cards_start, $players) = @_;
+	
+	my @player_list = @$players;
+	my $num_players = scalar @player_list;
+	my $cards_to_deal = (scalar @player_list) * $num_cards_start;
+	my $deck = $self->{'_cards'};
+	
+	if ($cards_to_deal > (scalar @$deck)) {
+		$cards_to_deal = scalar @$deck;
+	}
+	
+	my $ctr = 0;
+	
+	# Deal cards out, round-robin, to all the given players
+	for (1..$cards_to_deal) {
+		my $curr_player = $player_list[$ctr];
+		$curr_player->add_card($self->draw_card());
+		$ctr = ($ctr + 1) % $num_players;
+	}
+	
+	# Then insert the jokers (if we're playing that sort of game)
+	if ($self->{'_jokers'}) {
+		my $s = scalar @$deck;
+		my ($a, $b) = (int(rand($s)), int(rand($s)));
+
+		splice @$deck, $a, 0, Card->new(Card->JOKER);
+		splice @$deck, $b, 0, Card->new(Card->JOKER);
+	}
+}
+
+# Returns a printout of the contents of the deck and the discard pile.
+# ARGUMENTS: none
+sub contents
+{
+	my ($self) = shift;
+	my ($show_discard_only) = @_;
+	
+	my $ret = "";
+	
+	unless ($show_discard_only) {
+		$ret .= "Deck: ";
+		$ret .= cardlist ($self->{'_cards'});
+		#print cardlist ($self->{'_cards'});
+	}
+
+	$ret .= "\nDiscard pile: ";
+	$ret .= cardlist ($self->{'_discardpile'});
+	#print cardlist ($self->{'_discardpile'});
+	$ret;
+}
+#utility
+sub cardlist {
+	my ($cards) = @_;
+	my $ret = "";
+	if (scalar @{$cards}) {
+		foreach my $card (@{$cards}) {
+			$ret .= $card->descr() . " ";
+		}
+	} else {
+		$ret = "(EMPTY)";
+	}
+	$ret;
+} ------> Hand.pm <------ 
+package Hand;
+$VERSION = 1.00;
+use Card;
+use HashList;
+use strict;
+
+sub new
+{
+	my $class = shift;
+	
+	my @hand = ();
+	my $want = HashList->new();
+	my $keep = HashList->new();
+	
+	bless {
+		'_cards' => \@hand,
+		'_wanted' => $want,
+		'_keep' => $keep
+	}, $class;
+}
+
+
+########### INTERACTIONS WITH THE DECK #################
+sub draw {
+	my ($self) = shift;
+	my ($deck) = @_;
+	
+	my $drawn_card = $deck->draw_card();
+	if ($drawn_card->rank() ne Card->JOKER) {
+		$self->add_card( $drawn_card );
+	}
+	$drawn_card;
+}
+
+sub take_discard {
+	my $self = shift;
+	my ($deck) = @_;
+	my $ret = 1; # success if able to take a discard
+	
+	if ($deck->discard_pile_empty()) {
+		$ret = 0;
+	} else {
+		$self->add_card( $deck->give_discard());
+	}
+	
+	$ret;
+}
+
+sub decide_discard {
+	my $self = shift;
+	#my ($deck) = @_;
+	my $ret;
+	
+	my @hand = @{$self->{'_cards'}};
+	my $dropped = 0;
+	
+	my $ctr = 0;
+	foreach my $card (@hand) {
+		if (! $dropped) {
+			if ($self->can_drop($card)) {
+				#$self->discard($ctr, $deck);
+				$ret = $ctr;
+				$dropped = 1;
+			}
+		}
+		$ctr++;
+	}
+	
+	$ret;
+}
+
+sub discard {
+	my $self = shift;
+	my ($card_number, $deck) = @_;
+	
+	my @hand = @{$self->{'_cards'}};
+	$deck->take_discard($hand[$card_number]);
+	
+	my $n = scalar @hand;
+	@{$self->{'_cards'}} = ();
+	for (0..$n-1) {
+		push @{$self->{'_cards'}}, $hand[$_]
+			unless $_ == $card_number;
+	}
+}
+
+###### PATTERN CHECKERS #################
+sub check_hand {
+	my $self = shift;
+	my ($DEBUG) = @_;
+	my @cards = @{$self->{'_cards'}};
+	my $ret = 0;
+	my $prevcard;
+	
+	my $w = $self->{'_wanted'};
+	my $k = $self->{'_keep'};
+	
+	$w->clear_list();
+	$k->clear_list();
+	my $handcount = 0;
+	
+	my %rankcounts = ();
+	my %cards_counted = ();
+
+	# (a) check for cards of same face value
+	foreach my $rank (@{Card->RANKS}) {
+		my @cwr = $self->all_cards_with_rank($rank);
+		
+		# if we have 2 or more cards of a rank, mark them as 'to keep'
+		if (scalar @cwr > 1) {
+			$w->add_to_list("$rank:");
+			foreach (@cwr) {
+				$k->add_to_list($_->descr());
+			}
+		}
+		
+		# if we have MORE than 2 cards of a rank, add them to the 'win' total
+		# and mark them as used (for assessing whether we have a winning hand)
+		if (scalar @cwr > 2) {
+			$handcount += scalar @cwr;
+			# mark the cards as used
+			foreach (@cwr) {
+				$cards_counted{$_->descr()} = 1;
+			}
+			print "  (DEBUG) Found " . scalar @cwr . " cards of rank $rank.\n" if $DEBUG;
+		}
+	}
+	
+	# (b) check for card sequences
+	foreach my $suit (@{Card->SUITS}) {
+		my @cws = sort { $a->combined_val() <=> $b->combined_val() } 
+					$self->all_cards_in_suit($suit);
+		
+		my $prev_card;
+		my $s_len = 1;
+		my @seq = ();
+		foreach my $r_card (@cws) {
+			$w->add_to_list($r_card->next_lower_rank_spec());
+			$w->add_to_list($r_card->next_higher_rank_spec());
+			
+			if (defined $prev_card &&
+				$prev_card->next_higher_rank_spec() eq $r_card->descr()) {
+					
+			} else {
+				# check the sequence length and count the cards off if > 2
+				if (scalar @seq > 2) {
+					foreach (@seq) {
+						$cards_counted{$_} = 1;
+					}
+					$handcount += scalar @seq;
+				}
+				@seq = ();
+			}
+			
+			unless ($cards_counted{$r_card->descr()}) {
+				push @seq, $r_card->descr();
+			}
+			
+			if ($DEBUG && scalar @seq > 2) {
+				print "  (LOOP) " . $r_card->descr() . ". SEQ: ";
+				print "$_ " foreach @seq;
+				print "\n";
+			}
+		
+			$prev_card = $r_card unless ($cards_counted{$r_card->descr()});
+		}
+		if (scalar @seq > 2) {
+			foreach (@seq) {
+				$cards_counted{$_} = 1;
+			}
+			$handcount += scalar @seq;
+		}
+		
+		
+	}
+
+	#	my $c_rank = $card->rank();
+	#	my @checkrank = $self->all_cards_with_rank($c_rank);
+		
+
+	foreach my $card (@cards) {
+		$w->remove_from_list($card->descr());
+	}
+	# if there are 3 or 4 of a particular rank, we have a potential win
+	#TODO
+	if ($handcount == 7) {
+		$self->{'_haswon'} = 1;
+	}
+	$ret = $handcount;
+	$ret;
+}
+
+###### HELPER FUNCTIONS FOR ABOVE ########
+sub all_cards_with_rank {
+	my $self = shift;
+	my ($rank) = @_;
+	
+	my @ret = ();
+	
+	foreach my $card (@{$self->{'_cards'}}) {
+		push @ret, $card if ($card->rank() eq $rank);
+	}
+	@ret;
+}
+
+sub all_cards_in_suit {
+	my $self = shift;
+	my ($suit) = @_;
+	
+	my @ret = ();
+	
+	foreach my $card (@{$self->{'_cards'}}) {
+		push @ret, $card if ($card->suit() eq $suit);
+	}
+	@ret;
+}
+sub card_index {
+	my $self = shift;
+	my ($cardspec) = @_;
+	
+	my $ctr = 0;
+	my $found;
+	foreach my $card (@{$self->{'_cards'}}) {
+		$found = $ctr if $card->descr eq $cardspec;
+		$ctr++;
+	}
+	
+	$found;
+}
+
+###### BASIC OPERATIONS ##################
+sub has_won {
+	my $self = shift;
+	$self->{'_haswon'};
+}
+
+sub can_drop {
+	my $self = shift;
+	my ($card) = @_;
+	
+	my $ret = 1;
+	# check the 'keep' list to see if it's in there
+	$ret = $ret - $self->{'_keep'}->matches_exact($card->descr());
+	
+	$ret;
+}
+
+sub display_want_list {
+	my $self = shift;
+	
+	#foreach my $want (keys %{$self->{'_wanted'}}) {
+	#	print "  -> $want \n" if $self->{'_wanted'}{$want} == 1;
+	#}
+	$self->{'_wanted'}->display_list();
+}
+
+sub wants {
+	my $self = shift;
+	my ($card) = @_;
+	
+	$self->{'_wanted'}->matches_start($card->descr());
+}
+
+# Add the given Card to the Hand.
+# ARGUMENTS: the card to add (type Card)
+sub add_card {
+	my $self = shift;
+	my ($card) = @_;
+	
+	push @{$self->{'_cards'}}, $card;
+}
+
+# Returns a printout of the contents of the hand.
+# ARGUMENTS: none
+sub contents {
+	my $self = shift;
+	
+	my $ret = "";
+	
+	my @hand = @{$self->{'_cards'}};
+	my @hand_sorted = sort { $a->combined_val() <=> $b->combined_val() } @hand;
+	
+	foreach my $card (@hand_sorted) {
+		$ret .= $card->descr() . " ";
+	}
+	$ret;
+} ------> HashList.pm <------ 
+package HashList;
+$VERSION=1.00;
+use strict;
+
+sub new
+{
+	my $class = shift;
+	my %list = ();
+	bless {
+		'_list' => \%list
+	}, $class;
+}
+
+sub clear_list {
+	my $self = shift;
+	%{$self->{'_list'}} = ();
+}
+
+sub add_to_list {
+	my $self = shift;
+	my ($spec) = @_;
+	$self->{'_list'}{$spec} = 1;
+}
+
+sub remove_from_list {
+	my $self = shift;
+	my ($spec) = @_;
+	$self->{'_list'}{$spec} = 0;	
+}
+
+sub display_list {
+	my $self = shift;
+	
+	foreach my $item (keys %{$self->{'_list'}}) {
+		print "  -> $item \n" if $self->{'_list'}{$item} == 1;
+	}
+}
+
+sub matches_start {
+	my $self = shift;
+	my ($spec) = @_;
+	my $ret = 0;
+	
+	foreach my $item (keys %{$self->{'_list'}}) {
+		if ($spec =~ qr{^$item}) {
+			$ret = 1;
+		}
+	}
+	$ret;
+}
+
+sub matches_exact {
+	my $self = shift;
+	my ($spec) = @_;
+	my $ret = 0;
+	
+	foreach my $item (keys %{$self->{'_list'}}) {
+		if ($spec eq $item) {
+			$ret = 1;
+		}
+	}
+	$ret;
+}

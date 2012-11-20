@@ -1,0 +1,203 @@
+ ---------------- lovefilm/NOTES.txt ---------------- 
+I have completed Task 1 and made a start on Task 2:
+- Player, Stock and Tile objects.
+- Tests for each.
+- A Player can interact with a Stock by drawing a card.
+
+If I had more time, I would complete Task 2:
+- draw a full 'hand' of 7 tiles ('deal' method of Stock)
+- have more than 1 players
+- randomly play tiles just by checking the match
+- start to implement a simple strategy for playing tiles
+- write a Perldoc
+- clean up my tests!
+
+ ---------------- lovefilm/Player.pm ---------------- 
+package Player;
+$VERSION = 1.00;
+
+use strict;
+use Tile;
+
+sub new {
+	my $class = shift;
+	my @hand = ();
+	
+	bless { '_hand' => \@hand }, $class;
+}
+
+sub draw_tile {
+	my $self = shift;
+	my ($stock) = @_;
+	push @{$self->{'_hand'}}, $stock->given_top_tile();
+}
+
+sub display {
+	my $self = shift;
+	my $ret = "Hand: ";
+	foreach my $tile (@{$self->{'_hand'}}) {
+		$ret .= $tile->display . " ";
+	}
+	$ret;
+} ---------------- lovefilm/Stock.pm ---------------- 
+package Stock;
+$VERSION = 1.00;
+
+use strict;
+use Tile;
+
+sub new {
+	my $class = shift;
+	my @tiles;
+	
+	# create a new unscrambled(?) stock of 28
+	foreach my $x (0..6) {
+		foreach my $y (0..6) {
+			push @tiles, Tile->new($x, $y) if $x <= $y;
+		}
+	}
+	
+	bless { '_tiles' => \@tiles }, $class;
+}
+
+sub shuffle {
+	my $self = shift;
+	my @st = @{$self->{'_tiles'}};
+	my $s = scalar @st;
+	for (0..$s) {
+		my ($lo, $hi) = (int(rand($s)), int(rand($s)));
+		($st[$lo], $st[$hi]) = ($st[$hi], $st[$lo]);
+	}
+	$self->{'_tiles'} = \@st;
+}
+
+sub size {
+	my $self = shift;
+	my $ret = scalar @{$self->{'_tiles'}};
+	
+	$ret;
+}
+
+sub given_top_tile {
+	my $self = shift;
+	my $ret = undef;
+	if ($self->size() > 0) {
+		$ret = shift @{$self->{'_tiles'}};
+	}
+	
+	$ret;
+}
+
+sub display {
+	my $self = shift;
+	my $ret = "";
+	foreach my $tile (@{$self->{'_tiles'}}) {
+		$ret .= $tile->display . " ";
+	}
+	$ret .= "\n";
+	$ret;
+} ---------------- lovefilm/Tile.pm ---------------- 
+package Tile;
+$VERSION = 1.00;
+
+use strict;
+use Carp;
+
+sub new {
+	my $class = shift;
+	my ($lhs, $rhs) = @_;
+	
+	croak "Invalid # of pips on left hand side of domino: $lhs" unless ($lhs >= 0 and $lhs <= 6);
+	croak "Invalid # of pips on right hand side of domino: $rhs" unless ($rhs >= 0 and $rhs <= 6);
+	
+	bless { '_lhs' => $lhs,
+			'_rhs' => $rhs
+			}, $class;
+}
+
+# Left hand side #of pips
+sub lhs {
+	my $self = shift;
+	$self->{'_lhs'};
+}
+
+# Right hand side #of pips
+sub rhs {
+	my $self = shift;
+	$self->{'_rhs'};
+}
+
+# Does this match an incoming tile? i.e. its RHS matches the other tile's LHS
+sub matches {
+	my $self = shift;
+	my ($other) = @_;
+	my $ret = 0;
+	$ret = 1 if $self->rhs == $other->lhs;
+}
+
+sub points {
+	my $self = shift;
+	$self->lhs + $self->rhs;
+}
+
+sub display {
+	my $self = shift;
+	"Tile: " . $self->lhs . "|" . $self->rhs;
+} ---------------- lovefilm/test_player.pl ---------------- 
+#!/usr/bin/perl -w
+
+use strict;
+use Player;
+use Stock;
+
+my $p = Player->new();
+my $st = Stock->new();
+$st->shuffle;
+print "Stock is now" . $st->display . "\n";
+
+$p->draw_tile($st);
+
+print "Player has drawn a tile:";
+print $p->display() . "\n";
+
+print "\nRemainder of stock is now: ";
+print $st->display();
+ ---------------- lovefilm/test_stock.pl ---------------- 
+#!/usr/bin/perl -w
+
+use strict;
+use Stock;
+use Test::More tests => 3;
+
+my $st = Stock->new();
+$st->shuffle;
+
+is ( $st->size(), 28, '28 tiles in all');
+#print "Size of stock is " . $st->size() . "\n";
+print "Drawing a tile.\n";
+my $t = $st->given_top_tile();
+
+ok ( defined($t), 'Successfully drew tile from nonempty stock');
+
+print "\nDrawn tile is: " . $t->display();
+print "\nRemaining tiles:";
+#print $st->display();
+is ( $st->size(), 27, 'Drawn tile leaves size at 27');
+
+ ---------------- lovefilm/test_tile.pl ---------------- 
+#!/usr/bin/perl -w
+
+use strict;
+use Tile;
+use Test::More tests => 4;
+
+my $d1 = Tile->new(2, 3);
+#my $d2 = Tile->new(100, 3);
+is ( $d1->display , 'Tile: 2|3', 'expected # of pips 2,3' );
+
+my $d2 = Tile->new(3, 6);
+is ( $d2->display, 'Tile: 3|6', 'expected # of pips 3,6');
+
+is ( $d2->points, 9, 'expected # of points for 3,6 domino is 9');
+
+ok ($d1->matches($d2), "Above tiles match");
