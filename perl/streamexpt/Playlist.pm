@@ -16,6 +16,11 @@ sub new {
 	bless \%args, $class;
 }
 
+sub get_rootdir {
+	my $self = shift;
+	$self->{'rootdir'};
+}
+
 sub process_playlist {
 	my $self = shift;
 	my ($uri) = @_;
