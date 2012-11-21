@@ -5,10 +5,12 @@ use strict;
 use HTTP::Daemon;
 use HTTP::Status;
 use Data::Dumper;
+use URI::Escape;
 
 use ListPlayer;
 use Playlist;
 use Screener;
+use TextResponse;
 
 use Getopt::Long;
 use sigtrap qw(die INT QUIT);
@@ -72,13 +74,31 @@ while (my $conn = $d->accept) {
 			$uri = uri_unescape($uri);
 			print "Request: $uri\n" if $debug;
 			
+			# First bit is the command, /list/ or /play/
+			my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
 			#call the main child routine
-			my $lp = ListPlayer->new(conn => $conn, 
-									 playlist => $plist,
-									 random => $random,
-									 debug => $debug);
-			$lp->play_songs($uri, $downsample);
+			if ($command eq 'play') {
+				my $lp = ListPlayer->new(conn => $conn, 
+										 playlist => $plist,
+										 random => $random,
+										 debug => $debug);
+				$lp->play_songs($str_uri, $downsample);				
+			} elsif ($command eq 'list') {
+				if ($plist->process_playlist($str_uri)) {
+					my @lst = $plist->list_of_songs;
+					$conn->send_basic_header;
+					$conn->send_response( TextResponse::print_list(@lst) );
+					$conn->close();
+				} else {
+					$conn->send_error(RC_NOT_FOUND);
+					$conn->close();
+				}
+			} else {
+				$conn->send_error(RC_BAD_REQUEST);
+				$conn->close();
+			}
 		
+			$plist->setchild(1); # explain...
 			#if the child returns, then just exit;
 			$parent_quit = 0;
 			exit 0;
@@ -112,6 +132,7 @@ END {
 			print "Deleting temp file $delfile \n";
 			system("rm '$delfile'") or warn "Problems removing tempfile: $!";
 		}
+		print "Deleting all our temp files!\n";
 		system("rm -f /tmp/*.mxx");
 	} else {
 		warn "Child process ended.";

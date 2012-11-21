@@ -61,6 +61,11 @@ sub process_playlist {
 	$all_ok;
 }
 
+sub list_of_songs {
+	my $self = shift;
+	@{$self->{'songs'}};
+}
+
 sub get_song {
 	my $self = shift;
 	my ($random) = @_;
@@ -80,6 +85,7 @@ sub rm_temp_playlist {
 	my $self = shift;
 	if (defined $self->{'temp_playlist'}) {
 		my $plsname = $self->{'temp_playlist'};
+		warn "Removing temp playlist!";
 		system("rm -f $plsname");
 	}
 }
@@ -88,7 +94,7 @@ sub rm_temp_playlist {
 sub gen_playlist {
 	my ($rootdir, $debug) = @_;
 	
-	my ($fh, $plsname) = tempfile();
+	my ($fh, $plsname) = tempfile( SUFFIX => '.plx', UNLINK => 0 );
 	warn "Generating playlist for given root dir $rootdir\n";
 	
 	open ($fh, ">$plsname") or die "Unable to open temp playlist $plsname for writing: $!";
@@ -105,9 +111,16 @@ sub gen_playlist {
 	return $plsname;
 }
 
+sub setchild {
+	my $self = shift;
+	my ($is_child) = @_;
+	
+	$self->{'is_child'} = $is_child;
+}
+
 sub DESTROY {
 	my $self = shift;
-	$self->rm_temp_playlist;
+	$self->rm_temp_playlist unless $self->{'is_child'};
 }
 
 1;
