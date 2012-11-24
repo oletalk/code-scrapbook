@@ -34,8 +34,10 @@ sub play_songs {
 		
 		while (!$done && ($song = $plist->get_song($random))) {
 			#print the HTTP header
-			print $conn $self->_httpheaders();
-
+			$conn->send_status_line(RC_OK);
+			$conn->send_header(_stream_headers());
+			$conn->send_crlf;
+			
 			warn( "playing song: $song\n") if $debug;
 			my $player = SongPlayer->new(conn => $conn, 
 										 downsample => $downsample, 
@@ -52,15 +54,12 @@ sub play_songs {
 	warn "Done playing songs";
 }
 
-sub _httpheaders {
-	my $self = shift;
-    my $ret = "HTTP/1.0 200 OK\n";
-    $ret .= "Content-Type: audio/x-mp3stream\n";
-    $ret .= "Cache-Control: no-cache \n";
-    $ret .= "Pragma: no-cache \n";
-    $ret .= "Connection: close \n";
-    $ret .= "x-audiocast-name: My MP3 Server\n\n";
-	$ret;
+sub _stream_headers {
+	('Content-Type' => 'audio/x-mp3stream',
+	 'Cache-Control' => 'no-cache ',
+	 'Pragma' => 'no-cache ',
+	 'Connection' => 'close ',
+	 'x-audiocast-name' => 'My MP3 Server')
 	}
 
 1;

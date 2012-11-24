@@ -84,20 +84,17 @@ while (my $conn = $d->accept) {
 										 debug => $debug);
 				$lp->play_songs($str_uri, $downsample);				
 			} elsif ($command eq 'list') {
-				$conn->send_basic_header;
 				$conn->send_response( TextResponse::print_list($plist, $str_uri));
-				$conn->close();
-				#if ($plist->process_playlist($str_uri)) {
-				#	$conn->send_basic_header;
-				#	$conn->send_response( TextResponse::print_list($plist) );
-				#	$conn->close();
-				#} else {
-				#	$conn->send_error(RC_NOT_FOUND);
-				#	$conn->close();
-				#}
+				#$conn->close();
+
 			} elsif ($command eq 'drop') {
-				# TODO - compose and download list of songs matching $str_uri
-				$conn->send_error(RC_NOT_IMPLEMENTED);
+				my $plsname = $playlist || $rootdir;
+				($plsname) = $plsname =~ m/([^\/]*)$/;
+				$plsname ||= "playlist";
+				$plsname = "${plsname}.m3u" unless $plsname =~ /\.m3u$/i;
+
+				$conn->send_response( TextResponse::print_playlist($plist, $str_uri, $port), $plsname);
+				#$conn->close();
 			} else {
 				$conn->send_error(RC_BAD_REQUEST);
 				$conn->close();

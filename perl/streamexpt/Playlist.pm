@@ -71,6 +71,22 @@ sub list_of_songs {
 	@{$self->{'songs'}};
 }
 
+sub list_of_songs_URIs {
+	my $self = shift;
+	my ($hyperlinked) = (@_);
+	my @ret = ();
+	my $rootdir = $self->{'rootdir'};
+	foreach my $songpath (@{$self->{'songs'}}) {
+		my $songuri = $songpath;
+		$songuri =~ s/$rootdir//;
+		my $line = $hyperlinked ? qq |<a href="/play/${songuri}">${songuri}</a><br/> \n|
+		                        : qq |/play/${songuri}|;
+		push @ret, $line;
+	}
+	
+	@ret;
+}
+
 sub get_song {
 	my $self = shift;
 	my ($random) = @_;
