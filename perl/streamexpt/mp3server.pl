@@ -85,16 +85,8 @@ while (my $conn = $d->accept) {
 				$lp->play_songs($str_uri, $downsample);				
 			} elsif ($command eq 'list') {
 				$conn->send_response( TextResponse::print_list($plist, $str_uri));
-				#$conn->close();
-
 			} elsif ($command eq 'drop') {
-				my $plsname = $playlist || $rootdir;
-				($plsname) = $plsname =~ m/([^\/]*)$/;
-				$plsname ||= "playlist";
-				$plsname = "${plsname}.m3u" unless $plsname =~ /\.m3u$/i;
-
-				$conn->send_response( TextResponse::print_playlist($plist, $str_uri, $port), $plsname);
-				#$conn->close();
+				$conn->send_response( TextResponse::print_playlist($plist, $str_uri, $port));
 			} else {
 				$conn->send_error(RC_BAD_REQUEST);
 				$conn->close();

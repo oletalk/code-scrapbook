@@ -13,6 +13,7 @@ sub new {
 		$args{'temp_playlist'} = gen_playlist($args{'rootdir'}, $args{'debug'});
 		$args{'playlist'} = $args{'temp_playlist'};
 	}
+	croak ("No rootdir or playlist name was given") unless $args{'playlist'};
 	bless \%args, $class;
 }
 
@@ -64,6 +65,18 @@ sub process_playlist {
 	@{$self->{'songs'}} = @songs;
 	
 	$all_ok;
+}
+
+sub reckon_m3u_name {
+	my $self = shift;
+	
+	my $plsname = $self->{'rootdir'};
+	$plsname = $self->{'playlist'} unless $self->{'temp_playlist'};
+	($plsname) = $plsname =~ m/([^\/]*)$/;
+	$plsname ||= "playlist";
+	$plsname = "${plsname}.m3u" unless ($plsname =~ /\.m3u$/i);
+	
+	$plsname;
 }
 
 sub list_of_songs {

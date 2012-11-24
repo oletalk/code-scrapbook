@@ -32,8 +32,9 @@ sub print_list {
 }
 
 sub print_playlist {
-	my ($plist, $str_uri, $port, $plsname) = @_;
+	my ($plist, $str_uri, $port) = @_;
 	
+	my $plsname = $plist->reckon_m3u_name;
 	my $cont = HTTP::Response->new(RC_NOT_FOUND);
 	if ($plist->process_playlist($str_uri)) {
 		my @list = $plist->list_of_songs_URIs;

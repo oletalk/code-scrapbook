@@ -42,53 +42,24 @@ sub play {
 	my $self = shift;
 	
 	my ($song) = @_;
-	# downsampling?
+	
+	#downsampling?
 	if ($self->downsampling_on) {
-		warn "Downsampling it...\n";
-
+		warn "Downsampling song...\n";
 		$song = $self->downsample($song);
 	}
-
-	open my $f_song, $song or warn "unable to open song: $!";
-	return unless $f_song;
-
-	binmode($f_song);
-
-	my $read_status = 1;
-	my $print_status = 1;
-	my $chunk;
-
-	# This part prints the binary to the socket as fast as it can.
-	# The buffering will take place on the client side (it blocks
-	# when full) because this is not non-blocking IO
-	#
-	# The read will return 0 if it has reached EOF
-	#
-	# The print will return undef if it fails (i.e. the client has
-	# stopped listening)
-	my $conn = $self->get_connection;
-	croak "Connection was not set" unless $conn;
-	while ( $read_status && $print_status ) {
-		$read_status = read ($f_song, $chunk, 1024);
-		if ( defined $chunk && defined $read_status) {
-			$print_status = print $conn $chunk;
-		}
-		undef $chunk;
-	}
-	close $f_song;
-
+	
+	my $conn = $self->{'conn'};
+	$conn->send_file( $song );
+	
 	if ($self->downsampling_on && -r $song) {
 		warn "Deleting temp file $song";
 		system("rm -f '$song'");
 		#$delete_list{$song} = undef;
 	}
-
-	unless ( defined $print_status ) {
-		warn "closing socket." if $self->debug;
-		$conn->close();
-	}
-
+	
 }
+
 
 sub downsample {
 	
