@@ -41,22 +41,17 @@ sub print_playlist {
 		my $host = hostname();
 		
 		my $ret = "";
-		
-		# TEMP! This should ideally be generated only once
-		use TagInfo;
-		my $ti = new TagInfo(playlist => $plist);
-		$ti->generate_tags;
-		# END TEMP
+		$plist->generate_tag_info;
 		
 		foreach my $song_obj (@list) {
 			my $songURI = $song_obj->get_URI(playlink => 1);
 			
 			my $safe_entry = uri_escape($songURI, "^A-Za-z0-9\/\.");
 			#print "REFERENCE: " . ref($song_obj);
-			my $tn = $ti->get_trackname($song_obj);
+			my ($tn, $ts) = $plist->get_trackinfo($song_obj);
 			my $songline = "";
 			if ($tn) {
-				my $secs = "-1";
+				my $secs = $ts;
 				my $tags = "$tn" || $song_obj->get_filename;
 				my $m3uinf = "#EXTINF:${secs},${tags}";
 				

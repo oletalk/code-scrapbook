@@ -126,7 +126,46 @@ sub rm_temp_playlist {
 	}
 }
 
-# non class subs
+sub generate_tag_info {
+	my $self = shift;
+	warn "Generating tag info";
+	# This should ideally be generated only once, and after gen_playlist has been called
+	use TagInfo;
+	my $ti = new TagInfo(playlist => $self);
+	$ti->generate_tags;
+	$self->{'tag_info'} = $ti;
+	warn "Tag info generation done";
+}
+	
+sub get_tag_info {
+	my $self = shift;
+	if (!$self->{'tag_info'}) {
+		$self->generate_tag_info;
+	}
+	$self->{'tag_info'};
+}
+
+sub get_trackinfo {
+	my $self = shift;
+	my ($song_obj) = @_;
+	my $tname = undef;
+	my $tsecs = undef;
+	
+	my $ti = $self->get_tag_info;
+	if ($ti) {
+		$tname = $ti->get_trackname($song_obj);
+		$tsecs = $ti->get_tracksecs($song_obj);
+		
+		#if unable to find the artist/title, make song title up from filename
+		if ($tname =~ /Unknown Title/i) {
+			($tname) = $song_obj->get_filename =~ m/\/([^\/]*)$/;			
+		}
+		
+	}
+	($tname, $tsecs);
+}
+
+# non class sub
 sub gen_playlist {
 	my ($rootdir, $debug) = @_;
 	
@@ -139,6 +178,8 @@ sub gen_playlist {
 	my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
 	foreach my $song (@mp3s) {
 		chomp $song;
+		# strange ._Something.mp3 files in there
+		next if $song =~ /\/\.[^\/]*$/;
 		print "  Adding '$song' to temp playlist $plsname\n" if $debug;
 		$fh->print( "$song\n");
 	}
