@@ -1,7 +1,8 @@
-package Playlist; # DON'T USE AS YET
+package Playlist;
 
 use strict;
 use Carp;
+use Song;
 use File::Find::Rule;
 use File::Temp qw/ tempfile /;
 
@@ -49,7 +50,10 @@ sub process_playlist {
 		
 		
 		if ($acceptsong) {
-			push @songs, $s;
+			#push @songs, $s;
+			my $sn = Song->new(filename => $s);
+			$sn->set_URI_from_rootdir( $self->{'rootdir'} );
+			push @songs, $sn;
 			print "   Matching song: $s \n" if $narrowing;			
 		}
 	}
@@ -79,6 +83,7 @@ sub reckon_m3u_name {
 	$plsname;
 }
 
+# NOTE! returns a list of the Song objects, not the song names!
 sub list_of_songs {
 	my $self = shift;
 	@{$self->{'songs'}};
@@ -87,17 +92,14 @@ sub list_of_songs {
 sub list_of_songs_URIs {
 	my $self = shift;
 	my ($hyperlinked) = (@_);
-	my @ret = ();
+	#my @ret = ();
 	my $rootdir = $self->{'rootdir'};
-	foreach my $songpath (@{$self->{'songs'}}) {
-		my $songuri = $songpath;
-		$songuri =~ s/$rootdir//;
-		my $line = $hyperlinked ? qq |<a href="/play/${songuri}">${songuri}</a><br/> \n|
-		                        : qq |/play/${songuri}|;
-		push @ret, $line;
-	}
 	
-	@ret;
+	# CM and what if it's an ordinary playlist and no 'rootdir' was given?
+	$rootdir = "/";
+
+	map ($_->get_URI('hyperlinked' => $hyperlinked),  @{$self->{'songs'}});
+
 }
 
 sub get_song {

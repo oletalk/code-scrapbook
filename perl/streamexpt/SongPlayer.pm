@@ -41,7 +41,9 @@ sub debug {
 sub play {
 	my $self = shift;
 	
-	my ($song) = @_;
+	my ($song_obj) = @_;
+	
+	my $song = $song_obj->get_filename;
 	
 	#downsampling?
 	if ($self->downsampling_on) {

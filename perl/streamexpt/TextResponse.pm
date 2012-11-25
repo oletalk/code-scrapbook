@@ -3,7 +3,7 @@ package TextResponse;
 use strict;
 use HTTP::Status;
 use HTTP::Response;
-
+use URI::Escape;
 use Sys::Hostname;
 
 sub print_list {
@@ -37,14 +37,37 @@ sub print_playlist {
 	my $plsname = $plist->reckon_m3u_name;
 	my $cont = HTTP::Response->new(RC_NOT_FOUND);
 	if ($plist->process_playlist($str_uri)) {
-		my @list = $plist->list_of_songs_URIs;
+		my @list = $plist->list_of_songs;
 		my $host = hostname();
 		
 		my $ret = "";
-		foreach my $entry (@list) {
-			$ret .= "http://${host}:${port}${entry}\n";
+		
+		# TEMP! This should ideally be generated only once
+		use TagInfo;
+		my $ti = new TagInfo(playlist => $plist);
+		$ti->generate_tags;
+		# END TEMP
+		
+		foreach my $song_obj (@list) {
+			my $songURI = $song_obj->get_URI(playlink => 1);
+			
+			my $safe_entry = uri_escape($songURI, "^A-Za-z0-9\/\.");
+			#print "REFERENCE: " . ref($song_obj);
+			my $tn = $ti->get_trackname($song_obj);
+			my $songline = "";
+			if ($tn) {
+				my $secs = "-1";
+				my $tags = "$tn" || $song_obj->get_filename;
+				my $m3uinf = "#EXTINF:${secs},${tags}";
+				
+				$songline .= "${m3uinf}\n";				
+			}
+			$songline .= "http://${host}:${port}${safe_entry}\n";
+			
+			$ret .= $songline;
 		}
 		if ($ret) {
+			$ret = "#EXTM3U\n${ret}";
 			$cont = HTTP::Response->new(RC_OK);
 			$cont->header('Content-type' => 'application/octet-stream');
 			$cont->header("Content-Disposition" => "attachment; filename=$plsname");

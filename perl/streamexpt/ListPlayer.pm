@@ -38,7 +38,8 @@ sub play_songs {
 			$conn->send_header(_stream_headers());
 			$conn->send_crlf;
 			
-			warn( "playing song: $song\n") if $debug;
+			my $songname = $song->get_filename;
+			warn( "playing song: $songname\n") if $debug;
 			my $player = SongPlayer->new(conn => $conn, 
 										 downsample => $downsample, 
 										 debug => $debug);
