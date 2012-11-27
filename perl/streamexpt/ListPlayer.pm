@@ -20,12 +20,8 @@ sub play_songs {
 	my $random = $self->{'random'};
 	my $debug = $self->{'debug'};
 	croak ("Connection not set") unless $conn;
-	
-	# CM 20/11/2012 VVVVV copied from here
-	
+		
 	my $all_ok = $plist->process_playlist($uri);
-
-	# CM 20/11/2012 ^^^^^ copied up to here
 	
 	if ($all_ok) {
 		my $done = 0;

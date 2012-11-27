@@ -41,7 +41,7 @@ sub print_playlist {
 		my $host = hostname();
 		
 		my $ret = "";
-		$plist->generate_tag_info;
+		$plist->generate_tag_info;  # CM FIXME this takes really long (minutes) for reasonably large playlist
 		
 		foreach my $song_obj (@list) {
 			my $songURI = $song_obj->get_URI(playlink => 1);

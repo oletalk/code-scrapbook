@@ -132,7 +132,7 @@ sub generate_tag_info {
 	# This should ideally be generated only once, and after gen_playlist has been called
 	use TagInfo;
 	my $ti = new TagInfo(playlist => $self);
-	$ti->generate_tags;
+	$ti->generate_tags(progress_batchsize => 10, to_file => './blah.txt'); # TEST
 	$self->{'tag_info'} = $ti;
 	warn "Tag info generation done";
 }

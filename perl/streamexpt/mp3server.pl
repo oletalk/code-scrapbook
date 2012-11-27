@@ -12,6 +12,7 @@ use Playlist;
 use Screener;
 use TextResponse;
 
+use MSConf qw(config_value);
 use Getopt::Long;
 use sigtrap qw(die INT QUIT);
 
@@ -26,18 +27,25 @@ our $random;
 
 our %delete_list;
 our $parent_quit = 1;
+our $config_file = "default.conf";
 
 my $clientlist_file;
 
+# then override with command line args
 my $res = GetOptions("playlist=s" => \$playlist,
 					 "rootdir=s"  => \$rootdir,
 					 "downsample"  => \$downsample,
 					 "port=i"     => \$port,
 					 "clientlist=s" => \$clientlist_file,
 					 "random"     => \$random,
+					 "config_file=s" => \$config_file,
 					 "debug"      => \$debug);
 
+# get config first
+MSConf::init($config_file);
 
+$port       = config_value('port');
+$downsample = config_value('downsample');
 
 # either playlist or root dir must be specified
 die "Either playlist or rootdir must be specified" 
@@ -111,10 +119,6 @@ while (my $conn = $d->accept) {
 exit(0);
 
 
-#sub add_delete_list {
-#	my ($dsfilename) = @_;
-#	$delete_list{$dsfilename} = $dsfilename;
-#}
 
 END {
 	if ($parent_quit) {
