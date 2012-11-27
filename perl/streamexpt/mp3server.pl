@@ -17,7 +17,7 @@ use Getopt::Long;
 use sigtrap qw(die INT QUIT);
 
 #get the port to bind to or default to 8000
-my $port = 8000;
+my $port;
 
 our $debug;
 our $playlist;
@@ -44,8 +44,9 @@ my $res = GetOptions("playlist=s" => \$playlist,
 # get config first
 MSConf::init($config_file);
 
-$port       = config_value('port');
-$downsample = config_value('downsample');
+$port            ||= config_value('port') || 8000;
+$downsample      ||= config_value('downsample');
+$clientlist_file ||= config_value('clientlist');
 
 # either playlist or root dir must be specified
 die "Either playlist or rootdir must be specified" 
@@ -57,10 +58,12 @@ $SIG{CHLD} = 'IGNORE';
 
 # let's listen
 my $d = HTTP::Daemon->new(  LocalPort => $port ) || die "OH NOES! Couldn't create a new daemon: $!";
-										
-warn "Server ready. Waiting for connections ... \n";
+							
+print "Downsampling is ON.\n" if $downsample;			
+warn "Server is up on port $port. Waiting for connections ... \n";
 
 my $cl = Screener->new(ipfile => $clientlist_file);
+$cl->set_default_action(config_value('screenerdefault')) if config_value('screenerdefault');
 
 #wait for the connections at the accept call
 

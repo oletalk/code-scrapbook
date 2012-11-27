@@ -78,7 +78,10 @@ sub downsample_piped {
 	my $songname = $song;
 	
 	# thanks http://stackoverflow.com/questions/619926/should-i-escape-shell-arguments-in-perl
-	$songname =~ s/([;<>\*\|`\$!#\(\)\[\]\{\}:'"])/\\$1/g;
+	#$songname =~ s/([;<>\*\|`\$!#\(\)\{\}:'"])/\\$1/g;
+	$songname =~ s/([`\$\\"])/\\$1/g;
+	$songname =~ s/!/\"\'!\'\"/g;   # oh, bash.
+	
 	$songname = "\"${songname}\"";
 	if ($song =~ /mp3$/i) {
 		warn "Downsampling as MP3";
