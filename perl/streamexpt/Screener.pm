@@ -23,6 +23,7 @@ sub set_default_action {
 	my $self = shift;
 	my ($action) = @_;
 	$self->{'default_action'} = $action;
+	warn "Screener's default action has just been set to $action";
 }
 
 sub screen {

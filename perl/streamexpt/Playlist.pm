@@ -54,7 +54,7 @@ sub process_playlist {
 			my $sn = Song->new(filename => $s);
 			$sn->set_URI_from_rootdir( $self->{'rootdir'} );
 			push @songs, $sn;
-			print "   Matching song: $s \n" if $narrowing;			
+			print "   Matching song: $s \n" if ($narrowing && $self->{'debug'});			
 		}
 	}
 	close $f_pls;
@@ -86,6 +86,7 @@ sub reckon_m3u_name {
 # NOTE! returns a list of the Song objects, not the song names!
 sub list_of_songs {
 	my $self = shift;
+	croak "List of songs is empty (perhaps 'process_playlist' wasn't called yet?)" unless $self->{'songs'};
 	@{$self->{'songs'}};
 }
 

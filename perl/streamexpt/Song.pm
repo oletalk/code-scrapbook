@@ -24,8 +24,6 @@ sub set_URI_from_rootdir {
 	$self->{'URI'} = $songuri;
 }
 
-#my $line = $hyperlinked ? qq |<a href="/play/${songuri}">${songuri}</a><br/> \n|
-#                        : qq |/play/${songuri}|;
 
 sub get_URI {
 	my $self = shift;
@@ -37,7 +35,7 @@ sub get_URI {
 	} elsif ($args{'hyperlinked'}) {
 		my $title = $args{'title'};
 		$title ||= $URI;
-		$ret = qq |<a href="/play/${URI}">${title}</a><br/> \n|;
+		$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
 	} else {
 		$ret = $URI;
 	}

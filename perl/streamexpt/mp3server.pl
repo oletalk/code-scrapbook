@@ -63,7 +63,9 @@ print "Downsampling is ON.\n" if $downsample;
 warn "Server is up on port $port. Waiting for connections ... \n";
 
 my $cl = Screener->new(ipfile => $clientlist_file);
-$cl->set_default_action(config_value('screenerdefault')) if config_value('screenerdefault');
+if (config_value('screenerdefault')) {
+	$cl->set_default_action(config_value('screenerdefault'));	
+}
 
 #wait for the connections at the accept call
 

@@ -22,6 +22,7 @@ sub print_list {
 			$ret = "<h3>No results</h3>";		
 		}
 		$cont = HTTP::Response->new(RC_OK);
+		$cont->header('Content-type' => 'text/html');
 		$cont->content( $ret );		
 	} else {
 		$cont = HTTP::Response->new(RC_NOT_FOUND);
@@ -37,32 +38,8 @@ sub print_playlist {
 	my $plsname = $plist->reckon_m3u_name;
 	my $cont = HTTP::Response->new(RC_NOT_FOUND);
 	if ($plist->process_playlist($str_uri)) {
-		my @list = $plist->list_of_songs;
-		my $host = hostname();
-		
-		my $ret = "";
-		$plist->generate_tag_info;  # CM FIXME this takes really long (minutes) for reasonably large playlist
-		
-		foreach my $song_obj (@list) {
-			my $songURI = $song_obj->get_URI(playlink => 1);
-			
-			my $safe_entry = uri_escape($songURI, "^A-Za-z0-9\/\.");
-			#print "REFERENCE: " . ref($song_obj);
-			my ($tn, $ts) = $plist->get_trackinfo($song_obj);
-			my $songline = "";
-			if ($tn) {
-				my $secs = $ts;
-				my $tags = "$tn" || $song_obj->get_filename;
-				my $m3uinf = "#EXTINF:${secs},${tags}";
-				
-				$songline .= "${m3uinf}\n";				
-			}
-			$songline .= "http://${host}:${port}${safe_entry}\n";
-			
-			$ret .= $songline;
-		}
+		my $ret = get_m3u($plist, $port);
 		if ($ret) {
-			$ret = "#EXTM3U\n${ret}";
 			$cont = HTTP::Response->new(RC_OK);
 			$cont->header('Content-type' => 'application/octet-stream');
 			$cont->header("Content-Disposition" => "attachment; filename=$plsname");
@@ -72,6 +49,38 @@ sub print_playlist {
 	
 
 	$cont;
+}
+
+sub get_m3u {
+	my ($plist, $port) = @_;
+	my $ret = "";
+	
+	my @list = $plist->list_of_songs;
+	my $host = hostname();
+	
+	$plist->generate_tag_info;  # CM FIXME this takes really long (minutes) for reasonably large playlist
+	
+	foreach my $song_obj (@list) {
+		my $songURI = $song_obj->get_URI(playlink => 1);
+		
+		my $safe_entry = uri_escape($songURI, "^A-Za-z0-9\/\.");
+		#print "REFERENCE: " . ref($song_obj);
+		my ($tn, $ts) = $plist->get_trackinfo($song_obj);
+		my $songline = "";
+		if ($tn) {
+			my $secs = $ts;
+			my $tags = "$tn" || $song_obj->get_filename;
+			my $m3uinf = "#EXTINF:${secs},${tags}";
+			
+			$songline .= "${m3uinf}\n";				
+		}
+		$songline .= "http://${host}:${port}${safe_entry}\n";
+		
+		$ret .= $songline;
+	}
+	$ret = "#EXTM3U\n${ret}" if $ret; # the M3U file header
+	
+	$ret;
 }
 
 sub get_links {
