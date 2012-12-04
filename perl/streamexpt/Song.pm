@@ -1,5 +1,7 @@
 package Song;
 
+use Util;
+
 sub new {
 	my $class = shift;
 	my %args = @_;
@@ -35,6 +37,7 @@ sub get_URI {
 	} elsif ($args{'hyperlinked'}) {
 		my $title = $args{'title'};
 		$title ||= $URI;
+		$title = Util::unbackslashed($title);
 		$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
 	} else {
 		$ret = $URI;

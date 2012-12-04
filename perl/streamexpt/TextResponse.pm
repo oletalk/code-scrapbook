@@ -22,7 +22,7 @@ sub print_list {
 			$ret = "<h3>No results</h3>";		
 		}
 		$cont = HTTP::Response->new(RC_OK);
-		$cont->header('Content-type' => 'text/html');
+		$cont->header('Content-type' => 'text/html; charset=utf-8');
 		$cont->content( $ret );		
 	} else {
 		$cont = HTTP::Response->new(RC_NOT_FOUND);
@@ -41,7 +41,7 @@ sub print_playlist {
 		my $ret = get_m3u($plist, $port);
 		if ($ret) {
 			$cont = HTTP::Response->new(RC_OK);
-			$cont->header('Content-type' => 'application/octet-stream');
+			$cont->header('Content-type' => 'application/octet-stream; charset=utf8');
 			$cont->header("Content-Disposition" => "attachment; filename=$plsname");
 			$cont->content( $ret );			
 		}

@@ -3,6 +3,8 @@ package Playlist;
 use strict;
 use Carp;
 use Song;
+use Util;
+
 use File::Find::Rule;
 use File::Temp qw/ tempfile /;
 
@@ -161,7 +163,7 @@ sub get_trackinfo {
 		if ($tname =~ /Unknown Title/i) {
 			($tname) = $song_obj->get_filename =~ m/\/([^\/]*)$/;			
 		}
-		
+		$tname = Util::unbackslashed($tname);
 	}
 	($tname, $tsecs);
 }
@@ -176,12 +178,16 @@ sub gen_playlist {
 	open ($fh, ">$plsname") or die "Unable to open temp playlist $plsname for writing: $!";
 	#add_delete_list($plsname);
 	
-	my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
+	#my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
+	my $mp3result = qx|find "$rootdir" \\( -name '*.mp3' -o -name '*.ogg' \\) -exec ls -1 -b \{\} \\;|;
+	my @mp3s = split /\n/, $mp3result;
+	
 	foreach my $song (@mp3s) {
 		chomp $song;
 		# strange ._Something.mp3 files in there
 		next if $song =~ /\/\.[^\/]*$/;
 		print "  Adding '$song' to temp playlist $plsname\n" if $debug;
+		
 		$fh->print( "$song\n");
 	}
 	close $fh;

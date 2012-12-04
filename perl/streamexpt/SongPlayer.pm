@@ -4,6 +4,8 @@ use strict;
 use Carp;
 use File::Temp qw/ tempfile /; # if we need to generate a temp playlist file
 
+use Encode;
+
 sub new {
 	my $class = shift;
 	bless { 'downsample' => 0, 
@@ -77,19 +79,16 @@ sub downsample_piped {
 	my $ret;
 	my $songname = $song;
 	
-	# thanks http://stackoverflow.com/questions/619926/should-i-escape-shell-arguments-in-perl
-	#$songname =~ s/([;<>\*\|`\$!#\(\)\{\}:'"])/\\$1/g;
-	$songname =~ s/([`\$\\"])/\\$1/g;
-	$songname =~ s/!/\"\'!\'\"/g;   # oh, bash.
+	my $IFSC = qq|IFS="\$(printf '\\n\\t')";|;
+	my $new_songname = qx|${IFSC}printf "\%b" "$songname"|;
 	
-	$songname = "\"${songname}\"";
+	$songname = "\"${new_songname}\"";
 	if ($song =~ /mp3$/i) {
 		warn "Downsampling as MP3";
-		$ret = qq{/usr/local/bin/lame --mp3input -b 32 $songname - | };
+		$ret = qq{${IFSC}/usr/local/bin/lame --mp3input -b 32 $songname - | };
 	} elsif ($song =~ /ogg$/i) {
 		warn "Downsampling as OGG";
-		#$ret = qq{/usr/local/bin/sox -t ogg $songname -t raw - | oggenc --raw --downmix -b 64 - | };
-		$ret = qq{/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - | };
+		$ret = qq{${IFSC}/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - | };
 	} else {
 		warn "No idea how to downsample this file";
 	}

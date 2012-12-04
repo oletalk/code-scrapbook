@@ -60,7 +60,7 @@ $SIG{CHLD} = 'IGNORE';
 my $d = HTTP::Daemon->new(  LocalPort => $port ) || die "OH NOES! Couldn't create a new daemon: $!";
 							
 print "Downsampling is ON.\n" if $downsample;			
-warn "Server is up on port $port. Waiting for connections ... \n";
+warn "Server is up at ", $d->url, ". Waiting for connections ... \n";
 
 my $cl = Screener->new(ipfile => $clientlist_file);
 if (config_value('screenerdefault')) {
