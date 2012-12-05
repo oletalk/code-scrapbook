@@ -1,4 +1,4 @@
-package Util;
+package MP3S::Misc::Util;
 
 use warnings;
 use Encode;

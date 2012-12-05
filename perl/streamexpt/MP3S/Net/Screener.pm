@@ -1,4 +1,4 @@
-package Screener;
+package MP3S::Net::Screener;
 
 use strict;
 use Carp;

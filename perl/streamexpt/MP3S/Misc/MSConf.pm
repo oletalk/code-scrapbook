@@ -1,4 +1,4 @@
-package MSConf;
+package MP3S::Misc::MSConf;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw (config_value);

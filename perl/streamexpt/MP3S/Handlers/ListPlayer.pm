@@ -1,8 +1,9 @@
-package ListPlayer;
+package MP3S::Handlers::ListPlayer;
 
 use strict;
 use Carp;
-use SongPlayer;
+
+use MP3S::Handlers::SongPlayer;
 
 use HTTP::Status;
 
@@ -36,7 +37,7 @@ sub play_songs {
 			
 			my $songname = $song->get_filename;
 			warn( "playing song: $songname\n") if $debug;
-			my $player = SongPlayer->new(conn => $conn, 
+			my $player = MP3S::Handlers::SongPlayer->new(conn => $conn, 
 										 downsample => $downsample, 
 										 debug => $debug);
 			$player->play($song);

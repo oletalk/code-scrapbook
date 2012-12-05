@@ -11,8 +11,8 @@ use MP3S::Handlers::ListPlayer;
 use MP3S::Music::Playlist;
 use MP3S::Net::Screener;
 use MP3S::Net::TextResponse;
+use MP3S::Misc::MSConf qw(config_value);
 
-use MSConf qw(config_value);
 use Getopt::Long;
 use sigtrap qw(die INT QUIT);
 
@@ -42,7 +42,7 @@ my $res = GetOptions("playlist=s" => \$playlist,
 					 "debug"      => \$debug);
 
 # get config first
-MSConf::init($config_file);
+MP3S::Misc::MSConf::init($config_file);
 
 $port            ||= config_value('port') || 8000;
 $downsample      ||= config_value('downsample');
@@ -51,7 +51,7 @@ $clientlist_file ||= config_value('clientlist');
 # either playlist or root dir must be specified
 die "Either playlist or rootdir must be specified" 
 	unless (defined $playlist or defined $rootdir);
-my $plist = Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
+my $plist = MP3S::Music::Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
 
 #ignore child processes to prevent zombies
 $SIG{CHLD} = 'IGNORE';
@@ -62,7 +62,7 @@ my $d = HTTP::Daemon->new(  LocalPort => $port ) || die "OH NOES! Couldn't creat
 print "Downsampling is ON.\n" if $downsample;			
 warn "Server is up at ", $d->url, ". Waiting for connections ... \n";
 
-my $cl = Screener->new(ipfile => $clientlist_file);
+my $cl = MP3S::Net::Screener->new(ipfile => $clientlist_file);
 if (config_value('screenerdefault')) {
 	$cl->set_default_action(config_value('screenerdefault'));	
 }
@@ -78,7 +78,7 @@ while (my $conn = $d->accept) {
 	my $action = $cl->screen($peer);
 	print "Action for this peer is $action \n";
 	
-	if ($action eq Screener::ALLOW) {
+	if ($action eq MP3S::Net::Screener::ALLOW) {
 		# perform the fork or exit
 		die "Can't fork: $!" unless defined ($child = fork());
 		if ($child == 0) {
@@ -91,7 +91,7 @@ while (my $conn = $d->accept) {
 			my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
 			#call the main child routine
 			if ($command eq 'play') {
-				my $lp = ListPlayer->new(conn => $conn, 
+				my $lp = MP3S::Handlers::ListPlayer->new(conn => $conn, 
 										 playlist => $plist,
 										 random => $random,
 										 debug => $debug);
@@ -113,7 +113,7 @@ while (my $conn = $d->accept) {
 			#close the connection, the parent has already passed it off to a child
 			$conn->close();
 		}
-	} elsif ($action eq Screener::DENY) {
+	} elsif ($action eq MP3S::Net::Screener::DENY) {
 		$conn->send_error(RC_FORBIDDEN);
 		$conn->close();
 	} else { # BLOCK

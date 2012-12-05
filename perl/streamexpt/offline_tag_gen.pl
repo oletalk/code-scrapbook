@@ -1,10 +1,10 @@
 #!/usr/bin/perl -w
 
 use strict;
-use MSConf qw(config_value);
-use Playlist;
+use MP3S::Misc::MSConf qw(config_value);
+use MP3S::Music::Playlist;
 use Sys::Hostname;
-use TextResponse;
+use MP3S::Net::TextResponse;
 
 use Getopt::Long;
 

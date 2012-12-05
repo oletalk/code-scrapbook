@@ -1,9 +1,10 @@
-package Playlist;
+package MP3S::Music::Playlist;
 
 use strict;
 use Carp;
-use Song;
-use Util;
+
+use MP3S::Music::Song;
+use MP3S::Misc::Util;
 
 use File::Find::Rule;
 use File::Temp qw/ tempfile /;
@@ -53,7 +54,7 @@ sub process_playlist {
 		
 		if ($acceptsong) {
 			#push @songs, $s;
-			my $sn = Song->new(filename => $s);
+			my $sn = MP3S::Music::Song->new(filename => $s);
 			$sn->set_URI_from_rootdir( $self->{'rootdir'} );
 			push @songs, $sn;
 			print "   Matching song: $s \n" if ($narrowing && $self->{'debug'});			
@@ -133,8 +134,8 @@ sub generate_tag_info {
 	my $self = shift;
 	warn "Generating tag info";
 	# This should ideally be generated only once, and after gen_playlist has been called
-	use TagInfo;
-	my $ti = new TagInfo(playlist => $self);
+	use MP3S::Music::TagInfo;
+	my $ti = new MP3S::Music::TagInfo(playlist => $self);
 	$ti->generate_tags(progress_batchsize => 10, to_file => './blah.txt'); # TEST
 	$self->{'tag_info'} = $ti;
 	warn "Tag info generation done";
@@ -163,7 +164,7 @@ sub get_trackinfo {
 		if ($tname =~ /Unknown Title/i) {
 			($tname) = $song_obj->get_filename =~ m/\/([^\/]*)$/;			
 		}
-		$tname = Util::unbackslashed($tname);
+		$tname = MP3S::Misc::Util::unbackslashed($tname);
 	}
 	($tname, $tsecs);
 }

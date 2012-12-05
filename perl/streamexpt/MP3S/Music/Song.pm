@@ -1,6 +1,6 @@
-package Song;
+package MP3S::Music::Song;
 
-use Util;
+use MP3S::Misc::Util;
 
 sub new {
 	my $class = shift;
@@ -37,7 +37,7 @@ sub get_URI {
 	} elsif ($args{'hyperlinked'}) {
 		my $title = $args{'title'};
 		$title ||= $URI;
-		$title = Util::unbackslashed($title);
+		$title = MP3S::Misc::Util::unbackslashed($title);
 		$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
 	} else {
 		$ret = $URI;

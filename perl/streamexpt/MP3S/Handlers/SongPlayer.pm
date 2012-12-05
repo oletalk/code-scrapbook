@@ -1,4 +1,4 @@
-package SongPlayer;
+package MP3S::Handlers::SongPlayer;
 
 use strict;
 use Carp;

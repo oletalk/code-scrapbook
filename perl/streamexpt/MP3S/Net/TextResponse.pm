@@ -1,4 +1,4 @@
-package TextResponse;
+package MP3S::Net::TextResponse;
 
 use strict;
 use HTTP::Status;

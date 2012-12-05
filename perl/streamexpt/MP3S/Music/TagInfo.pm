@@ -1,10 +1,11 @@
-package TagInfo;
+package MP3S::Music::TagInfo;
 
 use strict;
 use Carp;
 use MP3::Info;
 use Digest::SHA qw(sha1_hex); # TODO: this isn't really being used right now
-use MSConf qw(config_value);
+
+use MP3S::Misc::MSConf qw(config_value);
 
 sub new {
 	my $class = shift;
