@@ -12,6 +12,7 @@ use MP3S::Music::Playlist;
 use MP3S::Net::Screener;
 use MP3S::Net::TextResponse;
 use MP3S::Misc::MSConf qw(config_value);
+use MP3S::Misc::Logger qw(log_info log_debug log_error);
 
 use Getopt::Long;
 use sigtrap qw(die INT QUIT);
@@ -43,6 +44,7 @@ my $res = GetOptions("playlist=s" => \$playlist,
 
 # get config first
 MP3S::Misc::MSConf::init($config_file);
+MP3S::Misc::Logger::init(debug => $debug);
 
 $port            ||= config_value('port') || 8000;
 $downsample      ||= config_value('downsample');
@@ -59,8 +61,8 @@ $SIG{CHLD} = 'IGNORE';
 # let's listen
 my $d = HTTP::Daemon->new(  LocalPort => $port ) || die "OH NOES! Couldn't create a new daemon: $!";
 							
-print "Downsampling is ON.\n" if $downsample;			
-warn "Server is up at ", $d->url, ". Waiting for connections ... \n";
+log_info( "Downsampling is ON.\n" ) if $downsample;			
+log_info( "Server is up at " . $d->url . ". Waiting for connections ... \n");
 
 my $cl = MP3S::Net::Screener->new(ipfile => $clientlist_file);
 if (config_value('screenerdefault')) {
@@ -74,9 +76,9 @@ while (my $conn = $d->accept) {
 	
 	# who connected?
 	my $peer = $conn->peerhost;
-	warn "Connection received ... ", $peer, "\n";
+	log_info( "Connection received ... ", $peer, "\n" );
 	my $action = $cl->screen($peer);
-	print "Action for this peer is $action \n";
+	log_info( "Action for this peer is $action \n");
 	
 	if ($action eq MP3S::Net::Screener::ALLOW) {
 		# perform the fork or exit
@@ -85,7 +87,7 @@ while (my $conn = $d->accept) {
 		
 			my $uri = $conn->get_request->uri; 
 			$uri = uri_unescape($uri);
-			print "Request: $uri\n" if $debug;
+			log_debug( "Request: $uri\n" );
 			
 			# First bit is the command, /list/ or /play/
 			my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
@@ -97,9 +99,9 @@ while (my $conn = $d->accept) {
 										 debug => $debug);
 				$lp->play_songs($str_uri, $downsample);				
 			} elsif ($command eq 'list') {
-				$conn->send_response( TextResponse::print_list($plist, $str_uri));
+				$conn->send_response( MP3S::Net::TextResponse::print_list($plist, $str_uri));
 			} elsif ($command eq 'drop') {
-				$conn->send_response( TextResponse::print_playlist($plist, $str_uri, $port));
+				$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $port));
 			} else {
 				$conn->send_error(RC_BAD_REQUEST);
 				$conn->close();
@@ -127,18 +129,17 @@ exit(0);
 
 END {
 	if ($parent_quit) {
-		warn "Wrapping up...\n";
-		print Dumper(\%delete_list) if $debug;
-	
+		log_info( "Wrapping up...\n" );
+		
 		foreach my $del (keys %delete_list) {
 			my $delfile = $delete_list{$del};
-			print "Deleting temp file $delfile \n";
-			system("rm '$delfile'") or warn "Problems removing tempfile: $!";
+			log_info( "Deleting temp file $delfile \n" );
+			system("rm '$delfile'") or log_error( "Problems removing tempfile: $!" );
 		}
-		print "Deleting all our temp files!\n";
+		log_info( "Deleting all our temp files!\n" );
 		system("rm -f /tmp/*.mxx");
 	} else {
-		warn "Child process ended.";
+		log_info( "Child process ended.\n" );
 	}
 	
 }

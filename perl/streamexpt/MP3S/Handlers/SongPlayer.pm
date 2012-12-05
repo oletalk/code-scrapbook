@@ -3,6 +3,7 @@ package MP3S::Handlers::SongPlayer;
 use strict;
 use Carp;
 use File::Temp qw/ tempfile /; # if we need to generate a temp playlist file
+use MP3S::Misc::Logger qw(log_info log_debug log_error);
 
 use Encode;
 
@@ -49,7 +50,7 @@ sub play {
 	
 	#downsampling?
 	if ($self->downsampling_on) {
-		warn "Downsampling song...\n";
+		log_info( "Downsampling song...\n" );
 		#$song = $self->downsample($song);
 	}
 	
@@ -61,9 +62,9 @@ sub play {
 	my $fh_song;
 	if ($self->downsampling_on) {
 		
-		open ($fh_song, downsample_piped($song)) or warn "Couldn't open downsampled song: $!";
+		open ($fh_song, downsample_piped($song)) or log_error( "Couldn't open downsampled song: $!" );
 	} else {
-		open ($fh_song, $song) or warn "Unable to open song: $!";		
+		open ($fh_song, $song) or log_error( "Unable to open song: $!" );		
 	}
 	if ($fh_song) {
 		$conn->send_file( $fh_song );
@@ -84,13 +85,13 @@ sub downsample_piped {
 	
 	$songname = "\"${new_songname}\"";
 	if ($song =~ /mp3$/i) {
-		warn "Downsampling as MP3";
+		log_info( "Downsampling as MP3" );
 		$ret = qq{${IFSC}/usr/local/bin/lame --mp3input -b 32 $songname - | };
 	} elsif ($song =~ /ogg$/i) {
-		warn "Downsampling as OGG";
+		log_info( "Downsampling as OGG" );
 		$ret = qq{${IFSC}/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - | };
 	} else {
-		warn "No idea how to downsample this file";
+		log_error( "No idea how to downsample this file" );
 	}
 	
 	$ret;

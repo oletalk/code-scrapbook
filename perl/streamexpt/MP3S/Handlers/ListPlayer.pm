@@ -4,6 +4,7 @@ use strict;
 use Carp;
 
 use MP3S::Handlers::SongPlayer;
+use MP3S::Misc::Logger qw(log_info log_debug log_error);
 
 use HTTP::Status;
 
@@ -36,20 +37,20 @@ sub play_songs {
 			$conn->send_crlf;
 			
 			my $songname = $song->get_filename;
-			warn( "playing song: $songname\n") if $debug;
+			log_debug ( "playing song: $songname\n");
 			my $player = MP3S::Handlers::SongPlayer->new(conn => $conn, 
 										 downsample => $downsample, 
 										 debug => $debug);
 			$player->play($song);
 		
 			$done = 1 unless $conn;
-			warn "Finishing after this song" if $done && $debug;
+			log_debug( "Finishing after this song" ) if $done;
 		}
 	} else {
 		$conn->send_error(RC_NOT_FOUND);
 	}
 	
-	warn "Done playing songs";
+	log_info( "Done playing songs\n" );
 }
 
 sub _stream_headers {

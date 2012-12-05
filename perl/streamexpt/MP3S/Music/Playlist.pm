@@ -5,6 +5,7 @@ use Carp;
 
 use MP3S::Music::Song;
 use MP3S::Misc::Util;
+use MP3S::Misc::Logger qw(log_info log_debug log_error);
 
 use File::Find::Rule;
 use File::Temp qw/ tempfile /;
@@ -57,7 +58,7 @@ sub process_playlist {
 			my $sn = MP3S::Music::Song->new(filename => $s);
 			$sn->set_URI_from_rootdir( $self->{'rootdir'} );
 			push @songs, $sn;
-			print "   Matching song: $s \n" if ($narrowing && $self->{'debug'});			
+			log_debug( "   Matching song: $s \n") if ($narrowing);			
 		}
 	}
 	close $f_pls;
@@ -66,7 +67,7 @@ sub process_playlist {
 	if (scalar @songs == 0 && $narrowing) { # stop poking about
 		sleep 1;
 		#$conn->send_error(RC_NOT_FOUND);
-		warn "Desired search $uri was not found - returning 404\n";
+		log_info( "Desired search $uri was not found - returning 404\n");
 		$all_ok = 0;
 	}
 	@{$self->{'songs'}} = @songs;
@@ -125,20 +126,20 @@ sub rm_temp_playlist {
 	my $self = shift;
 	if (defined $self->{'temp_playlist'}) {
 		my $plsname = $self->{'temp_playlist'};
-		warn "Removing temp playlist!";
+		log_info( "Removing temp playlist!\n" );
 		system("rm -f $plsname");
 	}
 }
 
 sub generate_tag_info {
 	my $self = shift;
-	warn "Generating tag info";
+	log_info( "Generating tag info\n" );
 	# This should ideally be generated only once, and after gen_playlist has been called
 	use MP3S::Music::TagInfo;
 	my $ti = new MP3S::Music::TagInfo(playlist => $self);
 	$ti->generate_tags(progress_batchsize => 10, to_file => './blah.txt'); # TEST
 	$self->{'tag_info'} = $ti;
-	warn "Tag info generation done";
+	log_info( "Tag info generation done" );
 }
 	
 sub get_tag_info {
@@ -174,7 +175,7 @@ sub gen_playlist {
 	my ($rootdir, $debug) = @_;
 	
 	my ($fh, $plsname) = tempfile( SUFFIX => '.plx', UNLINK => 0 );
-	warn "Generating playlist for given root dir $rootdir\n";
+	log_info( "Generating playlist for given root dir $rootdir\n" );
 	
 	open ($fh, ">$plsname") or die "Unable to open temp playlist $plsname for writing: $!";
 	#add_delete_list($plsname);
@@ -187,7 +188,7 @@ sub gen_playlist {
 		chomp $song;
 		# strange ._Something.mp3 files in there
 		next if $song =~ /\/\.[^\/]*$/;
-		print "  Adding '$song' to temp playlist $plsname\n" if $debug;
+		log_debug( "  Adding '$song' to temp playlist $plsname\n" );
 		
 		$fh->print( "$song\n");
 	}

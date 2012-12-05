@@ -37,7 +37,7 @@ if (defined $m3ufile && !defined $port) {
 die "Either playlist or rootdir must be specified" 
 	unless (defined $playlist or defined $rootdir);
 
-my $plist = Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
+my $plist = MP3S::Music::Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
 
 print "Specified output m3u file: $m3ufile\n" if $m3ufile;
 
@@ -47,7 +47,7 @@ $plist->generate_tag_info;  # CM this takes really long (minutes) for reasonably
 
 if (defined $m3ufile) {
 	open (my $fh, ">", "$m3ufile") or die "Unable to open file $m3ufile for writing: $!";
-	print $fh TextResponse::get_m3u($plist, $port);
+	print $fh MP3S::Net::TextResponse::get_m3u($plist, $port);
 	close $fh;
 }
 

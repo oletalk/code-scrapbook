@@ -3,6 +3,8 @@ package MP3S::Net::Screener;
 use strict;
 use Carp;
 
+use MP3S::Misc::Logger qw(log_info log_debug log_error);
+
 use NetAddr::IP;
 use constant ALLOW => 'ALLOW';
 use constant DENY  => 'DENY';
@@ -23,7 +25,7 @@ sub set_default_action {
 	my $self = shift;
 	my ($action) = @_;
 	$self->{'default_action'} = $action;
-	warn "Screener's default action has just been set to $action";
+	log_info( "Screener's default action has just been set to $action" );
 }
 
 sub screen {
@@ -33,7 +35,7 @@ sub screen {
 	my $ret = $self->get_default_action;
 	
 	if (!$self->{'clientlist'} && $self->{'ipfile'}) {
-		warn "client_screen without read_client_list called ... doing that now\n";
+		log_info( "client_screen without read_client_list called ... doing that now\n" );
 		$self->read_client_list($self->{'ipfile'});
 	}
 	
@@ -59,7 +61,7 @@ sub screen {
 		}
 		
 	} else {
-		warn "No clientfile (allow/deny) specified so defaulting to $ret.";		
+		log_info( "No clientfile (allow/deny) specified so defaulting to $ret.\n" );		
 	}
 	return $ret;
 }
@@ -79,7 +81,7 @@ sub read_client_list {
 			if ($ip) {
 				push @{$self->{'clientlist'}->{$spec}}, $ip;
 			} else {
-				warn "Unable to recognise $ip as a valid IP address/subnet";
+				log_error( "Unable to recognise $ip as a valid IP address/subnet" );
 			}
 		}
 	}
