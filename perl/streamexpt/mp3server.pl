@@ -5,9 +5,9 @@ use strict;
 use HTTP::Daemon;
 use HTTP::Status;
 use Data::Dumper;
-use URI::Escape;
 
 use MP3S::Handlers::ListPlayer;
+use MP3S::Handlers::CmdSwitch;
 use MP3S::Music::Playlist;
 use MP3S::Net::Screener;
 use MP3S::Net::TextResponse;
@@ -26,8 +26,6 @@ our $rootdir;
 our $downsample;
 our $random;
 
-our %delete_list;
-our $parent_quit = 1;
 our $config_file = "default.conf";
 
 my $clientlist_file;
@@ -84,32 +82,20 @@ while (my $conn = $d->accept) {
 		# perform the fork or exit
 		die "Can't fork: $!" unless defined ($child = fork());
 		if ($child == 0) {
-		
-			my $uri = $conn->get_request->uri; 
-			$uri = uri_unescape($uri);
-			log_debug( "Request: $uri\n" );
-			
-			# First bit is the command, /list/ or /play/
-			my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
-			#call the main child routine
-			if ($command eq 'play') {
-				my $lp = MP3S::Handlers::ListPlayer->new(conn => $conn, 
-										 playlist => $plist,
-										 random => $random,
-										 debug => $debug);
-				$lp->play_songs($str_uri, $downsample);				
-			} elsif ($command eq 'list') {
-				$conn->send_response( MP3S::Net::TextResponse::print_list($plist, $str_uri));
-			} elsif ($command eq 'drop') {
-				$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $port));
-			} else {
-				$conn->send_error(RC_BAD_REQUEST);
-				$conn->close();
+			eval {
+				MP3S::Handlers::CmdSwitch::handle(
+					connection => $conn,
+					playlist => $plist,
+					random => $random,
+					downsample => $downsample,
+					port => $port,
+				)
+			};
+			if ($@) {
+				#$had_errors = 1;
+				log_error("Problems handling request: $@");				
 			}
-		
-			$plist->setchild(1); # explain...
 			#if the child returns, then just exit;
-			$parent_quit = 0;
 			exit 0;
 		} else {
 			#close the connection, the parent has already passed it off to a child
@@ -127,19 +113,10 @@ exit(0);
 
 
 
-END {
-	if ($parent_quit) {
-		log_info( "Wrapping up...\n" );
-		
-		foreach my $del (keys %delete_list) {
-			my $delfile = $delete_list{$del};
-			log_info( "Deleting temp file $delfile \n" );
-			system("rm '$delfile'") or log_error( "Problems removing tempfile: $!" );
-		}
-		log_info( "Deleting all our temp files!\n" );
-		system("rm -f /tmp/*.mxx");
-	} else {
-		log_info( "Child process ended.\n" );
-	}
-	
-}
+#END {
+#	if ($parent_quit) {
+#		log_info( "Wrapping up...\n" );
+#	} else {
+#		log_info( "Child process ended.\n" );
+#	}
+#}

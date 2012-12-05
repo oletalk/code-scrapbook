@@ -36,11 +36,6 @@ sub downsampling_on {
 	$self->{'downsample'};
 }
 
-sub debug {
-	my $self = shift;
-	$self->{'debug'};
-}
-
 sub play {
 	my $self = shift;
 	

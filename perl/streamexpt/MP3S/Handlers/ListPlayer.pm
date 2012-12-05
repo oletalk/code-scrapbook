@@ -20,7 +20,6 @@ sub play_songs {
 	my $conn = $self->{'conn'};
 	my $plist = $self->{'playlist'}; # is an actual Playlist object as of 20/11/2012
 	my $random = $self->{'random'};
-	my $debug = $self->{'debug'};
 	croak ("Connection not set") unless $conn;
 		
 	my $all_ok = $plist->process_playlist($uri);
@@ -39,8 +38,7 @@ sub play_songs {
 			my $songname = $song->get_filename;
 			log_debug ( "playing song: $songname\n");
 			my $player = MP3S::Handlers::SongPlayer->new(conn => $conn, 
-										 downsample => $downsample, 
-										 debug => $debug);
+										 downsample => $downsample);
 			$player->play($song);
 		
 			$done = 1 unless $conn;
