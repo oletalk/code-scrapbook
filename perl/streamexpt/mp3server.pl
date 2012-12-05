@@ -7,10 +7,10 @@ use HTTP::Status;
 use Data::Dumper;
 use URI::Escape;
 
-use ListPlayer;
-use Playlist;
-use Screener;
-use TextResponse;
+use MP3S::Handlers::ListPlayer;
+use MP3S::Music::Playlist;
+use MP3S::Net::Screener;
+use MP3S::Net::TextResponse;
 
 use MSConf qw(config_value);
 use Getopt::Long;
