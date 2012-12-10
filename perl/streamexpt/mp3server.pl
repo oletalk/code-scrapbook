@@ -42,7 +42,9 @@ my $res = GetOptions("playlist=s" => \$playlist,
 
 # get config first
 MP3S::Misc::MSConf::init($config_file);
-MP3S::Misc::Logger::init(debug => $debug);
+
+my $llevel = $debug ? MP3S::Misc::Logger::DEBUG : MP3S::Misc::Logger::INFO;
+MP3S::Misc::Logger::init(level => $llevel);
 
 $port            ||= config_value('port') || 8000;
 $downsample      ||= config_value('downsample');
@@ -52,6 +54,19 @@ $clientlist_file ||= config_value('clientlist');
 die "Either playlist or rootdir must be specified" 
 	unless (defined $playlist or defined $rootdir);
 my $plist = MP3S::Music::Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
+my $gen_time = time;
+
+# if rootdir, how often will it check for new files?
+# regenplaylist option in config file TODO
+my $regen = config_value('regenplaylist');
+if ($regen > 0) {
+	if (defined $rootdir) {
+		log_info( "Playlist will regenerate every $regen minutes.");		
+	} else {
+		$regen = 0;
+		log_error("Ignoring 'regenplaylist' since a fixed playlist was provided.");
+	}
+}
 
 #ignore child processes to prevent zombies
 $SIG{CHLD} = 'IGNORE';
@@ -106,6 +121,16 @@ while (my $conn = $d->accept) {
 		$conn->close();
 	} else { # BLOCK
 		$conn->close();
+	}
+	
+	# check if we were asked to regenerate the playlist
+	if (defined $rootdir && $regen > 0) {
+		my $elapsed = time - $gen_time;
+		if ($elapsed > ($regen * 60)) {
+			log_info ("Re-generating playlist from rootdir $rootdir");
+			$plist = MP3S::Music::Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
+			$gen_time = time;			
+		}
 	}
 	#go back and listen for the next connection
 }
