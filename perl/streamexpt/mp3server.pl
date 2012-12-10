@@ -44,7 +44,7 @@ my $res = GetOptions("playlist=s" => \$playlist,
 MP3S::Misc::MSConf::init($config_file);
 
 my $llevel = $debug ? MP3S::Misc::Logger::DEBUG : MP3S::Misc::Logger::INFO;
-MP3S::Misc::Logger::init(level => $llevel);
+MP3S::Misc::Logger::init(level => $llevel, display_context => MP3S::Misc::Logger::NAME);
 
 $port            ||= config_value('port') || 8000;
 $downsample      ||= config_value('downsample');

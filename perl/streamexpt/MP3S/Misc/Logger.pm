@@ -16,6 +16,12 @@ use constant {
 	DEBUG => 5
 };
 
+use constant {
+	NONE => 0,
+	NAME => 1,
+	FULL => 2
+};
+
 our $logging_level = 3;
 our @levels = qw(none FATAL ERROR WARNING INFO DEBUG);
 our $st_onerr = 1;
@@ -81,8 +87,10 @@ sub _log {
 	my @messages = log_prep(@arr);
 
 	my $leveldisp = $levels[$level];
-	my $ctxtdisp;
-	$ctxtdisp = " ($ctxt)" if $display_context;
+	my $ctxtdisp = "";
+	my $ctxt_name = $ctxt;
+	$ctxt_name =~ s/.*:://g if $display_context == NAME;
+	$ctxtdisp = " ($ctxt_name)" if $display_context > NONE;
 	my $tstamp = strftime( "%d-%m-%Y,%H:%M:%S", localtime );
 	foreach (@messages) {
 		print "${tstamp}${ctxtdisp} [$leveldisp] $_ \n";
