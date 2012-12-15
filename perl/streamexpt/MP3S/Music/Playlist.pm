@@ -15,33 +15,69 @@ sub new {
 	my %args = @_;
 	
 	if ($args{'rootdir'}) {
-		$args{'temp_playlist'} = gen_playlist($args{'rootdir'}, $args{'debug'});
-		$args{'playlist'} = $args{'temp_playlist'};
+		$args{'song_objects'} = gen_master_list($args{'rootdir'});
+	} else {
+		$args{'song_objects'} = gen_master_list($args{'playlist'});
 	}
-	croak ("No rootdir or playlist name was given") unless $args{'playlist'};
+	croak ("No rootdir or playlist name was given") unless $args{'song_objects'};
 	bless \%args, $class;
 }
 
-sub get_rootdir {
-	my $self = shift;
-	$self->{'rootdir'};
+# NOTE: self->song_objects is the master list of songs, and
+#       self->songs is the list filtered through a URI
+#       The latter is also affected with each call of get_song
+
+#internal sub to generate song objects
+sub gen_master_list {
+	my ($arg1) = @_;
+	
+	my @ret = ();
+	if (-f $arg1) { #it's a playlist
+		open my $f_pls, $arg1 or die "Unable to open playlist $arg1: $!";
+		
+		while (<$f_pls>) {
+			my $s = $_;
+			chomp $s;
+			
+			log_debug( "  Adding '$s' to song_objects list\n" );
+			my $sn = MP3S::Music::Song->new(filename => $s);
+			$sn->set_URI_from_rootdir( $arg1 );
+			push @ret, $sn;
+		}
+	} elsif (-d $arg1) { #it's a rootdir
+		#my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
+		my $mp3result = qx|find "$arg1" \\( -name '*.mp3' -o -name '*.ogg' \\) -exec ls -1 -b \{\} \\;|;
+		my @mp3s = split /\n/, $mp3result;
+	
+		foreach my $song (@mp3s) {
+			chomp $song;
+			# strange ._Something.mp3 files in there
+			next if $song =~ /\/\.[^\/]*$/;
+			log_debug( "  Adding '$song' to song_objects list\n" );
+			my $sn = MP3S::Music::Song->new(filename => $song); # TODO! Get 'properly encoded name' as well
+			$sn->set_URI_from_rootdir( $arg1 );
+			push @ret, $sn;
+		}
+	
+	} else {
+		croak "Can't call gen_song_objects with non-file, non-dir $arg1";
+	}
+	
+	\@ret;
 }
 
 sub process_playlist {
 	my $self = shift;
 	my ($uri) = @_;
 	
-	my $playlist = $self->{'playlist'};
-	croak "no playlist provided" unless $playlist;
+	#my $master_list = $self->{'song_objects'};
 		
-	#get all the possible songs
-	open my $f_pls, $playlist or die "Unable to open playlist $playlist: $!";
+
 	my @songs = ();
-	
 	my $narrowing = (defined $uri && $uri ne '/');
 	
-	while (<$f_pls>) {
-		my $s = $_;
+	foreach my $song_obj (@{$self->{'song_objects'}}) {
+		my $s = $song_obj->get_filename;
 		my $acceptsong = 1;
 		chomp $s;
 		
@@ -50,18 +86,13 @@ sub process_playlist {
 		if ($narrowing && index($s, $uri) == -1) {
 			$acceptsong = 0;
 		}
-			#warn "INDEX IS " . index($s, $uri) . "\n";
-		
 		
 		if ($acceptsong) {
 			#push @songs, $s;
-			my $sn = MP3S::Music::Song->new(filename => $s);
-			$sn->set_URI_from_rootdir( $self->{'rootdir'} );
-			push @songs, $sn;
+			push @songs, $song_obj;
 			log_debug( "   Matching song: $s \n") if ($narrowing);			
 		}
 	}
-	close $f_pls;
 	
 	my $all_ok = 1;
 	if (scalar @songs == 0 && $narrowing) { # stop poking about
@@ -75,16 +106,10 @@ sub process_playlist {
 	$all_ok;
 }
 
+# just return 'playlist.m3u' for now
 sub reckon_m3u_name {
 	my $self = shift;
-	
-	my $plsname = $self->{'rootdir'};
-	$plsname = $self->{'playlist'} unless $self->{'temp_playlist'};
-	($plsname) = $plsname =~ m/([^\/]*)$/;
-	$plsname ||= "playlist";
-	$plsname = "${plsname}.m3u" unless ($plsname =~ /\.m3u$/i);
-	
-	$plsname;
+	"playlist.m3u";
 }
 
 # NOTE! returns a list of the Song objects, not the song names!
@@ -120,15 +145,6 @@ sub get_song {
 	}
 	
 	$ret;
-}
-
-sub rm_temp_playlist {
-	my $self = shift;
-	if (defined $self->{'temp_playlist'}) {
-		my $plsname = $self->{'temp_playlist'};
-		log_info( "Removing temp playlist!\n" );
-		system("rm -f $plsname");
-	}
 }
 
 sub generate_tag_info {
@@ -170,33 +186,6 @@ sub get_trackinfo {
 	($tname, $tsecs);
 }
 
-# non class sub
-sub gen_playlist {
-	my ($rootdir, $debug) = @_;
-	
-	my ($fh, $plsname) = tempfile( SUFFIX => '.plx', UNLINK => 0 );
-	log_info( "Generating playlist for given root dir $rootdir\n" );
-	
-	open ($fh, ">$plsname") or die "Unable to open temp playlist $plsname for writing: $!";
-	#add_delete_list($plsname);
-	
-	#my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
-	my $mp3result = qx|find "$rootdir" \\( -name '*.mp3' -o -name '*.ogg' \\) -exec ls -1 -b \{\} \\;|;
-	my @mp3s = split /\n/, $mp3result;
-	
-	foreach my $song (@mp3s) {
-		chomp $song;
-		# strange ._Something.mp3 files in there
-		next if $song =~ /\/\.[^\/]*$/;
-		log_debug( "  Adding '$song' to temp playlist $plsname\n" );
-		
-		$fh->print( "$song\n");
-	}
-	close $fh;
-	
-	return $plsname;
-}
-
 sub setchild {
 	my $self = shift;
 	my ($is_child) = @_;
@@ -206,7 +195,7 @@ sub setchild {
 
 sub DESTROY {
 	my $self = shift;
-	$self->rm_temp_playlist unless $self->{'is_child'};
+	log_info( "Playlist deleted. " );
 }
 
 1;
