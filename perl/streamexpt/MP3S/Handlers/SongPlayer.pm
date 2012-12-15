@@ -84,7 +84,7 @@ sub downsample_piped {
 		$ret = qq{${IFSC}/usr/local/bin/lame --mp3input -b 32 $songname - | };
 	} elsif ($song =~ /ogg$/i) {
 		log_info( "Downsampling as OGG" );
-		$ret = qq{${IFSC}/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - | };
+		$ret = qq{${IFSC}/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null | };
 	} else {
 		log_error( "No idea how to downsample this file" );
 	}

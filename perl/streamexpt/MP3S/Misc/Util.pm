@@ -6,7 +6,8 @@ use Encode;
 sub unbackslashed {
 	my ($title) = @_;
 	
-	$title =~ s/\\(\d\d\d)/encode('utf-8', chr(oct($1)))/ge;
+	#$title =~ s/\\(\d\d\d)/encode('utf-8', chr(oct($1)))/ge;
+	$title =~ s/\\\d\d\d/_/g;
 	$title;
 }
 
