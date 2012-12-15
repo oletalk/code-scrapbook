@@ -15,13 +15,18 @@ sub get_filename {
 	$self->{'filename'};
 }
 
+sub get_uni_filename {
+	my $self = shift;
+	$self->{'uni_filename'};
+}
+
 sub set_URI_from_rootdir {
 	my $self = shift;
 	my ($rootdir) = @_;
 	
 	$rootdir ||= "/";
 	
-	my $songuri = $self->{'filename'};
+	my $songuri = $self->{'uni_filename'} || $self->{'filename'};
 	$songuri =~ s/^$rootdir// if $rootdir;
 	$self->{'URI'} = $songuri;
 }
@@ -37,7 +42,7 @@ sub get_URI {
 	} elsif ($args{'hyperlinked'}) {
 		my $title = $args{'title'};
 		$title ||= $URI;
-		$title = MP3S::Misc::Util::unbackslashed($title);
+		#$title = MP3S::Misc::Util::unbackslashed($title);
 		$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
 	} else {
 		$ret = $URI;

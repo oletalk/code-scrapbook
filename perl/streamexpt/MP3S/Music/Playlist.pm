@@ -7,7 +7,7 @@ use MP3S::Music::Song;
 use MP3S::Misc::Util;
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
 
-use File::Find::Rule;
+use File::Find;
 use File::Temp qw/ tempfile /;
 
 sub new {
@@ -46,15 +46,28 @@ sub gen_master_list {
 		}
 	} elsif (-d $arg1) { #it's a rootdir
 		#my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
-		my $mp3result = qx|find "$arg1" \\( -name '*.mp3' -o -name '*.ogg' \\) -exec ls -1 -b \{\} \\;|;
-		my @mp3s = split /\n/, $mp3result;
+		#my $mp3result = qx|find "$arg1" \\( -name '*.mp3' -o -name '*.ogg' \\) -exec ls -1 -b \{\} \\;|;
+		#my @mp3s = split /\n/, $mp3result;
+		our @mp3s = (); # CM - check this for scope
+		
+		find({ wanted => sub {
+								my ($song) = $File::Find::name;
+								my $songpath = qx{ls -1 -b "$song"};
+								chomp $songpath;
+								push @mp3s, [ $song, $songpath ] if /\.(mp3|ogg)$/i;
+				
+							},
+			   no_chdir => 1,
+			    }, $arg1);
 	
-		foreach my $song (@mp3s) {
+	
+		foreach (@mp3s) {
+			my ($song, $songpath) = @{$_};
 			chomp $song;
 			# strange ._Something.mp3 files in there
 			next if $song =~ /\/\.[^\/]*$/;
 			log_debug( "  Adding '$song' to song_objects list\n" );
-			my $sn = MP3S::Music::Song->new(filename => $song); # TODO! Get 'properly encoded name' as well
+			my $sn = MP3S::Music::Song->new(filename => $song, uni_filename => $songpath); 
 			$sn->set_URI_from_rootdir( $arg1 );
 			push @ret, $sn;
 		}
@@ -77,7 +90,8 @@ sub process_playlist {
 	my $narrowing = (defined $uri && $uri ne '/');
 	
 	foreach my $song_obj (@{$self->{'song_objects'}}) {
-		my $s = $song_obj->get_filename;
+		my $s = $song_obj->get_uni_filename;
+
 		my $acceptsong = 1;
 		chomp $s;
 		
@@ -181,21 +195,21 @@ sub get_trackinfo {
 		if ($tname =~ /Unknown Title/i) {
 			($tname) = $song_obj->get_filename =~ m/\/([^\/]*)$/;			
 		}
-		$tname = MP3S::Misc::Util::unbackslashed($tname);
+		#$tname = MP3S::Misc::Util::unbackslashed($tname);
 	}
 	($tname, $tsecs);
 }
 
-sub setchild {
-	my $self = shift;
-	my ($is_child) = @_;
-	
-	$self->{'is_child'} = $is_child;
-}
+#sub setchild {
+#	my $self = shift;
+#	my ($is_child) = @_;
+#	
+#	$self->{'is_child'} = $is_child;
+#}
 
-sub DESTROY {
-	my $self = shift;
-	log_info( "Playlist deleted. " );
-}
+#sub DESTROY {
+#	my $self = shift;
+#	log_info( "Playlist deleted. " );
+#}
 
 1;
