@@ -45,7 +45,6 @@ sub handle {
 		$conn->close();
 	}
 
-	#$plist->setchild(1); # explain...
 	log_info( "Processing request complete.\n" );
 }
 

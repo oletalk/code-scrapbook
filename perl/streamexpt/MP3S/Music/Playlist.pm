@@ -200,16 +200,6 @@ sub get_trackinfo {
 	($tname, $tsecs);
 }
 
-#sub setchild {
-#	my $self = shift;
-#	my ($is_child) = @_;
-#	
-#	$self->{'is_child'} = $is_child;
-#}
 
-#sub DESTROY {
-#	my $self = shift;
-#	log_info( "Playlist deleted. " );
-#}
 
 1;

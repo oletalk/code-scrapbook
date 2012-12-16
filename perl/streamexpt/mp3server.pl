@@ -72,7 +72,9 @@ if ($regen > 0) {
 $SIG{CHLD} = 'IGNORE';
 
 # let's listen
-my $d = HTTP::Daemon->new(  LocalPort => $port ) || die "OH NOES! Couldn't create a new daemon: $!";
+my $d = HTTP::Daemon->new(  
+		ReuseAddr => 1,
+		LocalPort => $port ) || die "OH NOES! Couldn't create a new daemon: $!";
 							
 log_info( "Downsampling is ON.\n" ) if $downsample;			
 log_info( "Server is up at " . $d->url . ". Waiting for connections ... \n");
@@ -135,13 +137,3 @@ while (my $conn = $d->accept) {
 	#go back and listen for the next connection
 }
 exit(0);
-
-
-
-#END {
-#	if ($parent_quit) {
-#		log_info( "Wrapping up...\n" );
-#	} else {
-#		log_info( "Child process ended.\n" );
-#	}
-#}
