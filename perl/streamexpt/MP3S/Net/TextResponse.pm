@@ -5,6 +5,7 @@ use HTTP::Status;
 use HTTP::Response;
 use URI::Escape;
 use Sys::Hostname;
+use MP3S::Misc::Stats qw(output_stats get_uptime);
 
 sub print_list {
 	my ($plist, $str_uri) = @_;
@@ -47,6 +48,19 @@ sub print_playlist {
 		}
 	}
 	
+
+	$cont;
+}
+
+sub print_stats {
+	my $ret = "";
+	
+	$ret .= "<pre>" . output_stats() . "</pre>";
+	$ret .= "<b>Uptime:</b> " . get_uptime();
+	
+	my $cont = HTTP::Response->new(RC_OK);
+	$cont->header('Content-type' => 'text/html; charset=utf-8');
+	$cont->content( $ret );		
 
 	$cont;
 }

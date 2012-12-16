@@ -6,6 +6,7 @@ use Carp;
 use MP3S::Music::Song;
 use MP3S::Misc::Util;
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
+use MP3S::Misc::Stats qw(count_stat);
 
 use File::Find;
 use File::Temp qw/ tempfile /;
@@ -156,8 +157,12 @@ sub get_song {
 		srand(time / $$);
 		my $indx = $random ? rand $size : 0;
 		$ret = splice @{$self->{'songs'}}, $indx, 1;		
+		if ($ret) {
+			count_stat('SONGS PLAYED', $ret->get_uni_filename);
+			my $hour = MP3S::Misc::Util::get_hour();
+			count_stat('HOUR OF DAY', "${hour}:00");
+		}	
 	}
-	
 	$ret;
 }
 
