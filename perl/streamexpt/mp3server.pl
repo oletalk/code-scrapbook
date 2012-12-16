@@ -31,109 +31,129 @@ our $config_file = "default.conf";
 my $clientlist_file;
 
 # then override with command line args
-my $res = GetOptions("playlist=s" => \$playlist,
-					 "rootdir=s"  => \$rootdir,
-					 "downsample"  => \$downsample,
-					 "port=i"     => \$port,
-					 "clientlist=s" => \$clientlist_file,
-					 "random"     => \$random,
-					 "config_file=s" => \$config_file,
-					 "debug"      => \$debug);
+my $res = GetOptions(
+    "playlist=s"    => \$playlist,
+    "rootdir=s"     => \$rootdir,
+    "downsample"    => \$downsample,
+    "port=i"        => \$port,
+    "clientlist=s"  => \$clientlist_file,
+    "random"        => \$random,
+    "config_file=s" => \$config_file,
+    "debug"         => \$debug
+);
 
 # get config first
 MP3S::Misc::MSConf::init($config_file);
 
 my $llevel = $debug ? MP3S::Misc::Logger::DEBUG : MP3S::Misc::Logger::INFO;
-MP3S::Misc::Logger::init(level => $llevel, display_context => MP3S::Misc::Logger::NAME);
+MP3S::Misc::Logger::init(
+    level           => $llevel,
+    display_context => MP3S::Misc::Logger::NAME
+);
 
-$port            ||= config_value('port') || 8000;
+$port ||= config_value('port') || 8000;
 $downsample      ||= config_value('downsample');
 $clientlist_file ||= config_value('clientlist');
 
 # either playlist or root dir must be specified
-die "Either playlist or rootdir must be specified" 
-	unless (defined $playlist or defined $rootdir);
-my $plist = MP3S::Music::Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
+die "Either playlist or rootdir must be specified"
+  unless ( defined $playlist or defined $rootdir );
+my $plist =
+  MP3S::Music::Playlist->new( playlist => $playlist, rootdir => $rootdir )
+  ;    # rootdir overrides playlist
 my $gen_time = time;
 
 # if rootdir, how often will it check for new files?
 # regenplaylist option in config file TODO
 my $regen = config_value('regenplaylist');
-if ($regen > 0) {
-	if (defined $rootdir) {
-		log_info( "Playlist will regenerate every $regen minutes.");		
-	} else {
-		$regen = 0;
-		log_error("Ignoring 'regenplaylist' since a fixed playlist was provided.");
-	}
+if ( $regen > 0 ) {
+    if ( defined $rootdir ) {
+        log_info("Playlist will regenerate every $regen minutes.");
+    }
+    else {
+        $regen = 0;
+        log_error(
+            "Ignoring 'regenplaylist' since a fixed playlist was provided.");
+    }
 }
 
 #ignore child processes to prevent zombies
 $SIG{CHLD} = 'IGNORE';
 
 # let's listen
-my $d = HTTP::Daemon->new(  
-		ReuseAddr => 1,
-		LocalPort => $port ) || die "OH NOES! Couldn't create a new daemon: $!";
-							
-log_info( "Downsampling is ON.\n" ) if $downsample;			
-log_info( "Server is up at " . $d->url . ". Waiting for connections ... \n");
+my $d = HTTP::Daemon->new(
+    ReuseAddr => 1,
+    LocalPort => $port
+) || die "OH NOES! Couldn't create a new daemon: $!";
 
-my $cl = MP3S::Net::Screener->new(ipfile => $clientlist_file);
-if (config_value('screenerdefault')) {
-	$cl->set_default_action(config_value('screenerdefault'));	
+log_info("Downsampling is ON.\n") if $downsample;
+log_info( "Server is up at " . $d->url . ". Waiting for connections ... \n" );
+
+my $cl = MP3S::Net::Screener->new( ipfile => $clientlist_file );
+if ( config_value('screenerdefault') ) {
+    $cl->set_default_action( config_value('screenerdefault') );
 }
 
 #wait for the connections at the accept call
 
-while (my $conn = $d->accept) {
-	my $child;
-	
-	# who connected?
-	my $peer = $conn->peerhost;
-	log_info( "Connection received ... ", $peer, "\n" );
-	my $action = $cl->screen($peer);
-	log_info( "Action for this peer is $action \n");
-	
-	if ($action eq MP3S::Net::Screener::ALLOW) {
-		# perform the fork or exit
-		die "Can't fork: $!" unless defined ($child = fork());
-		if ($child == 0) {
-			eval {
-				MP3S::Handlers::CmdSwitch::handle(
-					connection => $conn,
-					playlist => $plist,
-					random => $random,
-					downsample => $downsample,
-					port => $port,
-				)
-			};
-			if ($@) {
-				#$had_errors = 1;
-				log_error("Problems handling request: $@");				
-			}
-			#if the child returns, then just exit;
-			exit 0;
-		} else {
-			#close the connection, the parent has already passed it off to a child
-			$conn->close();
-		}
-	} elsif ($action eq MP3S::Net::Screener::DENY) {
-		$conn->send_error(RC_FORBIDDEN);
-		$conn->close();
-	} else { # BLOCK
-		$conn->close();
-	}
-	
-	# check if we were asked to regenerate the playlist
-	if (defined $rootdir && $regen > 0) {
-		my $elapsed = time - $gen_time;
-		if ($elapsed > ($regen * 60)) {
-			log_info ("Re-generating playlist from rootdir $rootdir");
-			$plist = MP3S::Music::Playlist->new(playlist => $playlist, rootdir => $rootdir); # rootdir overrides playlist
-			$gen_time = time;			
-		}
-	}
-	#go back and listen for the next connection
+while ( my $conn = $d->accept ) {
+    my $child;
+
+    # who connected?
+    my $peer = $conn->peerhost;
+    log_info( "Connection received ... ", $peer, "\n" );
+    my $action = $cl->screen($peer);
+    log_info("Action for this peer is $action \n");
+
+    if ( $action eq MP3S::Net::Screener::ALLOW ) {
+
+        # perform the fork or exit
+        die "Can't fork: $!" unless defined( $child = fork() );
+        if ( $child == 0 ) {
+            eval {
+                MP3S::Handlers::CmdSwitch::handle(
+                    connection => $conn,
+                    playlist   => $plist,
+                    random     => $random,
+                    downsample => $downsample,
+                    port       => $port,
+                );
+            };
+            if ($@) {
+
+                #$had_errors = 1;
+                log_error("Problems handling request: $@");
+            }
+
+            #if the child returns, then just exit;
+            exit 0;
+        }
+        else {
+          #close the connection, the parent has already passed it off to a child
+            $conn->close();
+        }
+    }
+    elsif ( $action eq MP3S::Net::Screener::DENY ) {
+        $conn->send_error(RC_FORBIDDEN);
+        $conn->close();
+    }
+    else {    # BLOCK
+        $conn->close();
+    }
+
+    # check if we were asked to regenerate the playlist
+    if ( defined $rootdir && $regen > 0 ) {
+        my $elapsed = time - $gen_time;
+        if ( $elapsed > ( $regen * 60 ) ) {
+            log_info("Re-generating playlist from rootdir $rootdir");
+            $plist = MP3S::Music::Playlist->new(
+                playlist => $playlist,
+                rootdir  => $rootdir
+            );    # rootdir overrides playlist
+            $gen_time = time;
+        }
+    }
+
+    #go back and listen for the next connection
 }
 exit(0);
