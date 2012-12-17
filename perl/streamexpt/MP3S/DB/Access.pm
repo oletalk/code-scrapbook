@@ -86,7 +86,7 @@ sub DESTROY {
 	my $self = shift;
 	my $conn = $self->{'conn'};
 	if ($conn) {
-		#log_info("Disconnecting from the database.");
+		log_debug("Disconnecting from the database.");
 		$conn->disconnect();		
 	}
 }

@@ -13,6 +13,12 @@ sub unbackslashed {
 	$title;
 }
 
+sub filename_only {
+	my $str = shift;
+	$str =~ s/^.*\///g;
+	$str;
+}
+
 sub get_hour {
 	localtime->hour();
 }
