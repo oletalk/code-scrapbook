@@ -11,6 +11,7 @@ use MP3S::Handlers::CmdSwitch;
 use MP3S::Music::Playlist;
 use MP3S::Net::Screener;
 use MP3S::Net::TextResponse;
+use MP3S::DB::Setup;
 use MP3S::Misc::MSConf qw(config_value);
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
 
@@ -76,6 +77,9 @@ if ( $regen > 0 ) {
             "Ignoring 'regenplaylist' since a fixed playlist was provided.");
     }
 }
+
+# initialise database/stats
+MP3S::DB::Setup::init();
 
 #ignore child processes to prevent zombies
 $SIG{CHLD} = 'IGNORE';

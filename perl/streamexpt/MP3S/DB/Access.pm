@@ -21,55 +21,74 @@ sub _connect {
     my $user = $args{'user'} ||= config_value("user");
     my $pass = $args{'pass'} ||= config_value("pass");
 	my $conn = undef;
-	$conn = DBI->connect( "DBI:Pg:dbname=$dbname;host=$host",
-        $user, $pass, { AutoCommit => 1, RaiseError => 1, PrintError => 0 } )
+	$conn = DBI->connect_cached( "DBI:Pg:dbname=$dbname;host=$host",
+        $user, $pass, { AutoCommit => 1, RaiseError => 0, PrintError => 1 } )
       or die DBI->errstr;
 	$conn;
 }
 
-sub setup {
+sub exec_single_row {
 	my $self = shift;
-	my $conn = $self->{'conn'};
-	_connect() unless $conn; # TODO: hmm, this might be bad if 'new' had override args...
-	my $create_tables = $conn->prepare(qq{
-		DROP TABLE IF EXISTS stats;
-		
-		CREATE TABLE stats
-		( category varchar(50) not null,
-		  item     varchar(2000) not null,
-		  count int not null default 0,
-		PRIMARY KEY (category, item) );
-	});
-	$create_tables->execute();
+	my ($sql, @args) = @_;
+	my $res = $self->execute($sql, @args);
+	
+	my $ret = undef;
+	my $had_result = 0;
+	foreach my $row (@$res) {
+		$ret = $row;
+		$had_result++;
+	}
+	log_error("exec_single_row called but result had $had_result rows") if $had_result > 1;
+	$ret;
 }
 
-sub exec {
+sub exec_single_cell {
+	my $self = shift;
+	my ($sql, @args) = @_;
+	my $res = $self->exec_single_row($sql, @args);
+	
+	my $ret = undef;
+	$ret = $res->[0] if $res;
+	$ret;
+	
+}
+
+sub execute {
 	my $self = shift;
 	my $conn = $self->{'conn'};
 	my ($sql, @args) = @_;
-	_connect() unless $conn;
+	_connect() unless $conn; # TODO: hmm, this might be bad if 'new' had override args...
 	my $sth = $conn->prepare($sql);
-	log_info("Preparing SQL $sql");
+	log_debug("Preparing SQL $sql");
 	
 	my $ctr = 1;
 	foreach my $arg (@args) {
 		my $rc = $sth->bind_param($ctr++, $arg);
 	}
 	
-	$sth->execute;
+	my $had_error = 0;
+	$sth->execute or $had_error = 1;
+	$self->{'errstr'} = $DBI::errstr;
 	
 	my $ret = undef;
-	if (defined wantarray) {
+	if (defined wantarray && $had_error == 0) {
 		$ret = $sth->fetchall_arrayref;		
 	}
 	$ret;
 }
 
+sub errstr {
+	my $self = shift;
+	$self->{'errstr'};
+}
+
 sub DESTROY {
 	my $self = shift;
 	my $conn = $self->{'conn'};
-	log_info("Disconnecting from the database.");
-	$conn->disconnect();
+	if ($conn) {
+		#log_info("Disconnecting from the database.");
+		$conn->disconnect();		
+	}
 }
 
 1;
