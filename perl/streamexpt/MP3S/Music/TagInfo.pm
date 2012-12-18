@@ -6,6 +6,8 @@ use MP3::Info;
 use Digest::SHA qw(sha1_hex); # TODO: this isn't really being used right now
 
 use MP3S::Misc::MSConf qw(config_value);
+use MP3S::DB::Access;
+use MP3S::Misc::Logger qw(log_debug log_info log_error);
 
 sub new {
 	my $class = shift;
@@ -18,36 +20,27 @@ sub generate_tags {
 	my $self = shift;
 	my (%args) = @_;
 	
-	my $DELIM = "|||";
 	my $progress = 0;
 	if ($args{'progress_batchsize'}) {
 		$progress = int($args{'progress_batchsize'});
 	}
-	
-	my $fh_hashes;
-	if (config_value('tagsfile')) {
-		my $filename = config_value('tagsfile');
-		#read in anything already existing in the tagsfile
-		$self->read_tags($filename);
-		#then write out anything else we've encountered
-		open ($fh_hashes, ">>", $filename) or warn "Unable to open hashes file for writing: $!";
-	}
-	
-	if ($self->{'tags'}) {
-		warn"Tags already generated";
-	} 
-	
+		
 	my $pl = $self->{'playlist'};
 	
 	my $ctr = 0;
 	my $total = scalar $pl->list_of_songs;
 	
 	my %hashes = ();
+	
+	my $db = MP3S::DB::Access->new;
+	
 	foreach my $song_obj ($pl->list_of_songs) {
 		my $song = $song_obj->get_filename;		
 		my $file_hash = sha1_hex($song);
 		
-		unless (defined $self->{'tags'}->{$song}) {
+		my $res = $db->exec_single_cell("SELECT 1 FROM MP3S_tags WHERE song_filepath = ?", $song);
+		
+		unless ($res == 1) {
 			my $mp3tag = get_mp3tag($song);
 			my $mp3info = get_mp3info($song);
 
@@ -62,20 +55,22 @@ sub generate_tags {
 					$secs = int($secs);
 					$self->{'tags'}->{$song}->{'secs'} = $secs;					
 				}
+				$db->execute(qq{
+					INSERT INTO MP3S_tags (song_filepath, file_hash, artist, title, secs)
+					VALUES (?, ?, ?, ?, ?);
+				}, $song, $file_hash, $artist, $title, $secs);
+				log_info("Problem inserting tag for $song") if $db->errstr;
 
-				unless ($hashes{$file_hash}) {
-					if (defined $fh_hashes) { # FIXME hacky - do we or don't we need a tagsfile??
-						print $fh_hashes join($DELIM, ($song, $file_hash, $artist, $title, $secs)); 
-						print $fh_hashes "\n";						
-					}
-				}
+#						print $fh_hashes join($DELIM, ($song, $file_hash, $artist, $title, $secs)); 
 
 			} else {
-				warn "Tag not found for file $song";
-				if (defined $fh_hashes) { #FIXME! see above :-/
-					print $fh_hashes join($DELIM, ($song, $file_hash));
-					print $fh_hashes "\n";
-				}
+				log_info("Tag not found for file $song");
+#					print $fh_hashes join($DELIM, ($song, $file_hash));
+				$db->execute(qq{
+					INSERT INTO MP3S_tags (song_filepath, file_hash)
+					VALUES (?, ?);
+				}, $song, $file_hash);
+				log_error("Problem inserting tag for $song") if $db->errstr;
 			}
 			$ctr++;
 			if ($progress > 0 && $ctr % $progress == 0) {
@@ -84,30 +79,8 @@ sub generate_tags {
 			
 		}	
 	}
-
-	close $fh_hashes if $fh_hashes;
 	
-	$self->{'loaded'} = 1;
 	warn "Done generating tags";
-}
-
-sub read_tags {
-	my $self = shift;
-	my ($tags_filename) = @_;
-	
-	my $fh = undef;
-	open $fh, $tags_filename or warn "Unable to open tagfile $tags_filename: $!";
-	
-	if (defined $fh) {
-		while (<$fh>) {
-			my ($song, $file_hash, $artist, $title, $secs) = split(/\|\|\|/, $_);
-			chomp $secs if $secs;
-			$self->{'tags'}->{$song}->{'artist'} = $artist;
-			$self->{'tags'}->{$song}->{'title'} = $title;
-			$self->{'tags'}->{$song}->{'secs'} = $secs;
-		}
-		close $fh;
-	}
 }
 
 sub _get_tracktag_info {
@@ -117,17 +90,19 @@ sub _get_tracktag_info {
 	my $song = $song_obj->get_filename;
 	
 	my @ret = ();
-	if ($self->{'tags'}) {
-		my $tracktag = $self->{'tags'}->{$song};
-		if ($tracktag) {
-			foreach my $prop (@props) {
-				my $propval = $tracktag->{$prop};
-				push @ret, $propval;
-			}
-		}
-	} else {
-		warn "Tags not available";
+	
+	my $proplist = join(', ', @props); # CM FIXME: input validation pls!
+	
+	my $db = MP3S::DB::Access->new;
+	my $track_info = $db->exec_single_row(qq{
+		SELECT $proplist 
+		FROM MP3S_tags
+		WHERE song_filepath = ?
+	}, $song);
+	foreach (@$track_info) {
+		push @ret, $_;
 	}
+	log_error("Problem getting tag for $song") if $db->errstr;
 	
 	@ret;
 }

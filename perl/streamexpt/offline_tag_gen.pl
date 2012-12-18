@@ -3,6 +3,7 @@
 use strict;
 use MP3S::Misc::MSConf qw(config_value);
 use MP3S::Music::Playlist;
+use MP3S::DB::Setup;
 use Sys::Hostname;
 use MP3S::Net::TextResponse;
 
@@ -12,6 +13,7 @@ our $playlist;
 our $rootdir;
 our $config_file = "default.conf";
 our $debug;
+our $cleartags = 0;
 
 my $host = hostname();
 my $port;
@@ -20,16 +22,21 @@ my $m3ufile;
 # same usage (basically) as mp3server
 my $res = GetOptions("playlist=s" => \$playlist,
 					 "rootdir=s"  => \$rootdir,
+					 "cleartags"  => \$cleartags,
 					 "config_file=s" => \$config_file,
 					 "m3uoutput=s" => \$m3ufile,
 					 "debug"      => \$debug);
 
-MSConf::init($config_file);
+MP3S::Misc::MSConf::init($config_file);
 
-die "Tags file is not specified in config" unless config_value('tagsfile');
 
 $port ||= config_value('port');
 
+if (defined $cleartags) {
+	print "WARNING! This will clear out any existing tag info in the database!  If this is OK, hit Enter.\n";
+	my $dummy = <STDIN>;
+	MP3S::DB::Setup::create_tagstable;	
+}
 if (defined $m3ufile && !defined $port) {
 	die "Port needed to generate m3u file (which consists of URLs)";
 }
