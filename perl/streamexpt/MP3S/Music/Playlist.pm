@@ -139,7 +139,7 @@ sub reckon_m3u_name {
 # should be called by internal TagInfo object only. This is the unfiltered list of song objects.
 sub _master_list_of_songs {
 	my $self = shift;
-	$self->{'song_objects'};
+	@{$self->{'song_objects'}};
 }
 
 # NOTE! returns a list of the Song objects, not the song names!
@@ -148,7 +148,7 @@ sub list_of_songs {
     croak
       "List of songs is empty (perhaps 'process_playlist' wasn't called yet?)"
       unless $self->{'songs'};
-    @{ $self->{'songs'} };
+    sort @{ $self->{'songs'} };
 }
 
 sub list_of_songs_URIs {
@@ -161,7 +161,7 @@ sub list_of_songs_URIs {
     # CM and what if it's an ordinary playlist and no 'rootdir' was given?
     $rootdir = "/";
 
-    map ( $_->get_URI( 'hyperlinked' => $hyperlinked ), @{ $self->{'songs'} } );
+    sort map ( $_->get_URI( 'hyperlinked' => $hyperlinked ), @{ $self->{'songs'} } );
 
 }
 
