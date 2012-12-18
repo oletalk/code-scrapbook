@@ -59,6 +59,9 @@ $clientlist_file ||= config_value('clientlist');
 # either playlist or root dir must be specified
 die "Either playlist or rootdir must be specified"
   unless ( defined $playlist or defined $rootdir );
+
+$rootdir = "${rootdir}/" unless $rootdir =~ /\/$/;
+
 my $plist =
   MP3S::Music::Playlist->new( playlist => $playlist, rootdir => $rootdir )
   ;    # rootdir overrides playlist

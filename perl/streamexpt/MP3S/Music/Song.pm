@@ -27,10 +27,18 @@ sub set_URI_from_rootdir {
 	$rootdir ||= "/";
 	
 	my $songuri = $self->{'uni_filename'} || $self->{'filename'};
-	$songuri =~ s/^$rootdir// if $rootdir;
+	if ($rootdir) {
+		$songuri = _cut_rootdir($songuri, $rootdir);
+		$self->{'nonuni_URI'} = _cut_rootdir($self->{'filename'}, $rootdir);
+	}
 	$self->{'URI'} = $songuri;
 }
 
+sub _cut_rootdir {
+	my ($str, $rootdir) = @_;
+	$str =~ s/^$rootdir//;
+	$str;
+}
 
 sub get_URI {
 	my $self = shift;
@@ -41,8 +49,9 @@ sub get_URI {
 		$ret = qq |/play/${URI}|;
 	} elsif ($args{'hyperlinked'}) {
 		my $title = $args{'title'};
-		$title ||= $URI;
-		#$title = MP3S::Misc::Util::unbackslashed($title);
+		#$title ||= $URI;
+		$title ||= $self->{'nonuni_URI'} || $URI;
+
 		$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
 	} else {
 		$ret = $URI;
