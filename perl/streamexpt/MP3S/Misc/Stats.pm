@@ -14,7 +14,7 @@ sub get_uptime {
 
     my $db           = MP3S::DB::Access->new;
     my $elapsed_secs = $db->exec_single_cell(
-"select cast(date_part('epoch', now() - start) as integer) from starttime"
+"select cast(date_part('epoch', now() - start) as integer) from MP3S_starttime"
     );
     log_error("Problem fetching elapsed secs") unless $elapsed_secs;
     $days  = int( $elapsed_secs / 86400 );
@@ -38,18 +38,18 @@ sub count_stat {
     if ( $category && $item ) {
         my $db    = MP3S::DB::Access->new;
         my $count = $db->exec_single_cell(
-            "SELECT count FROM stats WHERE category = ? AND item = ?",
+            "SELECT count FROM MP3S_stats WHERE category = ? AND item = ?",
             $category, $item );
 
         if ($count) {
             $count++;
             $db->execute(
-                "UPDATE stats SET count = ? WHERE category = ? AND item = ?",
+                "UPDATE MP3S_stats SET count = ? WHERE category = ? AND item = ?",
                 $count, $category, $item );
         }
         else {
             $db->execute(
-                "INSERT INTO stats(category, item, count) VALUES (?, ?, 1)",
+                "INSERT INTO MP3S_stats(category, item, count) VALUES (?, ?, 1)",
                 $category, $item );
         }
     }
@@ -62,7 +62,7 @@ sub output_stats {
     my $ret = "";
     my $db  = MP3S::DB::Access->new;
     my $res = $db->execute(
-        "SELECT category, item, count FROM stats ORDER BY category, count desc, item"
+        "SELECT category, item, count FROM MP3S_stats ORDER BY category, count desc, item"
     );
 
     my $prevcat = "";

@@ -6,21 +6,40 @@ use MP3S::DB::Access;
 sub init {
 	my $db = MP3S::DB::Access->new;
 	$db->execute(qq{
-		DROP TABLE IF EXISTS stats;
+		DROP TABLE IF EXISTS MP3S_stats;
 		
-		DROP TABLE IF EXISTS starttime;
+		DROP TABLE IF EXISTS MP3S_starttime;
 		
-		CREATE TABLE stats
+		CREATE TABLE MP3S_stats
 		( category varchar(50) not null,
 		  item     varchar(2000) not null,
 		  count int not null default 0,
 		PRIMARY KEY (category, item) );
 		
-		CREATE TABLE starttime
+		CREATE TABLE MP3S_starttime
 		( start timestamp not null );
 		
-		INSERT INTO starttime VALUES(now());
+		INSERT INTO MP3S_starttime VALUES(now());
 		
+	});
+}
+
+sub create_tagstable {
+
+# 	print $fh_hashes join($DELIM, ($song, $file_hash, $artist, $title, $secs)); 
+
+
+	my $db = MP3S::DB::Access->new;
+	$db->execute(qq{
+		DROP TABLE IF EXISTS MP3S_tags;
+		
+		CREATE TABLE MP3S_tags
+		( song_filepath varchar(2000) not null,
+		  file_hash varchar(50) null,
+		  artist varchar(100) null,
+		  title varchar(200) null,
+		  secs integer not null default -1,
+		  PRIMARY KEY (song_filepath) );
 	});
 }
 
