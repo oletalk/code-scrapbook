@@ -13,7 +13,7 @@ our $playlist;
 our $rootdir;
 our $config_file = "default.conf";
 our $debug;
-our $cleartags = 0;
+our $cleartags;
 
 my $host = hostname();
 my $port;

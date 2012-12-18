@@ -62,6 +62,7 @@ die "Either playlist or rootdir must be specified"
 my $plist =
   MP3S::Music::Playlist->new( playlist => $playlist, rootdir => $rootdir )
   ;    # rootdir overrides playlist
+
 my $gen_time = time;
 
 # if rootdir, how often will it check for new files?

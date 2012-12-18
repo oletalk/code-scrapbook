@@ -16,6 +16,25 @@ sub new {
 	bless \%content, $class;
 }
 
+sub read_tags_from_db {
+	my $self = shift;
+	my $db = MP3S::DB::Access->new;
+	
+	my $res = $db->execute(qq{
+		SELECT song_filepath, file_hash, artist, title, secs
+		FROM MP3S_tags;
+	});
+	
+	foreach my $row(@$res) {
+		my ($song, $fhash, $artist, $title, $secs) = @$row;
+		$self->{'tags'}->{$song}->{'artist'} = $artist;
+		$self->{'tags'}->{$song}->{'title'} = $title;
+		$self->{'tags'}->{$song}->{'secs'} = $secs;							
+	}
+	log_info("Done reading tags from the database.");
+	
+}
+
 sub generate_tags {
 	my $self = shift;
 	my (%args) = @_;
@@ -30,17 +49,20 @@ sub generate_tags {
 	my $ctr = 0;
 	my $total = scalar $pl->list_of_songs;
 	
-	my %hashes = ();
+	my %db_songs = ();
 	
 	my $db = MP3S::DB::Access->new;
+	
+	my $res1 = $db->execute("SELECT song_filepath FROM MP3S_tags");
+	foreach my $row (@$res1) {
+		$db_songs{$row->[0]} = 1;
+	}
 	
 	foreach my $song_obj ($pl->list_of_songs) {
 		my $song = $song_obj->get_filename;		
 		my $file_hash = sha1_hex($song);
-		
-		my $res = $db->exec_single_cell("SELECT 1 FROM MP3S_tags WHERE song_filepath = ?", $song);
-		
-		unless ($res == 1) {
+				
+		unless (defined $db_songs{$song}) {
 			my $mp3tag = get_mp3tag($song);
 			my $mp3info = get_mp3info($song);
 
@@ -48,13 +70,12 @@ sub generate_tags {
 				my $artist = $mp3tag->{'ARTIST'};
 				my $title  = $mp3tag->{'TITLE'};
 				my $secs   = -1;
-				$self->{'tags'}->{$song}->{'artist'} = $artist;
-				$self->{'tags'}->{$song}->{'title'} = $title;
 				if ($mp3info) {
 					$secs = $mp3info->{'SECS'};
 					$secs = int($secs);
-					$self->{'tags'}->{$song}->{'secs'} = $secs;					
 				}
+				
+				$artist = substr($artist, 0, 99); # fix for some really really long artists in my collection! :-S
 				$db->execute(qq{
 					INSERT INTO MP3S_tags (song_filepath, file_hash, artist, title, secs)
 					VALUES (?, ?, ?, ?, ?);
@@ -87,22 +108,18 @@ sub _get_tracktag_info {
 	my $self = shift;
 	my ($song_obj, @props) = @_;
 	
+	die "Tag info not available" unless $self->{'tags'};
 	my $song = $song_obj->get_filename;
 	
 	my @ret = ();
 	
 	my $proplist = join(', ', @props); # CM FIXME: input validation pls!
 	
-	my $db = MP3S::DB::Access->new;
-	my $track_info = $db->exec_single_row(qq{
-		SELECT $proplist 
-		FROM MP3S_tags
-		WHERE song_filepath = ?
-	}, $song);
-	foreach (@$track_info) {
-		push @ret, $_;
+	my $track_info = $self->{'tags'}->{$song};
+	
+	foreach (@props) {
+		push @ret, $track_info->{$_};
 	}
-	log_error("Problem getting tag for $song") if $db->errstr;
 	
 	@ret;
 }

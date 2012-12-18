@@ -26,9 +26,6 @@ sub init {
 
 sub create_tagstable {
 
-# 	print $fh_hashes join($DELIM, ($song, $file_hash, $artist, $title, $secs)); 
-
-
 	my $db = MP3S::DB::Access->new;
 	$db->execute(qq{
 		DROP TABLE IF EXISTS MP3S_tags;

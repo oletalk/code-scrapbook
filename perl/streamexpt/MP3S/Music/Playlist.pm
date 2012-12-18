@@ -188,8 +188,8 @@ sub generate_tag_info {
 # This should ideally be generated only once, and after gen_playlist has been called
     use MP3S::Music::TagInfo;
     my $ti = new MP3S::Music::TagInfo( playlist => $self );
-    $ti->generate_tags( progress_batchsize => 10, to_file => './blah.txt' )
-      ;    # TEST
+    $ti->generate_tags( progress_batchsize => 10 );    # TEST
+	$ti->read_tags_from_db;
     $self->{'tag_info'} = $ti;
     log_info("Tag info generation done");
 }
