@@ -19,7 +19,7 @@ sub new {
 sub read_tags_from_db {
 	my $self = shift;
 	my $db = MP3S::DB::Access->new;
-	
+		
 	my $res = $db->execute(qq{
 		SELECT song_filepath, file_hash, artist, title, secs
 		FROM MP3S_tags;
@@ -47,7 +47,7 @@ sub generate_tags {
 	my $pl = $self->{'playlist'};
 	
 	my $ctr = 0;
-	my $total = scalar $pl->list_of_songs;
+	my $total = scalar $pl->_master_list_of_songs;
 	
 	my %db_songs = ();
 	
@@ -58,7 +58,7 @@ sub generate_tags {
 		$db_songs{$row->[0]} = 1;
 	}
 	
-	foreach my $song_obj ($pl->list_of_songs) {
+	foreach my $song_obj ($pl->_master_list_of_songs) {
 		my $song = $song_obj->get_filename;		
 		my $file_hash = sha1_hex($song);
 				
@@ -133,6 +133,14 @@ sub get_tracksecs {
 	$secs = int($secs);
 	
 	return $secs;
+}
+
+sub get_artist {
+	my $self = shift;
+	my ($song_obj) = @_;
+	
+	my ($artist) = $self->_get_tracktag_info($song_obj, 'artist');
+	$artist;
 }
 
 sub get_trackname {

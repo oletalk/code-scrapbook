@@ -4,6 +4,7 @@ use strict;
 use Carp;
 
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
+use MP3S::Misc::Stats qw(count_stat);
 
 use NetAddr::IP;
 use constant ALLOW => 'ALLOW';
@@ -63,6 +64,10 @@ sub screen {
 	} else {
 		log_info( "No clientfile (allow/deny) specified so defaulting to $ret.\n" );		
 	}
+	log_info("Action for client $ip_string is $ret.");
+	count_stat('CLIENTS', $ip_string);
+	count_stat('ACTIONS', $ret);
+	
 	return $ret;
 }
 

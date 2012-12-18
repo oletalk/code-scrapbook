@@ -4,6 +4,7 @@ use strict;
 use Carp;
 use File::Temp qw/ tempfile /; # if we need to generate a temp playlist file
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
+use MP3S::Misc::Util;
 
 use Encode;
 

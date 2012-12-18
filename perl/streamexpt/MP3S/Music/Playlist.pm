@@ -4,9 +4,7 @@ use strict;
 use Carp;
 
 use MP3S::Music::Song;
-use MP3S::Misc::Util;
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
-use MP3S::Misc::Stats qw(count_stat);
 
 use File::Find;
 use File::Temp qw/ tempfile /;
@@ -138,6 +136,12 @@ sub reckon_m3u_name {
     "playlist.m3u";
 }
 
+# should be called by internal TagInfo object only. This is the unfiltered list of song objects.
+sub _master_list_of_songs {
+	my $self = shift;
+	$self->{'song_objects'};
+}
+
 # NOTE! returns a list of the Song objects, not the song names!
 sub list_of_songs {
     my $self = shift;
@@ -171,12 +175,6 @@ sub get_song {
         srand( time / $$ );
         my $indx = $random ? rand $size : 0;
         $ret = splice @{ $self->{'songs'} }, $indx, 1;
-        if ($ret) {
-            count_stat( 'SONGS PLAYED',
-                MP3S::Misc::Util::filename_only( $ret->get_uni_filename ) );
-            my $hour = MP3S::Misc::Util::get_hour();
-            count_stat( 'HOUR OF DAY', "${hour}:00" );
-        }
     }
     $ret;
 }
@@ -197,6 +195,7 @@ sub generate_tag_info {
 sub get_tag_info {
     my $self = shift;
     if ( !$self->{'tag_info'} ) {
+		log_debug($self . " -= No tag info yet, generating now");
         $self->generate_tag_info;
     }
     $self->{'tag_info'};
@@ -207,20 +206,21 @@ sub get_trackinfo {
     my ($song_obj) = @_;
     my $tname      = undef;
     my $tsecs      = undef;
+	my $tartist    = undef;
 
     my $ti = $self->get_tag_info;
     if ($ti) {
         $tname = $ti->get_trackname($song_obj);
         $tsecs = $ti->get_tracksecs($song_obj);
+		$tartist = $ti->get_artist($song_obj);
 
         #if unable to find the artist/title, make song title up from filename
         if ( $tname =~ /Unknown Title/i ) {
             ($tname) = $song_obj->get_filename =~ m/\/([^\/]*)$/;
         }
 
-        #$tname = MP3S::Misc::Util::unbackslashed($tname);
     }
-    ( $tname, $tsecs );
+    ( $tname, $tsecs, $tartist );
 }
 
 1;

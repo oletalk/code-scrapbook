@@ -62,6 +62,9 @@ die "Either playlist or rootdir must be specified"
 my $plist =
   MP3S::Music::Playlist->new( playlist => $playlist, rootdir => $rootdir )
   ;    # rootdir overrides playlist
+# get the tags in now
+$plist->generate_tag_info();
+
 
 my $gen_time = time;
 
@@ -106,9 +109,7 @@ while ( my $conn = $d->accept ) {
 
     # who connected?
     my $peer = $conn->peerhost;
-    log_info( "Connection received ... ", $peer, "\n" );
     my $action = $cl->screen($peer);
-    log_info("Action for this peer is $action \n");
 
     if ( $action eq MP3S::Net::Screener::ALLOW ) {
 
