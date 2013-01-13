@@ -41,7 +41,7 @@ sub handle {
 	} elsif ($command eq 'drop') {
 		$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $port));
 	} elsif ($command eq 'stats') {
-		$conn->send_response( MP3S::Net::TextResponse::print_stats );
+		$conn->send_response( MP3S::Net::TextResponse::print_stats($str_uri));
 	} else {
 		$conn->send_error(RC_BAD_REQUEST);
 		$conn->close();

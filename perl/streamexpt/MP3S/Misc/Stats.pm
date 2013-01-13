@@ -57,25 +57,71 @@ sub count_stat {
 }
 
 sub output_stats {
-    my ($order) = @_;
+    my ($uri) = @_;
 
-    my $ret = "";
-    my $db  = MP3S::DB::Access->new;
-    my $res = $db->execute(
-        "SELECT category, item, count FROM MP3S_stats ORDER BY category, count desc, item"
-    );
+	my ($dummy, $cmd, @args) = split/\//, $uri;
+	
+	$cmd ||= "all";
+	
+	my $ret = "";
 
-    my $prevcat = "";
-    foreach my $row (@$res) {
-        my ( $category, $item, $count ) = @$row;
-        if ( $prevcat ne $category ) {
-            $ret .= " -------- $category ---------\n";
-        }
-        $ret .= "\t$count\t - $item \n";
-        $prevcat = $category;
-    }
+	if ($cmd =~ /^help|usage$/) {
+		$ret = qq{
+			<h3>Stats output</h3>
+			<p>Command format: /command/specifier e.g. <tt>/all /artists/top10 /clients/top20 /songs/top10 </tt></p>
+			<p>For a list of commands you can use /commands
+			<p>Command for this display is /help or /usage.</p>
+			<p>Default command is /all.</p>
+		};
+	} else {
+	    my $db  = MP3S::DB::Access->new;
+	
+		my $specif = undef;
+		if ($cmd !~ /^all|commands$/) {
+			$specif = uc $cmd;
+		}
+	
+	    my $res = $specif ?
+	 		  $db->execute(
+				"SELECT category, item, count FROM MP3S_stats WHERE category = ? ORDER BY count desc, item",
+				$specif
+			)
+			: $db->execute(
+	        	"SELECT category, item, count FROM MP3S_stats ORDER BY category, count desc, item"
+	    	);
 
-    $ret || "No stats available yet";
+	    my $prevcat = "";
+		my $catcount = 0;
+		my $max_for_cat = 0;
+		
+		# process args for cat-specific count requests e.g. 'top10' 'top20'
+		foreach my $arg (@args) {
+			if ($arg =~ /^top(\d+)$/) {
+				my $c = $1;
+				$max_for_cat = $c if ($c > 0 && ($c % 5 == 0) && $c <= 20);
+			}
+		}
+		
+	    foreach my $row (@$res) {
+	        my ( $category, $item, $count ) = @$row;
+	        if ( $prevcat ne $category ) {
+				$catcount = 0;
+	            $ret .= " -------- $category ---------\n";
+	        }
+			$catcount++;
+			
+			if ($cmd ne 'commands') {
+				if ($max_for_cat == 0 || $catcount <= $max_for_cat) {
+			        $ret .= "\t$count\t - $item \n";					
+				}
+			}
+	        $prevcat = $category;
+	    }
+
+	    $ret || "No stats available yet";
+		
+	}
+
 }
 
 1;

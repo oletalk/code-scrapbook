@@ -148,7 +148,7 @@ sub list_of_songs {
     croak
       "List of songs is empty (perhaps 'process_playlist' wasn't called yet?)"
       unless $self->{'songs'};
-    sort @{ $self->{'songs'} };
+    @{ $self->{'songs'} };
 }
 
 sub list_of_songs_URIs {

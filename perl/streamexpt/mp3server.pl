@@ -159,6 +159,8 @@ while ( my $conn = $d->accept ) {
                 playlist => $playlist,
                 rootdir  => $rootdir
             );    # rootdir overrides playlist
+			$plist->generate_tag_info();
+
             $gen_time = time;
         }
     }

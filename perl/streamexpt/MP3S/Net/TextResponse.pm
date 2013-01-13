@@ -53,9 +53,10 @@ sub print_playlist {
 }
 
 sub print_stats {
+	my ($uri) = @_;
 	my $ret = "";
 	
-	$ret .= "<pre>" . output_stats() . "</pre>";
+	$ret .= "<pre>" . output_stats($uri) . "</pre>";
 	$ret .= "<b>Uptime:</b> " . get_uptime();
 	
 	my $cont = HTTP::Response->new(RC_OK);
