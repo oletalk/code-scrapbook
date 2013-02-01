@@ -7,42 +7,45 @@ use MP3S::Music::Song;
 use MP3S::Misc::Logger qw(log_debug);
 
 sub new {
-	my $class = shift;
-	my ($arg1) = @_;
-    my %args  = { 'songs' => gen_master_list($arg1) };
+    my $class  = shift;
+    my ($arg1) = @_;
+    my %args   = ( 'songs' => gen_master_list($arg1) );
 
     bless \%args, $class;
 }
 
 sub is_stale {
-	my $self = shift;
-	my ($rootdir, $orig_time) = @_;
+    my $self = shift;
+    my ( $rootdir, $orig_time ) = @_;
 
-	our $new_mp3s = 0;
-	if ($rootdir) {
-		find(
+    our $new_mp3s = 0;
+    if ($rootdir) {
+        find(
             {
                 wanted => sub {
-                    my ($song) = $File::Find::name;
-					my $basename = $_;
-					my @stat = stat($song);
-                    if ($stat[9] > $orig_time && $basename =~ /\.(mp3|ogg)$/i) {
-						$new_mp3s++;
-						log_debug("Found a file newer than the playlist: $basename");
-					}
+                    my ($song)   = $File::Find::name;
+                    my $basename = $_;
+                    my @stat     = stat($song);
+                    if ( $stat[9] > $orig_time && $basename =~ /\.(mp3|ogg)$/i )
+                    {
+                        $new_mp3s++;
+                        log_debug(
+                            "Found a file newer than the playlist: $basename");
+                    }
 
                 },
                 no_chdir => 1,
+				follow_fast => 1,
             },
             $rootdir
         );
-	}
-	$new_mp3s;
+    }
+    $new_mp3s;
 }
 
 sub songs {
-	my $self = shift;
-	@{$self->{'songs'}};
+    my $self = shift;
+    $self->{'songs'};
 }
 
 #internal sub to generate song objects
@@ -64,7 +67,7 @@ sub gen_master_list {
         }
     }
     elsif ( -d $arg1 ) {    #it's a rootdir
-        our @mp3s = ();    # CM - check this for scope
+        our @mp3s = ();     # CM - check this for scope
 
         find(
             {

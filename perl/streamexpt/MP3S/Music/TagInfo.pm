@@ -47,7 +47,7 @@ sub generate_tags {
 	my $pl = $self->{'playlist'};
 	
 	my $ctr = 0;
-	my $total = scalar $pl->_master_list_of_songs;
+	my $total = scalar $pl->all_songnames;
 	
 	my %db_songs = ();
 	
@@ -58,8 +58,7 @@ sub generate_tags {
 		$db_songs{$row->[0]} = 1;
 	}
 	
-	foreach my $song_obj ($pl->_master_list_of_songs) {
-		my $song = $song_obj->get_filename;		
+	foreach my $song ($pl->all_songnames) {
 		my $file_hash = sha1_hex($song);
 				
 		unless (defined $db_songs{$song}) {
@@ -101,7 +100,7 @@ sub generate_tags {
 		}	
 	}
 	
-	warn "Done generating tags";
+	warn "Done generating tags for $total songs.";
 }
 
 sub _get_tracktag_info {

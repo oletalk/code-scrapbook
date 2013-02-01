@@ -154,16 +154,20 @@ while ( my $conn = $d->accept ) {
     if ( defined $rootdir && $regen > 0 ) {
         my $elapsed = time - $gen_time;
         if ( $elapsed > ( $regen * 60 ) ) {
-            log_info("Re-generating playlist from rootdir $rootdir");
+			if ($plist->is_stale) {
+				log_info("Re-generating playlist from rootdir $rootdir");
+	            
+	            $plist = MP3S::Music::Playlist->new(
+	                playlist => $playlist,
+	                rootdir  => $rootdir
+	            );    # rootdir overrides playlist
+				$plist->generate_tag_info();
 
-			# CM 01/02/2013 TODO - how about just adding new files?
-            $plist = MP3S::Music::Playlist->new(
-                playlist => $playlist,
-                rootdir  => $rootdir
-            );    # rootdir overrides playlist
-			$plist->generate_tag_info();
-
-            $gen_time = time;
+			} else {
+				log_info("Re-gen time passed but no new files encountered");
+			}
+			$gen_time = time;				
+            
         }
     }
 
