@@ -155,6 +155,8 @@ while ( my $conn = $d->accept ) {
         my $elapsed = time - $gen_time;
         if ( $elapsed > ( $regen * 60 ) ) {
             log_info("Re-generating playlist from rootdir $rootdir");
+
+			# CM 01/02/2013 TODO - how about just adding new files?
             $plist = MP3S::Music::Playlist->new(
                 playlist => $playlist,
                 rootdir  => $rootdir

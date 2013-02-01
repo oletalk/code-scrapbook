@@ -3,22 +3,21 @@ package MP3S::Music::Playlist;
 use strict;
 use Carp;
 
-use MP3S::Music::Song;
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
+use MP3S::Music::PlaylistMaster;
 
-use File::Find;
-use File::Temp qw/ tempfile /;
 
 sub new {
     my $class = shift;
     my %args  = @_;
 
     if ( $args{'rootdir'} ) {
-        $args{'song_objects'} = gen_master_list( $args{'rootdir'} );
+        $args{'song_objects'} = PlaylistMaster->new( $args{'rootdir'} );
     }
     else {
-        $args{'song_objects'} = gen_master_list( $args{'playlist'} );
+        $args{'song_objects'} = PlaylistMaster->new( $args{'playlist'} );
     }
+	$args{'gen_time'} = time();
     croak("No rootdir or playlist name was given") unless $args{'song_objects'};
     bless \%args, $class;
 }
@@ -27,77 +26,15 @@ sub new {
 #       self->songs is the list filtered through a URI
 #       The latter is also affected with each call of get_song
 
-#internal sub to generate song objects
-sub gen_master_list {
-    my ($arg1) = @_;
-
-    my @ret = ();
-    if ( -f $arg1 ) {    #it's a playlist
-        open my $f_pls, $arg1 or die "Unable to open playlist $arg1: $!";
-
-        while (<$f_pls>) {
-            my $s = $_;
-            chomp $s;
-
-            log_debug("  Adding '$s' to song_objects list\n");
-            my $sn = MP3S::Music::Song->new( filename => $s );
-            $sn->set_URI_from_rootdir($arg1);
-            push @ret, $sn;
-        }
-    }
-    elsif ( -d $arg1 ) {    #it's a rootdir
-         #my @mp3s = File::Find::Rule->file()->name( qr/\.(mp3|ogg)$/i )->in( $rootdir );
-         #my $mp3result = qx|find "$arg1" \\( -name '*.mp3' -o -name '*.ogg' \\) -exec ls -1 -b \{\} \\;|;
-         #my @mp3s = split /\n/, $mp3result;
-        our @mp3s = ();    # CM - check this for scope
-
-        find(
-            {
-                wanted => sub {
-                    my ($song) = $File::Find::name;
-                    my $songpath = qx{ls -1 -b "$song"};
-                    chomp $songpath;
-                    push @mp3s, [ $song, $songpath ] if /\.(mp3|ogg)$/i;
-
-                },
-                no_chdir => 1,
-            },
-            $arg1
-        );
-
-        foreach (@mp3s) {
-            my ( $song, $songpath ) = @{$_};
-            chomp $song;
-
-            # strange ._Something.mp3 files in there
-            next if $song =~ /\/\.[^\/]*$/;
-            log_debug("  Adding '$song' to song_objects list\n");
-            my $sn = MP3S::Music::Song->new(
-                filename     => $song,
-                uni_filename => $songpath
-            );
-            $sn->set_URI_from_rootdir($arg1);
-            push @ret, $sn;
-        }
-
-    }
-    else {
-        croak "Can't call gen_song_objects with non-file, non-dir $arg1";
-    }
-
-    \@ret;
-}
 
 sub process_playlist {
     my $self = shift;
     my ($uri) = @_;
 
-    #my $master_list = $self->{'song_objects'};
-
     my @songs = ();
     my $narrowing = ( defined $uri && $uri ne '/' );
 
-    foreach my $song_obj ( @{ $self->{'song_objects'} } ) {
+    foreach my $song_obj ( @{ $self->{'song_objects'}->songs } ) {
         my $s = $song_obj->get_uni_filename;
 
         my $acceptsong = 1;
@@ -139,7 +76,7 @@ sub reckon_m3u_name {
 # should be called by internal TagInfo object only. This is the unfiltered list of song objects.
 sub _master_list_of_songs {
 	my $self = shift;
-	@{$self->{'song_objects'}};
+	@{$self->{'song_objects'}->songs};
 }
 
 # NOTE! returns a list of the Song objects, not the song names!
