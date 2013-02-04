@@ -2,16 +2,7 @@ package MP3S::Misc::Util;
 
 use warnings;
 use Encode;
-
-use Time::localtime;
-
-sub unbackslashed {
-	my ($title) = @_;
-	
-	#$title =~ s/\\(\d\d\d)/encode('utf-8', chr(oct($1)))/ge;
-	$title =~ s/\\\d\d\d/_/g;
-	$title;
-}
+use POSIX qw/strftime/;
 
 sub filename_only {
 	my $str = shift;
@@ -19,8 +10,14 @@ sub filename_only {
 	$str;
 }
 
+sub format_datetime {
+	my ($format, $timesecs) = @_;
+	# note: using Time::localtime breaks this - use CORE::localtime only
+	strftime( $format, localtime($timesecs) );
+}
+
 sub get_hour {
-	localtime->hour();
+	strftime( '%H', localtime() );
 }
 
 1;

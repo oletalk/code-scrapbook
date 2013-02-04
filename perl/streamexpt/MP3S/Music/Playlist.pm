@@ -3,8 +3,10 @@ package MP3S::Music::Playlist;
 use strict;
 use Carp;
 
+use MP3S::Misc::MSConf qw(config_value);
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
 use MP3S::Music::PlaylistMaster;
+use MP3S::Misc::Util;
 
 sub new {
     my $class = shift;
@@ -16,6 +18,18 @@ sub new {
     $args{'gen_time'} = time();
     croak("No rootdir or playlist name was given") unless $args{'song_objects'};
     bless \%args, $class;
+}
+
+sub gen_date {
+	my $self = shift;
+	my $format = config_value("datetimeformat") || "%d-%m-%Y,%H:%M:%S";
+	log_info( "Date format is $format ");
+	MP3S::Misc::Util::format_datetime($format, $self->{'gen_time'});
+}
+
+sub gen_reason {
+	my $self = shift;
+	$self->{'gen_reason'} || 'No particular reason';
 }
 
 # NOTE: self->song_objects is the master list of songs, and

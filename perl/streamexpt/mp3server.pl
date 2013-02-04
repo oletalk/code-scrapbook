@@ -154,12 +154,14 @@ while ( my $conn = $d->accept ) {
     if ( defined $rootdir && $regen > 0 ) {
         my $elapsed = time - $gen_time;
         if ( $elapsed > ( $regen * 60 ) ) {
-			if ($plist->is_stale) {
+			my $newcount = $plist->is_stale();
+			if ($newcount) {
 				log_info("Re-generating playlist from rootdir $rootdir");
 	            
 	            $plist = MP3S::Music::Playlist->new(
 	                playlist => $playlist,
-	                rootdir  => $rootdir
+	                rootdir  => $rootdir,
+					gen_reason => "$newcount new songs found",
 	            );    # rootdir overrides playlist
 				$plist->generate_tag_info();
 

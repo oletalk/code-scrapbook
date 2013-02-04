@@ -19,6 +19,9 @@ sub print_list {
 		if ($ret) {
 			my $links = get_links($str_uri);
 			$ret = "<h2>Song list</h2> $links $ret";
+			my $reason = $plist->gen_reason;
+			$reason = " (reason: $reason )" if $reason;
+			$ret .= "<p><em>Generated: " . $plist->gen_date . "$reason </em></p>";
 		} else {
 			$ret = "<h3>No results</h3>";		
 		}
