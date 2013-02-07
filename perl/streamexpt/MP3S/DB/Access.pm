@@ -20,9 +20,18 @@ sub _connect {
     my $host = $args{'host'} ||= config_value("host");
     my $user = $args{'user'} ||= config_value("user");
     my $pass = $args{'pass'} ||= config_value("pass");
+
+	my $password = $pass;
+	if ( -f $pass) {
+		open my $fh, '<', $pass or die "Problems getting db password from file: $!";
+		$password = <$fh>;
+		close $fh;
+		chomp $password;
+	}
+
 	my $conn = undef;
 	$conn = DBI->connect_cached( "DBI:Pg:dbname=$dbname;host=$host",
-        $user, $pass, { AutoCommit => 1, RaiseError => 0, PrintError => 1 } )
+        $user, $password, { AutoCommit => 1, RaiseError => 0, PrintError => 1 } )
       or die DBI->errstr;
 	$conn;
 }
