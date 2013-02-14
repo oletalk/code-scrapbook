@@ -79,7 +79,7 @@ sub process_playlist {
 
 sub is_stale {
 	my $self = shift;
-	$self->{'song_objects'}->is_stale;
+	$self->{'song_objects'}->is_stale($self->{'rootdir'}, $self->{'gen_time'});
 }
 
 # just return 'playlist.m3u' for now
