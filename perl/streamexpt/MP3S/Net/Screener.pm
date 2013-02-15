@@ -11,6 +11,9 @@ use constant ALLOW => 'ALLOW';
 use constant DENY  => 'DENY';
 use constant BLOCK => 'BLOCK';
 
+use constant DOWNSAMPLE => 'DOWNSAMPLE';
+use constant NO_DOWNSAMPLE => 'NO_DOWNSAMPLE';
+
 sub new {
 	my $class = shift;
 	bless { 'default_action' => ALLOW, 
@@ -48,8 +51,9 @@ sub screen {
 				if ($listref) {
 					my @list = @$listref;
 					foreach my $ipbl (@list) {
-						if ($ipbl->contains($ip)) {
-							$ret = $actionbl;
+						my ($ip_block, @ip_options) = @$ipbl;
+						if ($ip_block->contains($ip)) {
+							$ret = [ $actionbl, @ip_options ];
 						}
 					}
 
@@ -64,7 +68,8 @@ sub screen {
 	} else {
 		log_info( "No clientfile (allow/deny) specified so defaulting to $ret.\n" );		
 	}
-	log_info("Action for client $ip_string is $ret.");
+	my ($action, @options) = @$ret;
+	log_info("Action for client $ip_string is $action.");
 	count_stat('CLIENTS', $ip_string);
 	count_stat('ACTIONS', $ret);
 	
@@ -80,11 +85,11 @@ sub read_client_list {
 	while (<$fh>) {
 		my $cline = $_;
 		chomp $cline;
-		my ($net, $spec) = split /\s+/, $cline;
+		my ($net, $spec, @options) = split /\s+/, $cline;
 		unless ($net =~ /^\#/) {
 			my $ip = NetAddr::IP->new($net);
 			if ($ip) {
-				push @{$self->{'clientlist'}->{$spec}}, $ip;
+				push @{$self->{'clientlist'}->{$spec}}, [$ip, @options];
 			} else {
 				log_error( "Unable to recognise $ip as a valid IP address/subnet" );
 			}

@@ -112,10 +112,24 @@ while ( my $conn = $d->accept ) {
 
     # who connected?
     my $peer = $conn->peerhost;
-    my $action = $cl->screen($peer);
+    my $action_ref = $cl->screen($peer);
+	my ($action, @screener_options) = @$action_ref;
+	log_info("Got options @screener_options") if scalar @screener_options;
 
     if ( $action eq MP3S::Net::Screener::ALLOW ) {
 
+		my $downsample_client = $downsample;
+		
+		foreach my $screener_opt (@screener_options) {
+			# override global downsampling on a per-client basis
+			#obviously if you include them both the last one wins!
+			if ($screener_opt eq MP3S::Net::Screener::NO_DOWNSAMPLE) {
+				$downsample_client = 0;
+			}
+			if ($screener_opt eq MP3S::Net::Screener::DOWNSAMPLE) {
+				$downsample_client = 1;
+			}
+		}
         # perform the fork or exit
         die "Can't fork: $!" unless defined( $child = fork() );
         if ( $child == 0 ) {
@@ -124,7 +138,7 @@ while ( my $conn = $d->accept ) {
                     connection => $conn,
                     playlist   => $plist,
                     random     => $random,
-                    downsample => $downsample,
+                    downsample => $downsample_client,
                     port       => $port,
                 );
             };
