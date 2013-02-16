@@ -36,7 +36,7 @@ sub screen {
 	my $self = shift;
 	my ($ip_string) = @_;
 
-	my $ret = $self->get_default_action;
+	my $ret = [ $self->get_default_action ];
 	
 	if (!$self->{'clientlist'} && $self->{'ipfile'}) {
 		log_info( "client_screen without read_client_list called ... doing that now\n" );
@@ -62,11 +62,12 @@ sub screen {
 
 		} else {
 			# invalid!? block it then
-			$ret = BLOCK;
+			$ret = [ BLOCK ];
 		}
 		
 	} else {
-		log_info( "No clientfile (allow/deny) specified so defaulting to $ret.\n" );		
+		my $retaction = $ret->[0];
+		log_info( "No clientfile (allow/deny) specified so defaulting to $retaction->[0].\n" );		
 	}
 	my ($action, @options) = @$ret;
 	log_info("Action for client $ip_string is $action.");
