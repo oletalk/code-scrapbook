@@ -65,9 +65,9 @@ $rootdir = "${rootdir}/" unless $rootdir =~ /\/$/;
 my $plist =
   MP3S::Music::Playlist->new( playlist => $playlist, rootdir => $rootdir )
   ;    # rootdir overrides playlist
+
 # get the tags in now
 $plist->generate_tag_info();
-
 
 my $gen_time = time;
 
@@ -106,87 +106,95 @@ if ( config_value('screenerdefault') ) {
 }
 
 #wait for the connections at the accept call
+while (1) {
+    while ( my $conn = $d->accept ) {
+        my $child;
 
-while ( my $conn = $d->accept ) {
-    my $child;
+        # who connected?
+        my $peer       = $conn->peerhost;
+        my $action_ref = $cl->screen($peer);
+        my ( $action, @screener_options ) = @$action_ref;
+        log_info("Got options @screener_options") if scalar @screener_options;
 
-    # who connected?
-    my $peer = $conn->peerhost;
-    my $action_ref = $cl->screen($peer);
-	my ($action, @screener_options) = @$action_ref;
-	log_info("Got options @screener_options") if scalar @screener_options;
+        if ( $action eq MP3S::Net::Screener::ALLOW ) {
 
-    if ( $action eq MP3S::Net::Screener::ALLOW ) {
+            my $downsample_client = $downsample;
 
-		my $downsample_client = $downsample;
-		
-		foreach my $screener_opt (@screener_options) {
-			# override global downsampling on a per-client basis
-			#obviously if you include them both the last one wins!
-			if ($screener_opt eq MP3S::Net::Screener::NO_DOWNSAMPLE) {
-				$downsample_client = 0;
-			}
-			if ($screener_opt eq MP3S::Net::Screener::DOWNSAMPLE) {
-				$downsample_client = 1;
-			}
-		}
-        # perform the fork or exit
-        die "Can't fork: $!" unless defined( $child = fork() );
-        if ( $child == 0 ) {
-            eval {
-                MP3S::Handlers::CmdSwitch::handle(
-                    connection => $conn,
-                    playlist   => $plist,
-                    random     => $random,
-                    downsample => $downsample_client,
-                    port       => $port,
-                );
-            };
-            if ($@) {
+            foreach my $screener_opt (@screener_options) {
 
-                #$had_errors = 1;
-                log_error("Problems handling request: $@");
+                # override global downsampling on a per-client basis
+                #obviously if you include them both the last one wins!
+                if ( $screener_opt eq MP3S::Net::Screener::NO_DOWNSAMPLE ) {
+                    $downsample_client = 0;
+                }
+                if ( $screener_opt eq MP3S::Net::Screener::DOWNSAMPLE ) {
+                    $downsample_client = 1;
+                }
             }
 
-            #if the child returns, then just exit;
-            exit 0;
-        }
-        else {
+            # perform the fork or exit
+            die "Can't fork: $!" unless defined( $child = fork() );
+            if ( $child == 0 ) {
+                eval {
+                    MP3S::Handlers::CmdSwitch::handle(
+                        connection => $conn,
+                        playlist   => $plist,
+                        random     => $random,
+                        downsample => $downsample_client,
+                        port       => $port,
+                    );
+                };
+                if ($@) {
+
+                    #$had_errors = 1;
+                    log_error("Problems handling request: $@");
+                }
+
+                #if the child returns, then just exit;
+                exit 0;
+            }
+            else {
           #close the connection, the parent has already passed it off to a child
+                $conn->close();
+            }
+        }
+        elsif ( $action eq MP3S::Net::Screener::DENY ) {
+            $conn->send_error(RC_FORBIDDEN);
             $conn->close();
         }
-    }
-    elsif ( $action eq MP3S::Net::Screener::DENY ) {
-        $conn->send_error(RC_FORBIDDEN);
-        $conn->close();
-    }
-    else {    # BLOCK
-        $conn->close();
-    }
-
-    # check if we were asked to regenerate the playlist
-    if ( defined $rootdir && $regen > 0 ) {
-        my $elapsed = time - $gen_time;
-        if ( $elapsed > ( $regen * 60 ) ) {
-			my $newcount = $plist->is_stale();
-			if ($newcount) {
-				log_info("Re-generating playlist from rootdir $rootdir");
-	            
-	            $plist = MP3S::Music::Playlist->new(
-	                playlist => $playlist,
-	                rootdir  => $rootdir,
-					gen_reason => "$newcount new songs found",
-	            );    # rootdir overrides playlist
-				$plist->generate_tag_info();
-
-			} else {
-				log_info("Re-gen time passed but no new files encountered");
-			}
-			$gen_time = time;				
-            
+        else {    # BLOCK
+            $conn->close();
         }
+
+        # check if we were asked to regenerate the playlist
+        if ( defined $rootdir && $regen > 0 ) {
+            my $elapsed = time - $gen_time;
+            if ( $elapsed > ( $regen * 60 ) ) {
+                my $newcount = $plist->is_stale();
+                if ($newcount) {
+                    log_info("Re-generating playlist from rootdir $rootdir");
+
+                    $plist = MP3S::Music::Playlist->new(
+                        playlist   => $playlist,
+                        rootdir    => $rootdir,
+                        gen_reason => "$newcount new songs found",
+                    );    # rootdir overrides playlist
+                    $plist->generate_tag_info();
+
+                }
+                else {
+                    log_info("Re-gen time passed but no new files encountered");
+                }
+                $gen_time = time;
+
+            }
+        }
+
+        #go back and listen for the next connection
     }
 
-    #go back and listen for the next connection
+	log_error("For some reason HTTP::Daemon accept returned a false value!  Looping back after 20 s");
+	sleep(20);
 }
+
 exit(0);

@@ -68,19 +68,6 @@ sub AUTOLOAD {
 	}
 }
 
-#sub log_info {
-#	_log(INFO, @_);
-#}
-
-#sub log_error {
-#	_log(ERROR, @_);
-#}
-
-#sub log_debug {
-#	_log(DEBUG, @_);
-#}
-
-# reuses Log::Message::Simple, but does a little preprocessing first
 sub _log {
 	my ($level, $ctxt, @arr) = @_;
 	return if $level > $logging_level;
