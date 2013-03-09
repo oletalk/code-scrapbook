@@ -19,7 +19,7 @@ sub play_songs {
 	my ($uri, $downsample) = @_;
 		
 	my $conn = $self->{'conn'};
-	my $plist = $self->{'playlist'}; # is an actual Playlist object as of 20/11/2012
+	my $plist = $self->{'playlist'}; 
 	my $random = $self->{'random'};
 	croak ("Connection not set") unless $conn;
 		
@@ -27,7 +27,6 @@ sub play_songs {
 	
 	if ($all_ok) {
 		my $done = 0;
-		#loop forever (or until the client closes the socket - see SongPlayer) 
 		my $song;
 		
 		while (!$done && ($song = $plist->get_song($random))) {
