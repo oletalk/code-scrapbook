@@ -4,7 +4,7 @@ use strict;
 use Carp;
 use File::Find;
 use MP3S::Music::Song;
-use MP3S::Misc::Logger qw(log_debug);
+use MP3S::Misc::Logger qw(log_debug log_info);
 
 sub new {
     my $class  = shift;
@@ -18,6 +18,7 @@ sub is_stale {
     my $self = shift;
     my ( $rootdir, $orig_time ) = @_;
 
+	no warnings 'File::Find';
     our $new_mp3s = 0;
     if ($rootdir) {
         find(
@@ -52,10 +53,13 @@ sub songs {
 sub gen_master_list {
     my ($arg1) = @_;
 
+	log_info("Generating master playlist.");
+	my $starttime = time;
     my @ret = ();
     if ( -f $arg1 ) {    #it's a playlist
         open my $f_pls, $arg1 or die "Unable to open playlist $arg1: $!";
 
+		log_info("Using given playlist $arg1.");
         while (<$f_pls>) {
             my $s = $_;
             chomp $s;
@@ -67,8 +71,10 @@ sub gen_master_list {
         }
     }
     elsif ( -d $arg1 ) {    #it's a rootdir
+		log_info("Using given root directory $arg1.");
+		
         our @mp3s = ();     # CM - check this for scope
-
+		no warnings 'File::Find'; #sshhhh
         find(
             {
                 wanted => sub {
@@ -102,6 +108,8 @@ sub gen_master_list {
     else {
         croak "Can't call gen_song_objects with non-file, non-dir $arg1";
     }
+	my $elapsed = time - $starttime;
+	log_info("Generating master playlist complete - took $elapsed secs.");
 
     \@ret;
 }

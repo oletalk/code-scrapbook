@@ -81,11 +81,8 @@ sub generate_tags {
 				}, $song, $file_hash, $artist, $title, $secs);
 				log_info("Problem inserting tag for $song") if $db->errstr;
 
-#						print $fh_hashes join($DELIM, ($song, $file_hash, $artist, $title, $secs)); 
-
 			} else {
 				log_info("Tag not found for file $song");
-#					print $fh_hashes join($DELIM, ($song, $file_hash));
 				$db->execute(qq{
 					INSERT INTO MP3S_tags (song_filepath, file_hash)
 					VALUES (?, ?);
@@ -100,7 +97,7 @@ sub generate_tags {
 		}	
 	}
 	
-	warn "Done generating tags for $total songs.";
+	log_info( "Done generating tags for $total songs." );
 }
 
 sub _get_tracktag_info {

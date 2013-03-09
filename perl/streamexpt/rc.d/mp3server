@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. /etc/rc.subr
+
+name=mp3server
+rcvar=mp3server_enable
+
+command="/usr/local/sbin/${name}"
+command_args="--config_file /etc/mp3server.conf --rootdir /opt/gulfport/mp3/ >/dev/null 2>&1"
+
+load_rc_config $name
+run_rc_command "$1"

@@ -5,6 +5,7 @@ require Exporter;
 
 
 use POSIX qw/strftime/;
+use Log::LogLite;
 use strict;
 use Carp;
 use warnings;
@@ -26,6 +27,7 @@ our $logging_level = 3;
 our @levels = qw(none FATAL ERROR WARNING INFO DEBUG);
 our $st_onerr = 1;
 our $display_context = 0;
+our $log;
 
 sub init {
 	my (%args) = @_;
@@ -33,16 +35,12 @@ sub init {
 	if ($args{display_context}) {
 		$display_context = 1;
 	}
-	
-	if ($args{level}) {
-		my $l = $args{level};
-		if ($l >= FATAL && $l <= DEBUG) {
-			$logging_level = $l;			
-		} else {
-			die "Level $l is unsupported";
-		}
+		
+	if ($args{logfile}) {
+		$log = new Log::LogLite( $args{logfile}, $args{level} );
+		$log->template('<date><message>');
 	}
-	
+		
 }
 
 sub AUTOLOAD {
@@ -70,7 +68,6 @@ sub AUTOLOAD {
 
 sub _log {
 	my ($level, $ctxt, @arr) = @_;
-	return if $level > $logging_level;
 	my @messages = log_prep(@arr);
 
 	my $leveldisp = $levels[$level];
@@ -79,8 +76,12 @@ sub _log {
 	$ctxt_name =~ s/.*:://g if $display_context == NAME;
 	$ctxtdisp = " ($ctxt_name)" if $display_context > NONE;
 	my $tstamp = strftime( "%d-%m-%Y,%H:%M:%S", localtime );
-	foreach (@messages) {
-		print "${tstamp}${ctxtdisp} [$leveldisp] $_ \n";
+	foreach my $m (@messages) {
+		if ($log) {
+			$log->write("${ctxtdisp} [$leveldisp] $m \n", $level);
+		} else {
+			print "${tstamp}${ctxtdisp} [$leveldisp] $m \n";			
+		}
 	}
 }
 

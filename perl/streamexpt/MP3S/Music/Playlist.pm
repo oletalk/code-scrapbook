@@ -57,8 +57,6 @@ sub process_playlist {
         }
 
         if ($acceptsong) {
-
-            #push @songs, $s;
             push @songs, $song_obj;
             log_debug("   Matching song: $s \n") if ($narrowing);
         }
