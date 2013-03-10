@@ -66,7 +66,7 @@ sub screen {
 		
 	} else {
 		my $retaction = $ret->[0];
-		log_info( "No clientfile (allow/deny) specified so defaulting to $retaction->[0].\n" );		
+		log_info( "No clientfile (allow/deny) specified so defaulting to $retaction.\n" );		
 	}
 	my ($action, @options) = @$ret;
 	log_info("Action for client $ip_string is $action.");
