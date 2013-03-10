@@ -5,7 +5,7 @@ use Carp;
 
 use MP3S::Handlers::SongPlayer;
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
-use MP3S::Misc::Stats qw(count_stat);
+use MP3S::Misc::MSConf qw(config_value);
 
 use HTTP::Status;
 
@@ -28,7 +28,10 @@ sub play_songs {
 	if ($all_ok) {
 		my $done = 0;
 		my $song;
-		
+
+		unless (config_value('TESTING')) {
+			use MP3S::Misc::Stats qw(count_stat);				
+		}		
 		while (!$done && ($song = $plist->get_song($random))) {
 			#print the HTTP header
 			$conn->send_status_line(RC_OK);
@@ -39,15 +42,17 @@ sub play_songs {
 			log_debug ( "playing song: $songname\n");
 			my $player = MP3S::Handlers::SongPlayer->new(conn => $conn, 
 										 downsample => $downsample);
-									
-			# record stats	
-		    count_stat( 'SONGS PLAYED',
-		        MP3S::Misc::Util::filename_only( $song->get_uni_filename ) );
-		    my $hour = MP3S::Misc::Util::get_hour();
-		    count_stat( 'HOUR OF DAY', "${hour}:00" );
-			my ($trackname, $secs, $artist) = $plist->get_trackinfo($song);
-			count_stat('ARTISTS', $artist);
-
+					
+		
+			unless (config_value('TESTING')) {
+				# record stats	
+			    count_stat( 'SONGS PLAYED',
+			        MP3S::Misc::Util::filename_only( $song->get_uni_filename ) );
+			    my $hour = MP3S::Misc::Util::get_hour();
+			    count_stat( 'HOUR OF DAY', "${hour}:00" );
+				my ($trackname, $secs, $artist) = $plist->get_trackinfo($song);
+				count_stat('ARTISTS', $artist);				
+			}
 
 			# play the song
 			$player->play($song);

@@ -27,7 +27,7 @@ sleep 1;
 my $pid;
 die "Can't fork: $!" unless defined ($pid = fork() );
 if ($pid == 0) {
-	my $conns = 3;
+	my $conns = 4;
 	while ($conns > 0) {
 		my $conn = $d->accept;
 		$server->process( $conn, $port );
@@ -43,9 +43,10 @@ is($links[1], '/drop', 'link for playlist download present');
 is($links[4], '/play/third.mp3', 'links for mp3s present');
 
 $local = TestUtils::getlocal($port, '/drop');
-ok( TestUtils::compare_result($local, 'tests/results/server-tests-playlist.txt'), 'generated playlist as expected');
+ok( TestUtils::compare_result($local, 'tests/results/server-tests-playlist.dat'), 'generated playlist as expected');
 
 $local = TestUtils::getlocal($port, '/stats');
-ok( TestUtils::compare_result($local, 'tests/results/server-tests-stats.txt'), 'stats URL does something');
+ok( TestUtils::compare_result($local, 'tests/results/server-tests-stats.dat'), 'stats URL does something');
 
-print $local;
+$local = TestUtils::getlocal($port, '/play/first.mp3');
+is($local, "not an mp3\n", "'playing' an mp3 non-downsampled works ok"); #as it turns out :-D

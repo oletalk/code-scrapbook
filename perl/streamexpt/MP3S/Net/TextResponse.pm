@@ -60,7 +60,6 @@ sub print_stats {
 	my $ret = "";
 	
 	if (config_value('TESTING')) {
-		warn "USING TESTING";
 		use tests::mocks::MockStats qw(output_stats_n get_uptime_n);
 		$ret .= "<pre>" . output_stats_n($uri) . "</pre>";
 		$ret .= "<b>Uptime:</b> " . get_uptime_n();
