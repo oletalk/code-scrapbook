@@ -9,7 +9,11 @@ use MP3S::Misc::Logger qw(log_info log_debug log_error);
 sub new {
 	my $class = shift;
 	my %args = @_;
-    
+	
+    if (config_value('TESTING')) {
+		__report_bug();
+	}
+		
 	my %struc = ('conn' => _connect(%args));
 	bless \%struc, $class;
 }
@@ -100,4 +104,10 @@ sub DESTROY {
 	}
 }
 
+sub __report_bug {
+	my ($c_sub, $c_fil, $c_lne) = (caller 1);
+	warn "we shouldn't be here. $c_sub, $c_fil, $c_lne ";
+	($c_sub, $c_fil, $c_lne) = (caller 2);
+	warn "another level up  ... $c_sub, $c_fil, $c_lne ";
+}
 1;

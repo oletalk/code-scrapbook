@@ -2,7 +2,6 @@ package TestingInit;
 
 use MP3S::Misc::Logger qw(log_info);
 use MP3S::Misc::MSConf qw(config_value);
-use MP3S::DB::Setup;
 use tests::mocks::MockStats;
 
 sub init {
@@ -15,6 +14,7 @@ sub init {
 	die "Unable to open testing config file: $!" unless -r $config_file;
 	MP3S::Misc::MSConf::init($config_file);
 	
+	die 'Testing config file did not set TESTING variable' unless config_value('TESTING');
 	
 	# erase the old logfile if it's there
 	my $logfile_location = config_value('logfile');

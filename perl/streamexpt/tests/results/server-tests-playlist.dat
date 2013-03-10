@@ -1,0 +1,7 @@
+#EXTM3U
+#EXTINF:100,Mr Foo - Track 1
+http://marta.homelinux.net:7990/play/first.mp3
+#EXTINF:90,Mr Foo - Track 2
+http://marta.homelinux.net:7990/play/second.mp3
+#EXTINF:122,Mr Foo - Track 3
+http://marta.homelinux.net:7990/play/third.mp3

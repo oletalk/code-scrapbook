@@ -4,6 +4,7 @@ use strict;
 use Carp;
 
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
+use MP3S::Misc::MSConf qw(config_value);
 
 use NetAddr::IP;
 use constant ALLOW => 'ALLOW';
@@ -86,13 +87,13 @@ sub _countstats {
 	my $self = shift;
 	my %args = @_;
 	
-	if ($self->{'testing'}) {
+	if (config_value('TESTING')) {
 		use tests::mocks::MockStats qw(count_stat_n);
 	} else {
 		use MP3S::Misc::Stats qw(count_stat);
 	}
 	foreach my $cat (keys %args) {
-		if ($self->{'testing'}) {
+		if (config_value('TESTING')) {
 			count_stat_n($cat, $args{$cat});			
 		} else {
 			count_stat($cat, $args{$cat});			

@@ -166,7 +166,7 @@ sub process {
             if ($newcount) {
                 log_info("Re-generating playlist from rootdir $rootdir");
 
-                $self->set_playlist(
+                $self->_set_playlist(
                     MP3S::Music::Playlist->new(
                         playlist   => $self->{playlist},
                         rootdir    => $rootdir,
@@ -196,9 +196,12 @@ sub _set_playlist {
 }
 
 sub __init {
-
-    # initialise database/stats
-    MP3S::DB::Setup::init();
+	if (config_value('TESTING')) {
+		log_info('database init not being called - Testing');
+	} else {
+	    # initialise database/stats
+	    MP3S::DB::Setup::init();		
+	}
 }
 
 sub __transfer_args {
