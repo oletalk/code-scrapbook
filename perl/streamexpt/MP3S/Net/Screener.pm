@@ -31,6 +31,12 @@ sub set_default_action {
 	log_info( "Screener's default action has just been set to $action" );
 }
 
+sub reload {
+	my $self = shift;
+	log_info( "Reloading screener." );
+	$self->read_client_list($self->{'ipfile'});
+}
+
 sub screen {
 	my $self = shift;
 	my ($ip_string) = @_;

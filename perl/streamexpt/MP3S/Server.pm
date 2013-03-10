@@ -16,10 +16,10 @@ sub new {
 
     my %content = ();
 
-    init();
+    __init();
 
     # setup components
-    transfer_args( \%args, \%content, qw(downsample playlist rootdir) );
+    __transfer_args( \%args, \%content, qw(downsample playlist rootdir) );
 
     my $rootdir = $args{rootdir};
     $rootdir = "${rootdir}/" unless $rootdir =~ /\/$/;
@@ -35,11 +35,16 @@ sub new {
     bless \%content, $class;
 }
 
-sub transfer_args {
-    my ( $from_ref, $to_ref, @args ) = @_;
-    foreach my $arg (@args) {
-        $to_ref->{$arg} = $from_ref->{$arg};
-    }
+sub reload {
+	my $self = shift;
+	my %args = (@_);
+	
+	# reload by arguments
+	if ($args{ipfile}) {
+		$self->{'screener'}->reload;
+	}
+	
+	
 }
 
 sub is_downsampling {
@@ -52,18 +57,12 @@ sub playlist {
     $self->{'plist'};
 }
 
-sub set_playlist {
-    my $self = shift;
-    my ($plist) = @_;
-    $self->{'plist'} = $plist;
-}
-
 sub setup_playlist {
     my $self = shift;
     $self->{downsample} ||= config_value('downsample');
     log_info("Downsampling is ON.\n") if $self->is_downsampling;
 
-    $self->set_playlist(
+    $self->_set_playlist(
         MP3S::Music::Playlist->new(
             playlist => $self->{playlist},
             rootdir  => $self->{rootdir}
@@ -91,12 +90,6 @@ sub setup_playlist {
     }
     $self->{regen} = $regen;
 
-}
-
-sub init {
-
-    # initialise database/stats
-    MP3S::DB::Setup::init();
 }
 
 sub process {
@@ -194,5 +187,26 @@ sub process {
     #go back and listen for the next connection
 
 }
+
+
+sub _set_playlist {
+    my $self = shift;
+    my ($plist) = @_;
+    $self->{'plist'} = $plist;
+}
+
+sub __init {
+
+    # initialise database/stats
+    MP3S::DB::Setup::init();
+}
+
+sub __transfer_args {
+    my ( $from_ref, $to_ref, @args ) = @_;
+    foreach my $arg (@args) {
+        $to_ref->{$arg} = $from_ref->{$arg};
+    }
+}
+
 
 1;
