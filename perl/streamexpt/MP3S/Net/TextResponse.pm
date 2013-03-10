@@ -5,7 +5,7 @@ use HTTP::Status;
 use HTTP::Response;
 use URI::Escape;
 use Sys::Hostname;
-use MP3S::Misc::Stats qw(output_stats get_uptime);
+use MP3S::Misc::MSConf qw(config_value);
 
 sub print_list {
 	my ($plist, $str_uri) = @_;
@@ -59,8 +59,20 @@ sub print_stats {
 	my ($uri) = @_;
 	my $ret = "";
 	
-	$ret .= "<pre>" . output_stats($uri) . "</pre>";
-	$ret .= "<b>Uptime:</b> " . get_uptime();
+	if (config_value('TESTING')) {
+		warn "USING TESTING";
+		use tests::mocks::MockStats qw(output_stats_n get_uptime_n);
+		$ret .= "<pre>" . output_stats_n($uri) . "</pre>";
+		$ret .= "<b>Uptime:</b> " . get_uptime_n();
+		
+	} else {
+		use MP3S::Misc::Stats qw(output_stats get_uptime);		
+		$ret .= "<pre>" . output_stats($uri) . "</pre>";
+		$ret .= "<b>Uptime:</b> " . get_uptime();
+		
+	}
+	
+	
 	
 	my $cont = HTTP::Response->new(RC_OK);
 	$cont->header('Content-type' => 'text/html; charset=utf-8');

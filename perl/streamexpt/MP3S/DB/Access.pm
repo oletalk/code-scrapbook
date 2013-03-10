@@ -9,7 +9,7 @@ use MP3S::Misc::Logger qw(log_info log_debug log_error);
 sub new {
 	my $class = shift;
 	my %args = @_;
-    
+    	
 	my %struc = ('conn' => _connect(%args));
 	bless \%struc, $class;
 }

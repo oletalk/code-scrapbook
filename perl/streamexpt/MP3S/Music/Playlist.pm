@@ -144,7 +144,7 @@ sub generate_tag_info {
 
 # This should ideally be generated only once, and after gen_playlist has been called
 	my $ti;
-	if ($self->{'testing'}) {
+	if (config_value('TESTING')) {
 	    use tests::mocks::MockTagInfo;
 	    $ti = new tests::mocks::MockTagInfo( playlist => $self );		
 	} else {
