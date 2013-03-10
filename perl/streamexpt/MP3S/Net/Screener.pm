@@ -4,7 +4,6 @@ use strict;
 use Carp;
 
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
-use MP3S::Misc::Stats qw(count_stat);
 
 use NetAddr::IP;
 use constant ALLOW => 'ALLOW';
@@ -71,10 +70,28 @@ sub screen {
 	}
 	my ($action, @options) = @$ret;
 	log_info("Action for client $ip_string is $action.");
-	count_stat('CLIENTS', $ip_string);
-	count_stat('ACTIONS', $ret);
+	$self->_countstats('CLIENTS' => $ip_string,
+				       'ACTIONS' => $ret);
 	
 	return $ret;
+}
+
+sub _countstats {
+	my $self = shift;
+	my %args = @_;
+	
+	if ($self->{'testing'}) {
+		use tests::mocks::MockStats qw(count_stat_n);
+	} else {
+		use MP3S::Misc::Stats qw(count_stat);
+	}
+	foreach my $cat (keys %args) {
+		if ($self->{'testing'}) {
+			count_stat_n($cat, $args{$cat});			
+		} else {
+			count_stat($cat, $args{$cat});			
+		}
+	}
 }
 
 sub read_client_list {

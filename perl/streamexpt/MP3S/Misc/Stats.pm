@@ -12,10 +12,7 @@ use MP3S::Misc::Logger qw(log_error);
 sub get_uptime {
     my ( $days, $hours, $min, $secs );
 
-    my $db           = MP3S::DB::Access->new;
-    my $elapsed_secs = $db->exec_single_cell(
-"select cast(date_part('epoch', now() - start) as integer) from MP3S_starttime"
-    );
+    my $elapsed_secs = _get_db_time();
     log_error("Problem fetching elapsed secs") unless $elapsed_secs;
     $days  = int( $elapsed_secs / 86400 );
     $hours = int( $elapsed_secs / 3600 ) % 24;
@@ -30,11 +27,18 @@ sub get_uptime {
     $ret;
 }
 
+sub _get_db_time {
+    my $db  = MP3S::DB::Access->new;
+    my $ret = $db->exec_single_cell(
+"select cast(date_part('epoch', now() - start) as integer) from MP3S_starttime"
+    );
+	$ret;
+}
+
 # ------------ MISCELLANEOUS EXTERNALLY DEFINED STATS -------
 
 sub count_stat {
     my ( $category, $item ) = @_;
-
     if ( $category && $item ) {
         my $db    = MP3S::DB::Access->new;
         my $count = $db->exec_single_cell(
@@ -74,21 +78,13 @@ sub output_stats {
 			<p>Default command is /all.</p>
 		};
 	} else {
-	    my $db  = MP3S::DB::Access->new;
 	
 		my $specif = undef;
 		if ($cmd !~ /^all|commands$/) {
 			$specif = uc $cmd;
 		}
-	
-	    my $res = $specif ?
-	 		  $db->execute(
-				"SELECT category, item, count FROM MP3S_stats WHERE category = ? ORDER BY count desc, item",
-				$specif
-			)
-			: $db->execute(
-	        	"SELECT category, item, count FROM MP3S_stats ORDER BY category, count desc, item"
-	    	);
+
+		my $res = _get_db_category_stats($specif);
 
 	    my $prevcat = "";
 		my $catcount = 0;
@@ -122,6 +118,20 @@ sub output_stats {
 		
 	}
 
+}
+
+sub _get_db_category_stats {
+    my ($specif) = @_;
+	my $db  = MP3S::DB::Access->new;
+	my $res = $specif ?
+		$db->execute(
+			"SELECT category, item, count FROM MP3S_stats WHERE category = ? ORDER BY count desc, item",
+			$specif
+			)
+		: $db->execute(
+			"SELECT category, item, count FROM MP3S_stats ORDER BY category, count desc, item"
+		    );
+    $res;
 }
 
 1;

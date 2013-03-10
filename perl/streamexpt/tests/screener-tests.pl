@@ -8,7 +8,7 @@ BEGIN { use_ok( 'MP3S::Net::Screener' ) }
 
 TestingInit::init;
 
-my $cl = MP3S::Net::Screener->new( ipfile => "tests/testdata/clients1.txt");
+my $cl = MP3S::Net::Screener->new( ipfile => "tests/testdata/clients1.txt", testing => 1);
 
 
 my ( $action, @screener_options ) = @{$cl->screen("10.80.40.100")};
