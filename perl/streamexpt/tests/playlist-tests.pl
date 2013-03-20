@@ -19,7 +19,7 @@ $p1->generate_tag_info();
 
 $p1->process_playlist("/");
 my @songs = $p1->list_of_songs;
-is( scalar @songs, 3, "pulled in and processed all 3 songs in test directory");
+is( scalar @songs, 4, "pulled in and processed all 4 songs in test directory");
 
 is( $p1->reckon_m3u_name, 'playlist.m3u', 'hardcoded m3u name as expected');
 
@@ -33,6 +33,7 @@ $p1->get_song;
 my $s3 = $p1->get_song;
 my @ti3 = $p1->get_trackinfo($s3);
 is( $ti3[0], 'Mr Foo - Track 3', 'track info correct');
+$p1->get_song;
 is( $p1->get_song, undef, "no more songs left");
 print "Sleeping for 1 second to test is_stale functionality...\n";
 sleep(1);
@@ -42,7 +43,7 @@ $p1 = MP3S::Music::Playlist->new(rootdir => 'tests/testdata', testing => 1);
 $p1->process_playlist("/");
 @songs = $p1->list_of_songs;
 
-is( scalar @songs, 4, "pulled in and processed new song additionally");
+is( scalar @songs, 5, "pulled in and processed new song additionally");
 
 END {
 	system(qq{rm -f tests/testdata/verynew.mp3});

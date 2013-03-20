@@ -5,3 +5,5 @@ http://marta.homelinux.net:7990/play/first.mp3
 http://marta.homelinux.net:7990/play/second.mp3
 #EXTINF:122,Mr Foo - Track 3
 http://marta.homelinux.net:7990/play/third.mp3
+#EXTINF:-1,weirdÊŷstuff.mp3
+http://marta.homelinux.net:7990/play/nonasc/weird%5C303%5C212%5C305%5C267stuff.mp3

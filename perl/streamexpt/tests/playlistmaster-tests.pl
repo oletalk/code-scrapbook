@@ -16,7 +16,7 @@ is( scalar @p1songs, 2, "Created Playlist master list fine");
 my $p2 = MP3S::Music::PlaylistMaster->new('tests/testdata/');
 my @p2songs = @{$p2->songs};
 
-is( scalar @p2songs, 3, "Created (rootdir-based) Playlist master list fine");
+is( scalar @p2songs, 4, "Created (rootdir-based) Playlist master list fine");
 
 
 #ok( 'greatalbum.m3u' eq $p2->reckon_m3u_name, "Name reckoning for directory-based pl works" );
