@@ -8,19 +8,19 @@ sub new {
 	my %args = @_;
 	
 	croak ("No filename given") unless $args{'filename'};
-	$args{'modified_date'} = _stat_modified(\%args);
+	$args{'modified_time'} = _stat_modified(\%args);
 	bless \%args, $class;
 }
 
-sub get_modified_date {
+sub get_modified_time {
 	my $self = shift;
-	$self->{'modified_date'};
+	$self->{'modified_time'};
 }
 
 sub _stat_modified {
 	my ($hashref) = @_;
 	
-	my $filepath = $hashref->{'uni_filename'} || $hashref->{'filename'};
+	my $filepath = $hashref->{'filename'};
 	my $ret;
 	
 	if ($filepath) {

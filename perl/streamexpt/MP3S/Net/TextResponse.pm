@@ -36,6 +36,38 @@ sub print_list {
 	$cont;
 }
 
+sub print_latest {
+	my ($plist, $str_uri) = @_;
+	my ($days) = $str_uri =~ /(\d+)/;
+	$days ||= 7;
+	
+	my $cont = undef;
+	if ($plist->process_playlist('/')) {
+		my @latest = ();
+		my $cutoff = time - (86400 * $days);
+		foreach my $song ($plist->list_of_songs) {
+			if ($song->get_modified_time > $cutoff) {
+				push @latest, $song->get_URI( hyperlinked => 1 );
+			}
+		}
+		
+		my $ret = "No new songs.";
+		$cont = HTTP::Response->new(RC_OK);
+		$cont->header('Content-type' => 'text/html; charset=utf-8');
+		if (@latest) {
+			my $word = ($days == 1 ? 'day' : 'days');
+			$ret = "<h3>New songs over the past $days $word</h3>\n";
+			$ret .= join('\n', @latest);
+		}
+		$cont->content( $ret );
+		
+	} else {
+		$cont = HTTP::Response->new(RC_NOT_FOUND);
+		$cont->content( "No matching results!");	
+	}
+	$cont;
+}
+
 sub print_playlist {
 	my ($plist, $str_uri, $port) = @_;
 	

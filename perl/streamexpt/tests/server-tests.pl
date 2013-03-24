@@ -1,6 +1,6 @@
 use lib '..';
 use strict;
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 use HTTP::Daemon;
 
@@ -30,7 +30,7 @@ sleep 1;
 my $pid;
 die "Can't fork: $!" unless defined ($pid = fork() );
 if ($pid == 0) {
-	my $conns = 7;
+	my $conns = 8;
 	while ($conns > 0) {
 		my $conn = $d->accept;
 		$server->process( $conn, $port );
@@ -62,5 +62,7 @@ is($local, undef, "looooong bogus URI in request returns no usable data"); # a 4
 $local = TestUtils::getlocal($port, '/stats');
 ok( TestUtils::compare_result($local, 'tests/results/server-tests-stats.dat'), 'stats URL does something');
 
+$local = TestUtils::getlocal($port, '/latest/1');
+ok( $local =~ /New songs over the past 1 day/, '/latest url does something');
 $local = TestUtils::getlocal($port, '/play/first.mp3');
 is($local, "not an mp3\n", "'playing' an mp3 non-downsampled works ok"); #as it turns out :-D
