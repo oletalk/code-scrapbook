@@ -25,14 +25,14 @@ is( $p1->reckon_m3u_name, 'playlist.m3u', 'hardcoded m3u name as expected');
 
 my $secondsong = $songs[1];
 # some song-specific tests here
-is( $secondsong->get_filename, 'tests/testdata/second.mp3', 'correct song name');
-is( $secondsong->get_URI, '/second.mp3', 'correct song URI');
+is( $secondsong->get_filename, 'tests/testdata/third.mp3', 'correct song name');
+is( $secondsong->get_URI, '/third.mp3', 'correct song URI');
 # getsong works as expected
 is( $p1->get_song->get_URI, '/first.mp3', 'got first song out OK');
 $p1->get_song;
 my $s3 = $p1->get_song;
 my @ti3 = $p1->get_trackinfo($s3);
-is( $ti3[0], 'Mr Foo - Track 3', 'track info correct');
+is( $ti3[0], 'Mr Foo - Track 2', 'track info correct');
 $p1->get_song;
 is( $p1->get_song, undef, "no more songs left");
 print "Sleeping for 1 second to test is_stale functionality...\n";

@@ -10,7 +10,7 @@ sub read_tags_from_db {
 	$self->{'tags'}->{'tests/testdata/first.mp3'} = {artist => 'Mr Foo',
 													 title  => 'Track 1',
 													 secs   => 100};
-	$self->{'tags'}->{'tests/testdata/second.mp3'} = {artist => 'Mr Foo',
+	$self->{'tags'}->{'tests/testdata/sec ond.mp3'} = {artist => 'Mr Foo',
 													 title  => 'Track 2',
 													 secs   => 90};
 	$self->{'tags'}->{'tests/testdata/third.mp3'} = {artist => 'Mr Foo',

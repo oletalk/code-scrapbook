@@ -1,5 +1,6 @@
 package MP3S::Music::Song;
 
+use strict;
 use MP3S::Misc::Util;
 
 sub new {
@@ -7,7 +8,26 @@ sub new {
 	my %args = @_;
 	
 	croak ("No filename given") unless $args{'filename'};
+	$args{'modified_date'} = _stat_modified(\%args);
 	bless \%args, $class;
+}
+
+sub get_modified_date {
+	my $self = shift;
+	$self->{'modified_date'};
+}
+
+sub _stat_modified {
+	my ($hashref) = @_;
+	
+	my $filepath = $hashref->{'uni_filename'} || $hashref->{'filename'};
+	my $ret;
+	
+	if ($filepath) {
+		my @stat = stat($filepath);
+		$ret = $stat[9]; #last modify time
+	}
+	$ret;
 }
 
 sub get_filename {
@@ -45,6 +65,7 @@ sub get_URI {
 	my (%args) = @_;
 	my $URI = $self->{'URI'};
 	
+	my $ret;
 	if ($args{'playlink'}) {
 		$ret = qq |/play/${URI}|;
 	} elsif ($args{'hyperlinked'}) {
