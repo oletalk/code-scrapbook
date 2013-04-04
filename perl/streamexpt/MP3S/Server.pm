@@ -16,7 +16,7 @@ sub new {
 
     my %content = ();
 
-    __init();
+    __init($args{reuse_stats});
 
     # setup components
     __transfer_args( \%args, \%content, qw(downsample playlist rootdir) );
@@ -196,11 +196,15 @@ sub _set_playlist {
 }
 
 sub __init {
+	my ($reuse_stats) = @_;
 	if (config_value('TESTING')) {
 		log_info('database init not being called - Testing');
 	} else {
 	    # initialise database/stats
-	    MP3S::DB::Setup::init();		
+		if ($reuse_stats) {
+			log_info('Requested NOT to drop and re-create stats table.');
+		}
+	    MP3S::DB::Setup::init($reuse_stats);		
 	}
 }
 

@@ -57,7 +57,7 @@ sub print_latest {
 		if (@latest) {
 			my $word = ($days == 1 ? 'day' : 'days');
 			$ret = "<h3>New songs over the past $days $word</h3>\n";
-			$ret .= join('\n', @latest);
+			$ret .= join("\n", @latest);
 		}
 		$cont->content( $ret );
 		

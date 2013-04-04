@@ -7,10 +7,11 @@
 #
 # As you can figure out, it doesn't need the server to be up, just the database
 #
-# Sample usage: ./randlister --size 50 --playlist ~/playlist.txt --option popular
+# Sample usage: ./randlister --size 50 --playlist ~/playlist.txt --option popular --copyto ~/favouritemusic
 
 use strict;
 
+use File::Copy;
 use Getopt::Long;
 use MP3S::DB::Access;
 use MP3S::Misc::MSConf;
@@ -21,6 +22,7 @@ my $size = 20;
 my $debug;
 my $playlist;
 my $option = "popular";
+my $copyto;
 
 # Get Options
 GetOptions(
@@ -29,6 +31,7 @@ GetOptions(
 	"size=i"	=> \$size,
 	"playlist=s"	=> \$playlist,
 	"option=s" => \$option,
+	"copyto=s" => \$copyto
 );
 
 MP3S::Misc::MSConf::init($config_file);
@@ -53,6 +56,12 @@ foreach my $row (@$res) {
 }
 my $total = keys %favourites;
 
+my $folder;
+if ($copyto) {
+	$folder = $copyto;
+	die "Can't check directory $folder" unless -d $folder;
+}
+
 # Read playlist
 open my $fh, $playlist or die "Unable to open provided playlist: $!";
 while (my $line = <$fh>) {
@@ -61,6 +70,10 @@ while (my $line = <$fh>) {
 	#print "SONG: $song \n";
 	if (defined $favourites{$song}) {
 		print "$line \n" ;
+		if (defined $folder) {
+			my $filepath = $line;
+			copy($filepath, $folder) or die "unable to copy file $filepath to folder: $!";
+		}
 		delete $favourites{$song};
 	}
 }
@@ -69,6 +82,7 @@ while (my $line = <$fh>) {
 foreach (sort keys %favourites) {
 		print "Not found: $_ \n";
 }
+
 print STDERR "Remainder: " . (keys %favourites) . " / $total \n";
 print STDERR "DONE\n";
 exit (0);

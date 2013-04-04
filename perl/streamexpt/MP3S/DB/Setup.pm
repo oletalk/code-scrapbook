@@ -4,18 +4,25 @@ use strict;
 use MP3S::DB::Access;
 
 sub init {
+	my ($reuse_stats) = @_;
 	my $db = MP3S::DB::Access->new;
+	
+	unless ($reuse_stats) {
+		$db->execute(qq{
+			DROP TABLE IF EXISTS MP3S_stats;
+			
+			CREATE TABLE MP3S_stats
+			( category varchar(50) not null,
+			  item     varchar(2000) not null,
+			  count int not null default 0,
+			PRIMARY KEY (category, item) );			
+		});
+	}
+	
 	$db->execute(qq{
-		DROP TABLE IF EXISTS MP3S_stats;
 		
 		DROP TABLE IF EXISTS MP3S_starttime;
-		
-		CREATE TABLE MP3S_stats
-		( category varchar(50) not null,
-		  item     varchar(2000) not null,
-		  count int not null default 0,
-		PRIMARY KEY (category, item) );
-		
+				
 		CREATE TABLE MP3S_starttime
 		( start timestamp not null );
 		

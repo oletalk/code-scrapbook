@@ -28,6 +28,7 @@ our $random;
 our $config_file = "default.conf";
 
 my $clientlist_file;
+my $reuse_stats;
 
 # then override with command line args
 my $res = GetOptions(
@@ -38,6 +39,7 @@ my $res = GetOptions(
     "clientlist=s"  => \$clientlist_file,
     "random"        => \$random,
     "config_file=s" => \$config_file,
+	"reusestats"    => \$reuse_stats,
     "debug"         => \$debug
 );
 
@@ -75,7 +77,8 @@ our $server = MP3S::Server->new(
     playlist   => $playlist,
     rootdir    => $rootdir,
     downsample => $downsample,
-    random     => $random
+    random     => $random,
+	reuse_stats => $reuse_stats
 );
 $server->setup_playlist;
 
