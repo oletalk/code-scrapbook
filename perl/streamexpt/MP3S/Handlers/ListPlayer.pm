@@ -43,19 +43,24 @@ sub play_songs {
 			my $player = MP3S::Handlers::SongPlayer->new(conn => $conn, 
 										 downsample => $downsample);
 					
-		
-			unless (config_value('TESTING')) {
-				# record stats	
-			    count_stat( 'SONGS PLAYED',
-			        MP3S::Misc::Util::filename_only( $song->get_uni_filename ) );
-			    my $hour = MP3S::Misc::Util::get_hour();
-			    count_stat( 'HOUR OF DAY', "${hour}:00" );
-				my ($trackname, $secs, $artist) = $plist->get_trackinfo($song);
-				count_stat('ARTISTS', $artist);				
-			}
-
 			# play the song
-			$player->play($song);
+			my $interrupted_secs = $player->play($song);
+			if ($interrupted_secs) {
+				log_debug("Playing of $songname was interrupted after $interrupted_secs");
+			} else {
+				# add to stats
+				unless (config_value('TESTING')) {
+					# record stats	
+				    count_stat( 'SONGS PLAYED',
+				        MP3S::Misc::Util::filename_only( $song->get_uni_filename ) );
+				    my $hour = MP3S::Misc::Util::get_hour();
+				    count_stat( 'HOUR OF DAY', "${hour}:00" );
+					my ($trackname, $secs, $artist) = $plist->get_trackinfo($song);
+					count_stat('ARTISTS', $artist);				
+				}
+			}
+			
+			
 		
 			$done = 1 unless $conn;
 			log_debug( "Finishing after this song" ) if $done;
