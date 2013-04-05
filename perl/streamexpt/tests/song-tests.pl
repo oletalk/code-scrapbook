@@ -11,10 +11,10 @@ my $song = MP3S::Music::Song->new( filename => '/path/to/song.mp3');
 is( $song->get_filename, '/path/to/song.mp3', 'path set correctly');
 
 my $realsong = MP3S::Music::Song->new( filename => './tests/testdata/first.mp3');
-ok( defined $realsong->get_modified_date, 'modified date set');
+ok( defined $realsong->get_modified_time, 'modified time set');
 my $realsong2 = MP3S::Music::Song->new( filename => './tests/testdata/third.mp3');
 
-my @list1 = sort { $a->get_modified_date <=> $b->get_modified_date }($realsong2, $realsong);
+my @list1 = sort { $a->get_modified_time <=> $b->get_modified_time }($realsong2, $realsong);
 is( $list1[0]->get_filename, './tests/testdata/first.mp3', 'sorted 2 songs in order of modified date ok');
 
 $song->set_URI_from_rootdir('/path/to');
