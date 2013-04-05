@@ -59,7 +59,7 @@ MP3S::Misc::Logger::init(
     display_context => MP3S::Misc::Logger::NAME
 );
 
-$reusestats ||= config_value('reusestats');
+$reuse_stats ||= config_value('reusestats');
 $port ||= config_value('port') || 8000;
 $clientlist_file ||= config_value('clientlist');
 
