@@ -63,7 +63,6 @@ $local = TestUtils::getlocal($port, '/stats');
 ok( TestUtils::compare_result($local, 'tests/results/server-tests-stats.dat'), 'stats URL does something');
 
 $local = TestUtils::getlocal($port, '/latest/1');
-warn "local is $local";
 ok( $local =~ /New songs over the past 1 day/ || $local eq 'No new songs.', '/latest url does something');
 $local = TestUtils::getlocal($port, '/play/first.mp3');
 is($local, "not an mp3\n", "'playing' an mp3 non-downsampled works ok"); #as it turns out :-D

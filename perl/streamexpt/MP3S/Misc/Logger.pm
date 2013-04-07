@@ -40,6 +40,7 @@ sub init {
 		$log = new Log::LogLite( $args{logfile}, $args{level} );
 		$log->template('<date><message>');
 	}
+	$logging_level = $args{level}; # for print-based logging
 		
 }
 
@@ -80,7 +81,9 @@ sub _log {
 		if ($log) {
 			$log->write("${ctxtdisp} [$leveldisp] $m \n", $level);
 		} else {
-			print "${tstamp}${ctxtdisp} [$leveldisp] $m \n";			
+			if ($level <= $logging_level) {
+				print "${tstamp}${ctxtdisp} [$leveldisp] $m \n";				
+			}
 		}
 	}
 }

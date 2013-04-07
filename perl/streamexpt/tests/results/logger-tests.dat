@@ -1,0 +1,6 @@
+__/__/____ __:__:__ [INFO] logged one line 
+__/__/____ __:__:__ [ERROR] logged an error! 
+__/__/____ __:__:__ [ERROR] error 2 
+__/__/____ __:__:__ [DEBUG] log line is spread
+out over several
+lines 

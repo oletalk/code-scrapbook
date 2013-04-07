@@ -14,15 +14,26 @@ sub getlinks {
 	@matches;
 }
 
+sub logfile_result {
+	my ($logfile) = @_;
+	_slurp_file($logfile);
+}
+
 sub compare_result {
 	my ($actual, $resultfile) = @_;
-	die "Problem accessing resultfile: $!" unless -r $resultfile;
-	open my $fh, $resultfile or die "Problem accessing resultfile: $!";
-	local $/;
-	my $expected = <$fh>;
-	close $fh;
+	my $expected = _slurp_file($resultfile);
 	warn "EXPECTED:\n$expected\nACTUAL:\n$actual\n" unless $expected eq $actual;
 	$expected eq $actual;
+}
+
+sub _slurp_file {
+	my ($filename) = @_;
+	die "Problem accessing file: $!" unless -r $filename;
+	open my $fh, $filename or die "Problem accessing file: $!";
+	local $/;
+	my $ret = <$fh>;
+	close $fh;
+	$ret;
 }
 
 # LINE: <h2>Song list</h2>  <a href="/play">Play these songs</a> | <a href="/drop">Download playlist</a><br/> first.mp3 <a href="/play/first.mp3">D</a><br/>  

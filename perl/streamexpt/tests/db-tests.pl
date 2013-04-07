@@ -10,13 +10,12 @@ use MP3S::Misc::Logger;
 MP3S::Misc::MSConf::init('tests/testdata/testing-withdb.conf');
 MP3S::Misc::Logger::init(level => MP3S::Misc::Logger::INFO);
 
-# need tests for:
-# new
-# exec_single_row (sql, args)
-# exec_single_row (sql, no args provided, no bind vars either)
-# exec_single_cell(sql, args)
-# execute (sql, args)
-# check errstr
+eval {
+	my $baddb = MP3S::DB::Access->new( quiet => 1, dbname => 'bogusdb');
+	$baddb->execute('SELECT 1');
+	fail('no error thrown with nonexistent db');
+};
+
 
 my $db = MP3S::DB::Access->new( quiet => 1);
 ok ($db, 'DB handle created ok');
