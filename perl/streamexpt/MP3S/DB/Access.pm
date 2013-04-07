@@ -34,8 +34,10 @@ sub _connect {
 	}
 
 	my $conn = undef;
+	my $printerror = ($args{'quiet'}) ? 0 : 1;
+	my $printwarn  = ($args{'loud'}) ? 1 : 0;
 	$conn = DBI->connect_cached( "DBI:Pg:dbname=$dbname;host=$host",
-        $user, $password, { AutoCommit => 1, RaiseError => 0, PrintError => 1, PrintWarn => 0 } )
+        $user, $password, { AutoCommit => 1, RaiseError => 0, PrintError => $printerror, PrintWarn => $printwarn } )
       or die DBI->errstr;
 	$conn;
 }
