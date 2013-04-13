@@ -28,7 +28,6 @@ public class TagDAO {
     }
     
     public List<Object> getEmptyTags() {
-        System.out.println("GET EMPTY TAGS!");
         String sql = "select song_filepath, file_hash, artist, title, secs from mp3s_tags where artist is NULL";
         return this.jdbcTemplate.query(sql, this.getMapper(), new HashMap());
     }
@@ -47,7 +46,6 @@ public class TagDAO {
               taginfo.setArtist(rs.getString("artist"));
               taginfo.setTitle(rs.getString("title"));
               taginfo.setSecs(rs.getInt("secs"));
-              System.out.println(taginfo.toString());
               return taginfo;
           }  
         };
