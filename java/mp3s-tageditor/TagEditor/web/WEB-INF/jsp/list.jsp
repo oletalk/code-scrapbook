@@ -11,6 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+         <link rel="stylesheet" type="text/css" href="../css/newcss.css">
         <title>List of MP3s with Missing Tags</title>
     </head>
     <body>

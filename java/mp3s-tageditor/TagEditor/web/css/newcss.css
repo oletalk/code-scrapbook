@@ -1,0 +1,27 @@
+/* 
+    Document   : newcss
+    Created on : Apr 13, 2013, 7:55:26 PM
+    Author     : colin
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+td {
+    font-family: arial, sans-serif;
+    font-size: small;
+}
+
+th {
+    font-family: helvetica, verdana, sans-serif;
+    font-size: medium;
+    font-weight: bold;
+}
+
+table {
+    width: 900px;
+    border: blue thin solid;
+}
