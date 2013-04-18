@@ -32,20 +32,20 @@ public class TagDAO {
     
     public void updateTag(String taghash, Map <String, String> newvalues) {
         String newartist = newvalues.get("artist");
-        String newtitle  = newvalues.get("newtitle");
+        String newtitle  = newvalues.get("title");
         String sql = "UPDATE mp3s_tags SET ";
         String suffix = " WHERE file_hash = ?";
         
         int rowsAffected = 0;
         if (newartist != null && newtitle != null) { // can't figure out any other way at the moment
             sql += "artist = ?, title = ?" + suffix;
-            rowsAffected = jdbcTemplate.update(sql, new Object[]{newartist, newtitle});
+            rowsAffected = jdbcTemplate.update(sql, new Object[]{newartist, newtitle, taghash});
         } else if (newartist != null) {
-            sql += "artist = ?";
-            rowsAffected = jdbcTemplate.update(sql, new Object[]{newartist});
+            sql += "artist = ?" + suffix;
+            rowsAffected = jdbcTemplate.update(sql, new Object[]{newartist, taghash});
         } else if (newtitle != null) {
-            sql += "title = ?";
-            rowsAffected = jdbcTemplate.update(sql, new Object[]{newtitle});
+            sql += "title = ?" + suffix;
+            rowsAffected = jdbcTemplate.update(sql, new Object[]{newtitle, taghash});
         } else {
             // do nothing, no new values received
         }

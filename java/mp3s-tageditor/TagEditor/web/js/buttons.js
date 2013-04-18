@@ -19,7 +19,19 @@ function updateDoc(row) {
         
     }
     
-    alert(postUrl);
+    if (!confirm('To send: ' + postUrl)) {
+        return;
+    }
+    if (window.XMLHttpRequest()) {
+        xmlhttp=new XMLHttpRequest();
+    } else {
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    
+    xmlhttp.open("POST", postUrl, false);
+    xmlhttp.send();
+    xmlDoc = xmlhttp.responseXML;
+    alert(xmlDoc);
 }
 
 function setedit(btn, val) {
