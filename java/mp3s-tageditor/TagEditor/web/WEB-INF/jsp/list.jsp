@@ -13,6 +13,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
          <link rel="stylesheet" type="text/css" href="../css/newcss.css">
         <title>List of MP3s with Missing Tags</title>
+        <script type="text/javascript" src="../js/buttons.js"></script>
     </head>
     <body>
         <c:choose>
@@ -24,12 +25,15 @@
                     <tr>
                         <th>Title</th>
                         <th>Artist</th>
+                        <th>&nbsp;</th>
                         <th>Location</th>
                     </tr>
                     <c:forEach var="tag" items="${tags}">
                         <tr id="${tag.filehash}">
-                            <td>${tag.title}</td>
-                            <td>${tag.artist}</td>
+                            <td><input type="hidden" name="filehash" value="${tag.filehash}">
+                                <input name="title" value="${tag.title}" onclick="setedit(this, true)" readonly="true"></td>
+                            <td><input name="artist" value="${tag.artist}" onclick="setedit(this, true)" readonly="true"></td>
+                            <td><input type="button" value="OK" onclick="setedit(this, false)"></td>
                             <td>${tag.songFilepath}</td>
                         </tr>
                     </c:forEach>

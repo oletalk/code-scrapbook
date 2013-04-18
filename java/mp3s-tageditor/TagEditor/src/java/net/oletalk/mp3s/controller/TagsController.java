@@ -6,14 +6,10 @@ package net.oletalk.mp3s.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import net.oletalk.mp3s.dao.TagDAO;
-import net.oletalk.mp3s.data.TagInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -25,12 +21,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("tags/")
 public class TagsController {
     
-    private TagDAO dao;
-    
     @Autowired
-    public void setTagDao(TagDAO t) {
-        dao = t;
-    }
+    private TagDAO dao;
     
     @RequestMapping("update")
     public ModelAndView updateTag(

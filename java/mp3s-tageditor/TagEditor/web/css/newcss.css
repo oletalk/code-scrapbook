@@ -21,6 +21,11 @@ th {
     font-weight: bold;
 }
 
+[readOnly] {
+    background-color: #ccc;
+    font-weight: bold;
+}
+
 table {
     width: 900px;
     border: blue thin solid;

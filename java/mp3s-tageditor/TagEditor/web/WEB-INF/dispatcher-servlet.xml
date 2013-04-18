@@ -16,7 +16,7 @@
     <!--bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/ -->
     <!--bean class="net.oletalk.mp3s.controller.TagsController" p:tagDao-ref="tagDao" /j-->
     <mvc:annotation-driven />
-    <context:component-scan base-package="net.oletalk.mp3s.controller" />
+    <context:component-scan base-package="net.oletalk.mp3s" />
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 
     <!--

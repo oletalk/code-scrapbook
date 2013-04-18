@@ -6,23 +6,25 @@ package net.oletalk.mp3s.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import net.oletalk.mp3s.data.TagInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author colin
  */
+@Component
 public class TagDAO {
     DataSource dataSource;
     JdbcTemplate jdbcTemplate;
     
+    @Autowired
     public void setDataSource(DataSource ds) {
         this.dataSource = ds;
         jdbcTemplate = new JdbcTemplate(ds);

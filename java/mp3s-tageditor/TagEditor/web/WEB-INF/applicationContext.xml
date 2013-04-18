@@ -21,10 +21,6 @@
           p:username="${jdbc.username}"
           p:password="${jdbc.password}" />
 
-    <bean id="tagDao" class="net.oletalk.mp3s.dao.TagDAO" >
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
     <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
 
 </beans>
