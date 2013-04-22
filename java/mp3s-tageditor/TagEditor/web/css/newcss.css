@@ -10,9 +10,18 @@ root {
     display: block;
 }
 
-td {
+.trvisible {
+    display: table-row;
+}
+
+.trhidden {
+    display: none;
+}
+
+td,th {
     font-family: arial, sans-serif;
     font-size: small;
+    border: black 2px solid;
 }
 
 th {

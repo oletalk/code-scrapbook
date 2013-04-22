@@ -15,6 +15,7 @@ function updateDoc(row) {
             var n = tdlist[i].name;
             var v = tdlist[i].value;
             postUrl += '&' + n + '=' + escape(v);
+            tdlist[i].value = '';
         }
         
     }
@@ -31,7 +32,30 @@ function updateDoc(row) {
     xmlhttp.open("POST", postUrl, false);
     xmlhttp.send();
     xmlDoc = xmlhttp.responseXML;
-    alert(xmlDoc);
+    //alert(xmlDoc);
+}
+
+function filter(fld) {
+    
+    var searchstr = fld.value.toUpperCase();
+    // filter on this value if it is not empty
+    var tdlist = document.getElementsByTagName('td');
+    for (var i = 0; i < tdlist.length; i++) {
+        if (tdlist[i].className == 'filepath') {
+            var j = tdlist[i].firstChild.textContent.toUpperCase();
+            var row = tdlist[i].parentNode;
+
+            if (searchstr != '') {
+                if (j.indexOf(searchstr) == -1) {
+                    row.className = 'trhidden';
+                } else {
+                    row.className = 'trvisible';
+                }
+            } else {
+                row.className = 'trvisible'; // all visible if no search string
+            }
+        }
+    }
 }
 
 function setedit(btn, val) {
