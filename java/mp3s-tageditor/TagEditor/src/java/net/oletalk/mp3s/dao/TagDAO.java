@@ -52,8 +52,15 @@ public class TagDAO {
                 
     }
     
-    public List<TagInfo> getEmptyTags() {
+    public List<TagInfo> getEmptyTags(int pagesize, int offset) {
         String sql = "select song_filepath, file_hash, artist, title, secs from mp3s_tags where artist is NULL";
+        
+        if (pagesize > 5) {
+            sql += " LIMIT " + pagesize;
+        }
+        if (offset > 0) {
+            sql += " OFFSET " + offset;
+        }
         //return this.jdbcTemplate.query(sql, this.getMapper(), new HashMap());
         return this.jdbcTemplate.query(sql, this.getMapper());
     }

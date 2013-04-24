@@ -7,6 +7,7 @@ package net.oletalk.mp3s.controller;
 import java.util.HashMap;
 import java.util.Map;
 import net.oletalk.mp3s.dao.TagDAO;
+import net.oletalk.mp3s.util.ParamUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,15 +36,20 @@ public class TagsController {
         newvalues.put("title", title);
 
         dao.updateTag(songHash, newvalues);
-        return listEmptyTags();
+        return listEmptyTags(null, null);
     }
     
     @RequestMapping("list")
-    public ModelAndView listEmptyTags() {
+    public ModelAndView listEmptyTags(
+            @RequestParam(value="numrows", defaultValue="20", required=false) String numRows,
+            @RequestParam(value="offset", defaultValue="0", required=false) String offset) {
         ModelAndView view = new ModelAndView();
         view.setViewName("list");
-        view.addObject("tags", dao.getEmptyTags());
-        
+        int pagesize = ParamUtils.parseOrZero(numRows);
+        int pageoffset = ParamUtils.parseOrZero(offset);
+        view.addObject("tags", dao.getEmptyTags(pagesize, pageoffset));
+        view.addObject("offset", pageoffset);
+        view.addObject("numrows", pagesize);
         return view;
     }
 }

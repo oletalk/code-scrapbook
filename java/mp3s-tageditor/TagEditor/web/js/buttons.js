@@ -35,6 +35,24 @@ function updateDoc(row) {
     //alert(xmlDoc);
 }
 
+function submitPageForm(offset) {
+    var frm = document.getElementById('paginateForm');
+    var frmInputs = frm.getElementsByTagName('input');
+    
+    var offsetInput = undefined;
+    
+    for (var i = 0; i < frmInputs.length; i++) {
+        if (frmInputs[i].name == 'offset') {
+            offsetInput = frmInputs[i];
+        }
+        
+    }
+    if (offsetInput != undefined) {
+        offsetInput.value = offset;
+    }
+    frm.submit();
+}
+
 function filter(fld) {
     
     var searchstr = fld.value.toUpperCase();
