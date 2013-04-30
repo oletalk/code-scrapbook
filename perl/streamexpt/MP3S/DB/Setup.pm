@@ -15,7 +15,8 @@ sub init {
 			( category varchar(50) not null,
 			  item     varchar(2000) not null,
 			  count int not null default 0,
-			PRIMARY KEY (category, item) );			
+			PRIMARY KEY (category, item) );		
+			GRANT SELECT on MP3S_stats to public;
 		});
 	}
 	

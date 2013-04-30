@@ -1,5 +1,9 @@
 # History files
 .Rhistory
+.properties
 
 # Example code in package build process
 *-Ex.R
+/java/mp3s-tageditor/TagEditor/nbproject/private/
+/java/mp3s-tageditor/TagEditor/build/
+/java/mp3s-tageditor/TagEditor/dist/
