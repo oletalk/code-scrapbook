@@ -24,9 +24,12 @@ sub handle {
 	croak "No connection given" unless $conn;
 	croak "Port number was not provided" unless $port;
 	
-	my $uri = $conn->get_request->uri; 
+	my $req = $conn->get_request;
+	my $uri = $req->uri;
+	my $headerhost = $req->header('host'); # HTTP::Headers (host) 
 	$uri = uri_unescape($uri);
 	log_debug( "Request: $uri\n" );
+	log_debug( "Host   : $headerhost\n" );
 	
 	# First bit is the command, /list/ or /play/
 	my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
