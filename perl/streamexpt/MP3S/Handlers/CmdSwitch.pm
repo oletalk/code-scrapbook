@@ -42,7 +42,7 @@ sub handle {
 	} elsif ($command eq 'list') {
 		$conn->send_response( MP3S::Net::TextResponse::print_list($plist, $str_uri));
 	} elsif ($command eq 'drop') {
-		$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $port));
+		$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $headerhost));
 	} elsif ($command eq 'stats') {
 		$conn->send_response( MP3S::Net::TextResponse::print_stats($str_uri));
 	} elsif ($command eq 'latest') {

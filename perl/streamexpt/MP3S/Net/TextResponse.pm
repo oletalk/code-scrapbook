@@ -69,12 +69,12 @@ sub print_latest {
 }
 
 sub print_playlist {
-	my ($plist, $str_uri, $port) = @_;
+	my ($plist, $str_uri, $headerhost) = @_;
 	
 	my $plsname = $plist->reckon_m3u_name;
 	my $cont = HTTP::Response->new(RC_NOT_FOUND);
 	if ($plist->process_playlist($str_uri)) {
-		my $ret = get_m3u($plist, $port);
+		my $ret = get_m3u($plist, $headerhost);
 		if ($ret) {
 			$cont = HTTP::Response->new(RC_OK);
 			$cont->header('Content-type' => 'application/octet-stream; charset=utf8');
@@ -113,11 +113,10 @@ sub print_stats {
 }
 
 sub get_m3u {
-	my ($plist, $port) = @_;
+	my ($plist, $headerhost) = @_;
 	my $ret = "";
 	
 	my @list = $plist->list_of_songs;
-	my $host = hostname();
 	
 	$plist->generate_tag_info;  # CM FIXME this takes really long (minutes) for reasonably large playlist
 	
@@ -135,7 +134,7 @@ sub get_m3u {
 			
 			$songline .= "${m3uinf}\n";				
 		}
-		$songline .= "http://${host}:${port}${safe_entry}\n";
+		$songline .= "http://${headerhost}${safe_entry}\n";
 		
 		$ret .= $songline;
 	}
