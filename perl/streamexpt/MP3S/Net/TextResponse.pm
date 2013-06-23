@@ -3,6 +3,8 @@ package MP3S::Net::TextResponse;
 use strict;
 use HTTP::Status;
 use HTTP::Response;
+use HTML::Template;
+
 use URI::Escape;
 use Sys::Hostname;
 use MP3S::Misc::MSConf qw(config_value);
@@ -14,20 +16,21 @@ sub print_list {
 	if ($plist->process_playlist($str_uri)) {
 		my @list = $plist->list_of_songs_URIs(1);
 
-		my $ret = join("\n", @list);
-
-		if ($ret) {
-			my $links = get_links($str_uri);
-			$ret = "<h2>Song list</h2> $links $ret";
-			my $reason = $plist->gen_reason;
-			$reason = " (reason: $reason )" if $reason;
-			$ret .= "<p><em>Generated: " . $plist->gen_date . "$reason </em></p>";
-		} else {
-			$ret = "<h3>No results</h3>";		
+		my ($reason, $date);
+		if (@list) {
+			$reason = $plist->gen_reason;
+			$date = $plist->gen_date;
 		}
+
+		my $template = HTML::Template->new(filename => 'templates/song-list.tmpl');
+		$template->param(URI => $str_uri);
+		$template->param(SONGS_URIS => \@list);
+		$template->param(GENDATE => $date);
+		$template->param(REASON => $reason);
+		
 		$cont = HTTP::Response->new(RC_OK);
 		$cont->header('Content-type' => 'text/html; charset=utf-8');
-		$cont->content( $ret );		
+		$cont->content( $template->output );		
 	} else {
 		$cont = HTTP::Response->new(RC_NOT_FOUND);
 		$cont->content( "No matching results!");
@@ -47,19 +50,17 @@ sub print_latest {
 		my $cutoff = time - (86400 * $days);
 		foreach my $song ($plist->list_of_songs) {
 			if ($song->get_modified_time > $cutoff) {
-				push @latest, $song->get_URI( hyperlinked => 1 );
+				push @latest, { 'TITLE' => $song->get_URI( hyperlinked => 1 ) , 'URI' => $song->get_URI() };
 			}
 		}
 		
-		my $ret = "No new songs.";
+		my $template = HTML::Template->new(filename => 'templates/song-latest.tmpl');
+		$template->param(SONGS_URIS => \@latest);
+		$template->param(DAYS => $days);
+
 		$cont = HTTP::Response->new(RC_OK);
 		$cont->header('Content-type' => 'text/html; charset=utf-8');
-		if (@latest) {
-			my $word = ($days == 1 ? 'day' : 'days');
-			$ret = "<h3>New songs over the past $days $word</h3>\n";
-			$ret .= join("\n", @latest);
-		}
-		$cont->content( $ret );
+		$cont->content( $template->output );
 		
 	} else {
 		$cont = HTTP::Response->new(RC_NOT_FOUND);
@@ -89,25 +90,23 @@ sub print_playlist {
 
 sub print_stats {
 	my ($uri) = @_;
-	my $ret = "";
+	
+	my $template = HTML::Template->new(filename => 'templates/stats.tmpl');
 	
 	if (config_value('TESTING')) {
 		use tests::mocks::MockStats qw(output_stats_n get_uptime_n);
-		$ret .= "<pre>" . output_stats_n($uri) . "</pre>";
-		$ret .= "<b>Uptime:</b> " . get_uptime_n();
+		$template->param(STATS => output_stats_n($uri));
+		$template->param(UPTIME => get_uptime_n());
 		
 	} else {
 		use MP3S::Misc::Stats qw(output_stats get_uptime);		
-		$ret .= "<pre>" . output_stats($uri) . "</pre>";
-		$ret .= "<b>Uptime:</b> " . get_uptime();
-		
+		$template->param(STATS => output_stats($uri));
+		$template->param(UPTIME => get_uptime());		
 	}
-	
-	
-	
+		
 	my $cont = HTTP::Response->new(RC_OK);
 	$cont->header('Content-type' => 'text/html; charset=utf-8');
-	$cont->content( $ret );		
+	$cont->content( $template->output );		
 
 	$cont;
 }
@@ -120,36 +119,28 @@ sub get_m3u {
 	
 	$plist->generate_tag_info;  # CM FIXME this takes really long (minutes) for reasonably large playlist
 	
+	my $template = HTML::Template->new(filename => 'templates/get-m3u.tmpl');
+	
+	my @m3ulist = ();
 	foreach my $song_obj (@list) {
 		my $songURI = $song_obj->get_URI(playlink => 1);
 		
 		my $safe_entry = uri_escape($songURI, "^A-Za-z0-9\/\.");
 		#print "REFERENCE: " . ref($song_obj);
 		my ($tn, $ts) = $plist->get_trackinfo($song_obj);
-		my $songline = "";
-		if ($tn) {
-			my $secs = $ts;
-			my $tags = "$tn" || $song_obj->get_filename;
-			my $m3uinf = "#EXTINF:${secs},${tags}";
-			
-			$songline .= "${m3uinf}\n";				
-		}
-		$songline .= "http://${headerhost}${safe_entry}\n";
-		
-		$ret .= $songline;
-	}
-	$ret = "#EXTM3U\n${ret}" if $ret; # the M3U file header
-	
-	$ret;
-}
 
-sub get_links {
-	my ($str_uri) = @_;
-	
-	my $playall = $str_uri;
-	my $ret = qq~ <a href="/play${str_uri}">Play these songs</a> | <a href="/drop${str_uri}">Download playlist</a><br/>~;
+		my %objhash = ();
+		if ($tn) {
+			$objhash{SECS} = $ts;
+			$objhash{TAGS} = "$tn" || $song_obj->get_filename;
+		}
+		$objhash{SONGURL} = "http://${headerhost}${safe_entry}\n";
+		push @m3ulist, \%objhash;
 		
-	$ret;
+	}
+	$template->param(SONGS => \@m3ulist);
+	
+	$template->output;
 }
 
 1;

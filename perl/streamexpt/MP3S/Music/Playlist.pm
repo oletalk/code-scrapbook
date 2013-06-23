@@ -119,9 +119,11 @@ sub list_of_songs_URIs {
     # CM and what if it's an ordinary playlist and no 'rootdir' was given?
     $rootdir = "/";
 
-    sort map ( $_->get_URI( 'hyperlinked' => $hyperlinked ),
-        @{ $self->{'songs'} } );
+    #sort map ( $_->get_URI( 'hyperlinked' => $hyperlinked ),
+    #    @{ $self->{'songs'} } );
 
+	sort map ( { 'TITLE' => $_->get_URI( 'hyperlinked' => $hyperlinked ),
+			     'URI'   => $_->get_URI() } , @{ $self->{'songs'}} ); 
 }
 
 sub get_song {

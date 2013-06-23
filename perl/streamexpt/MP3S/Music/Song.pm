@@ -73,7 +73,8 @@ sub get_URI {
 		#$title ||= $URI;
 		$title ||= $self->{'nonuni_URI'} || $URI;
 
-		$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
+		#$ret = qq |${title} <a href="/play/${URI}">D</a><br/> \n|;
+		$ret = $title;
 	} else {
 		$ret = $URI;
 	}
