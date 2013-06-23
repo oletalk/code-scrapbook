@@ -31,5 +31,6 @@ echo "Installing to destination directory $DEST"
 inst_all_in scripts $DEST
 inst_all_in conf $DEST
 inst_all_in MP3S $DEST
+inst_all_in templates $DEST
 inst_all_in tests/mocks $DEST
 echo DONE
