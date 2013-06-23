@@ -2,6 +2,7 @@ use lib '..';
 use strict;
 use Test::More tests => 11;
 
+use warnings;
 use HTTP::Daemon;
 
 use MP3S::Misc::MSConf qw(config_value);
@@ -42,8 +43,10 @@ if ($pid == 0) {
 
 my $local = TestUtils::getlocal($port, '/list');
 my @links = TestUtils::getlinks($local);
+@links = sort @links;  # CM FIXME - find order is very brittle here
+#print " ---> $_ \n" foreach @links;
 
-is($links[1], '/drop', 'link for playlist download present');
+is($links[0], '/drop', 'link for playlist download present');
 is($links[5], '/play/third.mp3', 'links for mp3s present');
 is($links[3], '/play/nonasc/weird\\303\\212\\305\\267stuff.mp3', 'files with strange characters in names ok');
 
