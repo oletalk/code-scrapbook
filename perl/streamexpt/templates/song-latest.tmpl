@@ -1,0 +1,10 @@
+<!-- songs-latest.tmpl -->
+<h3>New songs over the past <TMPL_VAR NAME=DAYS> day(s)</h3>
+
+<TMPL_IF NAME="SONGS_URIS">
+<TMPL_LOOP NAME=SONGS_URIS>
+<TMPL_VAR NAME=TITLE> <a href="/play/<TMPL_VAR NAME=URI>">D</a><br/>
+</TMPL_LOOP>
+<TMPL_ELSE>
+<h3>No new songs.</h3>
+</TMPL_IF>
