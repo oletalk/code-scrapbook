@@ -18,11 +18,9 @@ sub handle {
 	my $plist = $args{playlist};
 	my $random = $args{random};
 	my $downsample = $args{downsample};
-	my $port = $args{port};
 	
 	croak "No playlist provided" unless $plist;
 	croak "No connection given" unless $conn;
-	croak "Port number was not provided" unless $port;
 	
 	my $req = $conn->get_request;
 	my $uri = $req->uri;

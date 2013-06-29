@@ -94,7 +94,7 @@ sub setup_playlist {
 
 sub process {
     my $self = shift;
-    my ( $conn, $port ) = @_;
+    my ( $conn ) = @_;
 
     my $child;
 
@@ -132,7 +132,6 @@ sub process {
                     playlist   => $self->playlist,
                     random     => $self->{random},
                     downsample => $downsample_client,
-                    port       => $port,
                 );
             };
             if ($@) {

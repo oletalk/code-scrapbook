@@ -89,7 +89,7 @@ log_info( "Server is up at " . $d->url . ". Waiting for connections ... \n" );
 while (1) {
 	#local $SIG{HUP} = \&dispatch;
     while ( my $conn = $d->accept ) {
-        $server->process( $conn, $port );
+        $server->process( $conn );
     }
 
 	# CM for some reason it seems to fall through to here when I give it a SIGHUP
