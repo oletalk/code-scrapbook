@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use POSIX qw/strftime/;
+use Time::Local;  # ok, core module
 
 use constant START => qr/^start|begin$/;
 use constant STOP  => qr/^stop|end$/;
@@ -15,6 +16,7 @@ sub new {
 	my %stuff = ();
 	$stuff{input_timestamp_format} = 'HH:MM';
 	$stuff{timestamp_format} = '%a %d %b %Y %T';
+	$stuff{short_timestamp_format} = '%T';
 	
 	# TODO: validation for each
 	foreach my $arg (qw(timestamp_format input_timestamp_format file debug)) {
@@ -68,9 +70,21 @@ sub _add_period {
 	push @{$self->{periods}->{$task}}, [ $period_start, $period_end ];
 }
 
+sub get_periods {
+	my $self = shift;
+	my ($task) = @_;
+	
+	$self->{periods}->{$task};
+}
+
 sub get_timestamp_format {
 	my $self = shift;
 	$self->{timestamp_format};
+}
+
+sub get_short_timestamp_format {
+	my $self = shift;
+	$self->{short_timestamp_format};
 }
 
 sub get_open_tasks {
@@ -94,11 +108,30 @@ sub _add_elapsed_time {
 	$self->{closed_tasks}->{$taskname} += $elapsed_secs;
 }
 
+sub reset_timestamp {
+	my $self = shift;
+	my ($reset_time_HHMM) = @_;
+	
+	my @localtime = localtime();
+	my $timestamp;
+	
+	my ($hh, $mm) = $reset_time_HHMM =~ /^(\d\d):(\d\d)$/;
+	if ($hh < 0 || $hh > 23 || $mm < 0 || $mm > 59) {
+		carp "Given reset time $reset_time_HHMM isn't valid";
+	} else { # reset the hours/minutes
+		$localtime[2] = $hh;
+		$localtime[1] = $mm;
+		$localtime[0] = 0;
+	}
+	$timestamp = strftime('%s', @localtime);
+	$timestamp;
+}
+
 sub open_task {
 	my $self = shift;
 	my ($taskname, $timespec) = @_;
 	if (defined $self->{open_tasks}->{$taskname}) {
-		$self->{error} = "A task by the name '$taskname' already exists!";
+		$self->{error} = "An open task by the name '$taskname' already exists!";
 	} else {
 		undef $self->{error};
 		push @{$self->{pending_writes}}, [ 'start', $taskname, $timespec ];
@@ -111,9 +144,19 @@ sub close_task {
 	my ($taskname, $timespec) = @_;
 	if (defined $self->{open_tasks}->{$taskname}) {
 		undef $self->{error};
+		# we could be given a pre-defined time that's before the open time!
+		my $open_time = $self->{open_tasks}->{$taskname};
+		if ($timespec) {
+			my $adj_time = $self->reset_timestamp($timespec);
+			if ($adj_time < $open_time) {
+				my $fmt_begin_time = strftime( $self->{timestamp_format}, localtime($open_time));
+				
+				$self->{error} = "Given close time is before task '$taskname' begin time of $fmt_begin_time!";
+			}
+		}
 		push @{$self->{pending_writes}}, [ 'stop', $taskname, $timespec ];
 	} else {
-		$self->{error} = "No task by the name '$taskname' exists!";
+		$self->{error} = "No open task by the name '$taskname' exists!";
 	}
 	return !defined $self->{error};
 }
@@ -136,9 +179,9 @@ sub do_pending_writes {
 	
 	foreach my $write ( @{$self->{pending_writes}} ) {
 		my ( $cmd, $taskname, $timespec ) = @$write;
-		# TODO: timespec must be checked and made into a timestamp
-		$timespec ||= time;
-		print $fh qq{$cmd#$taskname#$timespec\n};
+		# timespec must be checked and made into a timestamp
+		my $ts = $timespec ? $self->reset_timestamp($timespec) : time;
+		print $fh qq{$cmd#$taskname#$ts\n};
 	}
 	close $fh;
 }

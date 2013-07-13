@@ -24,7 +24,7 @@ my $res = GetOptions(
 
 # read command
 my ($command, $task, @options) = @ARGV;
-if ($command !~ /^start|begin|stop|end|status|times$/) {
+if ($command !~ /^start|begin|stop|end|status|times|details|today$/) {
 	usage();
 	exit 1;
 }
@@ -51,6 +51,14 @@ if ($command eq 'start' || $command eq 'begin') {
 	TaskDisplay::display_open_tasks( $list );
 } elsif ($command eq 'times') {
 	TaskDisplay::display_closed_tasks( $list );
+} elsif ($command eq 'details') {
+	if (defined $task) {
+		TaskDisplay::display_task_details( $list, $task );
+	} else {
+		TaskDisplay::display_all_task_details( $list );
+	}
+} elsif ($command eq 'today') {
+	TaskDisplay::display_today( $list, '00:00', '23:59' );
 }
 
 exit 0;
@@ -64,5 +72,6 @@ sub usage {
 		stop 'task description'  [<HH:MM>] - Stops a task in progress
 		status                             - Lists tasks in progress
 		times                              - Shows elapsed times for stopped tasks
+		details 'task description'         - Shows details on elapsed times for task
 };
 }
