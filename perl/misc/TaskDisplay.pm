@@ -16,16 +16,19 @@ sub display_open_tasks {
 		print " [$ctr] $opentask: started " . 
 			strftime( $tl->get_timestamp_format, localtime ($o->{$opentask}) ) . "\n"; 
 	}
+	print "NO OPEN TASKS (you sure about that?)\n" if $ctr == 0;
 }
 
 sub display_closed_tasks {
-	my ($tl) = @_;
+	my ($tl, $detailed) = @_;
 	die "This is not a TaskList" unless $tl->isa('TaskList');
 	my $c = $tl->get_closed_tasks;
 	
 	foreach my $closedtask (keys %$c) {
 		my $tme = hms( $c->{$closedtask} );
-		print "   $closedtask: elapsed $tme \n";
+		if (!$detailed) {
+			print "   $closedtask: elapsed $tme \n";			
+		}
 	}
 }
 
@@ -42,9 +45,9 @@ sub hms {
 			$mins = $mins % 60;
 		}
 	}
-	my $ret = "$secs secs";
-	$ret = "$mins mins, $ret" if $mins > 0;
-	$ret = "$hrs hrs, $ret" if $hrs > 0;
+	my $ret = "$secs sec";
+	$ret = "$mins min, $ret" if $mins > 0;
+	$ret = "$hrs hr, $ret" if $hrs > 0;
 	
 	$ret;
 }

@@ -5,6 +5,9 @@ use warnings;
 use Carp;
 use POSIX qw/strftime/;
 
+use constant START => qr/^start|begin$/;
+use constant STOP  => qr/^stop|end$/;
+
 sub new {
 	my $class = shift;
 	my %args = @_;
@@ -38,16 +41,17 @@ sub read_activities_file {
 		my $ts = strftime( $self->{timestamp_format}, localtime($timestamp));
 		print "$state, $task, $ts ($timestamp)\n" if $self->{debug};
 		
-		if ($state =~ /^start|begin$/) {
+		if ($state =~ START) {
 			if (defined $self->{open_tasks}->{$task}) {
 				carp "[Internal list error] 'start' being called on already-open task '$task'!";
 			} else {
 				$self->{open_tasks}->{$task} = $timestamp;
 			}
-		} elsif ($state =~ /^stop|end$/) {
+		} elsif ($state =~ STOP) {
 			if (defined $self->{open_tasks}->{$task}) {
 				my $elapsed = $timestamp - $self->{open_tasks}->{$task};
 				$self->_add_elapsed_time($task, $elapsed);
+				$self->_add_period($task, $self->{open_tasks}->{$task}, $timestamp);
 				undef $self->{open_tasks}->{$task};
 			} else {
 				carp "[Internal list error] 'stop' being called on not-open task '$task'!";
@@ -55,6 +59,13 @@ sub read_activities_file {
 		}
 		
 	}
+}
+
+sub _add_period {
+	my $self = shift;
+	my ($task, $period_start, $period_end) = @_;
+	
+	push @{$self->{periods}->{$task}}, [ $period_start, $period_end ];
 }
 
 sub get_timestamp_format {
@@ -109,7 +120,7 @@ sub close_task {
 
 sub error_message {
 	my $self = shift;
-	$self->{error};
+	$self->{error} . "\n";
 }
 
 sub do_pending_writes {
