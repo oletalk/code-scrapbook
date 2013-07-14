@@ -3,20 +3,67 @@ package TaskDisplay;
 use strict;
 use warnings;
 use POSIX qw/strftime/;
+use Carp;
 
 use constant DAY_SECS => 86400;
+use constant SPACER => '   ';
+use constant PRE_SPACER => '---- ';
 
 # Date-sensitive display operations -------------
 sub display_today {
-	my ($tl, $begin, $end) = @_;
+	my ($tl, $begin, $end, $interval_size) = @_;
 	die "This is not a TaskList" unless $tl->isa('TaskList');
+	$interval_size ||= 1800; # half an hour
 
-
-
+	my $begin_time = $tl->reset_timestamp($begin);
+	my $end_time = $tl->reset_timestamp($end);
+	croak "Given end time is before given begin time" if $end_time < $begin_time;
+	
+	# 14 Jul 13:55
+	# what to do when tasks overlap?
+	
+	my %schedule = ();
+	my %offsets = ();
+	my $col_offset = 1;
+	
 	my $c = $tl->get_closed_tasks;
 	my $ctasks = $tl->get_closed_tasks;
 	foreach my $task (keys %$ctasks) {
-
+		my $periods = $tl->get_periods($task);
+		foreach my $period (@$periods) {
+			my ($pstart, $pend) = @$period;
+			# put these on the schedule
+			
+			$pstart = quantize_diff($begin_time, $pstart, $interval_size);
+			$pend   = quantize_diff($begin_time, $pend  , $interval_size);
+			
+			if (!defined $offsets{$task}) {
+				$offsets{$task} = ++$col_offset;
+			}
+			push @{$schedule{$pstart}}, SPACER x $offsets{$task} . "$task START";
+			push @{$schedule{$pend}}, SPACER x $offsets{$task} . "$task END";
+		}
+	}
+	
+	my $fmt = $tl->get_short_timestamp_format;
+	
+	for (my $curr_time = $begin_time; $curr_time < $end_time; $curr_time += $interval_size) {
+		
+		my $lhs_disp = strftime( $fmt, localtime( $curr_time )) . PRE_SPACER;
+		print $lhs_disp;
+		my $secondline_spacer = ' ' x length($lhs_disp);
+		my $first = 1;
+				
+		if (defined $schedule{$curr_time}) {
+			my @tasks_in_interval = @{$schedule{$curr_time}};	
+			foreach my $m (@tasks_in_interval) {
+				print $secondline_spacer unless ($first);
+				print $m . "\n";
+				$first = 0;
+			}
+		} else {
+			print "\n";
+		}
 	}
 	
 
@@ -107,6 +154,16 @@ sub hms {
 	$ret = "${hrs}h $ret" if $hrs > 0;
 	
 	$ret;
+}
+
+sub quantize_diff {
+	my ($start, $qty, $int_size) = @_;
+	
+	my $startdiff = $qty - $start;
+	$startdiff = int($startdiff / $int_size) * $int_size;
+	$startdiff += $start;
+	
+	$startdiff;
 }
 
 1;

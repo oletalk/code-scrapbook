@@ -58,7 +58,7 @@ if ($command eq 'start' || $command eq 'begin') {
 		TaskDisplay::display_all_task_details( $list );
 	}
 } elsif ($command eq 'today') {
-	TaskDisplay::display_today( $list, '00:00', '23:59' );
+	TaskDisplay::display_today( $list, '08:00', '18:00' );
 }
 
 exit 0;
