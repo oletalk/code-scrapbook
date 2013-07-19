@@ -9,6 +9,8 @@ use Time::Local;  # ok, core module
 use constant START => qr/^start|begin$/;
 use constant STOP  => qr/^stop|end$/;
 
+use constant DAY_SECONDS => 86400;
+
 sub new {
 	my $class = shift;
 	my %args = @_;
@@ -110,12 +112,18 @@ sub _add_elapsed_time {
 
 sub reset_timestamp {
 	my $self = shift;
-	my ($reset_time_HHMM) = @_;
+	my ($reset_time_HHMM, $day_offset) = @_;
+	$day_offset = 0 unless defined $day_offset;
 	
 	my @localtime = localtime();
 	my $timestamp;
 	
 	my ($hh, $mm) = $reset_time_HHMM =~ /^(\d\d):(\d\d)$/;
+	
+	if ($day_offset < 0 || $day_offset > 7) {
+		carp "Day offset must be between 0 and 7";
+		$day_offset = 0;
+	}
 	if ($hh < 0 || $hh > 23 || $mm < 0 || $mm > 59) {
 		carp "Given reset time $reset_time_HHMM isn't valid";
 	} else { # reset the hours/minutes
@@ -124,6 +132,7 @@ sub reset_timestamp {
 		$localtime[0] = 0;
 	}
 	$timestamp = strftime('%s', @localtime);
+	$timestamp -= $day_offset * DAY_SECONDS;
 	$timestamp;
 }
 

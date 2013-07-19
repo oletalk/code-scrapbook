@@ -11,12 +11,12 @@ use constant PRE_SPACER => '---- ';
 
 # Date-sensitive display operations -------------
 sub display_today {
-	my ($tl, $begin, $end, $interval_size) = @_;
+	my ($tl, $begin, $end, $day_offset) = @_;
 	die "This is not a TaskList" unless $tl->isa('TaskList');
-	$interval_size ||= 1800; # half an hour
+	my $interval_size = 1800; # half an hour
 
-	my $begin_time = $tl->reset_timestamp($begin);
-	my $end_time = $tl->reset_timestamp($end);
+	my $begin_time = $tl->reset_timestamp($begin, $day_offset);
+	my $end_time = $tl->reset_timestamp($end, $day_offset);
 	croak "Given end time is before given begin time" if $end_time < $begin_time;
 	
 	# 14 Jul 13:55

@@ -24,7 +24,7 @@ my $res = GetOptions(
 
 # read command
 my ($command, $task, @options) = @ARGV;
-if ($command !~ /^start|begin|stop|end|status|times|details|today$/) {
+if ($command !~ /^start|begin|stop|end|status|times|details|today|back$/) {
 	usage();
 	exit 1;
 }
@@ -59,6 +59,8 @@ if ($command eq 'start' || $command eq 'begin') {
 	}
 } elsif ($command eq 'today') {
 	TaskDisplay::display_today( $list, '08:00', '18:00' );
+} elsif ($command eq 'back') {
+	TaskDisplay::display_today( $list, '08:00', '18:00', $task);
 }
 
 exit 0;
