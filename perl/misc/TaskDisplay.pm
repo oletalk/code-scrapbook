@@ -11,9 +11,16 @@ use constant PRE_SPACER => '---- ';
 
 # Date-sensitive display operations -------------
 sub display_today {
-	my ($tl, $begin, $end, $day_offset) = @_;
+	my %args = @_;
+	my $tl = $args{tasks};
+	my $begin = $args{begin};
+	my $end = $args{end};
+	my $day_offset = $args{day_offset};
+	my $collapse = $args{collapse};
+	my $show_trails = $args{trails};
+	
 	die "This is not a TaskList" unless $tl->isa('TaskList');
-	my $interval_size = 1800; # half an hour
+	my $interval_size = $collapse ? 900: 1800; # half an hour
 
 	my $begin_time = $tl->reset_timestamp($begin, $day_offset);
 	my $end_time = $tl->reset_timestamp($end, $day_offset);
@@ -40,12 +47,17 @@ sub display_today {
 			if (!defined $offsets{$task}) {
 				$offsets{$task} = ++$col_offset;
 			}
+			$offsets{$task} = 0 if $collapse;
 			push @{$schedule{$pstart}}, SPACER x $offsets{$task} . "$task START";
 			push @{$schedule{$pend}}, SPACER x $offsets{$task} . "$task END";
 		}
 	}
 	
 	my $fmt = $tl->get_short_timestamp_format;
+	
+	my $num_trails = 0;
+	my @trails = ();
+	my $rhs_trail = 0;
 	
 	for (my $curr_time = $begin_time; $curr_time < $end_time; $curr_time += $interval_size) {
 		
@@ -58,16 +70,46 @@ sub display_today {
 			my @tasks_in_interval = @{$schedule{$curr_time}};	
 			foreach my $m (@tasks_in_interval) {
 				print $secondline_spacer unless ($first);
-				print $m . "\n";
+				print replace_spacer_trails($m, \@trails) . "\n";
 				$first = 0;
+				
+				if ($show_trails) {
+					my ($spacer, $task, $cmd) = $m =~ /^(\s*)(.*)(START|END)$/;
+					#print "SPACER: $spacer, TASK: $task, CMD: $cmd\n";
+					my $num = length($spacer);
+					if ($cmd eq 'START') {
+						$trails[$num] = 1;
+						$rhs_trail = $num > $rhs_trail ? $num : $rhs_trail;
+						$num_trails++;
+					} elsif ($cmd eq 'END') {
+						undef $trails[$num];
+						$num_trails--;
+					}					
+				}
 			}
 		} else {
+			if ($num_trails > 0) {
+				for (my $i = 0; $i <= $rhs_trail; $i++) {
+					print defined $trails[$i] ? '|' : ' ';
+				}
+			}
 			print "\n";
 		}
 	}
 	
 
 	display_open_tasks($tl);
+}
+
+sub replace_spacer_trails {
+	my ($str, $trailsref) = @_;
+	my @trails = @{$trailsref};
+	for (my $i = 0; $i < scalar @trails; $i++) {
+		if (substr($str, $i, 1) eq ' ' && defined $trails[$i]) {
+			substr($str, $i, 1) = '|';
+		}
+	}
+	$str;
 }
 
 # Display operations on open tasks --------------------

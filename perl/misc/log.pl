@@ -58,9 +58,24 @@ if ($command eq 'start' || $command eq 'begin') {
 		TaskDisplay::display_all_task_details( $list );
 	}
 } elsif ($command eq 'today') {
-	TaskDisplay::display_today( $list, '08:00', '18:00' );
+	push @options, $task;
+	my %opts = map { $_ => 1 } @options;
+	TaskDisplay::display_today( 
+		tasks => $list, 
+		begin => '08:00', 
+		end => '18:00', 
+		collapse => defined $opts{flat},
+		trails => defined $opts{trails}
+	);
 } elsif ($command eq 'back') {
-	TaskDisplay::display_today( $list, '08:00', '18:00', $task);
+	#push @options, $task;
+	#my %opts = map { $_ => 1 } @options;
+	TaskDisplay::display_today( 
+		tasks => $list, 
+		begin => '08:00', 
+		end => '18:00', 
+		day_offset => $task
+	);
 }
 
 exit 0;
@@ -75,5 +90,7 @@ sub usage {
 		status                             - Lists tasks in progress
 		times                              - Shows elapsed times for stopped tasks
 		details 'task description'         - Shows details on elapsed times for task
+		today [flat] [trails]              - Shows calendar-style view of today's tasks
+		back <X=1 to 7>                    - Shows calendar-style view for tasks X days ago
 };
 }
