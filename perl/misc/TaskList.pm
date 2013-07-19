@@ -56,7 +56,7 @@ sub read_activities_file {
 				my $elapsed = $timestamp - $self->{open_tasks}->{$task};
 				$self->_add_elapsed_time($task, $elapsed);
 				$self->_add_period($task, $self->{open_tasks}->{$task}, $timestamp);
-				undef $self->{open_tasks}->{$task};
+				delete $self->{open_tasks}->{$task};
 			} else {
 				carp "[Internal list error] 'stop' being called on not-open task '$task'!";
 			}
@@ -87,6 +87,11 @@ sub get_timestamp_format {
 sub get_short_timestamp_format {
 	my $self = shift;
 	$self->{short_timestamp_format};
+}
+
+sub number_of_open_tasks {
+	my $self = shift;
+	scalar (keys %{$self->{open_tasks}});
 }
 
 sub get_open_tasks {
@@ -170,6 +175,13 @@ sub close_task {
 	return !defined $self->{error};
 }
 
+sub close_all_tasks {
+	my $self = shift;
+	foreach my $taskname (keys %{$self->{open_tasks}}) {
+		$self->close_task($taskname);
+	}
+}
+
 sub error_message {
 	my $self = shift;
 	$self->{error} . "\n";
@@ -186,13 +198,16 @@ sub do_pending_writes {
 		print Dumper ( $self->{pending_writes});		
 	}
 	
+	my $changes = 0;
 	foreach my $write ( @{$self->{pending_writes}} ) {
+		$changes = 1;
 		my ( $cmd, $taskname, $timespec ) = @$write;
 		# timespec must be checked and made into a timestamp
 		my $ts = $timespec ? $self->reset_timestamp($timespec) : time;
 		print $fh qq{$cmd#$taskname#$ts\n};
 	}
 	close $fh;
+	carp "No pending changes were committed" unless $changes;
 }
 
 1;

@@ -24,7 +24,7 @@ my $res = GetOptions(
 
 # read command
 my ($command, $task, @options) = @ARGV;
-if ($command !~ /^start|begin|stop|end|status|times|details|today|back$/) {
+if ($command !~ /^start|begin|stop|end|status|times|details|today|back|quit$/) {
 	usage();
 	exit 1;
 }
@@ -38,12 +38,14 @@ $list->read_activities_file;
 if ($command eq 'start' || $command eq 'begin') {
 	if ($list->open_task($task, $options[0])) {
 		$list->do_pending_writes;
+		print "OK, task started.\n";
 	} else {
 		print $list->error_message;
 	}
 } elsif ($command eq 'stop' || $command eq 'end') {
 	if ($list->close_task($task, $options[0])) {
 		$list->do_pending_writes;
+		print "OK, task stopped.\n";
 	} else {
 		print $list->error_message;
 	}
@@ -76,6 +78,19 @@ if ($command eq 'start' || $command eq 'begin') {
 		end => '18:00', 
 		day_offset => $task
 	);
+} elsif ($command eq 'quit') {
+	my $size = $list->number_of_open_tasks;
+	if ($size > 0) {
+		TaskDisplay::display_open_tasks( $list );
+		my $descr = $size == 1 ? 'this task' : 'these tasks';
+		print "If you REALLY want to close $descr, hit Enter; otherwise hit Ctrl-C now!\n";
+		my $dummy = <STDIN>;
+		$list->close_all_tasks;
+		$list->do_pending_writes;
+		print "OK, closed $descr.\n";
+	} else {
+		print "No open tasks at this time.\n";
+	}
 }
 
 exit 0;
@@ -92,5 +107,6 @@ sub usage {
 		details 'task description'         - Shows details on elapsed times for task
 		today [flat] [trails]              - Shows calendar-style view of today's tasks
 		back <X=1 to 7>                    - Shows calendar-style view for tasks X days ago
+		quit                               - Close ALL currently open tasks
 };
 }
