@@ -7,8 +7,10 @@ package net.oletalk.stream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.logging.Logger;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.Config;
+import net.oletalk.stream.util.LogSetup;
 import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
@@ -27,7 +29,8 @@ public class StreamServer {
         // TODO code application logic here
         // Start up
         Config.init();
-        System.out.println(Config.get("rootdir"));
+        Logger LOG = LogSetup.getlog();
+
         StreamHandler hand = new StreamHandler();
         Server server = new ContainerServer(hand);
         Connection connection = new SocketConnection(server);
@@ -36,7 +39,8 @@ public class StreamServer {
         SocketAddress address = new InetSocketAddress(port);
         SongList songlist = new SongList();
         songlist.initList(Config.get("rootdir"));
-        System.out.println(songlist.toString());
+        hand.setSongList(songlist);
+        LOG.info( songlist.toString() );
         
         connection.connect(address);
         System.out.println("Server is now running at port " + port + ", waiting for connections.");

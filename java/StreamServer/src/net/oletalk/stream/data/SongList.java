@@ -11,8 +11,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.oletalk.stream.util.LogSetup;
+import net.oletalk.stream.util.Stopwatch;
 
 /**
  *
@@ -20,22 +24,57 @@ import java.util.List;
  */
 public class SongList extends SimpleFileVisitor<Path> {
     
-    private List<Song> list;
+    private final String SONGSPEC = "(?i).*\\.(mp3|ogg)";
+    private static final Logger LOG = LogSetup.getlog();
+
+    private Map<Path,Song> list;
     
     public void initList(String initialDir) throws IOException
     {
         Path initialPath = Paths.get(initialDir);
-        list = new ArrayList<>();
+        list = new TreeMap<>();
+
+        Stopwatch s = new Stopwatch(true);
         Files.walkFileTree(initialPath, this);
+        LOG.log(Level.CONFIG, "Loaded all songs in {0} in {1} ms.", 
+                new Object[]{initialDir, s.elapsedTime()});
+        
+    }
+    
+    public boolean contains(String songreq)
+    {
+        boolean ret = false;
+        Path p = Paths.get(songreq);
+        if (p != null)
+        {
+            ret = (list.containsKey(p));
+        } else {
+            LOG.warning("Requested path returned a null result");
+        }
+        
+        return ret;
+    }
+    
+    public Song songFor(String songreq)
+    {
+        Song ret = null;
+        Path p = Paths.get(songreq);
+        if (p != null) 
+        {
+            ret = list.get(p);
+        } else {
+            LOG.warning("Requested path returned a null result");
+        }
+        return ret;
     }
     
     @Override
     public String toString()
     {
         StringBuilder ret = new StringBuilder("SongList:");
-        for (Song s : list) 
+        for (Path p : list.keySet()) 
         {
-            ret.append(s.toString()).append("\n");
+            ret.append(p.toString()).append("\n");
         }
         return ret.toString();
     }
@@ -53,20 +92,15 @@ public class SongList extends SimpleFileVisitor<Path> {
             {
                 String filename = name.toString();
                 if (filename.startsWith("."))
-                {
                     addfile = false;
-                }
                                 
-                if (!filename.matches("(?i).*\\.(mp3|ogg)"))
-                {
-                    System.out.println("File '" + filename + "' doesn't match regex!");
+                if (!filename.matches(SONGSPEC))
                     addfile = false;
-                }
             }
             
             if (addfile)
             {
-                list.add(new Song(file));
+                list.put(file, new Song(file));
             }
         }
         return FileVisitResult.CONTINUE;
@@ -75,7 +109,8 @@ public class SongList extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc)
     {
-        System.err.println(exc);
+        LOG.log(Level.WARNING, "Problem with file {0}: {1}", 
+                new Object[]{file.toString(), exc.toString()});
         return FileVisitResult.CONTINUE;
     }
 }

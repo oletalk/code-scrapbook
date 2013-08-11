@@ -17,17 +17,24 @@ import java.util.logging.SimpleFormatter;
 public class LogSetup {
     
     private static FileHandler fh = null;
-    
-    public static Logger newlog() {
+            
+    public static Logger getlog() {
+        
+        String logfilename = "/Users/colin/test-server.log";
+        
         try {
-            fh = new FileHandler("/Users/colin/test-server.log", false);
+            fh = new FileHandler(logfilename, false);
         } catch (SecurityException | IOException e) {
             e.printStackTrace();
         }
         Logger l = Logger.getLogger("StreamServer");
         fh.setFormatter(new SimpleFormatter());
-        l.addHandler(fh);
-        l.setLevel(Level.CONFIG);
+        if (l.getHandlers().length == 0)
+        {
+            System.out.println("Adding log handler -> " + logfilename);
+            l.addHandler(fh);
+        }
+        l.setLevel(Level.FINE);
         
         return l;
     }
