@@ -4,6 +4,17 @@
  */
 package net.oletalk.stream.actor;
 
+import java.io.PrintStream;
+import java.net.URLDecoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.oletalk.stream.Header;
+import net.oletalk.stream.data.Song;
+import net.oletalk.stream.data.SongList;
+import net.oletalk.stream.util.Config;
+import net.oletalk.stream.util.LogSetup;
+import org.simpleframework.http.Response;
+
 /**
  *
  * @author colin
@@ -11,6 +22,71 @@ package net.oletalk.stream.actor;
 public class Command {
 
     public static final String PLAY = "play";
+    public static final String LIST = "list";
     public static final String DROP = "drop";
+    
+    private static final Logger LOG = LogSetup.getlog();
+
+    private Response response;
+    
+    public Command(Response response)
+    {
+        this.response = response;
+    }
+    
+    public void doDefault() throws Exception
+    {
+        try (PrintStream body = response.getPrintStream()) {
+            long time = System.currentTimeMillis();
+
+            Header.setHeaders(response, Header.HeaderType.TEXT);
+            response.setDate("Date", time);
+            response.setDate("Last-Modified", time);
+            body.println("400 Bad Request");
+            body.close();
+        }
+
+    }
+    
+    public void list(SongList list, String uri) throws Exception
+    {
+        // Unescape it
+        String path = URLDecoder.decode(uri, "UTF-8");
+        // TODO: Use paths to figure out which files are below the given URI
+        
+    }
+    
+    public void play(SongList list, String uri) throws Exception 
+    {
+        PrintStream body = response.getPrintStream();
+        long time = System.currentTimeMillis();
+                
+        // Unescape it
+        String path = URLDecoder.decode(uri, "UTF-8");
+        
+        LOG.log(Level.FINE, "Received PLAY command");
+        // note: the rootdir should have a trailing slash here
+        String songreq = Config.get("rootdir") + path;
+        LOG.log(Level.FINE, "Going to request song {0}", songreq);
+        // check for it in the songlist
+        Song song = list.songFor(songreq);
+        // play it if so
+        if (song != null)
+        {
+            LOG.log(Level.FINE, "Playing song {0} ...", song.toString());
+            Header.setHeaders(response, Header.HeaderType.MUSIC);
+            song.writeStream(body);
+            body.close();
+
+        } else {
+            LOG.log(Level.INFO, "Song {0} not found!", path.toString());
+            Header.setHeaders(response, Header.HeaderType.TEXT);
+            response.setDate("Date", time);
+            response.setDate("Last-Modified", time);
+            body.println("404 Not Found");
+            body.close();
+        }
+
+    }
     
 }
