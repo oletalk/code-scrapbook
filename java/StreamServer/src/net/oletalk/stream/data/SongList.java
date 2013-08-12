@@ -5,12 +5,16 @@
 package net.oletalk.stream.data;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -52,6 +56,36 @@ public class SongList extends SimpleFileVisitor<Path> {
             LOG.warning("Requested path returned a null result");
         }
         
+        return ret;
+    }
+    
+    public String HTMLforList (Path path) throws UnsupportedEncodingException
+    {
+        StringBuilder ret = new StringBuilder();
+        List<Song> songs = songsUnder(path);
+        for (Song song : songs)
+        {
+            String st = song.pathFrom(path);
+            // paths with accents in them don't work
+            String st_enc = URLEncoder.encode(st);
+
+            ret.append("<a href=\"/play/").append(st_enc).append("\">").append(st).append("<br/>\n");
+        }
+        
+        String str = new String(ret.toString().getBytes("UTF8"));
+        return str;
+    }
+    
+    private List<Song> songsUnder(Path path)
+    {
+        List<Song> ret = new ArrayList<>();
+        for (Path songpath : list.keySet())
+        {
+            if (songpath.startsWith(path))
+            {
+                ret.add(list.get(songpath));
+            }
+        }
         return ret;
     }
     

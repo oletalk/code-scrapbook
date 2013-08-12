@@ -7,6 +7,7 @@ package net.oletalk.stream.data;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +29,18 @@ public class Song {
         this.path = path;
     }
     
+    public String pathFrom(Path path)
+    {
+        Path p = path.relativize(this.path);
+        String str = null;
+        try {
+            str = new String(p.toString().getBytes("UTF8"));
+        } catch (UnsupportedEncodingException ex) {
+            LOG.log(Level.SEVERE, "Problems getting path from " + this.path.toString(), ex);
+        }
+        return str;
+    }
+    
     public void writeStream(PrintStream out)
     {
         Charset charset = Charset.forName("UTF-8");
@@ -39,6 +52,7 @@ public class Song {
             {
                 out.print((char)content);
             }
+            LOG.fine("Done streaming song.");
             
         } catch (IOException x) {
             LOG.log(Level.WARNING, "Exception caught streaming the song: {0}", x.toString());
