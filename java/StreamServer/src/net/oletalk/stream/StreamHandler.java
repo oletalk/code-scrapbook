@@ -47,6 +47,8 @@ public class StreamHandler implements Container {
                         cmd.play(list, path);
                     } else if (cmdStr.equals(Command.LIST)) {
                         cmd.list(list, path);
+                    } else if (cmdStr.equals(Command.DROP)) {
+                        cmd.drop(list, path);
                     } else {
                         cmd.doDefault();
                     }

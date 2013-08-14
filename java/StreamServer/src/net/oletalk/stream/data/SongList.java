@@ -147,4 +147,8 @@ public class SongList extends SimpleFileVisitor<Path> {
                 new Object[]{file.toString(), exc.toString()});
         return FileVisitResult.CONTINUE;
     }
+
+    public String M3UforList(Path listdir) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

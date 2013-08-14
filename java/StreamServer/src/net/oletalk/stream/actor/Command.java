@@ -71,6 +71,26 @@ public class Command {
 
     }
     
+    // TODO: drop doesn't really need a URI unless you want a partial playlist, maybe?
+    public void drop(SongList list, String uri) throws Exception
+    {
+        PrintStream body = response.getPrintStream();
+        String path = uri;
+        long time = System.currentTimeMillis();
+
+        String pathreq = Config.get("rootdir") + path;
+        Path listdir = Paths.get(pathreq);
+        LOG.log(Level.FINE, "Received DROP command");
+
+        String html = list.M3UforList(listdir);
+
+        Header.setHeaders(response, Header.HeaderType.HTML);
+        response.setDate("Date", time);
+        response.setDate("Last-Modified", time);
+        body.println(html);
+
+    }
+    
     public void play(SongList list, String uri) throws Exception 
     {
         PrintStream body = response.getPrintStream();
