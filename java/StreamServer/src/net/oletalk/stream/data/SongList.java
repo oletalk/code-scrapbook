@@ -59,6 +59,17 @@ public class SongList extends SimpleFileVisitor<Path> {
         return ret;
     }
     
+    public int numberOfSongs()
+    {
+        if (list != null)
+        {
+            return list.size();
+        }
+        else {
+            throw new IllegalStateException("SongList not yet initialised");
+        }
+    }
+    
     public String HTMLforList (Path path) throws UnsupportedEncodingException
     {
         StringBuilder ret = new StringBuilder();
@@ -135,6 +146,7 @@ public class SongList extends SimpleFileVisitor<Path> {
             if (addfile)
             {
                 list.put(file, new Song(file));
+                
             }
         }
         return FileVisitResult.CONTINUE;
@@ -148,7 +160,15 @@ public class SongList extends SimpleFileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    public String M3UforList(Path listdir) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String M3UforList(Path listdir) throws UnsupportedEncodingException {
+        StringBuilder ret = new StringBuilder();
+        List<Song> songs = songsUnder(listdir);
+        for (Song song : songs)
+        {
+            ret.append(song.htmlValue(listdir));
+        }
+        
+        String str = new String(ret.toString().getBytes("UTF8"));
+        return str;
     }
 }

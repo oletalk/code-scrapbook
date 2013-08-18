@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream.dao;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -24,6 +25,11 @@ public class TagDao {
         jdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
     
+    /**
+     * Saves audio tag info to the database.
+     * 
+     * @param tag The Tag object for the song
+     */
     public void saveTag(Tag tag)
     {
         jdbcTemplate.update(
@@ -42,13 +48,36 @@ public class TagDao {
         );
     }
     
+    /**
+     * Fetches tag info from the database, if it's there.
+     * 
+     * @param filehash The generated MD5 hash of the audio file.
+     * @return a Tag object with this file hash
+     */
     public Tag getTag(String filehash)
     {
         return jdbcTemplate.queryForObject(
                 "SELECT song_filepath, file_hash, artist, title, secs " +
                 "FROM MP3S_jtags where file_hash = ?",
-                new RowMapper<Tag>() {
-                    public Tag mapRow(ResultSet rs, int rowNum) throws SQLException {
+                new TagRowMapper(), filehash
+        );
+    }
+    public Tag getTagFromPath(Path path)
+    {
+        return jdbcTemplate.queryForObject(
+                "SELECT song_filepath, file_hash, artist, title, secs " +
+                "FROM MP3S_jtags where song_filepath = ?",
+                new TagRowMapper(), path.toString()
+        );
+    }
+    
+    
+    
+    class TagRowMapper implements RowMapper<Tag>
+    {
+
+        @Override
+        public Tag mapRow(ResultSet rs, int i) throws SQLException {
                         Tag t = new Tag();
                         t.setFilehash(rs.getString("file_hash"));
                         t.setFilepath(Paths.get(rs.getString("song_filepath")));
@@ -56,10 +85,8 @@ public class TagDao {
                         t.setTitle(rs.getString("title"));
                         t.setSecs(rs.getInt("secs"));
                         return t;
-                    }
-                },
-                filehash
-        );
+        }
+        
     }
 
 }

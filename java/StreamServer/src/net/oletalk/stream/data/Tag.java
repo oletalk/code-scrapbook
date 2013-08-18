@@ -68,6 +68,13 @@ public class Tag {
         this.secs = secs;
     }
     
+    public String m3uvalue()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#EXTINF:").append(this.secs).append(",").append(this.artist).append(" - ").append(this.title);
+        return sb.toString();
+    }
+    
     @Override
     public String toString()
     {

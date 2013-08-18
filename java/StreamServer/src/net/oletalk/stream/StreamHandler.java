@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.actor.Command;
 import net.oletalk.stream.data.SongList;
@@ -57,7 +58,7 @@ public class StreamHandler implements Container {
             }
             
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Problem handling request", e);
         }
     }
     

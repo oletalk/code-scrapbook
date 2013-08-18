@@ -15,6 +15,7 @@ import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.Config;
 import net.oletalk.stream.util.LogSetup;
+import net.oletalk.stream.util.TagReader;
 import org.simpleframework.http.Response;
 
 /**
@@ -108,6 +109,13 @@ public class Command {
         // play it if so
         if (song != null)
         {
+            // TODO: is this the best place to populate the tag? Probably not
+            if (song.getTag() == null)
+            {
+                LOG.log(Level.INFO, "Trying to populate empty tag...");
+                song.populateTag();
+            }
+            
             LOG.log(Level.FINE, "Playing song {0} ...", song.toString());
             Header.setHeaders(response, Header.HeaderType.MUSIC);
             song.writeStream(body);
