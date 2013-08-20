@@ -30,7 +30,7 @@ public class Scrap {
         LOG.setLevel(Level.FINER);
         
         SongList songlist = new SongList();
-        songlist.initList(env.getProperty("rootdir"));
+        //songlist.initList(env.getProperty("rootdir"));
         System.out.println("Done reading song list.  " + songlist.numberOfSongs() + " song(s) read.");
         
         // TODO: you may have duplicate mp3s in your list.  What happens then??

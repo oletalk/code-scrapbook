@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 import net.oletalk.stream.Header;
 import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.SongList;
-import net.oletalk.stream.util.Config;
 import net.oletalk.stream.util.LogSetup;
 import org.simpleframework.http.Response;
 
@@ -33,10 +32,10 @@ public class Command {
     
     private String rootdir;
     
-    public Command(Response response)
+    public Command(Response response, String rootdir)
     {
         this.response = response;
-        this.rootdir = Config.getBean().get("rootdir");
+        this.rootdir = rootdir;
     }
     
     public void doDefault() throws Exception
@@ -115,7 +114,7 @@ public class Command {
             if (song.getTag() == null)
             {
                 LOG.log(Level.INFO, "Trying to populate empty tag...");
-                song.populateTag();
+                list.populateTag(song);
             }
             
             LOG.log(Level.FINE, "Playing song {0} ...", song.toString());

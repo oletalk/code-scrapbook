@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.oletalk.stream.base.SpringBean;
 import net.oletalk.stream.dao.TagDao;
 import net.oletalk.stream.data.Tag;
 import org.jaudiotagger.audio.AudioFile;
@@ -26,7 +25,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
  *
  * @author colin
  */
-public class TagReader extends SpringBean {
+public class TagReader {
     
     private static final Logger LOG = LogSetup.getlog();
 
@@ -37,12 +36,7 @@ public class TagReader extends SpringBean {
     {
         td = tagdao;
     }
-    
-    public static TagReader getBean()
-    {
-        return (TagReader) SpringBean.getBean(TagReader.class);
-    }
-    
+        
     public Tag get(Path p)
     {
         Tag t = getFromDB(p);

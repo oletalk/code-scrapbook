@@ -95,7 +95,7 @@ public class Song {
         }
         return pathstr;
     }
-    
+        
     @Override
     public String toString()
     {
@@ -108,7 +108,8 @@ public class Song {
         return sb.toString();
     }
 
-    public void populateTag() {
-        setTag(TagReader.getBean().get(path));
+    void getTagFromReader(TagReader tagreader) {
+        setTag(tagreader.get(path));
     }
+
 }

@@ -12,6 +12,8 @@ import net.oletalk.stream.util.LogSetup;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -22,12 +24,15 @@ public class StreamHandler implements Container {
     private static final Logger LOG = LogSetup.getlog();
     
     private SongList list;
-        
+    private @Value("${rootdir}") String rootdir;
+    
+    @Autowired
     public void setSongList(SongList list) 
     {
         this.list = list;
+        LOG.log(Level.CONFIG, "Song list: {0}", list.toString());
     }
-    
+        
     @Override
     public void handle (Request request, Response response)
     {
@@ -45,7 +50,7 @@ public class StreamHandler implements Container {
                                 
                 if (cmdStr != null)
                 {
-                    Command cmd = new Command(response);
+                    Command cmd = new Command(response, rootdir);
                     switch (cmdStr) {
                         case Command.PLAY:
                             cmd.play(list, path);

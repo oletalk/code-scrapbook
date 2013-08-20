@@ -7,42 +7,58 @@ package net.oletalk.stream.data;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import net.oletalk.stream.actor.SongCollector;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
+import net.oletalk.stream.util.TagReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
  * @author colin
  */
-public class SongList extends SimpleFileVisitor<Path> {
+public class SongList  {
     
-    private final String SONGSPEC = "(?i).*\\.(mp3|ogg)";
     private static final Logger LOG = LogSetup.getlog();
 
     private Map<Path,Song> list;
     
-    public void initList(String initialDir) throws IOException
+    @Autowired
+    private TagReader tagreader;
+    
+    private @Value("${rootdir}") String initialDir;
+    
+    @PostConstruct
+    public void initList() throws IOException
     {
         Path initialPath = Paths.get(initialDir);
         list = new TreeMap<>();
 
         Stopwatch s = new Stopwatch(true);
-        Files.walkFileTree(initialPath, this);
-        LOG.log(Level.CONFIG, "Loaded all songs in {0} in {1} ms.", 
-                new Object[]{initialDir, s.elapsedTime()});
         
+        SongCollector sc = new SongCollector(list);
+        Files.walkFileTree(initialPath, sc);
+        int listsize = list.size();
+        LOG.log(Level.CONFIG, "Loaded {0} song(s) in {1} in {2} ms.", 
+                new Object[]{listsize, initialDir, s.elapsedTime()});
+        
+    }
+    
+    
+    public void populateTag(Song song)
+    {
+        song.getTagFromReader(tagreader);
     }
     
     public boolean contains(String songreq)
@@ -124,41 +140,7 @@ public class SongList extends SimpleFileVisitor<Path> {
         return ret.toString();
     }
     
-    // - File visitor methods
-    @Override
-    public FileVisitResult visitFile(Path file, BasicFileAttributes attr)
-    {
-        if (attr.isRegularFile())
-        {
-            boolean addfile = true;
-            // check for OGG/MP3, and we don't want any of those "._funny" files
-            Path name = file.getFileName();
-            if (name != null)
-            {
-                String filename = name.toString();
-                if (filename.startsWith("."))
-                    addfile = false;
-                                
-                if (!filename.matches(SONGSPEC))
-                    addfile = false;
-            }
-            
-            if (addfile)
-            {
-                list.put(file, new Song(file));
-                
-            }
-        }
-        return FileVisitResult.CONTINUE;
-    }
-    
-    @Override
-    public FileVisitResult visitFileFailed(Path file, IOException exc)
-    {
-        LOG.log(Level.WARNING, "Problem with file {0}: {1}", 
-                new Object[]{file.toString(), exc.toString()});
-        return FileVisitResult.CONTINUE;
-    }
+
 
     public String M3UforList(Path listdir) throws UnsupportedEncodingException {
         StringBuilder ret = new StringBuilder();

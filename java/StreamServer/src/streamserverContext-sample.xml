@@ -10,9 +10,7 @@ http://www.springframework.org/schema/context
     
     <bean 
 class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-    
-    <!-- context:component-scan base-package="net.oletalk.stream"/ -->
-    
+        
     <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="org.postgresql.Driver"/>
         <property name="url" value="jdbc:postgresql://192.168.0.4:5432/testdb" />
@@ -25,5 +23,25 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
     <bean id="config" class="net.oletalk.stream.util.Config" />
     
     <context:property-placeholder location="classpath:config.properties"/>
+        
+    <bean id="servercntr" class="org.simpleframework.http.core.ContainerServer">
+        <constructor-arg>
+            <ref bean="handler"/>
+        </constructor-arg>
+    </bean>
+    <bean id="handler" class="net.oletalk.stream.StreamHandler"/>
+    <bean id="songlist" class="net.oletalk.stream.data.SongList"/>
+    
+    <bean id="connxion" class="org.simpleframework.transport.connect.SocketConnection">
+        <constructor-arg>
+            <ref bean="servercntr"/>
+        </constructor-arg>
+    </bean>
+    <bean id="socketaddress" class="java.net.InetSocketAddress">
+        <constructor-arg value="${port}" type="int"/>
+    </bean>
+
+    <!-- the main guy -->
+    <bean id="server" class="net.oletalk.stream.StreamServer"/>
     
 </beans>
