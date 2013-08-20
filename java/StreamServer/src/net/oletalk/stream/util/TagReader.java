@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.oletalk.stream.base.SpringBean;
 import net.oletalk.stream.dao.TagDao;
 import net.oletalk.stream.data.Tag;
 import org.jaudiotagger.audio.AudioFile;
@@ -18,23 +19,31 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.TagException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 /**
  *
  * @author colin
  */
-public class TagReader {
+public class TagReader extends SpringBean {
     
     private static final Logger LOG = LogSetup.getlog();
+
+    private TagDao td;
     
-    private static final ApplicationContext ctx = new ClassPathXmlApplicationContext("streamserverContext.xml");
-    private static final TagDao td = ctx.getBean(TagDao.class);
-;
+    @Autowired
+    public void setTagDao(TagDao tagdao)
+    {
+        td = tagdao;
+    }
     
-    public static Tag get(Path p)
+    public static TagReader getBean()
+    {
+        return (TagReader) SpringBean.getBean(TagReader.class);
+    }
+    
+    public Tag get(Path p)
     {
         Tag t = getFromDB(p);
         
@@ -51,7 +60,7 @@ public class TagReader {
         return t;
     }
     
-    public static Tag getFromDB(Path p)
+    public Tag getFromDB(Path p)
     {
         LOG.log(Level.FINE, "Looking for Tag info from the database.");
         Tag t = null;
@@ -63,7 +72,7 @@ public class TagReader {
         return t;
     }
     
-    public static Tag getFromFileSystem(Path p)
+    public Tag getFromFileSystem(Path p)
     {
         Tag t = null;
         LOG.log(Level.FINE, "Looking for Tag info from the file itself.");
@@ -92,4 +101,5 @@ public class TagReader {
         }
         return t;
     }
+
 }

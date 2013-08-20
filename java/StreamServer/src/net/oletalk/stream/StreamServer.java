@@ -15,6 +15,8 @@ import org.simpleframework.http.core.ContainerServer;
 import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  *
@@ -28,17 +30,18 @@ public class StreamServer {
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
         // Start up
-        Config.init();
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("/streamserverContext.xml");
+        
         Logger LOG = LogSetup.getlog();
 
         StreamHandler hand = new StreamHandler();
         Server server = new ContainerServer(hand);
         Connection connection = new SocketConnection(server);
         
-        int port = Integer.parseInt(Config.get("port"));
+        int port = Integer.parseInt(Config.getBean().get("port"));
         SocketAddress address = new InetSocketAddress(port);
         SongList songlist = new SongList();
-        songlist.initList(Config.get("rootdir"));
+        songlist.initList(Config.getBean().get("rootdir"));
         hand.setSongList(songlist);
         LOG.info( songlist.toString() );
         

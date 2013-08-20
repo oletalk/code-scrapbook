@@ -4,15 +4,13 @@
  */
 package net.oletalk.stream;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.data.SongList;
-import net.oletalk.stream.data.Tag;
-import net.oletalk.stream.util.Config;
 import net.oletalk.stream.util.LogSetup;
-import net.oletalk.stream.util.TagReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 
 /**
  *
@@ -25,12 +23,14 @@ public class Scrap {
     public static void main(String[] args) throws Exception
     {
         // Start up
-        Config.init();
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("/streamserverContext.xml");
+
+        Environment env = applicationContext.getEnvironment();
 
         LOG.setLevel(Level.FINER);
         
         SongList songlist = new SongList();
-        songlist.initList(Config.get("rootdir"));
+        songlist.initList(env.getProperty("rootdir"));
         System.out.println("Done reading song list.  " + songlist.numberOfSongs() + " song(s) read.");
         
         // TODO: you may have duplicate mp3s in your list.  What happens then??

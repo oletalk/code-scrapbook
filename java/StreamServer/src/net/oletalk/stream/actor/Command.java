@@ -15,7 +15,6 @@ import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.Config;
 import net.oletalk.stream.util.LogSetup;
-import net.oletalk.stream.util.TagReader;
 import org.simpleframework.http.Response;
 
 /**
@@ -32,9 +31,12 @@ public class Command {
 
     private Response response;
     
+    private String rootdir;
+    
     public Command(Response response)
     {
         this.response = response;
+        this.rootdir = Config.getBean().get("rootdir");
     }
     
     public void doDefault() throws Exception
@@ -58,7 +60,7 @@ public class Command {
             long time = System.currentTimeMillis();
 
             // TODO: Use paths to figure out which files are below the given URI
-            String pathreq = Config.get("rootdir") + path;
+            String pathreq = rootdir + path;
             Path listdir = Paths.get(pathreq);
             LOG.log(Level.FINE, "Received LIST command");
             
@@ -79,7 +81,7 @@ public class Command {
         String path = uri;
         long time = System.currentTimeMillis();
 
-        String pathreq = Config.get("rootdir") + path;
+        String pathreq = rootdir + path;
         Path listdir = Paths.get(pathreq);
         LOG.log(Level.FINE, "Received DROP command");
 
@@ -102,7 +104,7 @@ public class Command {
         
         LOG.log(Level.FINE, "Received PLAY command");
         // note: the rootdir should have a trailing slash here
-        String songreq = Config.get("rootdir") + path;
+        String songreq = rootdir + path;
         LOG.log(Level.FINE, "Going to request song {0}", songreq);
         // check for it in the songlist
         Song song = list.songFor(songreq);

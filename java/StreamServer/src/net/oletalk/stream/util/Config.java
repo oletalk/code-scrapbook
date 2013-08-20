@@ -4,35 +4,32 @@
  */
 package net.oletalk.stream.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import net.oletalk.stream.base.SpringBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 
 /**
  *
  * @author colin
  */
-public class Config {
+
+@Configuration
+@PropertySource("classpath:config.properties")
+public class Config extends SpringBean {
     
-    private static Properties prop = new Properties();
+    @Autowired
+    Environment environment;
     
-    public static void init() throws IOException
+    public static Config getBean()
     {
-        init(null);
+        return (Config) SpringBean.getBean(Config.class);
     }
     
-    public static void init(String filename) throws IOException
+    public String get(String prop)
     {
-        String pathname = filename == null ? "config.properties" : filename;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream stream = loader.getResourceAsStream("config.properties");
-        prop.load(stream);
-    }
-    
-    public static String get(String name)
-    {
-        Object rval = prop.get(name);
-        return (rval == null ? null : rval.toString());
+        return environment.getProperty(prop);
     }
     
 }

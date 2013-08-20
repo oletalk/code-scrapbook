@@ -38,20 +38,27 @@ public class StreamHandler implements Container {
             {
                 String[] cmdargs = uri.split("/", 3);
                 String cmdStr = cmdargs[1];
-                String path = cmdargs[2];
+                String path = "";
+                if (cmdargs.length > 2) {
+                    path = cmdargs[2];                    
+                }
                                 
                 if (cmdStr != null)
                 {
                     Command cmd = new Command(response);
-                    if (cmdStr.equals(Command.PLAY))
-                    {
-                        cmd.play(list, path);
-                    } else if (cmdStr.equals(Command.LIST)) {
-                        cmd.list(list, path);
-                    } else if (cmdStr.equals(Command.DROP)) {
-                        cmd.drop(list, path);
-                    } else {
-                        cmd.doDefault();
+                    switch (cmdStr) {
+                        case Command.PLAY:
+                            cmd.play(list, path);
+                            break;
+                        case Command.LIST:
+                            cmd.list(list, path);
+                            break;
+                        case Command.DROP:
+                            cmd.drop(list, path);
+                            break;
+                        default:
+                            cmd.doDefault();
+                            break;
                     }
                 }
                 

@@ -109,6 +109,6 @@ public class Song {
     }
 
     public void populateTag() {
-        setTag(TagReader.get(path));
+        setTag(TagReader.getBean().get(path));
     }
 }

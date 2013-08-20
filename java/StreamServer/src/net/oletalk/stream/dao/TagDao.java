@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.oletalk.stream.data.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 /**
  *
@@ -20,6 +21,7 @@ public class TagDao {
     DataSource dataSource;
     SimpleJdbcTemplate jdbcTemplate;
 
+    @Autowired
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         jdbcTemplate = new SimpleJdbcTemplate(dataSource);
