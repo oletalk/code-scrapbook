@@ -1,7 +1,7 @@
 /*
  * Utility class to create a new tag (using jaudiotagger and MessageDigest) given a path.
  */
-package net.oletalk.stream.util;
+package net.oletalk.stream.actor;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.dao.TagDao;
 import net.oletalk.stream.data.Tag;
+import net.oletalk.stream.util.LogSetup;
+import net.oletalk.stream.util.Stopwatch;
+import net.oletalk.stream.util.Util;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;

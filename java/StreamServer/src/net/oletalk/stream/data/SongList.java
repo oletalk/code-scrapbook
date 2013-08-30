@@ -22,7 +22,7 @@ import javax.annotation.PostConstruct;
 import net.oletalk.stream.actor.SongCollector;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
-import net.oletalk.stream.util.TagReader;
+import net.oletalk.stream.actor.TagReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 

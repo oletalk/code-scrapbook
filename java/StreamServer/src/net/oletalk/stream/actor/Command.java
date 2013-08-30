@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.oletalk.stream.Header;
+import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.LogSetup;

@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.util.LogSetup;
-import net.oletalk.stream.util.TagReader;
+import net.oletalk.stream.actor.TagReader;
 
 /**
  *
