@@ -49,7 +49,7 @@ public class TagReader {
                 td.saveTag(t);
             } catch (TagException te) {
                 String errMsg = te.getCause().getMessage();
-                errMsg = errMsg.substring(0, 100);
+                errMsg = errMsg.substring(0, Math.min(100, errMsg.length()));
                 td.recordFailedTag(p, errMsg);
             }
         }

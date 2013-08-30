@@ -11,37 +11,35 @@ http://www.springframework.org/schema/context
     <bean 
 class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
         
-    <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.postgresql.Driver"/>
-        <property name="url" value="jdbc:postgresql://192.168.0.4:5432/testdb" />
-        <property name="username" value="username" />
-        <property name="password" value="password" />
-    </bean>
-    
+    <context:property-placeholder location="classpath:config.properties"/>
+            
+    <!-- reader of tags -->
     <bean id="tagDao" class="net.oletalk.stream.dao.TagDao"/>
     <bean id="tagReader" class="net.oletalk.stream.util.TagReader"/>
-    <bean id="config" class="net.oletalk.stream.util.Config" />
-    
-    <context:property-placeholder location="classpath:config.properties"/>
-        
-    <bean id="servercntr" class="org.simpleframework.http.core.ContainerServer">
-        <constructor-arg>
-            <ref bean="handler"/>
-        </constructor-arg>
+    <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${dbdriver}"/>
+        <property name="url" value="jdbc:${dburl}" />
+        <property name="username" value="${dbuser}" />
+        <property name="password" value="${dbpass}" />
     </bean>
+
+    <!-- autowire chain follows... -->    
+    <bean id="connxion" class="org.simpleframework.transport.connect.SocketConnection" autowire="constructor"/>
+    <bean id="servercntr" class="org.simpleframework.http.core.ContainerServer" autowire="constructor" />
+    <!-- (all flow/logic is in this one) -->
     <bean id="handler" class="net.oletalk.stream.StreamHandler"/>
+    <!-- and the list of songs ... -->
     <bean id="songlist" class="net.oletalk.stream.data.SongList"/>
-    
-    <bean id="connxion" class="org.simpleframework.transport.connect.SocketConnection">
-        <constructor-arg>
-            <ref bean="servercntr"/>
-        </constructor-arg>
-    </bean>
+
+
     <bean id="socketaddress" class="java.net.InetSocketAddress">
         <constructor-arg value="${port}" type="int"/>
     </bean>
 
-    <!-- the main guy -->
+    <!-- the server itself -->
     <bean id="server" class="net.oletalk.stream.StreamServer"/>
+
+    <!-- side thread which populates untagged songs -->
+    <bean id="populator" class="net.oletalk.stream.Populator"/>
     
 </beans>

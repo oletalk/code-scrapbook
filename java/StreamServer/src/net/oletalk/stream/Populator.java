@@ -38,7 +38,8 @@ public class Populator implements Runnable {
         {
             // get a song which doesn't have a tag
             
-            // (what if the songs all (currently) have tags?? sleep for a long time? exit?)
+            // TODO: What if the tagging library can't find the song?  How do we let it know to give up?
+            //       What if there's a more transient error?  Should be fine to keep searching then.
             
             LOG.log(Level.INFO, "Checking untagged songs");
             Set<Song> uss = songlist.getUntaggedSongs();
@@ -53,6 +54,10 @@ public class Populator implements Runnable {
                     songlist.populateTag(song);
                 }
                 
+            }
+            else { 
+                // (what if the songs all (currently) have tags?? sleep for a long time? exit?)
+                Util.sleep(pauseSecs * 10);
             }
             Util.sleep(pauseSecs);
         }
