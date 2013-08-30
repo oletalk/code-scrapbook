@@ -54,7 +54,6 @@ public class SongCollector extends SimpleFileVisitor<Path> {
             if (addfile)
             {
                 list.put(file, new Song(file));
-                
             }
         }
         return FileVisitResult.CONTINUE;

@@ -31,6 +31,13 @@ public class StreamHandler implements Container {
     {
         this.list = list;
         LOG.log(Level.CONFIG, "Song list: {0}", list.toString());
+        
+        // no songs? DIE
+        if (this.list.hasNoSongs())
+        {
+            System.err.println("NO SONGS FOUND!");
+            System.exit(1);
+        }
     }
         
     @Override

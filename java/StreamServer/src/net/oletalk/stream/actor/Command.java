@@ -84,6 +84,7 @@ public class Command {
         Path listdir = Paths.get(pathreq);
         LOG.log(Level.FINE, "Received DROP command");
 
+        // TODO: This won't be ready/usable until all song tags are populated
         String html = list.M3UforList(listdir);
 
         Header.setHeaders(response, Header.HeaderType.HTML);
@@ -110,12 +111,6 @@ public class Command {
         // play it if so
         if (song != null)
         {
-            // TODO: is this the best place to populate the tag? Probably not
-            if (song.getTag() == null)
-            {
-                LOG.log(Level.INFO, "Trying to populate empty tag...");
-                list.populateTag(song);
-            }
             
             LOG.log(Level.FINE, "Playing song {0} ...", song.toString());
             Header.setHeaders(response, Header.HeaderType.MUSIC);

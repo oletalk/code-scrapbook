@@ -11,7 +11,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import net.oletalk.stream.data.Tag;
+import net.oletalk.stream.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 /**
  *
@@ -71,6 +73,28 @@ public class TagDao {
                 "FROM MP3S_jtags where song_filepath = ?",
                 new TagRowMapper(), path.toString()
         );
+    }
+
+    public void recordFailedTag(Path p, String reason) {
+
+        // compute the md5 sum
+        String md5 = Util.computeMD5(p);
+
+        // check if there isn't already a failed attempt in there
+        try {
+            Integer check = jdbcTemplate.queryForObject(
+                    "SELECT 1 FROM MP3S_failedtags where file_hash = ?", Integer.class, md5);
+
+        } catch (EmptyResultDataAccessException erdae) {
+            // save to MP3S_failedtags for the md5sum
+            jdbcTemplate.update(
+                    "INSERT INTO MP3S_failedtags (file_hash, reason) " +
+                    "VALUES (?, ?)", 
+                    md5, reason
+            );            
+                        
+        }
+        
     }
     
     

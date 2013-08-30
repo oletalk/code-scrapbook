@@ -13,7 +13,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -38,6 +40,7 @@ public class SongList  {
     private TagReader tagreader;
     
     private @Value("${rootdir}") String initialDir;
+    private Map<Song,String> untaggedsongs = new ConcurrentHashMap<>();
     
     @PostConstruct
     public void initList() throws IOException
@@ -49,16 +52,69 @@ public class SongList  {
         
         SongCollector sc = new SongCollector(list);
         Files.walkFileTree(initialPath, sc);
+        
+        for (Song song : list.values())
+        {
+            // does the song already have a tag in the database?
+            Path p = song.getPath();
+            Tag tag = tagreader.getFromDB(p);
+            if (tag != null) {
+                song.setTag(tag);
+            }
+            else {
+                LOG.log(Level.INFO, "Song {0} doesn''t yet have a tag in the database.", p.toString());
+                addUntaggedSong(song);                
+            }
+        }
         int listsize = list.size();
         LOG.log(Level.CONFIG, "Loaded {0} song(s) in {1} in {2} ms.", 
                 new Object[]{listsize, initialDir, s.elapsedTime()});
         
     }
     
+    /**
+     * Extracts MP3 tag information for all the songs in the SongList.
+     * This takes VERY LONG, so best to call this offline
+     * @param notifyEvery 
+     */
+    public void populateAllTags(int notifyEvery)
+    {
+        int ctr = 0;
+        int total = list.size();
+        Stopwatch sw = new Stopwatch(true);
+        for (Song s : list.values())
+        {
+            ctr++;
+            if (ctr % notifyEvery == 0)
+            {
+                LOG.log(Level.INFO, "{0} out of {1} songs tagged.", new Object[]{ctr, total});
+            }
+            populateTag(s);
+        }
+        LOG.log(Level.INFO, "Operation completed in {0} ms.", sw.elapsedTime());
+    }
+    
+    public void addUntaggedSong(Song song)
+    {
+        untaggedsongs.put(song, "1");
+    }
     
     public void populateTag(Song song)
     {
         song.getTagFromReader(tagreader);
+        if (song.getTag() != null)
+        {
+            untaggedsongs.remove(song);
+        }
+    }
+    
+    /**
+     * Returns a random untagged song
+     * @return 
+     */
+    public Set<Song> getUntaggedSongs()
+    {
+        return untaggedsongs.keySet();
     }
     
     public boolean contains(String songreq)
@@ -152,5 +208,9 @@ public class SongList  {
         
         String str = new String(ret.toString().getBytes("UTF8"));
         return str;
+    }
+
+    public boolean hasNoSongs() {
+        return (list.isEmpty());
     }
 }

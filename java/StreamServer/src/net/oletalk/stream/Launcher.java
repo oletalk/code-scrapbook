@@ -9,7 +9,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ * Main class!
+ * 
  * @author colin
  */
 public class Launcher {
@@ -19,5 +20,7 @@ public class Launcher {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("/streamserverContext.xml");
         StreamServer ssrvr = applicationContext.getBean("server", StreamServer.class);
         ssrvr.startup();
+        Populator populator = applicationContext.getBean("populator", Populator.class);
+        new Thread(populator).start();
     }
 }

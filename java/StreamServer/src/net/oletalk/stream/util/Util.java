@@ -71,6 +71,13 @@ public class Util {
         }
         return new String(hexChars);
     }
+    
+    public static void sleep(int secs) {
+        try {
+            Thread.sleep(secs * 1000);
+        } catch (InterruptedException ie) {}
+    }
+    
     // (grabbed off http://stackoverflow.com/questions/9655181/convert-from-byte-array-to-hex-string-in-java)
 
 }

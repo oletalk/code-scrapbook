@@ -30,6 +30,10 @@ public class Song {
         return tag;
     }
 
+    public Path getPath() {
+        return path;
+    }
+    
     public void setTag(Tag tag) {
         this.tag = tag;
     }

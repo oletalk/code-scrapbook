@@ -43,11 +43,14 @@ public class TagReader {
         
         if (t == null)
         {
-            t = getFromFileSystem(p);
-            if (t != null)
-            {
+            try {
+                t = getFromFileSystem(p);
                 // save off to the db
                 td.saveTag(t);
+            } catch (TagException te) {
+                String errMsg = te.getCause().getMessage();
+                errMsg = errMsg.substring(0, 100);
+                td.recordFailedTag(p, errMsg);
             }
         }
         // and return
@@ -66,7 +69,7 @@ public class TagReader {
         return t;
     }
     
-    public Tag getFromFileSystem(Path p)
+    public Tag getFromFileSystem(Path p) throws TagException
     {
         Tag t = null;
         LOG.log(Level.FINE, "Looking for Tag info from the file itself.");
@@ -92,6 +95,7 @@ public class TagReader {
             }
         } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException ex) {
             LOG.log(Level.SEVERE, "Problems creating new Tag from the file", ex);
+            throw new TagException("Problems creating new Tag from the file", ex);
         }
         return t;
     }
