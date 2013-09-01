@@ -159,6 +159,26 @@ public class SongList  {
         return str;
     }
     
+    public String M3UforList(Path listdir, String hostheader) throws UnsupportedEncodingException {
+        StringBuilder ret = new StringBuilder();
+        List<Song> songs = songsUnder(listdir);
+        
+        LOG.log(Level.FINE, "Songs found for M3U list: {0}", songs.size());
+        
+        boolean firstSong = true;
+        for (Song song : songs)
+        {
+            if (firstSong) {
+                ret.append("#EXTM3U\n");
+                firstSong = false;
+            }
+            ret.append(song.m3uValue(hostheader, listdir));
+        }
+        
+        String str = new String(ret.toString().getBytes("UTF8"));
+        return str;
+    }
+
     private List<Song> songsUnder(Path path)
     {
         List<Song> ret = new ArrayList<>();
@@ -196,20 +216,6 @@ public class SongList  {
         return ret.toString();
     }
     
-
-
-    public String M3UforList(Path listdir) throws UnsupportedEncodingException {
-        StringBuilder ret = new StringBuilder();
-        List<Song> songs = songsUnder(listdir);
-        for (Song song : songs)
-        {
-            ret.append(song.htmlValue(listdir));
-        }
-        
-        String str = new String(ret.toString().getBytes("UTF8"));
-        return str;
-    }
-
     public boolean hasNoSongs() {
         return (list.isEmpty());
     }

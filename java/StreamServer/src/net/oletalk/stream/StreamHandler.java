@@ -4,11 +4,16 @@
  */
 package net.oletalk.stream;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.actor.Command;
+import net.oletalk.stream.commands.AbstractCommand;
+import net.oletalk.stream.commands.CommandFactory;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.LogSetup;
+import net.oletalk.stream.util.Util;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
@@ -57,21 +62,14 @@ public class StreamHandler implements Container {
                                 
                 if (cmdStr != null)
                 {
-                    Command cmd = new Command(response, rootdir);
-                    switch (cmdStr) {
-                        case Command.PLAY:
-                            cmd.play(list, path);
-                            break;
-                        case Command.LIST:
-                            cmd.list(list, path);
-                            break;
-                        case Command.DROP:
-                            cmd.drop(list, path);
-                            break;
-                        default:
-                            cmd.doDefault();
-                            break;
-                    }
+                    
+                    AbstractCommand cmd = CommandFactory.create(cmdStr, response, rootdir);
+                    Map<String,Object> args = new HashMap<>();
+                    args.put("list", list);
+                    args.put("uri", path);
+                    args.put("hostheader", Util.getHostHeader(request.getHeader()));
+                    cmd.exec(args);
+                    
                 }
                 
             }

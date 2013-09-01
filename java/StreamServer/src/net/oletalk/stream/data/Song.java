@@ -53,7 +53,11 @@ public class Song {
         } catch (UnsupportedEncodingException ex) {
             LOG.log(Level.SEVERE, "Problems getting path from " + this.path.toString(), ex);
         }
-        return str;
+        
+        // paths with accents in them don't work
+        String st_enc = URLEncoder.encode(str);
+
+        return st_enc;
     }
     
     public void writeStream(PrintStream out)
@@ -78,24 +82,23 @@ public class Song {
     public String htmlValue(Path rootpath)
     {
         String st = this.pathFrom(rootpath);
-            // paths with accents in them don't work
-        String st_enc = URLEncoder.encode(st);
 
-        return "<a href=\"/play/" + st_enc + "\">" + st + "<br/>\n";
+        return "<a href=\"/play/" + st + "\">" + st + "<br/>\n";
     }
     
     public String m3uValue(String hostheader, Path rootpath)
     {
-        StringBuilder sb = new StringBuilder();
-        Path p = rootpath.relativize(path);
-        String pathstr = hostheader + p.toString();
+        //Path p = rootpath.relativize(path);
+        String st = this.pathFrom(rootpath);
+
+        String pathstr = "http://" + hostheader + "/play/" + st;
         if (tag != null)
         {
-            pathstr = tag.m3uvalue() + "\n" + pathstr;
+            pathstr = tag.m3uvalue() + "\n" + pathstr + "\n";
         }
         else
         {
-            pathstr = "#EXTINF:-1," + path.getFileName().toString() + pathstr;
+            pathstr = "#EXTINF:-1," + path.getFileName().toString() + pathstr + "\n";
         }
         return pathstr;
     }

@@ -80,4 +80,30 @@ public class Util {
     
     // (grabbed off http://stackoverflow.com/questions/9655181/convert-from-byte-array-to-hex-string-in-java)
 
+    public static String getHostHeader(CharSequence header) {
+        String headerStr = header.toString();
+        String ret = null;
+        /*
+         * FINE: request.getHeader() = 'GET /favicon.ico HTTP/1.1
+            Host: 192.168.0.11:7890
+            Connection: keep-alive
+            User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.57 Safari/537.36
+            Accept-Encoding: gzip,deflate,sdch
+            Accept-Language: en-US,en;q=0.8
+            If-Modified-Since: Sun, 01 Sep 2013 16:33:04 GMT
+
+'
+         */
+        String lines[] = headerStr.split("\\r?\\n");
+        for (String line: lines)
+        {
+            if (line.startsWith("Host: "))
+            {
+                ret = line.substring(6);
+            }
+        }
+        
+        return ret;
+    }
+    
 }
