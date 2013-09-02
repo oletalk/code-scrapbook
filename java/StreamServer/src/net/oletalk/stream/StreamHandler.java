@@ -4,11 +4,11 @@
  */
 package net.oletalk.stream;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.oletalk.stream.actor.Command;
 import net.oletalk.stream.commands.AbstractCommand;
 import net.oletalk.stream.commands.CommandFactory;
 import net.oletalk.stream.data.SongList;
@@ -76,6 +76,12 @@ public class StreamHandler implements Container {
             
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Problem handling request", e);
+        } finally {
+            try {
+                response.close();
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, "Problem closing off response", ex);
+            }
         }
     }
     

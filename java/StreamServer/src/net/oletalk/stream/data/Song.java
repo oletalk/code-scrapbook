@@ -4,13 +4,8 @@
  */
 package net.oletalk.stream.data;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +16,7 @@ import net.oletalk.stream.actor.TagReader;
  *
  * @author colin
  */
-public class Song {
+public class Song extends Streamed {
     
     private Path path;
     private Tag tag;
@@ -42,6 +37,7 @@ public class Song {
     public Song (Path path)
     {
         this.path = path;
+        this.setStreamedPath(path);
     }
     
     public String pathFrom(Path path)
@@ -59,26 +55,7 @@ public class Song {
 
         return st_enc;
     }
-    
-    public void writeStream(PrintStream out)
-    {
-        Charset charset = Charset.forName("UTF-8");
-
-        try (BufferedInputStream is = new BufferedInputStream(Files.newInputStream(path)))
-        {
-            int content;
-            while ((content = is.read()) != -1)
-            {
-                out.print((char)content);
-            }
-            LOG.fine("Done streaming song.");
-            
-        } catch (IOException x) {
-            LOG.log(Level.WARNING, "Exception caught streaming the song: {0}", x.toString());
-            
-        }
-    }
-    
+        
     public String htmlValue(Path rootpath)
     {
         String st = this.pathFrom(rootpath);
@@ -98,7 +75,7 @@ public class Song {
         }
         else
         {
-            pathstr = "#EXTINF:-1," + path.getFileName().toString() + pathstr + "\n";
+            pathstr = "#EXTINF:-1," + path.getFileName().toString() + "\n" + pathstr + "\n";
         }
         return pathstr;
     }

@@ -31,7 +31,6 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
     <!-- and the list of songs ... -->
     <bean id="songlist" class="net.oletalk.stream.data.SongList"/>
 
-
     <bean id="socketaddress" class="java.net.InetSocketAddress">
         <constructor-arg value="${port}" type="int"/>
     </bean>
