@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream.commands;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.util.Map;
 import java.util.logging.Logger;
 import net.oletalk.stream.util.LogSetup;
@@ -18,7 +19,15 @@ public abstract class AbstractCommand {
     protected static final Logger LOG = LogSetup.getlog();
     protected Response response;
     protected String rootdir;
+    protected HttpExchange exchange;
     
+    public AbstractCommand(HttpExchange exchange, String rootdir)
+    {
+        this.exchange = exchange;
+        this.rootdir = rootdir;
+    }
+    
+    @Deprecated
     public AbstractCommand(Response response, String rootdir)
     {
         this.response = response;

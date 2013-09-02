@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream.commands;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.PrintStream;
 import java.util.Map;
 import net.oletalk.stream.data.Header;
@@ -18,6 +19,11 @@ public class DefaultCommand extends AbstractCommand {
     public DefaultCommand(Response response, String rootdir)
     {
         super(response, rootdir);
+    }
+    
+    public DefaultCommand(HttpExchange exchange, String rootdir)
+    {
+        super(exchange, rootdir);
     }
     
     @Override

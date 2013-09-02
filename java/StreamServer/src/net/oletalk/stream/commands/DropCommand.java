@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream.commands;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,6 +24,11 @@ public class DropCommand extends AbstractCommand {
         super(response, rootdir);
     }
 
+    public DropCommand(HttpExchange exchange, String rootdir)
+    {
+        super(exchange, rootdir);
+    }
+    
     @Override
     public void exec(Map<String, Object> args) throws Exception {
         
