@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream.commands;
 
+import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URLDecoder;
@@ -24,6 +25,11 @@ public class PlayCommand extends AbstractCommand {
         super(response, rootdir);
     }
     
+    public PlayCommand(HttpExchange exchange, String rootdir)
+    {
+        super(exchange, rootdir);
+    }
+        
     @Override
     public void exec(Map<String, Object> args)  {
         
