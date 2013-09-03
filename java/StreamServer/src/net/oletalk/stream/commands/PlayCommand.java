@@ -6,6 +6,7 @@ package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URLDecoder;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class PlayCommand extends AbstractCommand {
         String uri = (String)args.get("uri");
         SongList list = (SongList)args.get("list");
         
-        try (PrintStream body = response.getPrintStream()) {
+        try {
             long time = System.currentTimeMillis();
 
             // Unescape it
@@ -49,24 +50,57 @@ public class PlayCommand extends AbstractCommand {
             // check for it in the songlist
             Song song = list.songFor(songreq);
             // play it if so
-            if (song != null)
+            
+            if (exchange == null)
             {
+                PrintStream body = response.getPrintStream();
+                if (song != null)
+                {
 
-                LOG.log(Level.FINE, "Playing song {0} ...", song.toString());
-                Header.setHeaders(response, Header.HeaderType.MUSIC);
-                song.writeStream(body);
-                //song.writeDownsampledStream(body);
+                    LOG.log(Level.FINE, "Playing song {0} ...", song.toString());
+                    Header.setHeaders(response, Header.HeaderType.MUSIC);
+                    song.writeStream(body);
+                    //song.writeDownsampledStream(body);
 
+                } else {
+                    LOG.log(Level.WARNING, "Song {0} not found!", path.toString());
+                    Header.setHeaders(response, Header.HeaderType.TEXT);
+                    response.setDate("Date", time);
+                    response.setDate("Last-Modified", time);
+                    response.setCode(404);
+                    body.println("404 Not Found");
+                }
+                response.close();
+                
             } else {
-                LOG.log(Level.WARNING, "Song {0} not found!", path.toString());
-                Header.setHeaders(response, Header.HeaderType.TEXT);
-                response.setDate("Date", time);
-                response.setDate("Last-Modified", time);
-                response.setCode(404);
-                body.println("404 Not Found");
+                if (song != null)
+                {
+                    Header.setHeaders(exchange, Header.HeaderType.MUSIC);
+                    exchange.sendResponseHeaders(200, 0); // arbitrary amount - music
+
+                    try (OutputStream body = exchange.getResponseBody()) {
+                        song.writeStream(body);
+                    }
+                } else {
+                    LOG.log(Level.WARNING, "Song {0} not found!", path.toString());
+                    Header.setHeaders(exchange, Header.HeaderType.TEXT);
+                    String str = "404 Not Found";
+                    exchange.sendResponseHeaders(404, str.length());
+                    
+                    try (OutputStream body = exchange.getResponseBody()) {
+                        body.write(str.getBytes());
+                    }
+                }
             }
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, "Exception caught while playing song", ex);
+            String msg = ex.getMessage();
+            if ("Broken pipe".equals(msg))
+            {
+                LOG.log(Level.INFO, "Playing song terminated early");
+            }
+            else {
+                LOG.log(Level.SEVERE, "Exception caught while playing song", ex);                
+            }
         }
 
     }

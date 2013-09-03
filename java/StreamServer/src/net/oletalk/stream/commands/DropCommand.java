@@ -5,6 +5,7 @@
 package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,20 +37,31 @@ public class DropCommand extends AbstractCommand {
         SongList list = (SongList)args.get("list");
         String hostheader = (String)args.get("hostheader");
         
-        try (PrintStream body = response.getPrintStream()) {
-            long time = System.currentTimeMillis();
-            String pathreq = rootdir + uri;
-            Path listdir = Paths.get(pathreq);
-            LOG.log(Level.FINE, "Received DROP command");
+        long time = System.currentTimeMillis();
+        String pathreq = rootdir + uri;
+        Path listdir = Paths.get(pathreq);
+        LOG.log(Level.FINE, "Received DROP command");
 
-            // TODO: This won't be ready/usable until all song tags are populated
-            String html = list.M3UforList(listdir, hostheader);
+        // TODO: This won't be ready/usable until all song tags are populated
+        String html = list.M3UforList(listdir, hostheader);
+        
+        if (exchange == null) {
 
             Header.setHeaders(response, Header.HeaderType.TEXT);
             response.setDate("Date", time);
             response.setDate("Last-Modified", time);
+            PrintStream body = response.getPrintStream();
             body.println(html);
             
+        }
+        else {
+            
+            Header.setHeaders(exchange, Header.HeaderType.TEXT);
+            exchange.sendResponseHeaders(200, 0);
+            
+            try (OutputStream body = exchange.getResponseBody()) {
+                body.write(html.getBytes());
+            }
         }
     }
     

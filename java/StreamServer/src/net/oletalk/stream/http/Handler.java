@@ -65,7 +65,7 @@ public class Handler implements HttpHandler {
         // ------------- END ORIGINAL CODE ---------------------
         try {
                         
-            String uri = he.getRequestURI().toString();
+            String uri = he.getRequestURI().getPath();
             if (uri != null && uri.startsWith("/"))
             {
                 String[] cmdargs = uri.split("/", 3);

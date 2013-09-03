@@ -5,6 +5,7 @@
 package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Map;
 import net.oletalk.stream.data.Header;
@@ -30,13 +31,25 @@ public class DefaultCommand extends AbstractCommand {
     public void exec(Map<String, Object> args) throws Exception
     {
         
-        try (PrintStream body = response.getPrintStream()) {
-            long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
 
-            Header.setHeaders(response, Header.HeaderType.TEXT);
-            response.setDate("Date", time);
-            response.setDate("Last-Modified", time);
-            body.println("400 Bad Request");
+        if (exchange == null) 
+        {
+            try (PrintStream body = response.getPrintStream()) {
+                Header.setHeaders(response, Header.HeaderType.TEXT);
+                response.setDate("Date", time);
+                response.setDate("Last-Modified", time);
+                body.println("400 Bad Request");
+
+            }
+        }
+        else {
+            String str = "Bad Request";
+            Header.setHeaders(exchange, Header.HeaderType.TEXT);
+            exchange.sendResponseHeaders(400, str.length());
+            try (OutputStream body = exchange.getResponseBody()) {
+                body.write(str.getBytes());
+            }
         }
 
     }

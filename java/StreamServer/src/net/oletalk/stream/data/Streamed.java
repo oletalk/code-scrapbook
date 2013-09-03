@@ -7,6 +7,7 @@ package net.oletalk.stream.data;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -30,7 +31,7 @@ public class Streamed {
         streamedPath = path;
     }
     
-    public void writeStream(PrintStream out)
+    public void writeStream(OutputStream out)
     {
         if (streamedPath == null)
             throw new IllegalStateException("streamedPath not set yet");
@@ -47,6 +48,7 @@ public class Streamed {
         if (streamedPath == null)
             throw new IllegalStateException("streamedPath not set yet");        
         
+        // TODO: this downsamples only mp3s.
         try  {
             String lame = "/opt/local/bin/lame";
     
@@ -55,8 +57,6 @@ public class Streamed {
                     new String[]{lame, "--mp3input", "-b", "32", 
                             streamedPath.toString(), "--flush",
                             "-"} );
-            // TODO: this process doesn't terminate when the user clicks 'stop' in the MP3 player.
-            //       Can that be fixed?
             InputStream in = proc.getInputStream();
             streamThrough(in, out);
         } catch (IOException ex) {
@@ -66,7 +66,7 @@ public class Streamed {
     
     
     
-    private static void streamThrough(InputStream in, PrintStream out)
+    private static void streamThrough(InputStream in, OutputStream out)
     {
         Charset charset = Charset.forName("UTF-8");
 
@@ -75,7 +75,7 @@ public class Streamed {
             int content;
             while ((content = is.read()) != -1)
             {
-                out.print((char)content);
+                out.write((char)content);
             }
             LOG.fine("Done streaming.");
             
