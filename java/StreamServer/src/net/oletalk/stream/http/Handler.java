@@ -8,7 +8,6 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -48,21 +47,7 @@ public class Handler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange he) throws IOException {
-        // ----------- START ORIGINAL CODE ------------
-        /*String response = "Here is the response";
-        he.sendResponseHeaders(200, response.length());
-        System.out.println("URL is " + he.getRequestURI());
-        System.out.println("Request headers are ");
-        for (String k : hr.keySet()) {
-            System.out.println("   --> " + k + ": " + hr.getFirst(k));
-        }
-
-        try (OutputStream os = he.getResponseBody()) {
-            os.write(response.getBytes());
-        }*/
-        Headers hr = he.getRequestHeaders();
                 
-        // ------------- END ORIGINAL CODE ---------------------
         try {
                         
             String uri = he.getRequestURI().getPath();
@@ -77,6 +62,9 @@ public class Handler implements HttpHandler {
                                 
                 if (cmdStr != null)
                 {
+                    Headers hr = he.getRequestHeaders();
+                    System.out.println("Remote host: " + he.getRemoteAddress().getHostString());
+                    // TODO: client filtering/downsampling depending on IP range/config file
                     
                     AbstractCommand cmd = CommandFactory.create(cmdStr, he, rootdir);
                     Map<String,Object> args = new HashMap<>();

@@ -11,8 +11,12 @@ import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -96,6 +100,26 @@ public class Util {
         return ret;
     }
     
+    public static List<String> getLineItems(String line, String regex)
+    {
+        List<String> ret = new ArrayList<>();
+        Pattern pat = Pattern.compile(regex);
+        Matcher matcher = pat.matcher(line);
+        if (matcher.find())
+        {
+            int count = matcher.groupCount();
+            LOG.log(Level.FINE, "Found {0} matcher groups", count);
+            for (int i = 1; i <= count; i++)
+            {
+                String mgrp = matcher.group(i);
+                if (mgrp != null) {
+                    ret.add(matcher.group(i));                
+                }
+                LOG.log(Level.FINE, "  Group {0}: {1}", new Object[]{i, matcher.group(i)});
+            }
+        }
+        return ret;
+    }
 
     
 }

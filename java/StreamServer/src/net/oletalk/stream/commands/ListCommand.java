@@ -42,7 +42,6 @@ public class ListCommand extends AbstractCommand {
         
         long time = System.currentTimeMillis();
 
-        // TODO: Use paths to figure out which files are below the given URI
         String pathreq = rootdir + path;
         Path listdir = Paths.get(pathreq);
         LOG.log(Level.FINE, "Received LIST command");

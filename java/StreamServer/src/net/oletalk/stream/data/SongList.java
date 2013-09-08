@@ -39,6 +39,7 @@ public class SongList  {
     @Autowired
     private TagReader tagreader;
     
+    private @Value("${downsampling:on}") boolean downsamplingEnabled;
     private @Value("${rootdir}") String initialDir;
     private Map<Song,String> untaggedsongs = new ConcurrentHashMap<>();
     

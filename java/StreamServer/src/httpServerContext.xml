@@ -33,6 +33,9 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
     </bean>
 
 
+    <!-- ip client filter list -->
+    <bean id="clientlist" class="net.oletalk.stream.actor.ClientList"/>
+    
     <!-- side thread which populates untagged songs -->
     <bean id="populator" class="net.oletalk.stream.Populator"/>
     

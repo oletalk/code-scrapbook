@@ -26,6 +26,12 @@ public class Streamed {
     
     private Path streamedPath = null;
     
+    protected enum AudioType {
+        MP3, OGG, OTHER
+    }
+    
+    protected AudioType audioType;
+    
     public void setStreamedPath(Path path)
     {
         streamedPath = path;
@@ -50,13 +56,27 @@ public class Streamed {
         
         // TODO: this downsamples only mp3s.
         try  {
-            String lame = "/opt/local/bin/lame";
+            
     
             Runtime rt = Runtime.getRuntime();
-            final Process proc = rt.exec( 
-                    new String[]{lame, "--mp3input", "-b", "32", 
+            final Process proc;
+            if (audioType == AudioType.MP3) {
+                proc = rt.exec( 
+                    new String[]{"/opt/local/bin/lame", "--mp3input", "-b", "32", 
                             streamedPath.toString(), "--flush",
                             "-"} );
+            }
+            else if (audioType == AudioType.OGG) {
+                proc = rt.exec(
+                        //qq{${IFSC}/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null | };
+
+                    new String[]{"/usr/local/bin/ffmpeg", "-loglevel", "quiet", "-i", 
+                            streamedPath.toString(), "-acodec", "libvorbis", "-f", "ogg",
+                            "-ac", "2", "-ab", "64k", "-"} );
+            }
+            else {
+                throw new IllegalArgumentException("Can't downsample: audioType for file not recognised or set");
+            }
             InputStream in = proc.getInputStream();
             streamThrough(in, out);
         } catch (IOException ex) {

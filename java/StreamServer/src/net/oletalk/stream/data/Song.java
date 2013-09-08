@@ -38,6 +38,15 @@ public class Song extends Streamed {
     {
         this.path = path;
         this.setStreamedPath(path);
+        
+        String filename = this.path.getFileName().toString();
+        if (filename.endsWith(".ogg")) {
+            this.audioType = AudioType.OGG;
+        } else if (filename.endsWith(".mp3")) {
+            this.audioType = AudioType.MP3;
+        } else {
+            this.audioType = AudioType.OTHER;
+        }
     }
     
     public String pathFrom(Path path)
