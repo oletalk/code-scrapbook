@@ -13,17 +13,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.SongList;
-import org.simpleframework.http.Response;
 
 /**
  *
  * @author colin
  */
 public class DropCommand extends AbstractCommand {
-
-    public DropCommand(Response response, String rootdir) {
-        super(response, rootdir);
-    }
 
     public DropCommand(HttpExchange exchange, String rootdir)
     {
@@ -45,23 +40,12 @@ public class DropCommand extends AbstractCommand {
         // TODO: This won't be ready/usable until all song tags are populated
         String html = list.M3UforList(listdir, hostheader);
         
-        if (exchange == null) {
+            
+        Header.setHeaders(exchange, Header.HeaderType.TEXT);
+        exchange.sendResponseHeaders(200, 0);
 
-            Header.setHeaders(response, Header.HeaderType.TEXT);
-            response.setDate("Date", time);
-            response.setDate("Last-Modified", time);
-            PrintStream body = response.getPrintStream();
-            body.println(html);
-            
-        }
-        else {
-            
-            Header.setHeaders(exchange, Header.HeaderType.TEXT);
-            exchange.sendResponseHeaders(200, 0);
-            
-            try (OutputStream body = exchange.getResponseBody()) {
-                body.write(html.getBytes());
-            }
+        try (OutputStream body = exchange.getResponseBody()) {
+            body.write(html.getBytes());
         }
     }
     

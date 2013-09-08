@@ -8,12 +8,20 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.oletalk.stream.actor.ClientList;
 import net.oletalk.stream.commands.AbstractCommand;
 import net.oletalk.stream.commands.CommandFactory;
+import net.oletalk.stream.data.FilterAction;
+import net.oletalk.stream.data.FilterAction.Action;
+import net.oletalk.stream.data.FilterAction.Option;
+import net.oletalk.stream.data.Header;
+import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.LogSetup;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +39,11 @@ public class Handler implements HttpHandler {
     private @Value("${rootdir}") String rootdir;
     
     @Autowired
-    public void setSongList(SongList list) 
+    public ClientList clientlist;
+
+    
+    @Autowired
+    public void setSongList(SongList list)     
     {
         this.list = list;
         LOG.log(Level.CONFIG, "Song list: {0}", list.toString());
@@ -63,15 +75,40 @@ public class Handler implements HttpHandler {
                 if (cmdStr != null)
                 {
                     Headers hr = he.getRequestHeaders();
-                    System.out.println("Remote host: " + he.getRemoteAddress().getHostString());
-                    // TODO: client filtering/downsampling depending on IP range/config file
                     
-                    AbstractCommand cmd = CommandFactory.create(cmdStr, he, rootdir);
-                    Map<String,Object> args = new HashMap<>();
-                    args.put("list", list);
-                    args.put("uri", path);
-                    args.put("hostheader", hr.getFirst("Host"));
-                    cmd.exec(args);
+                    String remotehost = he.getRemoteAddress().getHostString();
+
+                    FilterAction fa = clientlist.filterActionFor(remotehost);
+                    Action action = (fa == null ? clientlist.getDefaultAction() : fa.getAction());
+                    Set<Option> options = (fa == null ? null : fa.getOptions());
+                    boolean downsample = options != null && options.contains(Option.DOWNSAMPLE);
+                    
+                    if (action == Action.ALLOW) {
+                        AbstractCommand cmd = CommandFactory.create(cmdStr, he, rootdir);
+                        Map<String,Object> args = new HashMap<>();
+                        args.put("list", list);
+                        args.put("uri", path);
+                        args.put("hostheader", hr.getFirst("Host"));
+                        if (downsample)
+                        {
+                            args.put("downsample", "1");                            
+                        }
+                        cmd.exec(args);                        
+                    }
+                    else if (action == Action.DENY) {
+                        // send Access Denied
+                        OutputStream ps = he.getResponseBody();
+                        String html = "Access Denied";
+                        Header.setHeaders(he, Header.HeaderType.TEXT);
+                        he.sendResponseHeaders(401, html.length());
+                        ps.write(html.getBytes());
+                        ps.close();
+                        he.close();
+                    }
+                    else {
+                        // just close the connection
+                        he.close();
+                    }
                     
                 }
                 

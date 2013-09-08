@@ -8,7 +8,6 @@ import com.sun.net.httpserver.HttpExchange;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import net.oletalk.stream.actor.Command;
-import org.simpleframework.http.Response;
 
 /**
  *
@@ -34,14 +33,6 @@ public class CommandFactory {
         return cls != null ? cls : DefaultCommand.class;
     }
     
-    public static AbstractCommand create(String cmdType, Response response, String rootdir) 
-            throws Exception
-    {
-        Class cmdclass = cmdFromType(cmdType);
-        Constructor cmdcon = cmdclass.getDeclaredConstructor(Response.class, String.class);
-        //System.err.println("cmdclass = " + cmdclass);
-        return (AbstractCommand)cmdcon.newInstance(response, rootdir);
-    }
     
     public static AbstractCommand create(String cmdType, HttpExchange exchange, String rootdir) 
             throws Exception

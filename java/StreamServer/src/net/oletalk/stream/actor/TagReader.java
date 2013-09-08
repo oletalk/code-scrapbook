@@ -49,7 +49,13 @@ public class TagReader {
             try {
                 t = getFromFileSystem(p);
                 // save off to the db
-                td.saveTag(t);
+                if (t != null)
+                {
+                    td.saveTag(t);                
+                } else {
+                    td.recordFailedTag(p, "No tag found within file");
+                    LOG.log(Level.WARNING, "Still couldn't find tag for song");
+                }
             } catch (TagException te) {
                 String errMsg = te.getCause().getMessage();
                 errMsg = errMsg.substring(0, Math.min(100, errMsg.length()));

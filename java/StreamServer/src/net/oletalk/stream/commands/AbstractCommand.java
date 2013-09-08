@@ -8,7 +8,6 @@ import com.sun.net.httpserver.HttpExchange;
 import java.util.Map;
 import java.util.logging.Logger;
 import net.oletalk.stream.util.LogSetup;
-import org.simpleframework.http.Response;
 
 /**
  *
@@ -17,7 +16,6 @@ import org.simpleframework.http.Response;
 public abstract class AbstractCommand {
     
     protected static final Logger LOG = LogSetup.getlog();
-    protected Response response;
     protected String rootdir;
     protected HttpExchange exchange;
     
@@ -26,14 +24,7 @@ public abstract class AbstractCommand {
         this.exchange = exchange;
         this.rootdir = rootdir;
     }
-    
-    @Deprecated
-    public AbstractCommand(Response response, String rootdir)
-    {
-        this.response = response;
-        this.rootdir = rootdir;
-    }
-    
+        
     public void exec() throws Exception
     {
         exec(null);

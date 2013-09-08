@@ -6,6 +6,7 @@ package net.oletalk.stream.http;
 
 import com.sun.net.httpserver.HttpServer;
 import java.net.InetSocketAddress;
+import net.oletalk.stream.Populator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -25,6 +26,9 @@ public class SocketServer {
         server.createContext("/", handler);
         server.setExecutor(null);
         server.start();
+        
+        Populator populator = applicationContext.getBean(Populator.class);
+        populator.run();
         
     }
 

@@ -4,28 +4,20 @@
  */
 package net.oletalk.stream.commands;
 
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.logging.Level;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.SongList;
-import org.simpleframework.http.Response;
 
 /**
  *
  * @author colin
  */
 public class ListCommand extends AbstractCommand {
-
-    public ListCommand(Response response, String rootdir)
-    {
-        super(response, rootdir);
-    }
     
     public ListCommand(HttpExchange exchange, String rootdir)
     {
@@ -48,28 +40,14 @@ public class ListCommand extends AbstractCommand {
 
         String html = getHeaderHtml() + list.HTMLforList(listdir);
 
-        // ------ OLD VERSION ----------
-        if (exchange == null) {
-            try (PrintStream body = response.getPrintStream()) {
-
-                Header.setHeaders(response, Header.HeaderType.HTML);
-                response.setDate("Date", time);
-                response.setDate("Last-Modified", time);
-                body.println(html);
-            }
-            
-        }
-        else {
         
-            // --------- NEW VERSION ----------
-            Header.setHeaders(exchange, Header.HeaderType.HTML);
-            exchange.sendResponseHeaders(200, html.length());
+        Header.setHeaders(exchange, Header.HeaderType.HTML);
+        exchange.sendResponseHeaders(200, html.length());
 
-            try (OutputStream body = exchange.getResponseBody()) {    
-                body.write(html.getBytes());
-            }
-            
+        try (OutputStream body = exchange.getResponseBody()) {    
+            body.write(html.getBytes());
         }
+            
     }
     
     public String getHeaderHtml(){

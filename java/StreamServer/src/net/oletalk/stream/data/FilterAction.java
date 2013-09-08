@@ -16,24 +16,37 @@ public class FilterAction {
     public enum Action { ALLOW, DENY, BLOCK };
     public enum Option { DOWNSAMPLE, NO_DOWNSAMPLE };
 
+    private String ipBlock;
     private Action action;
     private Set<Option> options;
     
-    public FilterAction (Action action, Collection<Option> options)
+    public FilterAction (String ipBlock, Action action, Collection<Option> options)
     {
+        this.ipBlock = ipBlock;
         this.action = action;
         this.options = new TreeSet<>();
         this.options.addAll(options);
     }
     
-    public FilterAction (String action, Collection<String> options)
+    public FilterAction (String ipBlock, String action, Collection<String> options)
     {
+        this.ipBlock = ipBlock;
         this.action = actionFor(action);
         this.options = new TreeSet<>();
         for (String i : options)
         {
             this.options.add(optionFor(i));
         }
+    }
+    
+    public String getIpBlock()
+    {
+        return ipBlock;
+    }
+    
+    public Set<Option> getOptions()
+    {
+        return options;
     }
     
     public Action getAction()
@@ -89,6 +102,7 @@ public class FilterAction {
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
+        sb.append("IP Range: ").append(ipBlock).append(" => ");
         sb.append("Action: ").append(action).append(" ");
         if (options.size() > 0) {
             sb.append("[");

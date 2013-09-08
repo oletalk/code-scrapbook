@@ -5,13 +5,14 @@
 package net.oletalk.stream.data;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.util.LogSetup;
@@ -49,36 +50,41 @@ public class Streamed {
         }
     }
     
-    public void writeDownsampledStream(PrintStream out)
+    public void writeDownsampledStream(OutputStream out)
     {
         if (streamedPath == null)
             throw new IllegalStateException("streamedPath not set yet");        
         
-        // TODO: this downsamples only mp3s.
         try  {
             
-    
             Runtime rt = Runtime.getRuntime();
             final Process proc;
+            
+            String[] downsamplecmd;
+            
+            // TODO: put command contents in a config file
             if (audioType == AudioType.MP3) {
-                proc = rt.exec( 
-                    new String[]{"/opt/local/bin/lame", "--mp3input", "-b", "32", 
-                            streamedPath.toString(), "--flush",
-                            "-"} );
+                downsamplecmd = new String[]{"/opt/local/bin/lame", "--mp3input", "-b", "32", 
+                            streamedPath.toString(), "-"};
+                
+            
             }
             else if (audioType == AudioType.OGG) {
-                proc = rt.exec(
-                        //qq{${IFSC}/usr/local/bin/ffmpeg -loglevel quiet -i $songname -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null | };
-
-                    new String[]{"/usr/local/bin/ffmpeg", "-loglevel", "quiet", "-i", 
+                downsamplecmd = new String[]{"/usr/local/bin/ffmpeg", "-loglevel", "quiet", "-i", 
                             streamedPath.toString(), "-acodec", "libvorbis", "-f", "ogg",
-                            "-ac", "2", "-ab", "64k", "-"} );
+                            "-ac", "2", "-ab", "64k", "-"};
             }
             else {
                 throw new IllegalArgumentException("Can't downsample: audioType for file not recognised or set");
             }
+            
+            // don't use Runtime.exec, but ProcessBuilder (since Java1.5)
+            ProcessBuilder builder = new ProcessBuilder(Arrays.asList(downsamplecmd));
+            builder.redirectErrorStream(true);
+            proc = builder.start();
+            
             InputStream in = proc.getInputStream();
-            streamThrough(in, out);
+            streamThrough(in, new BufferedOutputStream(out));
         } catch (IOException ex) {
             LOG.log(Level.WARNING, "Exception caught streaming the DOWNSAMPLED song: {0}", ex.toString());
         }
