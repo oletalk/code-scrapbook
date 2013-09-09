@@ -57,7 +57,6 @@ public class Streamed {
         
         try  {
             
-            Runtime rt = Runtime.getRuntime();
             final Process proc;
             
             String[] downsamplecmd;

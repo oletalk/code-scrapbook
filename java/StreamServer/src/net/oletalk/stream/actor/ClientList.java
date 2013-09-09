@@ -35,6 +35,12 @@ public class ClientList {
 
     private List<FilterAction> filterActions;
 
+    public ClientList()
+    {
+        filterActions = new ArrayList<>();
+
+    }
+    
     @PostConstruct
     public void initList() throws Exception
     {
@@ -69,7 +75,6 @@ public class ClientList {
     
     
     private void readIntoList(String filterListPath) {
-        filterActions = new ArrayList<>();
         BufferedReader br = new BufferedReader(
                                 new InputStreamReader(
                                     ClassLoader.getSystemResourceAsStream(filterListPath)));
@@ -78,13 +83,13 @@ public class ClientList {
             while ((dataRow = br.readLine()) != null)
             {
                 // should be of the format 192.168.0.0/24 ALLOW,NO_DOWNSAMPLE
-                List<String> lineitems = Util.getLineItems(dataRow, CLIENT_FILE_FORMAT);
+                List<String> lineitems = Arrays.asList(dataRow.split("[, ]"));
                 if (lineitems.size() >= 2)
                 {
-                    String ipblock = lineitems.remove(0); // TODO: validate subnet?
-                    String action = lineitems.remove(0);
+                    String ipblock = lineitems.get(0); // TODO: validate subnet?
+                    String action = lineitems.get(1);
 
-                    filterActions.add(new FilterAction(ipblock, action, lineitems));
+                    filterActions.add(new FilterAction(ipblock, action, lineitems.subList(2, lineitems.size())));
                 }       
             
             }
@@ -102,6 +107,7 @@ public class ClientList {
         {
             sb.append(fa.toString()).append("\n");
         }
+        sb.append("Default action: ").append(defaultAction);
         return sb.toString();
     }
     

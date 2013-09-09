@@ -26,11 +26,6 @@ public class Util {
     
     private static final Logger LOG = LogSetup.getlog();
     final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-
-    public static String uriencoded(Path path)
-    {
-        return null;
-    }
     
     public static String computeMD5(Path path)
     {
@@ -82,44 +77,5 @@ public class Util {
             Thread.sleep(secs * 1000);
         } catch (InterruptedException ie) {}
     }
-    
-
-    public static String getHostHeader(CharSequence header) {
-        String headerStr = header.toString();
-        String ret = null;
-
-        String lines[] = headerStr.split("\\r?\\n");
-        for (String line: lines)
-        {
-            if (line.startsWith("Host: "))
-            {
-                ret = line.substring(6);
-            }
-        }
-        
-        return ret;
-    }
-    
-    public static List<String> getLineItems(String line, String regex)
-    {
-        List<String> ret = new ArrayList<>();
-        Pattern pat = Pattern.compile(regex);
-        Matcher matcher = pat.matcher(line);
-        if (matcher.find())
-        {
-            int count = matcher.groupCount();
-            LOG.log(Level.FINE, "Found {0} matcher groups", count);
-            for (int i = 1; i <= count; i++)
-            {
-                String mgrp = matcher.group(i);
-                if (mgrp != null) {
-                    ret.add(matcher.group(i));                
-                }
-                LOG.log(Level.FINE, "  Group {0}: {1}", new Object[]{i, matcher.group(i)});
-            }
-        }
-        return ret;
-    }
-
     
 }

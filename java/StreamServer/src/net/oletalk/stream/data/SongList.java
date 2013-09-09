@@ -149,11 +149,7 @@ public class SongList  {
         List<Song> songs = songsUnder(path);
         for (Song song : songs)
         {
-            String st = song.pathFrom(path);
-            // paths with accents in them don't work
-            String st_enc = URLEncoder.encode(st);
-
-            ret.append("<a href=\"/play/").append(st_enc).append("\">").append(st).append("<br/>\n");
+            ret.append(song.htmlValue(path));
         }
         
         String str = new String(ret.toString().getBytes("UTF8"));

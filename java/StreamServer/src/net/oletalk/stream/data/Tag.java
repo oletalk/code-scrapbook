@@ -75,12 +75,18 @@ public class Tag {
         return sb.toString();
     }
     
+    public boolean equals(Tag otherTag)
+    {
+        return otherTag != null && this.toString().equals(otherTag.toString());
+    }
+    
     @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Song: \n Path: ").append(filepath.toString()).append(",\nHash: ")
+        String pathstr = filepath != null ? filepath.toString() : "[NO PATH SET]";
+        sb.append("Song: \n Path: ").append(pathstr).append(",\nHash: ")
                 .append(filehash).append(",\nArtist: ").append(artist)
                 .append(",\nTitle: ").append(title).append(",\nLength ")
                 .append(secs).append("s");

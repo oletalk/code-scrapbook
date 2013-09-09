@@ -101,14 +101,12 @@ public class ClientListTest {
      * Test of toString method, of class ClientList.
      */
     @Test
-    public void testToString() {
+    public void testToString() throws Exception {
         System.out.println("toString");
         ClientList instance = new ClientList();
-        String expResult = "";
+        String expResult = "Default action: null";
         String result = instance.toString();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**

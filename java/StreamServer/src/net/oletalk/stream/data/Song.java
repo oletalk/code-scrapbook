@@ -5,6 +5,7 @@
 package net.oletalk.stream.data;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -31,6 +32,13 @@ public class Song extends Streamed {
     
     public void setTag(Tag tag) {
         this.tag = tag;
+        
+        if (!this.path.equals(tag.getFilepath()))
+        {
+            LOG.log(Level.WARNING, "Tag filepath != song path, as we expected - fixing that");
+            this.tag.setFilepath(this.path);
+        }
+        
     }
     private static final Logger LOG = LogSetup.getlog();
     
@@ -68,8 +76,11 @@ public class Song extends Streamed {
     public String htmlValue(Path rootpath)
     {
         String st = this.pathFrom(rootpath);
-
-        return "<a href=\"/play/" + st + "\">" + st + "<br/>\n";
+        String st_dec = st;
+        try {
+            st_dec = URLDecoder.decode(st, "UTF-8");
+        } catch (UnsupportedEncodingException uee) { }
+        return "<a href=\"/play/" + st + "\">" + st_dec + "<br/>\n";
     }
     
     public String m3uValue(String hostheader, Path rootpath)

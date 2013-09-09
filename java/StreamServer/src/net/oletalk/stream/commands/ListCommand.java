@@ -42,7 +42,7 @@ public class ListCommand extends AbstractCommand {
 
         
         Header.setHeaders(exchange, Header.HeaderType.HTML);
-        exchange.sendResponseHeaders(200, html.length());
+        exchange.sendResponseHeaders(200, 0);
 
         try (OutputStream body = exchange.getResponseBody()) {    
             body.write(html.getBytes());
