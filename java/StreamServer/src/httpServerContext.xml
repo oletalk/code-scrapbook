@@ -13,6 +13,9 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
         
     <context:property-placeholder location="classpath:config.properties"/>
             
+    <bean id="statsDao" class="net.oletalk.stream.dao.StatsDao"/>
+    <bean id="statsCollector" class="net.oletalk.stream.actor.StatsCollector"/>
+    
     <!-- reader of tags -->
     <bean id="tagDao" class="net.oletalk.stream.dao.TagDao"/>
     <bean id="tagReader" class="net.oletalk.stream.actor.TagReader"/>

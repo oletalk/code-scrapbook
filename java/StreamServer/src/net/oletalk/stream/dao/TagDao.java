@@ -6,52 +6,49 @@ package net.oletalk.stream.dao;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javax.sql.DataSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 import net.oletalk.stream.data.Tag;
 import net.oletalk.stream.util.Util;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 /**
  *
  * @author colin
  */
-public class TagDao {
-    DataSource dataSource;
-    SimpleJdbcTemplate jdbcTemplate;
+public class TagDao extends BasicDao<Tag> {
 
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-    }
-    
     /**
      * Saves audio tag info to the database.
      * 
      * @param tag The Tag object for the song
      */
-    public void saveTag(Tag tag)
-    {
+    @Override
+    public void save(Tag t) {
         jdbcTemplate.update(
                 "DELETE FROM MP3S_jtags WHERE file_hash = ?", 
-                tag.getFilehash()
+                t.getFilehash()
                 );
         
         jdbcTemplate.update(
                 "INSERT INTO MP3S_jtags (song_filepath, file_hash, artist, title, secs) " +
                 "VALUES (?, ?, ?, ?, ?)", 
-                tag.getFilepath().toString(),
-                tag.getFilehash(),
-                tag.getArtist(),
-                tag.getTitle(),
-                tag.getSecs()
+                t.getFilepath().toString(),
+                t.getFilehash(),
+                t.getArtist(),
+                t.getTitle(),
+                t.getSecs()
         );
+
     }
-    
+
+    public Tag get(Map<String, Object> args) {
+        
+        String sql = "SELECT song_filepath, file_hash, artist, title, secs FROM MP3S_jtags";
+        return super.get(sql, new TagRowMapper(), args);
+    }
+
     /**
      * Fetches tag info from the database, if it's there.
      * 
@@ -60,19 +57,11 @@ public class TagDao {
      */
     public Tag getTag(String filehash)
     {
-        return jdbcTemplate.queryForObject(
-                "SELECT song_filepath, file_hash, artist, title, secs " +
-                "FROM MP3S_jtags where file_hash = ?",
-                new TagRowMapper(), filehash
-        );
+        return get(mapFrom("file_hash", filehash));
     }
     public Tag getTagFromPath(Path path)
     {
-        return jdbcTemplate.queryForObject(
-                "SELECT song_filepath, file_hash, artist, title, secs " +
-                "FROM MP3S_jtags where song_filepath = ?",
-                new TagRowMapper(), path.toString()
-        );
+        return get(mapFrom("song_filepath", path.toString()));
     }
 
     public void recordFailedTag(Path p, String reason) {

@@ -32,14 +32,9 @@ public class TagReader {
     
     private static final Logger LOG = LogSetup.getlog();
 
-    private TagDao td;
-    
     @Autowired
-    public void setTagDao(TagDao tagdao)
-    {
-        td = tagdao;
-    }
-        
+    private TagDao td;
+            
     public Tag get(Path p)
     {
         Tag t = getFromDB(p);
@@ -51,14 +46,14 @@ public class TagReader {
                 // save off to the db
                 if (t != null)
                 {
-                    td.saveTag(t);                
+                    td.save(t);                
                 } else {
                     td.recordFailedTag(p, "No tag found within file");
                     LOG.log(Level.WARNING, "Still couldn't find tag for song");
                 }
             } catch (TagException te) {
                 String errMsg = te.getCause().getMessage();
-                errMsg = errMsg.substring(0, Math.min(100, errMsg.length()));
+                errMsg = errMsg.substring(0, Math.min(99, errMsg.length()));
                 td.recordFailedTag(p, errMsg);
             }
         }

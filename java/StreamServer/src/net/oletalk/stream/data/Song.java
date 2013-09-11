@@ -33,7 +33,12 @@ public class Song extends Streamed {
     public void setTag(Tag tag) {
         this.tag = tag;
         
-        if (!this.path.equals(tag.getFilepath()))
+        if (tag == null)
+        {
+            LOG.log(Level.WARNING, "Tag for song {0} is NULL", this.toString());
+        }
+        
+        if (tag != null && !this.path.equals(tag.getFilepath()))
         {
             LOG.log(Level.WARNING, "Tag filepath != song path, as we expected - fixing that");
             this.tag.setFilepath(this.path);

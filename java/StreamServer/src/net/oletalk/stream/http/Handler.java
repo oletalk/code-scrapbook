@@ -15,12 +15,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.actor.ClientList;
+import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.commands.AbstractCommand;
 import net.oletalk.stream.commands.CommandFactory;
 import net.oletalk.stream.data.FilterAction;
 import net.oletalk.stream.data.FilterAction.Action;
 import net.oletalk.stream.data.FilterAction.Option;
-import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.SongList;
 import net.oletalk.stream.util.LogSetup;
@@ -41,6 +41,8 @@ public class Handler implements HttpHandler {
     @Autowired
     public ClientList clientlist;
 
+    @Autowired
+    public StatsCollector stats;
     
     @Autowired
     public void setSongList(SongList list)     
@@ -89,11 +91,12 @@ public class Handler implements HttpHandler {
                         args.put("list", list);
                         args.put("uri", path);
                         args.put("hostheader", hr.getFirst("Host"));
+                        args.put("statscollector", stats);
                         if (downsample)
                         {
                             args.put("downsample", "1");                            
                         }
-                        cmd.exec(args);                        
+                        cmd.exec(args);  
                     }
                     else if (action == Action.DENY) {
                         // send Access Denied
@@ -103,11 +106,11 @@ public class Handler implements HttpHandler {
                         he.sendResponseHeaders(401, html.length());
                         ps.write(html.getBytes());
                         ps.close();
-                        he.close();
+                        //he.close();
                     }
                     else {
                         // just close the connection
-                        he.close();
+                        //he.close();
                     }
                     
                 }
@@ -116,6 +119,8 @@ public class Handler implements HttpHandler {
             
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Problem handling request", e);
+        } finally {
+            he.close();
         }
     }
 }

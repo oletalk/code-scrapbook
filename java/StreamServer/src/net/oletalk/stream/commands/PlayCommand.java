@@ -7,13 +7,14 @@ package net.oletalk.stream.commands;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.URLDecoder;
 import java.util.Map;
 import java.util.logging.Level;
+import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.SongList;
+import net.oletalk.stream.data.Tag;
 
 /**
  *
@@ -27,12 +28,15 @@ public class PlayCommand extends AbstractCommand {
     }
         
     @Override
-    public void exec(Map<String, Object> args)  {
+    public void exec(Map<String, Object> args) {
         
         String uri = (String)args.get("uri");
         SongList list = (SongList)args.get("list");
         boolean downsample = args.containsKey("downsample");
-
+        // TODO: better way to get the song info counted 
+        //  other than passing the stats collector around?
+        StatsCollector sc = (StatsCollector)args.get("statscollector");
+        
         try {
             long time = System.currentTimeMillis();
 
@@ -53,14 +57,23 @@ public class PlayCommand extends AbstractCommand {
                 exchange.sendResponseHeaders(200, 0); // arbitrary amount - music
 
                 try (OutputStream body = exchange.getResponseBody()) {
-                if (downsample)
-                {
-                    LOG.log(Level.INFO, "Downsampling requested");
-                    song.writeDownsampledStream(body);                        
-                }
-                else {
-                    song.writeStream(body);                        
-                }
+                    if (downsample)
+                    {
+                        LOG.log(Level.INFO, "Downsampling requested");
+                        song.writeDownsampledStream(body);                        
+                    }
+                    else {
+                        song.writeStream(body);                        
+                    }
+                    // if didn't terminate early, write the stats out
+                    if (sc != null && song.getTag() != null)
+                    {
+                        Tag t = song.getTag();
+                        sc.countStat("ARTIST", t.getArtist());
+                        sc.countStat("TITLE", t.getTitle());
+                        LOG.log(Level.FINER, "Recorded 1 play for artist: ''{0}'', title: ''{1}.", 
+                                new Object[]{t.getArtist(), t.getTitle()});
+                    }
 
                 }
             } else {
