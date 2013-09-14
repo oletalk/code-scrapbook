@@ -4,6 +4,7 @@
 package net.oletalk.stream.actor;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Level;
@@ -52,7 +53,7 @@ public class TagReader {
                     LOG.log(Level.WARNING, "Still couldn't find tag for song");
                 }
             } catch (TagException te) {
-                String errMsg = te.getCause().getMessage();
+                String errMsg = (te.getCause() != null ? te.getCause().getMessage() : te.getMessage() );
                 errMsg = errMsg.substring(0, Math.min(99, errMsg.length()));
                 td.recordFailedTag(p, errMsg);
             }
@@ -97,6 +98,11 @@ public class TagReader {
             } else {
                 LOG.log(Level.FINE, "No tag found for {0}", p.toString());
             }
+        } catch (FileNotFoundException fnfe) {
+            // most likely because JAudioTagger's file check failed on weird characters :-/
+            LOG.log(Level.WARNING, "3rd-party tagger couldn't find the file");
+            throw new TagException("3rd-party tagger couldn't find the file");
+            
         } catch (CannotReadException | IOException | TagException | ReadOnlyFileException | InvalidAudioFrameException ex) {
             LOG.log(Level.SEVERE, "Problems creating new Tag from the file", ex);
             throw new TagException("Problems creating new Tag from the file", ex);

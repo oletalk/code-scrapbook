@@ -13,5 +13,6 @@ public class Command {
     public static final String PLAY = "play";
     public static final String LIST = "list";
     public static final String DROP = "drop";
+    public static final String STATS = "stats";
     
 }

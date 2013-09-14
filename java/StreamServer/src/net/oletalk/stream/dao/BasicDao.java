@@ -6,12 +6,9 @@ package net.oletalk.stream.dao;
 
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 /**
@@ -30,10 +27,22 @@ public abstract class BasicDao<T> {
     
     public abstract void save(T t);
     
+    public List<T> getAll(String sql, RowMapper<T> rowmapper, Map<String, Object> args, List<String> orderby) {
+        QueryDetails details = new QueryDetails(sql, args, orderby);
+        Object[] qargs = details.getQueryArgs();
+        String finalsql = details.toString();
+
+        return qargs != null ? jdbcTemplate.query(finalsql, rowmapper, qargs) 
+                             : jdbcTemplate.query(finalsql, rowmapper);
+        
+    }
+    
     public T get(String sql, RowMapper<T> rowmapper, Map<String, Object> args) {
-        if (args.keySet() != null)
-            sql += whereClause(args);
-        return jdbcTemplate.queryForObject(sql, rowmapper, args.values().toArray());
+        QueryDetails details = new QueryDetails(sql, args);
+        
+        Object[] qargs = details.getQueryArgs();
+        return qargs != null ? jdbcTemplate.queryForObject(details.toString(), rowmapper, qargs)
+                             : jdbcTemplate.queryForObject(details.toString(), rowmapper);
     }
 
     
@@ -44,22 +53,6 @@ public abstract class BasicDao<T> {
         Map<String,Object> m = new HashMap<>();
         m.put(s, o);
         return m;
-    }
-    
-    protected String whereClause(Map<String,Object> criteria)
-    {
-        StringBuilder sb = new StringBuilder();
-        if (criteria != null && !criteria.isEmpty())
-        {
-            boolean firstArg = true;
-            for (String s : criteria.keySet())
-            {
-                sb.append(firstArg ? " WHERE " : " AND ");
-                firstArg = false;
-                sb.append(s).append(" = ?");
-            }
-        }
-        return sb.toString();
     }
     
 }

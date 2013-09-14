@@ -39,10 +39,13 @@ public class Handler implements HttpHandler {
     private @Value("${rootdir}") String rootdir;
     
     @Autowired
-    public ClientList clientlist;
+    private CommandFactory factory;
+    
+    @Autowired
+    private ClientList clientlist;
 
     @Autowired
-    public StatsCollector stats;
+    private StatsCollector stats;
     
     @Autowired
     public void setSongList(SongList list)     
@@ -81,12 +84,22 @@ public class Handler implements HttpHandler {
                     String remotehost = he.getRemoteAddress().getHostString();
 
                     FilterAction fa = clientlist.filterActionFor(remotehost);
-                    Action action = (fa == null ? clientlist.getDefaultAction() : fa.getAction());
-                    Set<Option> options = (fa == null ? null : fa.getOptions());
+                    Action action = clientlist.getDefaultAction();
+                    Set<Option> options = null;
+                    
+                    if (fa != null)
+                    {
+                        action = fa.getAction();
+                        options = fa.getOptions();
+                    }
+                    
+                    stats.countStat("CLIENT_ACTION", action.toString());
+                    stats.countStat("CLIENT", remotehost);
+                    
                     boolean downsample = options != null && options.contains(Option.DOWNSAMPLE);
                     
                     if (action == Action.ALLOW) {
-                        AbstractCommand cmd = CommandFactory.create(cmdStr, he, rootdir);
+                        AbstractCommand cmd = factory.create(cmdStr, he, rootdir);
                         Map<String,Object> args = new HashMap<>();
                         args.put("list", list);
                         args.put("uri", path);
@@ -106,11 +119,9 @@ public class Handler implements HttpHandler {
                         he.sendResponseHeaders(401, html.length());
                         ps.write(html.getBytes());
                         ps.close();
-                        //he.close();
                     }
                     else {
                         // just close the connection
-                        //he.close();
                     }
                     
                 }

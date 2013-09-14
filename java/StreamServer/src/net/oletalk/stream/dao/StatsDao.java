@@ -6,7 +6,10 @@ package net.oletalk.stream.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import net.oletalk.stream.data.Stats;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,12 +20,19 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class StatsDao extends BasicDao<Stats> {
 
-    public Stats get(String category, String item)
+    public List<Stats> get(String category, String item)
     {
         HashMap<String,Object> args = new HashMap<>();
-        args.put("category", category);
-        args.put("item", item);
-        return get("SELECT category, item, count FROM MP3S_jstats", new StatsRowMapper(), args);
+        if (category != null)
+        {
+            args.put("category", category);
+            if (item != null) {
+                args.put("item", item);            
+            }
+        }
+        List<String> olist = Arrays.asList(new String[]{"1", "2", "3 desc"});
+        
+        return getAll("SELECT category, item, count FROM MP3S_jstats", new StatsRowMapper(), args, olist);
     }
     
     @Override

@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.logging.Level;
+import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.SongList;
 
@@ -17,41 +18,36 @@ import net.oletalk.stream.data.SongList;
  *
  * @author colin
  */
-public class ListCommand extends AbstractCommand {
-    
-    public ListCommand(HttpExchange exchange, String rootdir)
-    {
+public class StatsCommand extends AbstractCommand {
+
+    public StatsCommand(HttpExchange exchange, String rootdir) {
         super(exchange, rootdir);
     }
-    
+
     @Override
     public void exec(Map<String, Object> args) throws Exception {
-        
+        StatsCollector sc = (StatsCollector)args.get("statscollector");
         String uri = (String)args.get("uri");
-        SongList list = (SongList)args.get("list");
         // Unescape it
         String path = uri;
         
-        long time = System.currentTimeMillis();
-
-        String pathreq = rootdir + path;
-        Path listdir = Paths.get(pathreq);
-        LOG.log(Level.FINE, "Received LIST command");
-
-        String html = getHeaderHtml() + list.asHTML(listdir);
-
+        LOG.log(Level.FINE, "Received STATS command");
+        // TODO: how to specify different types of stats?
         
+        String category = null;
+        String[] opts = path.split("/"); // 0 = category, 1 = all/top10 ... etc TODO
+        if (!"".equals(opts[0]))
+            category = opts[0].toUpperCase();
+        
+        String html = sc.fetchStats(category, null);
+
         Header.setHeaders(exchange, Header.HeaderType.HTML);
-        exchange.sendResponseHeaders(200, 0);
+        exchange.sendResponseHeaders(200, html.length());
 
         try (OutputStream body = exchange.getResponseBody()) {    
             body.write(html.getBytes());
         }
-            
-    }
-    
-    public String getHeaderHtml(){
-        return "<h2>List of songs</h2><p><a href='/drop'>Download playlist</a></p>";
+
     }
     
 }

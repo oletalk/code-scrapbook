@@ -22,6 +22,7 @@ import net.oletalk.stream.actor.SongCollector;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
 import net.oletalk.stream.actor.TagReader;
+import net.oletalk.stream.interfaces.HTMLRepresentable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
  *
  * @author colin
  */
-public class SongList  {
+public class SongList implements HTMLRepresentable {
     
     private static final Logger LOG = LogSetup.getlog();
 
@@ -142,16 +143,22 @@ public class SongList  {
         }
     }
     
-    public String HTMLforList (Path path) throws UnsupportedEncodingException
+    @Override
+    public String asHTML (Path path)
     {
         StringBuilder ret = new StringBuilder();
         List<Song> songs = songsUnder(path);
         for (Song song : songs)
         {
-            ret.append(song.htmlValue(path));
+            ret.append(song.asHTML(path));
         }
         
-        String str = new String(ret.toString().getBytes("UTF8"));
+        String str = "Problem with UTF8 encoding!";
+        try {
+            str = new String(ret.toString().getBytes("UTF8"));
+        } catch (UnsupportedEncodingException ex) {
+            LOG.log(Level.SEVERE, "Problems with UTF8 encoding", ex);
+        }
         return str;
     }
     

@@ -124,7 +124,7 @@ public class SongTest {
         Song instance = SongTest.getTest1();
         
         String expResult = "<a href=\"/play/path%2Fsong.mp3\">path/song.mp3<br/>\n";
-        String result = instance.htmlValue(rootpath);
+        String result = instance.asHTML(rootpath);
         assertEquals(expResult, result);
     }
 

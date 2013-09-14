@@ -28,6 +28,7 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
 
     <!-- (all flow/logic is in this one) -->
     <bean id="handler" class="net.oletalk.stream.http.Handler"/>
+    <bean id="factory" class="net.oletalk.stream.commands.CommandFactory"/>
     <!-- and the list of songs ... -->
     <bean id="songlist" class="net.oletalk.stream.data.SongList"/>
 

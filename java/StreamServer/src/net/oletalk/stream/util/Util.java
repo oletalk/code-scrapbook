@@ -78,4 +78,19 @@ public class Util {
         } catch (InterruptedException ie) {}
     }
     
+    public static String join(List<String> tojoin, String joiner)
+    {
+        StringBuilder sb = new StringBuilder();
+        boolean firstArg = true;
+        for (String s : tojoin)
+        {
+            if (!firstArg)
+                sb.append(joiner);
+            sb.append(s);
+            firstArg = false;
+        }
+        return sb.toString();
+    }
+
+    
 }

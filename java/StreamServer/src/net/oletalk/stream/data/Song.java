@@ -12,12 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.actor.TagReader;
+import net.oletalk.stream.interfaces.HTMLRepresentable;
 
 /**
  *
  * @author colin
  */
-public class Song extends Streamed {
+public class Song extends Streamed implements HTMLRepresentable {
     
     private Path path;
     private Tag tag;
@@ -78,7 +79,8 @@ public class Song extends Streamed {
         return st_enc;
     }
         
-    public String htmlValue(Path rootpath)
+    @Override
+    public String asHTML(Path rootpath)
     {
         String st = this.pathFrom(rootpath);
         String st_dec = st;
