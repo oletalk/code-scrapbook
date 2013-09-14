@@ -37,6 +37,8 @@ public class PlayCommand extends AbstractCommand {
         //  other than passing the stats collector around?
         StatsCollector sc = (StatsCollector)args.get("statscollector");
         
+        boolean songWasInterrupted = false;
+        
         try {
             long time = System.currentTimeMillis();
 
@@ -65,17 +67,28 @@ public class PlayCommand extends AbstractCommand {
                     else {
                         song.writeStream(body);                        
                     }
-                    // if didn't terminate early, write the stats out
-                    if (sc != null && song.getTag() != null)
-                    {
-                        Tag t = song.getTag();
-                        sc.countStat("ARTIST", t.getArtist());
-                        sc.countStat("TITLE", t.getTitle());
-                        LOG.log(Level.FINER, "Recorded 1 play for artist: ''{0}'', title: ''{1}.", 
-                                new Object[]{t.getArtist(), t.getTitle()});
-                    }
 
+                } catch (IOException ioe) {
+                    String msg = ioe.getMessage();
+                    if ("Broken pipe".equals(msg))
+                    {
+                        LOG.log(Level.INFO, "Playing song terminated early");
+                        songWasInterrupted = true;
+                    }
                 }
+                
+                // if didn't terminate early, write the stats out
+                if (sc != null && song.getTag() != null && !songWasInterrupted)
+                {
+                    Tag t = song.getTag();
+                    sc.countStat("ARTIST", t.getArtist());
+                    sc.countStat("TITLE", t.getTitle());
+                    LOG.log(Level.FINER, "Recorded 1 play for artist: ''{0}'', title: ''{1}.", 
+                            new Object[]{t.getArtist(), t.getTitle()});
+                }
+
+                
+                
             } else {
                 LOG.log(Level.WARNING, "Song {0} not found!", path.toString());
                 Header.setHeaders(exchange, Header.HeaderType.TEXT);

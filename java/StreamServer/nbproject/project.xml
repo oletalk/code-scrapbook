@@ -13,7 +13,7 @@
         </data>
         <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
             <config-files>
-                <config-file>src/streamserverContext.xml</config-file>
+                <config-file>src/httpServerContext.xml</config-file>
             </config-files>
             <config-file-groups/>
         </spring-data>
