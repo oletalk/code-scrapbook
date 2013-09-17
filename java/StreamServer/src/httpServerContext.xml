@@ -26,6 +26,8 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
         <property name="password" value="${dbpass}" />
     </bean>
 
+    <bean id="downsampler" class="net.oletalk.stream.actor.Downsampler"/>
+
     <!-- (all flow/logic is in this one) -->
     <bean id="handler" class="net.oletalk.stream.http.Handler"/>
     <bean id="factory" class="net.oletalk.stream.commands.CommandFactory"/>

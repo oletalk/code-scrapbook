@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.actor.ClientList;
+import net.oletalk.stream.actor.Downsampler;
 import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.commands.AbstractCommand;
 import net.oletalk.stream.commands.CommandFactory;
@@ -46,6 +47,9 @@ public class Handler implements HttpHandler {
 
     @Autowired
     private StatsCollector stats;
+    
+    @Autowired
+    private Downsampler downsampler;
     
     @Autowired
     public void setSongList(SongList list)     
@@ -99,7 +103,7 @@ public class Handler implements HttpHandler {
                     boolean downsample = options != null && options.contains(Option.DOWNSAMPLE);
                     
                     if (action == Action.ALLOW) {
-                        AbstractCommand cmd = factory.create(cmdStr, he, rootdir);
+                        final AbstractCommand cmd = factory.create(cmdStr, he, rootdir);
                         Map<String,Object> args = new HashMap<>();
                         args.put("list", list);
                         args.put("uri", path);
@@ -107,7 +111,7 @@ public class Handler implements HttpHandler {
                         args.put("statscollector", stats);
                         if (downsample)
                         {
-                            args.put("downsample", "1");                            
+                            args.put("downsampler", downsampler);                            
                         }
                         cmd.exec(args);  
                     }

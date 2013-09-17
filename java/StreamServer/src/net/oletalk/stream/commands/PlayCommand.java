@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.Map;
 import java.util.logging.Level;
+import net.oletalk.stream.actor.Downsampler;
 import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.Song;
@@ -32,11 +33,12 @@ public class PlayCommand extends AbstractCommand {
         
         String uri = (String)args.get("uri");
         SongList list = (SongList)args.get("list");
-        boolean downsample = args.containsKey("downsample");
-        // TODO: better way to get the song info counted 
-        //  other than passing the stats collector around?
+        boolean downsample = args.containsKey("downsampler");
+        Downsampler downsampler = null;
+        if (downsample)
+            downsampler = (Downsampler)args.get("downsampler");
         StatsCollector sc = (StatsCollector)args.get("statscollector");
-        
+        boolean songStarted = false;
         boolean songWasInterrupted = false;
         
         try {
@@ -59,14 +61,8 @@ public class PlayCommand extends AbstractCommand {
                 exchange.sendResponseHeaders(200, 0); // arbitrary amount - music
 
                 try (OutputStream body = exchange.getResponseBody()) {
-                    if (downsample)
-                    {
-                        LOG.log(Level.INFO, "Downsampling requested");
-                        song.writeDownsampledStream(body);                        
-                    }
-                    else {
-                        song.writeStream(body);                        
-                    }
+                    songStarted = true;
+                    song.writeStream(body, downsampler); // 2nd arg null if no downsampling                        
 
                 } catch (IOException ioe) {
                     String msg = ioe.getMessage();
@@ -78,7 +74,7 @@ public class PlayCommand extends AbstractCommand {
                 }
                 
                 // if didn't terminate early, write the stats out
-                if (sc != null && song.getTag() != null && !songWasInterrupted)
+                if (sc != null && song.getTag() != null && songStarted && !songWasInterrupted)
                 {
                     Tag t = song.getTag();
                     sc.countStat("ARTIST", t.getArtist());

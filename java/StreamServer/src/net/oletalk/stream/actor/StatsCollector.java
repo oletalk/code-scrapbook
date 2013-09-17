@@ -4,11 +4,9 @@
  */
 package net.oletalk.stream.actor;
 
-import java.nio.file.Path;
 import java.util.List;
 import net.oletalk.stream.dao.StatsDao;
 import net.oletalk.stream.data.Stats;
-import net.oletalk.stream.interfaces.HTMLRepresentable;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -20,7 +18,7 @@ public class StatsCollector {
     @Autowired
     private StatsDao sd;
     
-    public void countStat(String category, String item)
+    public synchronized void countStat(String category, String item)
     {
         Stats st = new Stats();
         st.setCategory(category);

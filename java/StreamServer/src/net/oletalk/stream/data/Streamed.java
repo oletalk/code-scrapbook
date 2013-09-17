@@ -12,9 +12,9 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.oletalk.stream.actor.Downsampler;
 import net.oletalk.stream.util.LogSetup;
 
 /**
@@ -27,15 +27,26 @@ public class Streamed {
     
     private Path streamedPath = null;
     
-    protected enum AudioType {
+    public enum AudioType {
         MP3, OGG, OTHER
     }
     
     protected AudioType audioType;
     
+    public AudioType getAudioType()
+    {
+        return audioType;
+    }
+    
+    // TODO - why do we need this IN ADDITION TO path? No access to subclass path?
     public void setStreamedPath(Path path)
     {
         streamedPath = path;
+    }
+    
+    public Path getStreamedPath()
+    {
+        return streamedPath;
     }
     
     public void writeStream(OutputStream out)
@@ -50,42 +61,29 @@ public class Streamed {
         }
     }
     
-    public void writeDownsampledStream(OutputStream out)
+    public void writeStream(OutputStream out, Downsampler downsampler)
     {
         if (streamedPath == null)
             throw new IllegalStateException("streamedPath not set yet");        
         
+        InputStream in = null;
         try  {
-            
-            final Process proc;
-            
-            String[] downsamplecmd;
-            
-            // TODO: put command contents in a config file
-            if (audioType == AudioType.MP3) {
-                downsamplecmd = new String[]{"/opt/local/bin/lame", "--mp3input", "-b", "32", 
-                            streamedPath.toString(), "-"};
-                
-            
-            }
-            else if (audioType == AudioType.OGG) {
-                downsamplecmd = new String[]{"/usr/local/bin/ffmpeg", "-loglevel", "quiet", "-i", 
-                            streamedPath.toString(), "-acodec", "libvorbis", "-f", "ogg",
-                            "-ac", "2", "-ab", "64k", "-"};
+            if (downsampler == null) { // regular stream
+                in = Files.newInputStream(streamedPath);
+                streamThrough(in, out);        
             }
             else {
-                throw new IllegalArgumentException("Can't downsample: audioType for file not recognised or set");
+                in = downsampler.downsampled(this);
+                streamThrough(in, new BufferedOutputStream(out));        
             }
-            
-            // don't use Runtime.exec, but ProcessBuilder (since Java1.5)
-            ProcessBuilder builder = new ProcessBuilder(Arrays.asList(downsamplecmd));
-            builder.redirectErrorStream(true);
-            proc = builder.start();
-            
-            InputStream in = proc.getInputStream();
-            streamThrough(in, new BufferedOutputStream(out));
-        } catch (IOException ex) {
-            LOG.log(Level.WARNING, "Exception caught streaming the DOWNSAMPLED song: {0}", ex.toString());
+        } catch (Exception ex) {
+            LOG.log(Level.WARNING, "Exception caught streaming the song: {0}", ex.toString());
+        } finally {
+            try {
+                if (in != null) in.close();
+            } catch (IOException ex) {
+                LOG.log(Level.WARNING, "Problems cleaning up input stream after exception", ex);
+            }
         }
     }
     
