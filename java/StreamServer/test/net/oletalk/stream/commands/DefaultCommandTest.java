@@ -6,8 +6,6 @@ package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Map;
 import net.oletalk.stream.util.TesterOutputStream;
 import org.junit.After;

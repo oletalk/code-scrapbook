@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import net.oletalk.stream.actor.NewSongChecker;
 import net.oletalk.stream.actor.SongCollector;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
@@ -39,9 +42,14 @@ public class SongList implements HTMLRepresentable {
     @Autowired
     private TagReader tagreader;
     
+    private @Value("${updatemins}") String updateMins;
     private @Value("${downsampling:on}") boolean downsamplingEnabled;
     private @Value("${rootdir}") String initialDir;
     private Map<Song,String> untaggedsongs = new ConcurrentHashMap<>();
+    
+    private int updateSecs = 0;
+    private Date lastUpdated;
+    private Date lastChecked; // TODO: walk file tree for rootdir for new files
     
     @PostConstruct
     public void initList() throws IOException
@@ -49,11 +57,46 @@ public class SongList implements HTMLRepresentable {
         Path initialPath = Paths.get(initialDir);
         list = new TreeMap<>();
 
+        try {
+            updateSecs = Integer.parseInt(updateMins);
+            updateSecs *= 60;
+        } catch (NumberFormatException nfe) {
+            LOG.log(Level.INFO, "Unable to parse number of minutes to update the songlist from '{0}'", updateMins);
+        }
+        
         Stopwatch s = new Stopwatch(true);
         
         SongCollector sc = new SongCollector(list);
         Files.walkFileTree(initialPath, sc);
         
+        checkSongsForTags();
+        int listsize = list.size();
+        LOG.log(Level.CONFIG, "Loaded {0} song(s) in {1} in {2} ms.", 
+                new Object[]{listsize, initialDir, s.elapsedTime()});
+        lastUpdated = new Date();
+        lastChecked = new Date();
+        
+    }
+        
+    // TODO: TEST, TEST TEST TEST...
+    public void checkForNewSongs()
+    {
+        lastChecked = new Date();
+        
+        Map<Path,Song> newsongs = new HashMap<>();
+        NewSongChecker nsc = new NewSongChecker(newsongs);
+        
+        if (!newsongs.isEmpty())
+        {
+            LOG.log(Level.INFO, "Found {0} new song(s).", newsongs.size());
+            list.putAll(newsongs);
+            checkSongsForTags();
+            lastUpdated = new Date();
+        }
+    }
+    
+    private void checkSongsForTags()
+    {
         for (Song song : list.values())
         {
             // does the song already have a tag in the database?
@@ -66,11 +109,23 @@ public class SongList implements HTMLRepresentable {
                 LOG.log(Level.INFO, "Song {0} doesn''t yet have a tag in the database.", p.toString());
                 addUntaggedSong(song);                
             }
-        }
-        int listsize = list.size();
-        LOG.log(Level.CONFIG, "Loaded {0} song(s) in {1} in {2} ms.", 
-                new Object[]{listsize, initialDir, s.elapsedTime()});
+        }        
+    }
+
+    public boolean isStale()
+    {
+        boolean ret = false;
+        Date now = new Date();
         
+        if (updateSecs > 0)
+        {
+            long diff = (now.getTime() - lastChecked.getTime());
+            if (diff > (updateSecs * 1000))
+            {
+                ret = true;
+            }
+        }
+        return ret;
     }
     
     /**

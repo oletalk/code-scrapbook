@@ -6,13 +6,10 @@ package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
 import java.io.OutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.logging.Level;
 import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.data.Header;
-import net.oletalk.stream.data.SongList;
 
 /**
  *

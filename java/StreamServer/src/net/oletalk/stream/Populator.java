@@ -4,6 +4,7 @@
  */
 package net.oletalk.stream;
 
+import java.io.IOException;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
@@ -59,6 +60,17 @@ public class Populator implements Runnable {
                 // (what if the songs all (currently) have tags?? sleep for a long time? exit?)
                 Util.sleep(pauseSecs * 10);
             }
+            
+            // also check if it's time to regenerate the songlist
+            if (songlist.isStale())
+            {
+                synchronized (this) {
+                    LOG.log(Level.INFO, "Songlist is now stale! Trying to regenerate it now.");
+                    songlist.checkForNewSongs();
+                }
+            }
+            
+            // and sleep
             Util.sleep(pauseSecs);
         }
     }
