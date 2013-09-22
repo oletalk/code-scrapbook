@@ -25,7 +25,22 @@ public class Streamed {
     
     private static final Logger LOG = LogSetup.getlog();
     
-    private Path streamedPath = null;
+    protected Path streamedPath = null;
+    
+    public Streamed(Path path)
+    {
+        streamedPath = path;
+        
+        String filename = this.streamedPath.getFileName().toString().toLowerCase();
+        if (filename.endsWith(".ogg")) {
+            this.audioType = AudioType.OGG;
+        } else if (filename.endsWith(".mp3")) {
+            this.audioType = AudioType.MP3;
+        } else {
+            this.audioType = AudioType.OTHER;
+        }
+
+    }
     
     public enum AudioType {
         MP3, OGG, OTHER
@@ -51,14 +66,7 @@ public class Streamed {
     
     public void writeStream(OutputStream out)
     {
-        if (streamedPath == null)
-            throw new IllegalStateException("streamedPath not set yet");
-        try (InputStream in = Files.newInputStream(streamedPath))
-        {
-            streamThrough(in, out);        
-        } catch (IOException ex) {
-            LOG.log(Level.WARNING, "Exception caught streaming the song: {0}", ex.toString());
-        }
+        writeStream(out, null);
     }
     
     public void writeStream(OutputStream out, Downsampler downsampler)

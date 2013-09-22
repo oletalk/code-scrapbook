@@ -49,7 +49,7 @@ public class SongList implements HTMLRepresentable {
     
     private int updateSecs = 0;
     private Date lastUpdated;
-    private Date lastChecked; // TODO: walk file tree for rootdir for new files
+    private Date lastChecked;
     
     @PostConstruct
     public void initList() throws IOException
@@ -78,7 +78,6 @@ public class SongList implements HTMLRepresentable {
         
     }
         
-    // TODO: TEST, TEST TEST TEST...
     public void checkForNewSongs()
     {
         lastChecked = new Date();

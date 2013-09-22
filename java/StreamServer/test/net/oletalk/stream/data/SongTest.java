@@ -101,18 +101,6 @@ public class SongTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of pathFrom method, of class Song.
-     */
-    @Test
-    public void testPathFrom() {
-        System.out.println("pathFrom");
-        Path path = Paths.get("/hello/there");
-        Song instance = new Song(Paths.get("/hello/there/song.mp3"));
-        String expResult = "song.mp3";
-        String result = instance.pathFrom(path);
-        assertEquals(expResult, result);
-    }
 
     /**
      * Test of htmlValue method, of class Song.

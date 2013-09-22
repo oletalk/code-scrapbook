@@ -64,8 +64,8 @@ public class Populator implements Runnable {
             // also check if it's time to regenerate the songlist
             if (songlist.isStale())
             {
+                LOG.log(Level.INFO, "Songlist is now stale! Trying to regenerate it now.");
                 synchronized (this) {
-                    LOG.log(Level.INFO, "Songlist is now stale! Trying to regenerate it now.");
                     songlist.checkForNewSongs();
                 }
             }

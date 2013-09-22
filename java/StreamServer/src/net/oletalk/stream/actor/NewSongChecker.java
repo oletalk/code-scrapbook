@@ -6,6 +6,7 @@ package net.oletalk.stream.actor;
 
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 import java.util.Map;
 import net.oletalk.stream.data.Song;
 
@@ -17,6 +18,11 @@ public class NewSongChecker extends SongCollector {
 
     public NewSongChecker(Map<Path, Song> songlist) {
         super(songlist);
+    }
+    
+    public void setBaseline()
+    {
+        baseline = new Date();
     }
     
     @Override

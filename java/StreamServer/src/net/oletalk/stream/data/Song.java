@@ -20,7 +20,6 @@ import net.oletalk.stream.interfaces.HTMLRepresentable;
  */
 public class Song extends Streamed implements HTMLRepresentable {
     
-    private Path path;
     private Tag tag;
 
     public Tag getTag() {
@@ -28,7 +27,7 @@ public class Song extends Streamed implements HTMLRepresentable {
     }
 
     public Path getPath() {
-        return path;
+        return streamedPath;
     }
     
     public void setTag(Tag tag) {
@@ -39,10 +38,10 @@ public class Song extends Streamed implements HTMLRepresentable {
             LOG.log(Level.WARNING, "Tag for song {0} is NULL", this.toString());
         }
         
-        if (tag != null && !this.path.equals(tag.getFilepath()))
+        if (tag != null && !this.streamedPath.equals(tag.getFilepath()))
         {
             LOG.log(Level.WARNING, "Tag filepath != song path, as we expected - fixing that");
-            this.tag.setFilepath(this.path);
+            this.tag.setFilepath(this.streamedPath);
         }
         
     }
@@ -50,27 +49,17 @@ public class Song extends Streamed implements HTMLRepresentable {
     
     public Song (Path path)
     {
-        this.path = path;
-        this.setStreamedPath(path);
-        
-        String filename = this.path.getFileName().toString();
-        if (filename.endsWith(".ogg")) {
-            this.audioType = AudioType.OGG;
-        } else if (filename.endsWith(".mp3")) {
-            this.audioType = AudioType.MP3;
-        } else {
-            this.audioType = AudioType.OTHER;
-        }
+        super(path);
     }
     
-    public String pathFrom(Path path)
+    private String pathFrom(Path path)
     {
-        Path p = path.relativize(this.path);
+        Path p = path.relativize(this.streamedPath);
         String str = null;
         try {
             str = new String(p.toString().getBytes("UTF8"));
         } catch (UnsupportedEncodingException ex) {
-            LOG.log(Level.SEVERE, "Problems getting path from " + this.path.toString(), ex);
+            LOG.log(Level.SEVERE, "Problems getting path from " + this.streamedPath.toString(), ex);
         }
         
         // paths with accents in them don't work
@@ -102,7 +91,7 @@ public class Song extends Streamed implements HTMLRepresentable {
         }
         else
         {
-            pathstr = "#EXTINF:-1," + path.getFileName().toString() + "\n" + pathstr + "\n";
+            pathstr = "#EXTINF:-1," + streamedPath.getFileName().toString() + "\n" + pathstr + "\n";
         }
         return pathstr;
     }
@@ -111,7 +100,7 @@ public class Song extends Streamed implements HTMLRepresentable {
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("Song: ").append(path.toString());
+        sb.append("Song: ").append(streamedPath.toString());
         if (tag != null)
         {
             sb.append("\nwith Tag:").append(tag.toString());        
@@ -120,7 +109,7 @@ public class Song extends Streamed implements HTMLRepresentable {
     }
 
     void getTagFromReader(TagReader tagreader) {
-        setTag(tagreader.get(path));
+        setTag(tagreader.get(streamedPath));
     }
 
 }
