@@ -4,10 +4,10 @@
  */
 package net.oletalk.stream.http;
 
-import com.sun.net.httpserver.HttpServer;
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
+import net.oletalk.stream.handler.StreamHandler;
+import net.oletalk.stream.handler.RenderHandler;
 import net.oletalk.stream.Populator;
+import net.oletalk.stream.actor.Wrapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -20,15 +20,15 @@ public class SocketServer {
     public static void main(String[] args) throws Exception
     {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("/httpServerContext.xml");
-        Handler handler = applicationContext.getBean("handler", Handler.class);
+        //Handler handler = applicationContext.getBean("handler", Handler.class);
         
+        Wrapper wrapper = applicationContext.getBean(Wrapper.class);
+        //server.createContext("/", handler);
+
+        wrapper.addHandler("/s", applicationContext.getBean(StreamHandler.class));
+        wrapper.addHandler("/r", applicationContext.getBean(RenderHandler.class));
         
-        HttpServer server = HttpServer.create(new InetSocketAddress(8081), 0);
-        server.createContext("/", handler);
-        server.setExecutor(Executors.newFixedThreadPool(3));
-        
-        server.start();
-        System.out.println("Server is ready for connections.");
+        wrapper.start();
         
         Populator populator = applicationContext.getBean(Populator.class);
         populator.run();

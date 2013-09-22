@@ -4,7 +4,6 @@
  */
 package net.oletalk.stream;
 
-import java.io.IOException;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;

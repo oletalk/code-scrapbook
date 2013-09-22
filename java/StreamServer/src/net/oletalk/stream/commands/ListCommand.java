@@ -51,7 +51,7 @@ public class ListCommand extends AbstractCommand {
     }
     
     public String getHeaderHtml(){
-        return "<h2>List of songs</h2><p><a href='/drop'>Download playlist</a></p>";
+        return "<h2>List of songs</h2><p><a href='/r/drop'>Download playlist</a></p>";
     }
     
 }
