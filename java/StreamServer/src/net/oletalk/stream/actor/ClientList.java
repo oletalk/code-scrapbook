@@ -11,10 +11,9 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import net.oletalk.stream.data.FilterAction;
 import net.oletalk.stream.util.LogSetup;
-import net.oletalk.stream.util.Util;
-import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.beans.factory.annotation.Value;
 import static net.oletalk.stream.data.FilterAction.Action;
+import net.oletalk.stream.util.SubnetUtil;
 
 /**
  * ClientList - whitelist/blacklist for incoming ips by subnet
@@ -111,16 +110,18 @@ public class ClientList {
         return sb.toString();
     }
     
+    
+    // ---------- the following methods are for IPv4 only
     // method to check an incoming ip address against the list
     public FilterAction filterActionFor(String addr)
     {
         // test
         for (FilterAction fa : filterActions)
         {
-            String subnet = fa.getIpBlock();
-            SubnetUtils utils = new SubnetUtils(subnet);
+            String subnetStr = fa.getIpBlock();                        
+            SubnetUtil utl = new SubnetUtil(subnetStr);
             
-            if (utils.getInfo().isInRange(addr))
+            if (utl.inSubnet(addr))
             {
                 LOG.log(Level.INFO, "Action for peer {0} is {1}", new Object[]{addr, fa});
                 return fa;
@@ -130,8 +131,13 @@ public class ClientList {
         return null;
     }
     
+    
+
+    // -------------------------------
+    
     public static void main(String[] args) throws Exception {
         ClientList cl = new ClientList();
+                        
         cl.initList("clientlist.txt");
         cl.setDefaultAction("BLOCK");
         List<String> testips = Arrays.asList(new String[]{"192.168.0.4", "211.200.100.160", "194.168.0.11"});

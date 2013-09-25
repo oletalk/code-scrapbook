@@ -111,7 +111,7 @@ public class SongTest {
         Path rootpath = Paths.get("/test");
         Song instance = SongTest.getTest1();
         
-        String expResult = "<a href=\"/play/path%2Fsong.mp3\">path/song.mp3<br/>\n";
+        String expResult = "<a href=\"/s/play/path%2Fsong.mp3\">path/song.mp3<br/>\n";
         String result = instance.asHTML(rootpath);
         assertEquals(expResult, result);
     }
@@ -125,7 +125,7 @@ public class SongTest {
         String hostheader = "funkyhost:8081";
         Path rootpath = Paths.get("/test");
         Song instance = SongTest.getTest1();
-        String expResult = "#EXTINF:100,Us - A song\nhttp://funkyhost:8081/play/path%2Fsong.mp3\n";
+        String expResult = "#EXTINF:100,Us - A song\nhttp://funkyhost:8081/s/play/path%2Fsong.mp3\n";
         String result = instance.m3uValue(hostheader, rootpath);
         assertEquals(expResult, result);
     }
