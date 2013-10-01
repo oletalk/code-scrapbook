@@ -57,7 +57,7 @@ public class Populator implements Runnable {
             }
             else { 
                 // (what if the songs all (currently) have tags?? sleep for a long time? exit?)
-                Util.sleep(pauseSecs * 10);
+                Util.sleep(pauseSecs * 100);
             }
             
             // also check if it's time to regenerate the songlist

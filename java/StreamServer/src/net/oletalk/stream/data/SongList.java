@@ -68,7 +68,11 @@ public class SongList implements HTMLRepresentable {
         
         SongCollector sc = new SongCollector(list);
         Files.walkFileTree(initialPath, sc);
-        
+        if (this.hasNoSongs()) 
+        {
+            System.err.println("NO SONGS FOUND!");
+            System.exit(1);
+        }
         checkSongsForTags();
         int listsize = list.size();
         LOG.log(Level.CONFIG, "Loaded {0} song(s) in {1} in {2} ms.", 
