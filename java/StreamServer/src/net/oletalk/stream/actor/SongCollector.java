@@ -10,9 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.oletalk.stream.data.InternalMap;
 import net.oletalk.stream.data.Song;
 import net.oletalk.stream.util.LogSetup;
 
@@ -23,13 +23,13 @@ import net.oletalk.stream.util.LogSetup;
 public class SongCollector extends SimpleFileVisitor<Path> {
     
     private final String SONGSPEC = "(?i).*\\.(mp3|ogg)";
-    private Map<Path,Song> list;
+    private InternalMap list;
     
     private static final Logger LOG = LogSetup.getlog();
 
     protected Date baseline;
     
-    public SongCollector(Map<Path,Song> songlist)
+    public SongCollector(InternalMap songlist)
     {
         list = songlist;
         baseline = new Date();

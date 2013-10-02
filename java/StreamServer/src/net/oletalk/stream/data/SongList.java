@@ -11,11 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +35,7 @@ public class SongList implements HTMLRepresentable {
     
     private static final Logger LOG = LogSetup.getlog();
 
-    private Map<Path,Song> list;
+    private InternalMap list;
     
     @Autowired
     private TagReader tagreader;
@@ -55,7 +53,7 @@ public class SongList implements HTMLRepresentable {
     public void initList() throws IOException
     {
         Path initialPath = Paths.get(initialDir);
-        list = new TreeMap<>();
+        list = new InternalMap();
 
         try {
             updateSecs = Integer.parseInt(updateMins);
@@ -86,7 +84,7 @@ public class SongList implements HTMLRepresentable {
     {
         lastChecked = new Date();
         
-        Map<Path,Song> newsongs = new HashMap<>();
+        InternalMap newsongs = new InternalMap();
         NewSongChecker nsc = new NewSongChecker(newsongs);
         
         if (!newsongs.isEmpty())
@@ -251,6 +249,19 @@ public class SongList implements HTMLRepresentable {
             }
         }
         return ret;
+    }
+    
+    public Song songById(String songreq)
+    {
+        long sid;
+        try {
+            sid = Long.parseLong(songreq); 
+        } catch (NumberFormatException nfe) {
+            LOG.log(Level.WARNING, "Couldn't parse long given input", nfe);
+            return null;
+        }
+        return list.getById(sid);
+        
     }
     
     public Song songFor(String songreq)

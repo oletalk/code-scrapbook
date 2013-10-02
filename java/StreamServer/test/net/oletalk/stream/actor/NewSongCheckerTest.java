@@ -7,9 +7,7 @@ package net.oletalk.stream.actor;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import net.oletalk.stream.data.Song;
+import net.oletalk.stream.data.InternalMap;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -38,7 +36,7 @@ public class NewSongCheckerTest {
         tempDir.toFile().deleteOnExit();
         
         // Collect the initial list first
-        HashMap<Path,Song> songlist = new HashMap<>();
+        InternalMap songlist = new InternalMap();
         SongCollector collector = new SongCollector(songlist);
         
         Files.walkFileTree(tempDir, collector);

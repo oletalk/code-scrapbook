@@ -52,7 +52,8 @@ public class PlayCommand extends AbstractCommand {
             String songreq = rootdir + path;
             LOG.log(Level.FINE, "Going to request song {0}", songreq);
             // check for it in the songlist
-            Song song = list.songFor(songreq);
+            //Song song = list.songFor(songreq);
+            Song song = list.songById(uri);
             // play it if so
             
             if (song != null)

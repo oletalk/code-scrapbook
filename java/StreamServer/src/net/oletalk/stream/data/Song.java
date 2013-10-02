@@ -23,6 +23,7 @@ public class Song extends Streamed implements HTMLRepresentable {
     private Tag tag;
 
     private static final String PLAYURL = "/s/play/";
+    private long id = -1; // sentinel value
     
     public Tag getTag() {
         return tag;
@@ -53,6 +54,19 @@ public class Song extends Streamed implements HTMLRepresentable {
     {
         super(path);
     }
+        
+    public void setId(long id)
+    {
+        if (this.id != -1) {
+            throw new IllegalStateException("Song's ID has already been set!");
+        }
+        this.id = id;
+    }
+    
+    public long getId()
+    {
+        return id;
+    }
     
     private String pathFrom(Path path)
     {
@@ -78,7 +92,8 @@ public class Song extends Streamed implements HTMLRepresentable {
         try {
             st_dec = URLDecoder.decode(st, "UTF-8");
         } catch (UnsupportedEncodingException uee) { }
-        return "<a href=\"" + PLAYURL + st + "\">" + st_dec + "<br/>\n";
+        //return "<a href=\"" + PLAYURL + st + "\">" + st_dec + "<br/>\n";
+        return "<a href=\"" + PLAYURL + this.getId() + "\">" + st_dec + "<br/>\n";
     }
     
     public String m3uValue(String hostheader, Path rootpath)
@@ -86,7 +101,8 @@ public class Song extends Streamed implements HTMLRepresentable {
         //Path p = rootpath.relativize(path);
         String st = this.pathFrom(rootpath);
 
-        String pathstr = "http://" + hostheader + PLAYURL + st;
+        //String pathstr = "http://" + hostheader + PLAYURL + st;
+        String pathstr = "http://" + hostheader + PLAYURL + this.getId();
         if (tag != null)
         {
             pathstr = tag.m3uvalue() + "\n" + pathstr + "\n";
