@@ -4,11 +4,10 @@
  */
 package net.oletalk.stream.dao;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.Tag;
 import net.oletalk.stream.util.Util;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -27,15 +26,14 @@ public class TagDao extends BasicDao<Tag> {
     @Override
     public void save(Tag t) {
         jdbcTemplate.update(
-                "DELETE FROM MP3S_jtags WHERE file_hash = ?", 
-                t.getFilehash()
+                "DELETE FROM MP3S_jtags WHERE song_id = ?", 
+                t.getSong_id()
                 );
         
         jdbcTemplate.update(
-                "INSERT INTO MP3S_jtags (song_filepath, file_hash, artist, title, secs) " +
-                "VALUES (?, ?, ?, ?, ?)", 
-                t.getFilepath().toString(),
-                t.getFilehash(),
+                "INSERT INTO MP3S_jtags (song_id, artist, title, secs) " +
+                "VALUES (?, ?, ?, ?)", 
+                t.getSong_id(),
                 t.getArtist(),
                 t.getTitle(),
                 t.getSecs()
@@ -45,7 +43,7 @@ public class TagDao extends BasicDao<Tag> {
 
     public Tag get(Map<String, Object> args) {
         
-        String sql = "SELECT song_filepath, file_hash, artist, title, secs FROM MP3S_jtags";
+        String sql = "SELECT song_id, artist, title, secs FROM MP3S_jtags";
         return super.get(sql, new TagRowMapper(), args);
     }
 
@@ -55,19 +53,16 @@ public class TagDao extends BasicDao<Tag> {
      * @param filehash The generated MD5 hash of the audio file.
      * @return a Tag object with this file hash
      */
-    public Tag getTag(String filehash)
-    {
-        return get(mapFrom("file_hash", filehash));
-    }
-    public Tag getTagFromPath(Path path)
-    {
-        return get(mapFrom("song_filepath", path.toString()));
-    }
 
-    public void recordFailedTag(Path p, String reason) {
+    public Tag getTagFromSong(Song song)
+    {
+        return get(mapFrom("song_id", song.getId()));
+    }
+    
+    public void recordFailedTag(Song s, String reason) {
 
         // compute the md5 sum
-        String md5 = Util.computeMD5(p);
+        String md5 = Util.computeMD5(s.getPath());
 
         // check if there isn't already a failed attempt in there
         try {
@@ -94,8 +89,7 @@ public class TagDao extends BasicDao<Tag> {
         @Override
         public Tag mapRow(ResultSet rs, int i) throws SQLException {
                         Tag t = new Tag();
-                        t.setFilehash(rs.getString("file_hash"));
-                        t.setFilepath(Paths.get(rs.getString("song_filepath")));
+                        t.setSong_id(rs.getLong("song_id"));
                         t.setArtist(rs.getString("artist"));
                         t.setTitle(rs.getString("title"));
                         t.setSecs(rs.getInt("secs"));

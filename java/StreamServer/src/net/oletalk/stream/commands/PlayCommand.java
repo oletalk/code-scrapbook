@@ -34,6 +34,7 @@ public class PlayCommand extends AbstractCommand {
         String uri = (String)args.get("uri");
         SongList list = (SongList)args.get("list");
         boolean downsample = args.containsKey("downsampler");
+        Integer buffersize = (Integer)args.get("buffersize");
         Downsampler downsampler = null;
         if (downsample)
             downsampler = (Downsampler)args.get("downsampler");
@@ -63,7 +64,7 @@ public class PlayCommand extends AbstractCommand {
 
                 try (OutputStream body = exchange.getResponseBody()) {
                     songStarted = true;
-                    song.writeStream(body, downsampler); // 2nd arg null if no downsampling                        
+                    song.writeStream(body, downsampler, buffersize); // 2nd arg null if no downsampling                        
 
                 } catch (IOException ioe) {
                     String msg = ioe.getMessage();

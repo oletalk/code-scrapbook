@@ -4,38 +4,25 @@
  */
 package net.oletalk.stream.data;
 
-import java.nio.file.Path;
-
 /**
  *
  * @author colin
  */
 public class Tag {
     
-    private Path filepath;
-    private String filehash;
+//    private Path filepath;
+//    private String filehash;
     private String artist;
     private String title;
     private int secs;
+    private long song_id; // CM TODO: why not Song object?
 
-    public Path getFilepath() 
-    {
-        return filepath;
+    public long getSong_id() {
+        return song_id;
     }
 
-    public void setFilepath(Path filepath) 
-    {
-        this.filepath = filepath;
-    }
-
-    public String getFilehash() 
-    {
-        return filehash;
-    }
-
-    public void setFilehash(String filehash) 
-    {
-        this.filehash = filehash;
+    public void setSong_id(long song_id) {
+        this.song_id = song_id;
     }
 
     public String getArtist() 
@@ -85,9 +72,7 @@ public class Tag {
     {
         StringBuilder sb = new StringBuilder();
 
-        String pathstr = filepath != null ? filepath.toString() : "[NO PATH SET]";
-        sb.append("Song: \n Path: ").append(pathstr).append(",\nHash: ")
-                .append(filehash).append(",\nArtist: ").append(artist)
+        sb.append("Tag: \n Path: ").append(",\nArtist: ").append(artist)
                 .append(",\nTitle: ").append(title).append(",\nLength ")
                 .append(secs).append("s");
         return sb.toString();

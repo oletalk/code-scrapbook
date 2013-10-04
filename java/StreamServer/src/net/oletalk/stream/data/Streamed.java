@@ -25,8 +25,10 @@ public class Streamed {
     
     private static final Logger LOG = LogSetup.getlog();
     
-    protected Path streamedPath = null;
+    private static final int DEFAULT_BUFFER_SIZE = 8192;
     
+    protected Path streamedPath = null;
+        
     public Streamed(Path path)
     {
         streamedPath = path;
@@ -41,7 +43,7 @@ public class Streamed {
         }
 
     }
-    
+        
     public enum AudioType {
         MP3, OGG, OTHER
     }
@@ -66,10 +68,10 @@ public class Streamed {
     
     public void writeStream(OutputStream out)
     {
-        writeStream(out, null);
+        writeStream(out, null, DEFAULT_BUFFER_SIZE);
     }
     
-    public void writeStream(OutputStream out, Downsampler downsampler)
+    public void writeStream(OutputStream out, Downsampler downsampler, int buffersize)
     {
         if (streamedPath == null)
             throw new IllegalStateException("streamedPath not set yet");        
@@ -82,7 +84,8 @@ public class Streamed {
             }
             else {
                 in = downsampler.downsampled(this);
-                streamThrough(in, new BufferedOutputStream(out));        
+                // CM apparently we shouldn't buffer 'out' - too much buffering is a bad thing!
+                streamThrough(in, out, buffersize);        
             }
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "Exception caught streaming the song: {0}", ex.toString());
@@ -95,18 +98,21 @@ public class Streamed {
         }
     }
     
+    private void streamThrough(InputStream in, OutputStream out)
+    {
+        streamThrough(in, out, DEFAULT_BUFFER_SIZE);
+    }
     
-    
-    private static void streamThrough(InputStream in, OutputStream out)
+    private void streamThrough(InputStream in, OutputStream out, int buffersize)
     {
         Charset charset = Charset.forName("UTF-8");
-
-        try (BufferedInputStream is = new BufferedInputStream(in))
+        LOG.log(Level.FINE, "Using buffer of size {0}", buffersize);
+        try (BufferedInputStream is = new BufferedInputStream(in, buffersize))
         {
             int content;
             while ((content = is.read()) != -1)
             {
-                out.write((char)content);
+                out.write((char) content);
             }
             LOG.fine("Done streaming.");
             

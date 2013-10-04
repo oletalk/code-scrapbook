@@ -6,6 +6,7 @@ package net.oletalk.stream.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
@@ -23,6 +24,35 @@ public class Util {
     
     private static final Logger LOG = LogSetup.getlog();
     final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+    
+    public static String computeMD5(String original)
+    {
+        String ret = null;
+        MessageDigest m = null;
+        try {
+            m = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException ex) {
+            LOG.log(Level.SEVERE, "Problems using MD5 algorithm", ex);
+        }
+        if (m != null)
+        {
+            try {
+                m.update(original.getBytes("UTF8"));
+            } catch (UnsupportedEncodingException ex) {
+                LOG.log(Level.SEVERE, "Problems using UTF8 encoding", ex);
+            }
+            byte[] digest = m.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest)
+            {
+                sb.append(Integer.toHexString((int)(b & 0xff)));
+            }
+            ret = sb.toString();
+        }
+        
+        return ret;
+    }
+    
     
     public static String computeMD5(Path path)
     {

@@ -35,7 +35,7 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
     <bean id="factory" class="net.oletalk.stream.commands.CommandFactory"/>
     <!-- and the list of songs ... -->
     <bean id="songlist" class="net.oletalk.stream.data.SongList"/>
-
+    <bean id="songdao"  class="net.oletalk.stream.dao.SongDao"/>
 
     <bean id="wrapper" class="net.oletalk.stream.actor.Wrapper">
         <constructor-arg value="${port}" type="int"/>

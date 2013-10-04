@@ -4,6 +4,8 @@
  */
 package net.oletalk.stream.actor;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -29,6 +31,10 @@ public class Downsampler {
     private String mp3DownsampleOptions;
     @Value("${downsampler.ogg.options}")
     private String oggDownsampleOptions;
+    
+    @Value("${buffersize}")
+    private int buffersize;
+
     
     public InputStream downsampled(Streamed stream) throws IOException
     {
@@ -57,13 +63,15 @@ public class Downsampler {
             throw new IllegalArgumentException("Can't downsample: audioType for file not recognised or set");
         } else {
             ProcessBuilder builder = new ProcessBuilder(cmd);
-            builder.redirectErrorStream(true);
+            //builder.redirectErrorStream(true);
+            File errorlog = new File("/tmp/test-server-errors.log");
+            builder.redirectError(errorlog);
             proc = builder.start();
             
             in = proc.getInputStream();
 
         }
-        return in;
+        return in; //new BufferedInputStream(in, buffersize);
     }
     
     private List<String> listSubstitute(String[] args, String substituted)

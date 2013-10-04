@@ -6,14 +6,13 @@ package net.oletalk.stream.actor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.dao.TagDao;
+import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.Tag;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
-import net.oletalk.stream.util.Util;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
@@ -36,52 +35,52 @@ public class TagReader {
     @Autowired
     private TagDao td;
             
-    public Tag get(Path p)
+    public Tag get(Song s)
     {
-        Tag t = getFromDB(p);
+        Tag t = getFromDB(s);
         
         if (t == null)
         {
             try {
-                t = getFromFileSystem(p);
+                t = getFromFileSystem(s);
                 // save off to the db
                 if (t != null)
                 {
                     td.save(t);                
                 } else {
-                    td.recordFailedTag(p, "No tag found within file");
+                    td.recordFailedTag(s, "No tag found within file");
                     LOG.log(Level.WARNING, "Still couldn't find tag for song");
                 }
             } catch (TagException te) {
                 String errMsg = (te.getCause() != null ? te.getCause().getMessage() : te.getMessage() );
                 errMsg = errMsg.substring(0, Math.min(99, errMsg.length()));
-                td.recordFailedTag(p, errMsg);
+                td.recordFailedTag(s, errMsg);
             }
         }
         // and return
         return t;
     }
     
-    public Tag getFromDB(Path p)
+    public Tag getFromDB(Song s)
     {
         LOG.log(Level.FINE, "Looking for Tag info from the database.");
         Tag t = null;
         try {
-            t = td.getTagFromPath(p);
+            t = td.getTagFromSong(s);
         } catch (EmptyResultDataAccessException erd) {
             LOG.log(Level.FINE, "No tag info found in db for file");
         }
         return t;
     }
     
-    public Tag getFromFileSystem(Path p) throws TagException
+    public Tag getFromFileSystem(Song s) throws TagException
     {
         Tag t = null;
         LOG.log(Level.FINE, "Looking for Tag info from the file itself.");
         // Create a new Tag object using file info/md5sum/id3 tags
         try {
             Stopwatch st = new Stopwatch(true);
-            AudioFile f = AudioFileIO.read(new File(p.toString()));
+            AudioFile f = AudioFileIO.read(new File(s.getPath().toString())); // TODO - sometimes the tagger misses the file
             AudioHeader hdr = f.getAudioHeader();
             org.jaudiotagger.tag.Tag audiotag = f.getTag();
             
@@ -90,13 +89,13 @@ public class TagReader {
                 t = new Tag();
                 t.setArtist(audiotag.getFirst(FieldKey.ARTIST));
                 t.setTitle(audiotag.getFirst(FieldKey.TITLE));
-                t.setFilepath(p);
+                t.setSong_id(s.getId());
                 t.setSecs(hdr.getTrackLength());
-                t.setFilehash(Util.computeMD5(p));
+                //t.setFilehash(Util.computeMD5(p)); // CM 4/10/2013 this is going up to song level now
                 LOG.log(Level.FINE, "Created Tag for ''{0} in {1}ms.", 
-                        new Object[]{p.toString(), st.elapsedTime()});
+                        new Object[]{s.getPath().toString(), st.elapsedTime()});
             } else {
-                LOG.log(Level.FINE, "No tag found for {0}", p.toString());
+                LOG.log(Level.FINE, "No tag found for {0}", s.getPath().toString());
             }
         } catch (FileNotFoundException fnfe) {
             // most likely because JAudioTagger's file check failed on weird characters :-/

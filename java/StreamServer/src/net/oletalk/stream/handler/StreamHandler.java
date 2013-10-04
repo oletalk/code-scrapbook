@@ -11,6 +11,7 @@ import net.oletalk.stream.actor.Downsampler;
 import net.oletalk.stream.commands.AbstractCommand;
 import net.oletalk.stream.data.FilterAction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -22,6 +23,8 @@ public class StreamHandler extends GeneralHandler {
     
     @Autowired
     private Downsampler downsampler;
+    
+    private @Value("${buffersize}") int buffersize;
     
     public StreamHandler()
     {
@@ -36,6 +39,7 @@ public class StreamHandler extends GeneralHandler {
         Map<String,Object> args = new HashMap<>();
         args.put("list", list);
         args.put("uri", path);
+        args.put("buffersize", buffersize);
         args.put("hostheader", hr.getFirst("Host"));
         args.put("statscollector", stats);
         if (downsample)

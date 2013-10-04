@@ -23,6 +23,7 @@ import net.oletalk.stream.actor.SongCollector;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
 import net.oletalk.stream.actor.TagReader;
+import net.oletalk.stream.dao.SongDao;
 import net.oletalk.stream.interfaces.HTMLRepresentable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,9 @@ public class SongList implements HTMLRepresentable {
     
     @Autowired
     private TagReader tagreader;
+    
+    @Autowired
+    private SongDao songdao;
     
     private @Value("${updatemins}") String updateMins;
     private @Value("${downsampling:on}") boolean downsamplingEnabled;
@@ -100,9 +104,12 @@ public class SongList implements HTMLRepresentable {
     {
         for (Song song : list.values())
         {
+            // save song off to database
+            song.setId(songdao.saved(song));
+            
             // does the song already have a tag in the database?
             Path p = song.getPath();
-            Tag tag = tagreader.getFromDB(p);
+            Tag tag = tagreader.getFromDB(song);
             if (tag != null) {
                 song.setTag(tag);
             }
@@ -260,8 +267,8 @@ public class SongList implements HTMLRepresentable {
             LOG.log(Level.WARNING, "Couldn't parse long given input", nfe);
             return null;
         }
-        return list.getById(sid);
-        
+        //return list.getById(sid);
+        return songdao.get(sid);
     }
     
     public Song songFor(String songreq)

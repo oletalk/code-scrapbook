@@ -21,6 +21,15 @@ import net.oletalk.stream.interfaces.HTMLRepresentable;
 public class Song extends Streamed implements HTMLRepresentable {
     
     private Tag tag;
+    private String filehash;
+
+    public String getFilehash() {
+        return filehash;
+    }
+
+    public void setFilehash(String filehash) {
+        this.filehash = filehash;
+    }
 
     private static final String PLAYURL = "/s/play/";
     private long id = -1; // sentinel value
@@ -41,11 +50,6 @@ public class Song extends Streamed implements HTMLRepresentable {
             LOG.log(Level.WARNING, "Tag for song {0} is NULL", this.toString());
         }
         
-        if (tag != null && !this.streamedPath.equals(tag.getFilepath()))
-        {
-            LOG.log(Level.WARNING, "Tag filepath != song path, as we expected - fixing that");
-            this.tag.setFilepath(this.streamedPath);
-        }
         
     }
     private static final Logger LOG = LogSetup.getlog();
@@ -127,7 +131,7 @@ public class Song extends Streamed implements HTMLRepresentable {
     }
 
     void getTagFromReader(TagReader tagreader) {
-        setTag(tagreader.get(streamedPath));
+        setTag(tagreader.get(this));
     }
 
 }
