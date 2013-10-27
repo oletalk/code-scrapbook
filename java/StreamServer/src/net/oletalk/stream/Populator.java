@@ -74,14 +74,3 @@ public class Populator implements Runnable {
         }
     }
 }
-
-   //        songlist.populateAllTags(10);
-      //  System.exit(0);
-        // 20/08/2013
-        // TODO: possibly use this class to background(??)-populate song tags in the db
-        // TODO: you may have duplicate mp3s in your list.  What happens then??
-        
-        //Path p = Paths.get("/Volumes/rockport/mp3/ripped/Sneaker Pimps - Velvet Divorce.mp3");
-        //Tag t = TagReader.get(p);
-        //System.out.println(t);
-    //}

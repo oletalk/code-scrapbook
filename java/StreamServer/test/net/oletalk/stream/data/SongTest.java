@@ -28,8 +28,6 @@ public class SongTest {
         Path p = Paths.get("/test/path/song.mp3");
         Song instance = new Song(p);
         Tag tag = new Tag();
-        tag.setFilepath(p);
-        tag.setFilehash("3r328rifhsf");
         tag.setArtist("Us");
         tag.setTitle("A song");
         tag.setSecs(100);
@@ -45,7 +43,6 @@ public class SongTest {
 
     public static Tag getTagTest2() {
         Tag tag = new Tag();
-        tag.setFilehash("239r8iusddisuf");
         tag.setArtist("Us");
         tag.setTitle("A tune");
         tag.setSecs(112);
@@ -81,8 +78,6 @@ public class SongTest {
         instance.setTag(tag);
         
         Tag expResult = new Tag();
-        // the following should have the song copy its path to the tag.
-        expResult.setFilepath(Paths.get("/test/path/song.mp3"));
         expResult.setTitle("A song");
         expResult.setSecs(100);
         Tag result = instance.getTag();
@@ -111,7 +106,7 @@ public class SongTest {
         Path rootpath = Paths.get("/test");
         Song instance = SongTest.getTest1();
         
-        String expResult = "<a href=\"/s/play/path%2Fsong.mp3\">path/song.mp3<br/>\n";
+        String expResult = "<a href=\"/s/play/-1\">path/song.mp3<br/>\n";
         String result = instance.asHTML(rootpath);
         assertEquals(expResult, result);
     }
@@ -125,7 +120,7 @@ public class SongTest {
         String hostheader = "funkyhost:8081";
         Path rootpath = Paths.get("/test");
         Song instance = SongTest.getTest1();
-        String expResult = "#EXTINF:100,Us - A song\nhttp://funkyhost:8081/s/play/path%2Fsong.mp3\n";
+        String expResult = "#EXTINF:100,Us - A song\nhttp://funkyhost:8081/s/play/-1\n";
         String result = instance.m3uValue(hostheader, rootpath);
         assertEquals(expResult, result);
     }
@@ -152,7 +147,7 @@ public class SongTest {
         Song instance = SongTest.getTest2();
         // the following calls setTag() and tagreader.get(APath), so let's mock the latter
         TagReader tagreader = mock(TagReader.class);
-        when(tagreader.get(instance.getPath())).thenReturn(SongTest.getTagTest2());
+        when(tagreader.get(instance)).thenReturn(SongTest.getTagTest2());
         
         instance.getTagFromReader(tagreader);
     }

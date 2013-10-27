@@ -6,16 +6,19 @@ package net.oletalk.stream.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import net.oletalk.stream.data.Song;
 import net.oletalk.stream.data.Tag;
 import net.oletalk.stream.util.Util;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 /**
  *
  * @author colin
  */
+@Transactional
 public class TagDao extends BasicDao<Tag> {
 
     /**
@@ -41,6 +44,23 @@ public class TagDao extends BasicDao<Tag> {
 
     }
 
+    /** Bulk tag info fetch for multiple songs (useful for server startup)
+     * 
+     * @param songs
+     * @return 
+     */
+    public List<Tag> getTags(List<Song> songs) {
+        StringBuilder sb = new StringBuilder( "SELECT song_id, artist, title, secs FROM MP3S_jtags WHERE song_id in (" );
+        
+        boolean first = true;
+        for (Song s : songs) {
+            if (!first) sb.append(',');
+            sb.append(s.getId());
+        }
+        sb.append(")");
+        return jdbcTemplate.query(sb.toString(), new TagRowMapper() );
+    }
+    
     public Tag get(Map<String, Object> args) {
         
         String sql = "SELECT song_id, artist, title, secs FROM MP3S_jtags";

@@ -13,6 +13,10 @@ class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
         
     <context:property-placeholder location="classpath:config.properties"/>
             
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="myDataSource"/>
+    </bean>
+    
     <bean id="statsDao" class="net.oletalk.stream.dao.StatsDao"/>
     <bean id="statsCollector" class="net.oletalk.stream.actor.StatsCollector"/>
     

@@ -2,9 +2,18 @@
 .Rhistory
 .properties
 *DS_Store*
+.log
 
 # Example code in package build process
 *-Ex.R
 /java/mp3s-tageditor/TagEditor/nbproject/private/
 /java/mp3s-tageditor/TagEditor/build/
 /java/mp3s-tageditor/TagEditor/dist/
+/java/StreamExpt/nbproject/private/
+/java/StreamExpt/build/
+/java/MinaStream/nbproject/private/
+/java/MinaStream/build/
+/java/StreamServer/nbproject/private/
+/java/StreamServer/build/
+/java/StreamServer/src/config.properties
+/java/StreamServer/dist/

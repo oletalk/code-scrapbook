@@ -108,6 +108,9 @@ public class SongList implements HTMLRepresentable {
             song.setId(songdao.saved(song));
             
             // does the song already have a tag in the database?
+            // TODO: you probably want to get the complete list of tags instead of hitting the db once per song!
+            // something like List<tag> tagBatch = tagreader.getManyFromDb(List<Song> theseSongs);
+            
             Path p = song.getPath();
             Tag tag = tagreader.getFromDB(song);
             if (tag != null) {

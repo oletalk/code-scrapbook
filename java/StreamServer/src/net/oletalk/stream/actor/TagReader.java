@@ -6,6 +6,7 @@ package net.oletalk.stream.actor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.dao.TagDao;
@@ -59,6 +60,19 @@ public class TagReader {
         }
         // and return
         return t;
+    }
+    
+    public List<Tag> getFromDB(List<Song> songs)
+    {
+        LOG.log(Level.FINE, "Looking for Tag info from the database for {0} song(s).", songs.size());
+        List<Tag> tags = null;
+        try {
+            tags = td.getTags(songs);            
+        } catch (EmptyResultDataAccessException erd) {
+            LOG.log(Level.FINE, "No tag info found for any of the songs!");
+        }
+        return tags;
+        
     }
     
     public Tag getFromDB(Song s)

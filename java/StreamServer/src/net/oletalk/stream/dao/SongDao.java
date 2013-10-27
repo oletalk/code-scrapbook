@@ -11,11 +11,13 @@ import net.oletalk.stream.data.Song;
 import net.oletalk.stream.util.Util;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author colin
  */
+@Transactional
 public class SongDao extends BasicDao<Song> {
 
     public Song get(String filehash)
