@@ -146,6 +146,8 @@ sub open_task {
 	my ($taskname, $timespec) = @_;
 	if (defined $self->{open_tasks}->{$taskname}) {
 		$self->{error} = "An open task by the name '$taskname' already exists!";
+	} elsif ($taskname =~ /^\d+$/ ) {
+		$self->{error} = "All-numeric task names are not allowed!";
 	} else {
 		undef $self->{error};
 		push @{$self->{pending_writes}}, [ 'start', $taskname, $timespec ];
@@ -156,6 +158,23 @@ sub open_task {
 sub close_task {
 	my $self = shift;
 	my ($taskname, $timespec) = @_;
+	
+	# can be given task number as well
+	if ($taskname =~ /^\d+$/) {
+		# see also TaskDisplay::display_open_tasks
+		my $o = $self->{open_tasks};
+
+		my $ctr = 0;
+		foreach my $opentask (sort { $o->{$a} <=> $o->{$b} } keys %$o) {
+			$ctr++;
+			if ($taskname == $ctr) {
+				$taskname = $opentask;
+				last;
+			}
+		}
+		
+	}
+	
 	if (defined $self->{open_tasks}->{$taskname}) {
 		undef $self->{error};
 		# we could be given a pre-defined time that's before the open time!
@@ -170,7 +189,7 @@ sub close_task {
 		}
 		push @{$self->{pending_writes}}, [ 'stop', $taskname, $timespec ];
 	} else {
-		$self->{error} = "No open task by the name '$taskname' exists!";
+		$self->{error} = "No open task identified by '$taskname' exists!";
 	}
 	return !defined $self->{error};
 }

@@ -119,7 +119,7 @@ sub display_open_tasks {
 	my $o = $tl->get_open_tasks;
 	
 	my $ctr = 0;
-	foreach my $opentask (keys %$o) {
+	foreach my $opentask (sort { $o->{$a} <=> $o->{$b} } keys %$o) {
 		next unless defined $o->{$opentask};
 		$ctr++;
 		print " [$ctr] $opentask: started " . 
