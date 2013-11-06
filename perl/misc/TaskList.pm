@@ -19,6 +19,7 @@ sub new {
 	$stuff{input_timestamp_format} = 'HH:MM';
 	$stuff{timestamp_format} = '%a %d %b %Y %T';
 	$stuff{short_timestamp_format} = '%T';
+	$stuff{archive_timestamp_format} = '%Y%m%d.%H%M';
 	
 	# TODO: validation for each
 	foreach my $arg (qw(timestamp_format input_timestamp_format file debug)) {
@@ -204,6 +205,19 @@ sub close_all_tasks {
 sub error_message {
 	my $self = shift;
 	$self->{error} . "\n";
+}
+
+sub backup_and_clear_file {
+	my $self = shift;
+	my $backupname = $self->{file};
+	my $tstamp = strftime($self->{archive_timestamp_format}, localtime());
+	$backupname =~ s/\.txt$/.$tstamp/;
+	if ( system('mv', $self->{file}, $backupname) != 0 ) {
+		die "Problem moving old file away: $!";
+	}
+	if ( system('touch', $self->{file}) != 0 ) {
+		die "Problem re-creating new file: $!";
+	}
 }
 
 sub do_pending_writes {

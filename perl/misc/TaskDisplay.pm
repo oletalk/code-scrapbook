@@ -138,6 +138,7 @@ sub display_closed_tasks {
 		my $tme = hms( $c->{$closedtask} );
 		print "   $closedtask: elapsed $tme \n";			
 	}
+	print "NO CLOSED TASKS\n" unless scalar %$c;
 }
 
 sub display_all_task_details {

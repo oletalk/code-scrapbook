@@ -124,7 +124,22 @@ sub commands {
                 }
             },
             'Close ALL currently open tasks'
-        ]
+        ],
+
+		'clear' => [
+			sub {
+				my ( $list ) = @_;
+
+				print "This will back up the current activities list, then clear it.\n";
+				print "If this is fine, hit Enter; otherwise hit Ctrl-C now!\n";
+				my $dummy = <STDIN>;
+				$list->close_all_tasks;
+				$list->do_pending_writes;
+				$list->backup_and_clear_file;
+				print "OK, your activities file is now empty.\n"
+			},
+			'Archive activities file'
+		]
     );
 
     #aliases
@@ -138,7 +153,7 @@ sub commands {
 sub usage {
     my $cmds = commands();
     print "Usage: log.pl <command> <options>\n";
-    foreach my $cmd (qw(start stop status times details today back quit)) {
+    foreach my $cmd (qw(start stop status times details today back quit clear)) {
         my $description = $cmds->{$cmd}[2] || $cmd;
         printf( "     %-35s - %-45s\n", $description, $cmds->{$cmd}[1] );
     }
