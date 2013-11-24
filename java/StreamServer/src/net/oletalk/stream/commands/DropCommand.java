@@ -6,10 +6,8 @@ package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.logging.Level;
 import net.oletalk.stream.data.Header;
 import net.oletalk.stream.data.SongList;
@@ -26,11 +24,11 @@ public class DropCommand extends AbstractCommand {
     }
     
     @Override
-    public void exec(Map<String, Object> args) throws Exception {
+    public void exec(Args args) throws Exception {
         
-        String uri = (String)args.get("uri");
-        SongList list = (SongList)args.get("list");
-        String hostheader = (String)args.get("hostheader");
+        String uri = args.getUri();
+        SongList list = args.getList();
+        String hostheader = args.getHostheader();
         
         long time = System.currentTimeMillis();
         String pathreq = rootdir + uri;

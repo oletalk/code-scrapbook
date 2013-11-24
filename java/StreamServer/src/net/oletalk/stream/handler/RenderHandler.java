@@ -4,10 +4,9 @@
  */
 package net.oletalk.stream.handler;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.oletalk.stream.actor.Command;
 import net.oletalk.stream.commands.AbstractCommand;
+import net.oletalk.stream.commands.Args;
 
 /**
  *
@@ -17,16 +16,20 @@ public class RenderHandler extends GeneralHandler {
 
     public RenderHandler()
     {
-        super(new String[]{ Command.DROP, Command.LIST, Command.STATS });
+        super(new Command.Type[]{ 
+            Command.Type.DROP, 
+            Command.Type.LIST, 
+            Command.Type.SEARCH,
+            Command.Type.STATS });
     }
     
     @Override
     public void continueHandle(AbstractCommand cmd) throws Exception {
-        Map<String,Object> args = new HashMap<>();
-        args.put("list", list);
-        args.put("uri", path);
-        args.put("hostheader", hr.getFirst("Host"));
-        args.put("statscollector", stats);
+        Args args = new Args();
+        args.setList(list);
+        args.setUri(path);
+        args.setHostheader(hr.getFirst("Host"));
+        args.setCollector(stats);
         cmd.exec(args);
     }
     

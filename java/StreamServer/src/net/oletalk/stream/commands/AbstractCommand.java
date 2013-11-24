@@ -5,7 +5,6 @@
 package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
-import java.util.Map;
 import java.util.logging.Logger;
 import net.oletalk.stream.util.LogSetup;
 
@@ -30,6 +29,6 @@ public abstract class AbstractCommand {
         exec(null);
     }
     
-    public abstract void exec(Map<String,Object> args) throws Exception;
+    public abstract void exec(Args args) throws Exception;
         
 }

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.oletalk.stream.actor.ClientList;
+import net.oletalk.stream.actor.Command;
 import net.oletalk.stream.actor.StatsCollector;
 import net.oletalk.stream.commands.AbstractCommand;
 import net.oletalk.stream.commands.CommandFactory;
@@ -55,9 +56,9 @@ public abstract class GeneralHandler implements HttpHandler {
     protected String path;
     protected Headers hr;
     
-    protected String[] allowedCommands;
+    protected Command.Type[] allowedCommands;
         
-    public GeneralHandler(String[] allowedCommands)
+    public GeneralHandler(Command.Type[] allowedCommands)
     {
         this.allowedCommands = allowedCommands;
     }
@@ -74,7 +75,8 @@ public abstract class GeneralHandler implements HttpHandler {
                 /* /s/play/My%20Song.mp3 =
                    /s = context (1)
                    /play = command (2)
-                   /My%20Song.mp3 (3) 
+                   /100 = song id in internal db (3)
+                   /My%20Song.mp3 (4) // friendly name for players that can't read extended M3u info
                 */
                 String[] cmdargs = uri.split("/", 4);
                 String context = cmdargs[1]; // TODO - should we do anything with this?
@@ -110,9 +112,10 @@ public abstract class GeneralHandler implements HttpHandler {
                     final AbstractCommand cmd;
                     if (allowedCommands != null)
                     {
-                        if (Arrays.asList(allowedCommands).contains(cmdStr))
+                        Command.Type cmdStrType = Command.Type.get(cmdStr);
+                        if (Arrays.asList(allowedCommands).contains(cmdStrType))
                         {
-                            cmd = factory.create(cmdStr, he, rootdir);
+                            cmd = factory.create(cmdStrType, he, rootdir);
                             handleAccess(he, cmd);
                         } else {
                             throw new IllegalArgumentException("This type of handler doesn't support the '" + cmdStr + "' command");

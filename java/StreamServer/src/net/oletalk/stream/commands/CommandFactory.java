@@ -15,20 +15,21 @@ import net.oletalk.stream.actor.Command;
  */
 public class CommandFactory {
     
-    private final HashMap<String,Class> cmdTypes;
+    private final HashMap<Command.Type,Class> cmdTypes;
     
     public CommandFactory() 
     {
         // all your command types here:
         cmdTypes = new HashMap<>();
-        cmdTypes.put(Command.DROP, DropCommand.class);
-        cmdTypes.put(Command.LIST, ListCommand.class);
-        cmdTypes.put(Command.PLAY, PlayCommand.class);
-        cmdTypes.put(Command.STATS, StatsCommand.class);
+        cmdTypes.put(Command.Type.DROP, DropCommand.class);
+        cmdTypes.put(Command.Type.LIST, ListCommand.class);
+        cmdTypes.put(Command.Type.SEARCH, SearchCommand.class);
+        cmdTypes.put(Command.Type.PLAY, PlayCommand.class);
+        cmdTypes.put(Command.Type.STATS, StatsCommand.class);
         
     }
     
-    private Class cmdFromType (String cmdType)
+    private Class cmdFromType (Command.Type cmdType)
     {
         Class cls;
         cls = cmdTypes.get(cmdType);
@@ -36,7 +37,7 @@ public class CommandFactory {
     }
     
     
-    public AbstractCommand create(String cmdType, HttpExchange exchange, String rootdir) 
+    public AbstractCommand create(Command.Type cmdType, HttpExchange exchange, String rootdir) 
             throws Exception
     {
         Class cmdclass = cmdFromType(cmdType);

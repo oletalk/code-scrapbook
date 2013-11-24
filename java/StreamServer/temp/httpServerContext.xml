@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd" xmlns:aop="http://www.springframework.org/schema/aop">
+    <context:annotation-config />
+    
+    <bean 
+class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+        
+    <context:property-placeholder location="classpath:config.properties"/>
+            
+    <bean id="statsDao" class="net.oletalk.stream.dao.StatsDao"/>
+    <bean id="statsCollector" class="net.oletalk.stream.actor.StatsCollector"/>
+    
+    <!-- reader of tags -->
+    <bean id="tagDao" class="net.oletalk.stream.dao.TagDao"/>
+    <bean id="tagReader" class="net.oletalk.stream.actor.TagReader"/>
+    <bean id="myDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${dbdriver}"/>
+        <property name="url" value="jdbc:${dburl}" />
+        <property name="username" value="${dbuser}" />
+        <property name="password" value="${dbpass}" />
+    </bean>
+
+    <bean id="downsampler" class="net.oletalk.stream.actor.Downsampler"/>
+
+    <!-- (all flow/logic is in this one) -->
+    <bean id="streamer" class="net.oletalk.stream.handler.StreamHandler"/>
+    <bean id="renderer" class="net.oletalk.stream.handler.RenderHandler"/>
+    
+    <bean id="factory" class="net.oletalk.stream.commands.CommandFactory"/>
+    <!-- and the list of songs ... -->
+    <bean id="songlist" class="net.oletalk.stream.data.SongList"/>
+    <bean id="songdao"  class="net.oletalk.stream.dao.SongDao"/>
+
+    <bean id="wrapper" class="net.oletalk.stream.actor.Wrapper">
+        <constructor-arg value="${port}" type="int"/>
+    </bean>
+
+    <!-- ip client filter list -->
+    <bean id="clientlist" class="net.oletalk.stream.actor.ClientList"/>
+    
+    <!-- side thread which populates untagged songs -->
+    <bean id="populator" class="net.oletalk.stream.Populator"/>
+    
+</beans>

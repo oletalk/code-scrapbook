@@ -4,11 +4,10 @@
  */
 package net.oletalk.stream.handler;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.oletalk.stream.actor.Command;
 import net.oletalk.stream.actor.Downsampler;
 import net.oletalk.stream.commands.AbstractCommand;
+import net.oletalk.stream.commands.Args;
 import net.oletalk.stream.data.FilterAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +27,7 @@ public class StreamHandler extends GeneralHandler {
     
     public StreamHandler()
     {
-        super(new String[]{ Command.PLAY });
+        super(new Command.Type[]{ Command.Type.PLAY });
     }
     
     @Override
@@ -36,15 +35,15 @@ public class StreamHandler extends GeneralHandler {
     {
         boolean downsample = options != null && options.contains(FilterAction.Option.DOWNSAMPLE);
                     
-        Map<String,Object> args = new HashMap<>();
-        args.put("list", list);
-        args.put("uri", path);
-        args.put("buffersize", buffersize);
-        args.put("hostheader", hr.getFirst("Host"));
-        args.put("statscollector", stats);
+        Args args = new Args();
+        args.setList(list);
+        args.setUri(path);
+        args.setBuffersize(buffersize);
+        args.setHostheader(hr.getFirst("Host"));
+        args.setCollector(stats);
         if (downsample)
         {
-            args.put("downsampler", downsampler);                            
+            args.setDownsampler(downsampler);                            
         }
         cmd.exec(args);  
 

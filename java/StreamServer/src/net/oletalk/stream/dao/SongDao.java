@@ -7,6 +7,7 @@ package net.oletalk.stream.dao;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import net.oletalk.stream.data.Song;
 import net.oletalk.stream.util.Util;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,16 +21,31 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SongDao extends BasicDao<Song> {
 
+    private static final String SONG_DETAILS = "SELECT id, file_hash, song_filepath FROM MP3S_jsongs";
+    private static final String SONG_DETAILS_TAGS = SONG_DETAILS + ", MP3s_jtags WHERE id = song_id ";
+    
     public Song get(String filehash)
     {
-        String sql = "SELECT id, file_hash, song_filepath FROM MP3S_jsongs";
-        return get(sql, new SongRowMapper(), mapFrom("file_hash", filehash));
+        return get(SONG_DETAILS, new SongRowMapper(), mapFrom("file_hash", filehash));
     }
     
     public Song get(long id)
     {
-        String sql = "SELECT id, file_hash, song_filepath FROM MP3S_jsongs";
-        return get(sql, new SongRowMapper(), mapFrom("id", id));
+        return get(SONG_DETAILS, new SongRowMapper(), mapFrom("id", id));
+    }
+    
+    public List<Song> find(Song.Attribute attribute, String searchTerm) {
+        String searchCol = attribute.toString();
+        String searchVal = "%" + searchTerm + "%";
+        
+        if (attribute == Song.Attribute.ANY) {
+            // ILIKE provides case insensitive search (only works for PostgreSQL as of 11/2013)
+            String sql = SONG_DETAILS_TAGS + "AND (title ILIKE ? OR artist ILIKE ?)";
+            return jdbcTemplate.query(sql, new SongRowMapper(), new Object[]{searchVal,searchVal});
+        } else {
+            String sql = SONG_DETAILS_TAGS + "AND " + searchCol + " ILIKE ?";
+            return jdbcTemplate.query(sql, new SongRowMapper(), searchVal);
+        }
     }
     
     @Override

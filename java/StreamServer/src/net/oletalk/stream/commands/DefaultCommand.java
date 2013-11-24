@@ -6,7 +6,6 @@ package net.oletalk.stream.commands;
 
 import com.sun.net.httpserver.HttpExchange;
 import java.io.OutputStream;
-import java.util.Map;
 import net.oletalk.stream.data.Header;
 
 /**
@@ -21,7 +20,7 @@ public class DefaultCommand extends AbstractCommand {
     }
     
     @Override
-    public void exec(Map<String, Object> args) throws Exception
+    public void exec(Args args) throws Exception
     {
         
         long time = System.currentTimeMillis();

@@ -23,6 +23,18 @@ public class Song extends Streamed implements HTMLRepresentable {
     private Tag tag;
     private String filehash;
 
+    public enum Attribute { 
+        TITLE, ARTIST, ANY;
+        
+        public static Attribute get(String att) {
+            for (Attribute a : Attribute.values()) {
+                if (a.toString().equalsIgnoreCase(att))
+                    return a;
+            }
+            throw new IllegalArgumentException("Unknown Song.Attribute '" + att + "'");
+        }
+    }
+    
     public String getFilehash() {
         return filehash;
     }
@@ -102,11 +114,11 @@ public class Song extends Streamed implements HTMLRepresentable {
     
     public String m3uValue(String hostheader, Path rootpath)
     {
-        //Path p = rootpath.relativize(path);
         String st = this.pathFrom(rootpath);
 
         //String pathstr = "http://" + hostheader + PLAYURL + st;
         String pathstr = "http://" + hostheader + PLAYURL + this.getId();
+        pathstr += "/" + streamedPath.getFileName();
         if (tag != null)
         {
             pathstr = tag.m3uvalue() + "\n" + pathstr + "\n";

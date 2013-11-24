@@ -8,7 +8,6 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.util.Map;
 import java.util.logging.Level;
 import net.oletalk.stream.actor.Downsampler;
 import net.oletalk.stream.actor.StatsCollector;
@@ -29,16 +28,15 @@ public class PlayCommand extends AbstractCommand {
     }
         
     @Override
-    public void exec(Map<String, Object> args) {
+    public void exec(Args args) {
         
-        String uri = (String)args.get("uri");
-        SongList list = (SongList)args.get("list");
-        boolean downsample = args.containsKey("downsampler");
-        Integer buffersize = (Integer)args.get("buffersize");
+        String uri = args.getUri();
+        SongList list = args.getList();
+        Integer buffersize = args.getBuffersize();
         Downsampler downsampler = null;
-        if (downsample)
-            downsampler = (Downsampler)args.get("downsampler");
-        StatsCollector sc = (StatsCollector)args.get("statscollector");
+        if (args.isDownsample())
+            downsampler = args.getDownsampler();
+        StatsCollector sc = args.getCollector();
         boolean songStarted = false;
         boolean songWasInterrupted = false;
         
@@ -47,14 +45,16 @@ public class PlayCommand extends AbstractCommand {
 
             // Unescape it
             String path = URLDecoder.decode(uri, "UTF-8");
-
+            if (path != null && path.indexOf("/") != -1) {
+                path = path.split("/")[0];
+            }
             LOG.log(Level.FINE, "Received PLAY command");
             // note: the rootdir should have a trailing slash here
             String songreq = rootdir + path;
             LOG.log(Level.FINE, "Going to request song {0}", songreq);
             // check for it in the songlist
             //Song song = list.songFor(songreq);
-            Song song = list.songById(uri);
+            Song song = list.songById(path);
             // play it if so
             
             if (song != null)

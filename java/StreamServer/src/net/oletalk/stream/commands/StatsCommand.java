@@ -22,9 +22,9 @@ public class StatsCommand extends AbstractCommand {
     }
 
     @Override
-    public void exec(Map<String, Object> args) throws Exception {
-        StatsCollector sc = (StatsCollector)args.get("statscollector");
-        String uri = (String)args.get("uri");
+    public void exec(Args args) throws Exception {
+        StatsCollector sc = args.getCollector();
+        String uri = args.getUri();
         // Unescape it
         String path = uri;
         

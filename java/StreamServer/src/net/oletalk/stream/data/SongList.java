@@ -23,6 +23,7 @@ import net.oletalk.stream.actor.SongCollector;
 import net.oletalk.stream.util.LogSetup;
 import net.oletalk.stream.util.Stopwatch;
 import net.oletalk.stream.actor.TagReader;
+import net.oletalk.stream.commands.SearchCommand;
 import net.oletalk.stream.dao.SongDao;
 import net.oletalk.stream.interfaces.HTMLRepresentable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -259,6 +260,10 @@ public class SongList implements HTMLRepresentable {
             }
         }
         return ret;
+    }
+    
+    public List<Song> findSongsByCriteria(Song.Attribute criteria, String searchTerm) {
+        return songdao.find(criteria, searchTerm);
     }
     
     public Song songById(String songreq)

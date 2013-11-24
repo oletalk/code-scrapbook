@@ -132,21 +132,4 @@ public class ClientList {
     }
     
     
-
-    // -------------------------------
-    
-    public static void main(String[] args) throws Exception {
-        ClientList cl = new ClientList();
-                        
-        cl.initList("clientlist.txt");
-        cl.setDefaultAction("BLOCK");
-        List<String> testips = Arrays.asList(new String[]{"192.168.0.4", "211.200.100.160", "194.168.0.11"});
-        for (String ip : testips)
-        {
-            System.out.println(ip + ": " + cl.filterActionFor(ip));
-        }
-        System.out.println("LIST CONTENTS: \n" + cl.toString());
-        System.out.println("--DONE--");
-        
-    }
 }
