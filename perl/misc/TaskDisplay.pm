@@ -117,13 +117,23 @@ sub display_open_tasks {
 	my ($tl) = @_;
 	die "This is not a TaskList" unless $tl->isa('TaskList');
 	my $o = $tl->get_open_tasks;
-	
+		
 	my $ctr = 0;
 	foreach my $opentask (sort { $o->{$a} <=> $o->{$b} } keys %$o) {
 		next unless defined $o->{$opentask};
+		# also check if this task is stale, from yesterday.
+		# if so, automatically close it and inform the user
+		my $task_open_ts = $o->{$opentask};
+		
+		if (time - $task_open_ts > 28800) { # task was opened over 8 hours ago
+			carp "Task '$opentask' appears to be stale - closing it off now";
+			$tl->close_task($opentask, $task_open_ts + 1);
+			$tl->do_pending_writes;
+			next;
+		}
 		$ctr++;
 		print " [$ctr] $opentask: started " . 
-			strftime( $tl->get_timestamp_format, localtime ($o->{$opentask}) ) . "\n"; 
+			strftime( $tl->get_timestamp_format, localtime ($task_open_ts) ) . "\n"; 
 	}
 	print "NO OPEN TASKS (you sure about that?)\n" if $ctr == 0;
 }

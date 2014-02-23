@@ -106,6 +106,10 @@ sub get_closed_tasks {
 	$self->{closed_tasks};
 }
 
+sub reopen_closed_task {
+	my $self = shift;
+}
+
 sub _add_elapsed_time {
 	my $self = shift;
 	my ($taskname, $elapsed_secs) = @_;
@@ -116,6 +120,9 @@ sub _add_elapsed_time {
 	$self->{closed_tasks}->{$taskname} += $elapsed_secs;
 }
 
+# reset timestamp to given argument(s):
+# either (1) a given 'time' e.g. '09:50' and day offset e.g. 2 days ago
+#     or (2) a raw timestamp e.g. 1393166660
 sub reset_timestamp {
 	my $self = shift;
 	my ($reset_time_HHMM, $day_offset) = @_;
@@ -124,21 +131,26 @@ sub reset_timestamp {
 	my @localtime = localtime();
 	my $timestamp;
 	
-	my ($hh, $mm) = $reset_time_HHMM =~ /^(\d\d):(\d\d)$/;
-	
-	if ($day_offset < 0 || $day_offset > 7) {
-		carp "Day offset must be between 0 and 7";
-		$day_offset = 0;
+	if ($reset_time_HHMM =~ /^\d+$/) {
+		$timestamp = $reset_time_HHMM;
+		warn "Given raw timestamp value to reset to";
+	} else {
+		my ($hh, $mm) = $reset_time_HHMM =~ /^(\d\d):(\d\d)$/;
+
+		if ($day_offset < 0 || $day_offset > 7) {
+			carp "Day offset must be between 0 and 7";
+			$day_offset = 0;
+		}
+		if ($hh < 0 || $hh > 23 || $mm < 0 || $mm > 59) {
+			carp "Given reset time $reset_time_HHMM isn't valid";
+		} else { # reset the hours/minutes
+			$localtime[2] = $hh;
+			$localtime[1] = $mm;
+			$localtime[0] = 0;
+		}
+		$timestamp = strftime('%s', @localtime);
+		$timestamp -= $day_offset * DAY_SECONDS;		
 	}
-	if ($hh < 0 || $hh > 23 || $mm < 0 || $mm > 59) {
-		carp "Given reset time $reset_time_HHMM isn't valid";
-	} else { # reset the hours/minutes
-		$localtime[2] = $hh;
-		$localtime[1] = $mm;
-		$localtime[0] = 0;
-	}
-	$timestamp = strftime('%s', @localtime);
-	$timestamp -= $day_offset * DAY_SECONDS;
 	$timestamp;
 }
 
