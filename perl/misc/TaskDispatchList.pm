@@ -11,6 +11,21 @@ sub commands {
     #  The 3rd list item is a sample call for your task type and is optional.
 
     my %commands = (
+		'reopen' => [
+			sub {
+				my ( $list, $task, $options ) = @_;
+				my $task_descr;
+				if ( $task_descr = $list->reopen_closed_task( $task, $options->[0] ) ) {
+					$list->do_pending_writes;
+					print "OK, reopened task '$task_descr'.\n";
+				}
+				else {
+					print $list->error_message;
+				}
+			},
+			'Shortcut to reopen a closed task',
+			'reopen <X> [<HH:MM>]'
+		],
         'start' => [
             sub {
                 my ( $list, $task, $options ) = @_;
@@ -32,6 +47,15 @@ sub commands {
                 if ( $list->close_task( $task, $options->[0] ) ) {
                     $list->do_pending_writes;
                     print "OK, task stopped.\n";
+
+					# and, we assume the user is always busy,
+					# so if no tasks are 'open', ask if the user wants to
+					# reopen a previously closed task.
+					my $tasks_open = $list->number_of_open_tasks;
+					$list->read_activities_file;  # refresh ourselves
+					if ( $list->number_of_open_tasks < 1 ) {
+						print "You now have no open tasks.\nUse 'log reopen <number from 'log times' list>' if you wish to reopen a task.\n "
+					}
                 }
                 else {
                     print $list->error_message;
@@ -153,7 +177,7 @@ sub commands {
 sub usage {
     my $cmds = commands();
     print "Usage: log.pl <command> <options>\n";
-    foreach my $cmd (qw(start stop status times details today back quit clear)) {
+    foreach my $cmd (qw(start stop reopen status times details today back quit clear)) {
         my $description = $cmds->{$cmd}[2] || $cmd;
         printf( "     %-35s - %-45s\n", $description, $cmds->{$cmd}[1] );
     }

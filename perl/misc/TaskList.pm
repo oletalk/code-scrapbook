@@ -55,7 +55,7 @@ sub read_activities_file {
 		} elsif ($state =~ STOP) {
 			if (defined $self->{open_tasks}->{$task}) {
 				my $elapsed = $timestamp - $self->{open_tasks}->{$task};
-				$self->_add_elapsed_time($task, $elapsed);
+				$self->_add_elapsed_time($task, $elapsed);  # adds task to closed_tasks
 				$self->_add_period($task, $self->{open_tasks}->{$task}, $timestamp);
 				delete $self->{open_tasks}->{$task};
 			} else {
@@ -90,9 +90,15 @@ sub get_short_timestamp_format {
 	$self->{short_timestamp_format};
 }
 
+# note that this number only gets updated *after* the activities file is read
+# so immediately after an operation it will probably be wrong
 sub number_of_open_tasks {
 	my $self = shift;
-	scalar (keys %{$self->{open_tasks}});
+	my $ctr = 0;
+	foreach (keys %{$self->{open_tasks}}) {
+		$ctr++ if defined $self->{open_tasks}->{$_};
+	}
+	$ctr;
 }
 
 sub get_open_tasks {
@@ -108,6 +114,21 @@ sub get_closed_tasks {
 
 sub reopen_closed_task {
 	my $self = shift;
+	my ( $tasknum, $timespec ) = @_;
+	
+	# Find out the task name from closed_tasks
+	my $ctr = 0;
+	my $taskname;
+	my %closed = %{$self->{closed_tasks}};
+	foreach my $task (sort keys %closed) {
+		$ctr++;
+		$taskname = $task if $ctr == $tasknum;
+	}
+	
+	if ( $self->open_task( $taskname, $timespec ) ) {
+		return $taskname;
+	}
+	return 0;
 }
 
 sub _add_elapsed_time {

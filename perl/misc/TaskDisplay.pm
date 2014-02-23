@@ -6,8 +6,13 @@ use POSIX qw/strftime/;
 use Carp;
 
 use constant DAY_SECS => 86400;
+
+# pretty constants for displaying the task list in 'log today'
 use constant SPACER => '   ';
 use constant PRE_SPACER => '---- ';
+
+# tasks open over this number of hours will be automatically closed at the next 'log status' invocation
+use constant MAX_HOURS => 8;  
 
 # Date-sensitive display operations -------------
 sub display_today {
@@ -125,8 +130,8 @@ sub display_open_tasks {
 		# if so, automatically close it and inform the user
 		my $task_open_ts = $o->{$opentask};
 		
-		if (time - $task_open_ts > 28800) { # task was opened over 8 hours ago
-			carp "Task '$opentask' appears to be stale - closing it off now";
+		if (time - $task_open_ts > MAX_HOURS * 3600) { # task was opened over MAX_HOURS hours ago
+			carp "Task '$opentask' has been open for over ".MAX_HOURS." hours - closing it off now";
 			$tl->close_task($opentask, $task_open_ts + 1);
 			$tl->do_pending_writes;
 			next;
@@ -144,11 +149,21 @@ sub display_closed_tasks {
 	die "This is not a TaskList" unless $tl->isa('TaskList');
 	my $c = $tl->get_closed_tasks;
 	
-	foreach my $closedtask (keys %$c) {
-		my $tme = hms( $c->{$closedtask} );
-		print "   $closedtask: elapsed $tme \n";			
+	my $total_time = 0;
+	
+	my $ctr = 0;
+	foreach my $closedtask (sort keys %$c) {
+		my $task_duration = $c->{$closedtask};
+		my $tme = hms( $task_duration );
+		$total_time += $task_duration;
+		$ctr++;
+		print "   ( $ctr ) $closedtask: elapsed $tme \n";			
 	}
-	print "NO CLOSED TASKS\n" unless scalar %$c;
+	if (scalar %$c) {
+		print "  (Total elapsed time - " . hms($total_time) . ")\n";
+	} else {
+		print "NO CLOSED TASKS\n";
+	}
 }
 
 sub display_all_task_details {
