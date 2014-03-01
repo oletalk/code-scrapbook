@@ -36,7 +36,7 @@ sub new {
 sub read_activities_file {
 	my $self = shift;
 	
-	open my $fh, '<', $self->{file} or die "Problem opening activities file for reading: $!";
+	open my $fh, '<', $self->{file} or die "Problem opening activities file ".$self->{file}." for reading: $!";
 	
 	$self->{open_tasks} = ();
 	while (my $line = <$fh>) {
