@@ -54,7 +54,7 @@ sub commands {
 					my $tasks_open = $list->number_of_open_tasks;
 					$list->read_activities_file;  # refresh ourselves
 					if ( $list->number_of_open_tasks < 1 ) {
-						print "You now have no open tasks.\nUse 'log reopen <number from 'log times' list>' if you wish to reopen a task.\n "
+						print "You now have no open tasks.\nUse 'log reopen <number from 'log times' list>' if you wish to reopen a task.\n"
 					}
                 }
                 else {
