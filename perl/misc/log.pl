@@ -8,8 +8,10 @@ use Data::Dumper;
 use TaskList;
 use TaskDisplay;
 use TaskDispatchList;
+use TaskUtil qw(read_cfg process_overrides);
 
 # defaults
+my $config_file = "$ENV{HOME}/.activities.cfg";
 my $activities_file = "$ENV{HOME}/activities.txt";
 my $debug;
 my $TS_FORMAT = '%a %d %b %Y %T';
@@ -18,10 +20,16 @@ my $TS_FORMAT = '%a %d %b %Y %T';
 
 # get options
 my $res = GetOptions(
+	"config=s" => \$config_file,
 	"file=s"	=> \$activities_file,
 	"timestampformat=s" => \$TS_FORMAT,
 	"debug"		=> \$debug
 );
+
+# override with config if provided
+process_overrides( read_cfg($config_file),
+				{ activities_file => \$activities_file,
+				  timestampformat => \$TS_FORMAT} );
 
 # read command
 my ($command, $task, @options) = @ARGV;
