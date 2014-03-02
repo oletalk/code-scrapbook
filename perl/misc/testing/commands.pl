@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use strict;
 use lib '..';
@@ -6,7 +6,8 @@ use Cwd;
 use Harness;
 use Data::Dumper;
 
-use vars qw( $activities_file $TS_FORMAT );
+$TaskDisplay::quiet = 1;
+$TaskDispatchList::quiet = 1;
 
 my $h = new Harness( activities_file => '/tmp/activities0.txt', timestamp_format => '%T' );
 
@@ -30,8 +31,7 @@ $h->do_log ( 'start', 'bartask', [ '11:00' ] );
 my $struc = $h->internal_structure();
 is($struc->{closed_tasks}->{footask}, 1800, 'Task duration calculated correctly');
 is(scalar keys $struc->{open_tasks}, 1, 'Open task in internal hash');
-sub checktime {
-	#$localtime[2] = $hh;
-	#$localtime[1] = $mm;
-	
-}
+
+$h->do_log( 'quit' );
+$struc = $h->internal_structure();
+is(scalar keys $struc->{open_tasks}, 0, 'Quitting closed all tasks, no tasks in internal hash');

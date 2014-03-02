@@ -1,6 +1,7 @@
 package TaskDispatchList;
 
 use strict;
+use vars qw( $quiet );
 
 #contains all of the function definitions for the 'log' tool
 
@@ -17,10 +18,12 @@ sub commands {
 				my $task_descr;
 				if ( $task_descr = $list->reopen_closed_task( $task, $options->[0] ) ) {
 					$list->do_pending_writes;
-					print "OK, reopened task '$task_descr'.\n";
+					print "OK, reopened task '$task_descr'.\n" unless $quiet;
+					return 1;
 				}
 				else {
 					print $list->error_message;
+					return 0;
 				}
 			},
 			'Shortcut to reopen a closed task',
@@ -31,10 +34,12 @@ sub commands {
                 my ( $list, $task, $options ) = @_;
                 if ( $list->open_task( $task, $options->[0] ) ) {
                     $list->do_pending_writes;
-                    print "OK, task started.\n";
+                    print "OK, task started.\n" unless $quiet;
+					return 1;
                 }
                 else {
                     print $list->error_message;
+					return 0;
                 }
             },
             'Start a new task',
@@ -46,19 +51,21 @@ sub commands {
                 my ( $list, $task, $options ) = @_;
                 if ( $list->close_task( $task, $options->[0] ) ) {
                     $list->do_pending_writes;
-                    print "OK, task stopped.\n";
+                    print "OK, task stopped.\n" unless $quiet;
 
 					# and, we assume the user is always busy,
 					# so if no tasks are 'open', ask if the user wants to
 					# reopen a previously closed task.
 					my $tasks_open = $list->number_of_open_tasks;
 					$list->read_activities_file;  # refresh ourselves
-					if ( $list->number_of_open_tasks < 1 ) {
+					if ( $list->number_of_open_tasks < 1 && !$quiet) {
 						print "You now have no open tasks.\nUse 'log reopen <number from 'log times' list>' if you wish to reopen a task.\n"
 					}
+					return 1;
                 }
                 else {
                     print $list->error_message;
+					return 0;
                 }
             },
             'Stops a task in progress',
@@ -134,14 +141,17 @@ sub commands {
                 my ( $list, $task, $options ) = @_;
                 my $size = $list->number_of_open_tasks;
                 if ( $size > 0 ) {
-                    TaskDisplay::display_open_tasks($list);
                     my $descr = $size == 1 ? 'this task' : 'these tasks';
-                    print
-"If you REALLY want to close $descr, hit Enter; otherwise hit Ctrl-C now!\n";
-                    my $dummy = <STDIN>;
+					if (!$quiet) {
+	                    TaskDisplay::display_open_tasks($list);
+	                    print
+						"If you REALLY want to close $descr, hit Enter; otherwise hit Ctrl-C now!\n";
+	                    my $dummy = <STDIN>;
+						
+					}
                     $list->close_all_tasks;
                     $list->do_pending_writes;
-                    print "OK, closed $descr.\n";
+                    print "OK, closed $descr.\n" unless $quiet;
                 }
                 else {
                     print "No open tasks at this time.\n";
@@ -160,7 +170,7 @@ sub commands {
 				$list->close_all_tasks;
 				$list->do_pending_writes;
 				$list->backup_and_clear_file;
-				print "OK, your activities file is now empty.\n"
+				print "OK, your activities file is now empty.\n" unless $quiet
 			},
 			'Archive activities file'
 		]

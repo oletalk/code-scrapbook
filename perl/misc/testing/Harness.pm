@@ -31,6 +31,11 @@ sub new {
 	bless \%stuff, $class;
 }
 
+sub get_error_message {
+	my $self = shift;
+	$self->{error_message};
+}
+
 sub do_log {
 	my $self = shift;
 	my ( $command, $task, $options_aref ) = @_;
@@ -43,7 +48,9 @@ sub do_log {
 	);
 
 	$list->read_activities_file;
-	&{$exec}($list, $task, $options_aref);
+	my $ret = &{$exec}($list, $task, $options_aref);
+	$self->{error_message} = $list->error_message;
+	$ret;
 }
 
 sub do_overrides {

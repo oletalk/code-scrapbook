@@ -5,6 +5,8 @@ use warnings;
 use POSIX qw/strftime/;
 use Carp;
 
+use vars qw( $quiet );
+
 use constant DAY_SECS => 86400;
 
 # pretty constants for displaying the task list in 'log today'
@@ -140,7 +142,7 @@ sub display_open_tasks {
 		print " [$ctr] $opentask: started " . 
 			strftime( $tl->get_timestamp_format, localtime ($task_open_ts) ) . "\n"; 
 	}
-	print "NO OPEN TASKS (you sure about that?)\n" if $ctr == 0;
+	print "NO OPEN TASKS (you sure about that?)\n" if ($ctr == 0 && !$quiet);
 }
 
 # Display operations on closed tasks ---------------
@@ -157,12 +159,12 @@ sub display_closed_tasks {
 		my $tme = hms( $task_duration );
 		$total_time += $task_duration;
 		$ctr++;
-		print "   ( $ctr ) $closedtask: elapsed $tme \n";			
+		print "   ( $ctr ) $closedtask: elapsed $tme \n" unless $quiet;			
 	}
 	if (scalar %$c) {
-		print "  (Total elapsed time - " . hms($total_time) . ")\n";
+		print "  (Total elapsed time - " . hms($total_time) . ")\n" unless $quiet;
 	} else {
-		print "NO CLOSED TASKS\n";
+		print "NO CLOSED TASKS\n" unless $quiet;
 	}
 }
 
@@ -197,7 +199,7 @@ sub display_task_details {
 			print "Period: $pstart - $pend ($plen)\n";
 		}
 	} else {
-		print "No details found - do 'log times' to ensure this task has been closed\n";
+		print "No details found - do 'log times' to ensure this task has been closed\n" unless $quiet;
 	}
 	
 }

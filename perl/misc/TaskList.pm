@@ -162,8 +162,11 @@ sub reset_timestamp {
 			carp "Day offset must be between 0 and 7";
 			$day_offset = 0;
 		}
-		if ($hh < 0 || $hh > 23 || $mm < 0 || $mm > 59) {
-			carp "Given reset time $reset_time_HHMM isn't valid";
+		if (!defined $hh || !defined $mm) {
+			carp "Given reset time $reset_time_HHMM isn't valid - resetting to now";
+		}
+		elsif ($hh < 0 || $hh > 23 || $mm < 0 || $mm > 59) {
+			carp "Given reset time $reset_time_HHMM isn't valid - resetting to now";
 		} else { # reset the hours/minutes
 			$localtime[2] = $hh;
 			$localtime[1] = $mm;
@@ -237,7 +240,9 @@ sub close_all_tasks {
 
 sub error_message {
 	my $self = shift;
-	$self->{error} . "\n";
+	my $ret = "";
+	$ret = $self->{error} . "\n" if defined $self->{error};
+	$ret;
 }
 
 sub backup_and_clear_file {
