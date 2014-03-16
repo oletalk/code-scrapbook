@@ -4,6 +4,8 @@
  */
 package net.oletalk.stream.data;
 
+import net.oletalk.stream.util.Util;
+
 /**
  *
  * @author colin
@@ -32,7 +34,9 @@ public class Tag {
 
     public void setArtist(String artist) 
     {
-        this.artist = artist;
+        this.artist = Util.truncate(artist, 100);
+        // maximum varchar(100)
+        
     }
 
     public String getTitle() 
@@ -42,7 +46,8 @@ public class Tag {
 
     public void setTitle(String title) 
     {
-        this.title = title;
+        this.title = Util.truncate(title, 200);
+        //maximum varchar(200)
     }
 
     public int getSecs() 

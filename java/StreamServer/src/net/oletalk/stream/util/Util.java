@@ -53,6 +53,13 @@ public class Util {
         return ret;
     }
     
+    public static String truncate(String str, int len) {
+        if (str != null && str.length() > len) {
+            return str.substring(0, len-1);
+        } else {
+            return null;
+        }
+    }
     
     public static String computeMD5(Path path)
     {

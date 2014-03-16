@@ -42,14 +42,18 @@ sub do_log {
 	my $commands = TaskDispatchList::commands;
 	my $exec = $commands->{$command}[0];
 
-	my $list = new TaskList(
-		timestamp_format => $self->{timestamp_format}, 
-		file => $self->{activities_file},
-	);
+	my $ret = 0;
 
-	$list->read_activities_file;
-	my $ret = &{$exec}($list, $task, $options_aref);
-	$self->{error_message} = $list->error_message;
+	if (defined $exec) {
+		my $list = new TaskList(
+			timestamp_format => $self->{timestamp_format}, 
+			file => $self->{activities_file},
+		);
+
+		$list->read_activities_file;
+		$ret = &{$exec}($list, $task, $options_aref);
+		$self->{error_message} = $list->error_message;		
+	}
 	$ret;
 }
 

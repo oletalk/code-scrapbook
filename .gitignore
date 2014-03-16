@@ -3,6 +3,7 @@
 .properties
 *DS_Store*
 .log
+.class
 
 # Example code in package build process
 *-Ex.R
@@ -17,3 +18,7 @@
 /java/StreamServer/build/
 /java/StreamServer/src/config.properties
 /java/StreamServer/dist/
+/java/JSFProducer/nbproject/private/
+/java/JSFProducer/build/
+/java/JMSExpt1/target/
+/java/SpringBatchExpt/target/

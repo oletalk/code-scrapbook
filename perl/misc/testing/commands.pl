@@ -1,4 +1,4 @@
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use strict;
 use lib '..';
@@ -16,6 +16,7 @@ my $config_file = 'testdata/config1.cfg';
 
 $h->do_overrides( $config_file );
 
+is ($h->do_log ( 'blah', 'footask' ), 0, 'Bad command rejected' );
 # NB hash keys for log items are cmd/task/timestamp
 $h->do_log ( 'start', 'footask', [ '10:00' ] );
 my $log = $h->log_contents;

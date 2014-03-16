@@ -120,7 +120,7 @@ public class SongTest {
         String hostheader = "funkyhost:8081";
         Path rootpath = Paths.get("/test");
         Song instance = SongTest.getTest1();
-        String expResult = "#EXTINF:100,Us - A song\nhttp://funkyhost:8081/s/play/-1\n";
+        String expResult = "#EXTINF:100,Us - A song\nhttp://funkyhost:8081/s/play/-1/song.mp3\n";
         String result = instance.m3uValue(hostheader, rootpath);
         assertEquals(expResult, result);
     }
