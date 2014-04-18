@@ -9,5 +9,11 @@
     </head>
     <body>
         <h1>Welcome <c:out value="${user}"/>!</h1>
+        <c:if test="${admin == true}">
+            (admin)
+        </c:if>
     </body>
+    <form name="logout" action="/logout" method="POST">
+        <input type="submit" value="Logout">
+    </form>
 </html>

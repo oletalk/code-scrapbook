@@ -8,10 +8,10 @@
     </head>
     <body>
         <c:out value="${errorMsg}"/>
-        <form action="/srv/dologin" method="POST">
-            Username: <input type="text" name="user">
+        <form action="/front/login" method="POST">
+            Username: <input type="text" name="username">
             <br/>
-            Password: <input type="password" name="pwd">
+            Password: <input type="password" name="password">
             <br/>
             <input type="submit" value="Login">
         </form>
