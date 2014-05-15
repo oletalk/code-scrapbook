@@ -32,7 +32,11 @@ sub handle {
 	# First bit is the command, /list/ or /play/
 	my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
 	#call the main child routine
-	if ($command eq 'play') {
+	if (!defined $command) {
+		$conn->send_error(RC_BAD_REQUEST);
+		$conn->close();
+	}
+	elsif ($command eq 'play') {
 		my $lp = MP3S::Handlers::ListPlayer->new(conn => $conn, 
 								 playlist => $plist,
 								 random => $random);

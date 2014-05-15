@@ -40,7 +40,6 @@ my $res = GetOptions(
     "random"        => \$random,
     "config_file=s" => \$config_file,
 	"reusestats"    => \$reuse_stats,
-    "debug"         => \$debug
 );
 
 die "Another copy of mp3server is already running - check pidfile"
@@ -54,8 +53,7 @@ die "Either playlist or rootdir must be specified"
 MP3S::Misc::MSConf::init($config_file);
 
 MP3S::Misc::Logger::init(
-    level => $debug ? MP3S::Misc::Logger::DEBUG : MP3S::Misc::Logger::INFO,
-    logfile         => config_value('logfile'),
+	logconf         => config_value('logconf'),
     display_context => MP3S::Misc::Logger::NAME
 );
 

@@ -4,6 +4,7 @@ use strict;
 use Carp;
 use File::Find;
 use MP3S::Music::Song;
+use MP3S::Misc::MSConf qw(config_value);
 use MP3S::Misc::Logger qw(log_debug log_info);
 
 sub new {
@@ -74,20 +75,46 @@ sub gen_master_list {
 		log_info("Using given root directory $arg1.");
 		
         our @mp3s = ();     # CM - check this for scope
-		no warnings 'File::Find'; #sshhhh
-        find(
-            {
-                wanted => sub {
-                    my ($song) = $File::Find::name;
-                    my $songpath = qx{ls -1 -b "$song"};
-                    chomp $songpath;
-                    push @mp3s, [ $song, $songpath ] if /\.(mp3|ogg)$/i;
 
-                },
-                no_chdir => 1,
-            },
-            $arg1
-        );
+		if (config_value('fromtags')) { # TODO: what if the playlist IS stale?
+			#die "fromtags not supported yet";
+			use MP3S::DB::Access;
+			my $db = MP3S::DB::Access->new;
+
+			my $res = $db->execute(qq{
+				SELECT DISTINCT song_filepath
+				FROM MP3S_tags
+				WHERE song_filepath like '${arg1}%'
+				ORDER BY 1;
+			});
+
+			my $ctr = 0;
+			foreach my $row(@$res) {
+				$ctr++;
+				my ($song) = @$row;
+				my $songpath = $song; # should have stored the 'correct' characters in the db. qx{ls -1 -b "$song"};
+                chomp $songpath;
+                push @mp3s, [ $song, $songpath ] if $song =~ /\.(mp3|ogg)$/i;
+			}
+			log_info("Done figuring out song list from the tags in the database! $ctr song(s) found.");
+			
+		}
+		else {
+			no warnings 'File::Find'; #sshhhh
+	        find(
+	            {
+	                wanted => sub {
+	                    my ($song) = $File::Find::name;
+	                    my $songpath = qx{ls -1 -b "$song"};
+	                    chomp $songpath;
+	                    push @mp3s, [ $song, $songpath ] if /\.(mp3|ogg)$/i;
+
+	                },
+	                no_chdir => 1,
+	            },
+	            $arg1
+	        );			
+		}
 
         foreach (@mp3s) {
             my ( $song, $songpath ) = @{$_};
