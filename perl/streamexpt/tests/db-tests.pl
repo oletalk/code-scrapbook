@@ -8,7 +8,7 @@ BEGIN { use_ok( 'MP3S::DB::Access' ) }
 use MP3S::Misc::MSConf;
 use MP3S::Misc::Logger;
 MP3S::Misc::MSConf::init('tests/testdata/testing-withdb.conf');
-MP3S::Misc::Logger::init(level => MP3S::Misc::Logger::INFO);
+MP3S::Misc::Logger::init(logconf => 'tests/testdata/log4perl-testing.conf');
 
 eval {
 	my $baddb = MP3S::DB::Access->new( quiet => 1, dbname => 'bogusdb');

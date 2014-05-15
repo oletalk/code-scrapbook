@@ -22,7 +22,22 @@ sub logfile_result {
 sub compare_result {
 	my ($actual, $resultfile) = @_;
 	my $expected = _slurp_file($resultfile);
-	warn "EXPECTED:\n$expected\nACTUAL:\n$actual\n" unless $expected eq $actual;
+	if ( $expected ne $actual ) {
+		warn "EXPECTED:\n$expected\nACTUAL:\n$actual\n";
+		for my $i (0 .. length($expected)) {
+			my $exp_char = substr($expected, $i, 1);
+			my $act_char = substr($actual, $i, 1);
+			if ($exp_char ne $act_char) {
+				my $exp_ctx = substr($expected, $i-2, 5);
+				my $act_ctx = substr($actual, $i-2, 5);
+				$exp_ctx =~ s/\n//g;
+				$act_ctx =~ s/\n//g;
+				print "First difference is at: [$exp_ctx] vs [$act_ctx] (char $i)\n";
+				print "                           ^         ^\n";
+				last;
+			}
+		}		
+	}
 	$expected eq $actual;
 }
 

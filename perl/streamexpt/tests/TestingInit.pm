@@ -23,8 +23,7 @@ sub init {
 	#}
 	
 	MP3S::Misc::Logger::init(
-	    level           => MP3S::Misc::Logger::DEBUG,
-		logfile			=> $logfile_location,
+	    logconf => config_value('logconf'),
 	    display_context => MP3S::Misc::Logger::NAME
 	);
 	if ($initialise_tags) { # FIXME: can't create fake mp3s just yet 9/3/2013

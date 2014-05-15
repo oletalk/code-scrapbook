@@ -48,7 +48,7 @@ my @links = TestUtils::getlinks($local);
 
 is($links[0], '/drop', 'link for playlist download present');
 is($links[5], '/play/third.mp3', 'links for mp3s present');
-is($links[3], '/play/nonasc/weird\\303\\212\\305\\267stuff.mp3', 'files with strange characters in names ok');
+is($links[3], '/play/nonasc/weirdE\\314\\202y\\314\\202stuff.mp3', 'files with strange characters in names ok');
 
 $local = TestUtils::getlocal($port, '/drop');
 ok( TestUtils::compare_result($local, 'tests/results/server-tests-playlist.dat'), 'generated playlist as expected');
