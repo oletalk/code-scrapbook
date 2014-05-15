@@ -10,7 +10,6 @@ import javax.servlet.ServletRegistration;
 import net.oletalk.sessionexample.config.AppConfig;
 import net.oletalk.sessionexample.config.SecurityConfig;
 import net.oletalk.sessionexample.config.WebMvcConfig;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;

@@ -36,8 +36,6 @@ public class LoginController {
             @RequestParam(value="password") String password
             ) {
         
-        log.info("IndexController.handleRequest called!");
-        //Subject currentUser = SecurityUtils.getSubject();
         log.info("Trying to login with given info");
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         
@@ -60,9 +58,6 @@ public class LoginController {
         if (loginSuccess) {
             String userName = currentUser.getPrincipal().toString();
             ModelAndView mav = new ModelAndView("home.jsp");
-            if (currentUser.hasRole("admin")) {
-                mav.addObject("admin", "true");
-            }
             log.log(Level.INFO, "Shiro says we have a user! The value is {0}", userName);
             mav.addObject("user", userName);
             return mav;

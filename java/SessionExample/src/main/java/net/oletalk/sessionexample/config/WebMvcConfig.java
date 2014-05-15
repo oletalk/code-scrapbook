@@ -4,6 +4,8 @@
  */
 package net.oletalk.sessionexample.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,10 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     public ShiroFilterFactoryBean shiroFilter() {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
+        Map<String,String> filterDefs = new HashMap<String,String>();
+        filterDefs.put("/members/**", "authc");
+        shiroFilter.setFilterChainDefinitionMap(filterDefs);
+        shiroFilter.setUnauthorizedUrl("/login.jsp");
         return shiroFilter;
     }
 

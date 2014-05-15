@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="US-ASCII"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 
 <!DOCTYPE html>
 <html>
@@ -9,10 +10,12 @@
     </head>
     <body>
         <h1>Welcome <c:out value="${user}"/>!</h1>
-        <c:if test="${admin == true}">
-            (admin)
-        </c:if>
+        <shiro:hasRole name="admin">
+            <b>(admin)</b>
+        </shiro:hasRole>
     </body>
+    <a href="/members/view">Some members-only page example</a>
+    
     <form name="logout" action="/logout" method="POST">
         <input type="submit" value="Logout">
     </form>
