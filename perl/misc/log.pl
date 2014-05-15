@@ -27,9 +27,13 @@ my $res = GetOptions(
 );
 
 # override with config if provided
+if ( -r $config_file ) {
 process_overrides( read_cfg($config_file),
 				{ activities_file => \$activities_file,
 				  timestampformat => \$TS_FORMAT} );
+} else {
+	warn "Config file $config_file not provided, please create";
+}
 
 # read command
 my ($command, $task, @options) = @ARGV;

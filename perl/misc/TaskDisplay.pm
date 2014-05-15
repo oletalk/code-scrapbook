@@ -162,7 +162,8 @@ sub display_closed_tasks {
 		print "   ( $ctr ) $closedtask: elapsed $tme \n" unless $quiet;			
 	}
 	if (scalar %$c) {
-		print "  (Total elapsed time - " . hms($total_time) . ")\n" unless $quiet;
+		my $nowtime = strftime ( $tl->get_short_timestamp_format, localtime ) . "\n"; 
+		print "  (Total elapsed time - " . hms($total_time) . ". List generated $nowtime.)\n" unless $quiet;
 	} else {
 		print "NO CLOSED TASKS\n" unless $quiet;
 	}
