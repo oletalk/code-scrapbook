@@ -1,7 +1,7 @@
 #!/opt/local/bin/ruby2.1
 
 require 'optparse'
-
+require './activities'  # ruby 1.9 removed current path from load path
 options = {}
 
 OptionParser.new do |opts|
@@ -29,6 +29,15 @@ if options[:debug]
   p options
   p command_args
 end
+
+logger = ActivityLogger.new('test/activities.txt')
+case command
+when "start"
+  logger.start(command_args[0])
+else
+  puts "Don't know how to handle your '#{command}' command"
+end
+puts "done"
 
 #'p' is a kernel method that writes out <the object>.inspect
 # e.g. p ARGV
