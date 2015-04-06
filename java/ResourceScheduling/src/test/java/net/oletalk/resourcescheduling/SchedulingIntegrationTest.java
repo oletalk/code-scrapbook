@@ -93,14 +93,40 @@ public class SchedulingIntegrationTest {
                     "Message, content = 'message4', group id = 3, complete = true"
                     , allMessages());
     }
+    
+    @Test
+    public void testSend4Messages2Resources() {
+        
+        // add a new Resource
+        MockResourceImpl res2 = new MockResourceImpl(true); // let the resource process the message as soon as it's ready
+        gateway.addResource(res2);
+        
+        // send 4 messages in 3 groups
+        rs.sendOrQueueMessage(new MessageImpl("message1", 2));
+        rs.sendOrQueueMessage(new MessageImpl("message2", 1));
+        rs.sendOrQueueMessage(new MessageImpl("message3", 2));
 
-    private String allMessages() {
+        rs.sendOrQueueMessage(new MessageImpl("message4", 3));
+        rs.processQueuedMessages();
+        // order is random and we have two resources now, so we'll just test for content for now
+        String messages = allMessages() + allMessages(res2);
+        assertTrue("First message incorrect or not found", messages.contains("'message1'"));
+        assertTrue("Second message incorrect or not found", messages.contains("'message2'"));
+        assertTrue("Third message incorrect or not found", messages.contains("'message3'"));
+        assertTrue("Fourth message incorrect or not found", messages.contains("'message4'"));
+    }
+
+    private String allMessages(MockResourceImpl res2) {
         StringBuilder sb = new StringBuilder();
         
-        for (Message m: res.messagesSent()) {
+        for (Message m: res2.messagesSent()) {
             sb.append(m.toString());
         }
         return sb.toString();
+
+    }
+    private String allMessages() {
+        return allMessages(res);
     }
     
 }
