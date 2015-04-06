@@ -4,6 +4,7 @@
  */
 package net.oletalk.resourcescheduling;
 
+import java.util.TreeSet;
 import net.oletalk.resourcescheduling.impl.MessageImpl;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -55,15 +56,18 @@ public class InnerQueueTest {
         q.insertMessage(new MessageImpl("foobar", 2));
         q.insertMessage(new MessageImpl("something",2));
         assertEquals(q.getActiveGroups().size(), 2);
-       
+        TreeSet<String> messageContents = new TreeSet<String>();
+        
         MessageImpl m;
         int ctr = 0;
-        do {
-            m = q.getMessage();
+        while ((m = q.getMessage()) != null) {
+            messageContents.add(m.getContent());
             ctr++;
-        } while (m != null);
+        }
         
         assertEquals("Should have contained 3 messages", ctr, 3);
+        String[] expected = {"foobar", "hello", "something"};
+        assertEquals(expected, messageContents.toArray());
     }
 
 

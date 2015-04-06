@@ -18,4 +18,6 @@ public class ResourceSchedulerTest {
         ResourceScheduler rs = new ResourceScheduler(1);
         assertEquals("Scheduler should have been configured with just one resource available", 1, rs.getNumResources());
     }
+    
+
 }

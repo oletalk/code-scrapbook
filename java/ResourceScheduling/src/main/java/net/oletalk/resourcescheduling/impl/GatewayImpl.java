@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import net.oletalk.resourcescheduling.interfaces.Gateway;
 import net.oletalk.resourcescheduling.interfaces.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author colin
  */
 public class GatewayImpl implements Gateway {
+    private Logger log = LoggerFactory.getLogger(GatewayImpl.class);
 
     private List<Resource> resources;
     
@@ -28,6 +31,7 @@ public class GatewayImpl implements Gateway {
         Resource r = firstResourceAvailable();
         if (r != null) {
             r.receive(msg);
+            log.info("Sent message on to available resource.");
         } else {
             throw new IllegalStateException("No resources available");
         }

@@ -32,6 +32,10 @@ public class MessageImpl implements Message {
     public void addListener(MessageListener listener_) {
         listeners.add(listener_);
     }
+    
+    public String getContent() {
+        return content;
+    }
         
     public int getGroupId() {
         return groupId;
@@ -47,5 +51,10 @@ public class MessageImpl implements Message {
     
     public boolean isCompleted() {
         return isComplete;
+    }
+    
+    @Override
+    public String toString() {
+        return "Message, content = '" + content + "', group id = " + groupId + ", complete = " + isComplete;
     }
 }

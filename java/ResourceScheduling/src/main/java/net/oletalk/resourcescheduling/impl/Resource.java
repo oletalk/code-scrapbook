@@ -34,13 +34,24 @@ public abstract class Resource {
     }
     
     // This is the call-out to your 3rd-party resource
-    public abstract void processMessage(Message msg);
+    protected abstract void processMessage(Message msg);
+    
+    public void process(final Message msg) {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                processMessage(msg);                
+            }
+        };
+                
+        t.start();
+    }
     
     public void receive(Message msg) throws IllegalStateException {
         if (available) {
             available = false;
             if (autoProcess) {
-                processMessage(msg);
+                process(msg);
             }
         } else {
             throw new IllegalStateException("Resource is still busy, try again later");
