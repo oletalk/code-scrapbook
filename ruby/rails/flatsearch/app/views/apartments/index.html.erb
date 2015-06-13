@@ -1,0 +1,22 @@
+<h1>Apartment listings</h1>
+
+<table>
+	<tr>
+		<th>Bedrooms</th>
+		<th>Rent PCM</th>
+		<th>Postcode</th>
+		<th>Description</th>
+	</tr>
+	<% @apartments.each do |apartment| %>
+	<tr>
+		<td><%= apartment.number_of_bedrooms %></td>
+		<td><%= apartment.rent_pcm %></td>
+		<td><%= apartment.postcode %></td>
+		<td><%= link_to 'Description', apartment_path( apartment ) %></td>
+	</tr>
+	<% end %>
+</table>
+
+<%= link_to 'Add a listing', new_apartment_path %>
+
+		<!-- number of bedrooms, rent pcm, postcode, description, active? -->

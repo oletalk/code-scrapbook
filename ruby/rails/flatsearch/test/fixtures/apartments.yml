@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  number_of_bedrooms: 1
+  rent_pcm: 9.99
+  postcode: MyString
+  description: MyString
+  active: false
+
+two:
+  number_of_bedrooms: 1
+  rent_pcm: 9.99
+  postcode: MyString
+  description: MyString
+  active: false
