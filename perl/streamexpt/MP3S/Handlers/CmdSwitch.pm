@@ -30,7 +30,7 @@ sub handle {
 	log_debug( "Host   : $headerhost\n" );
 	
 	# First bit is the command, /list/ or /play/
-	my ($command, $str_uri) = $uri =~ m/^\/(\w+)(.*)$/;
+	my ($command, $str_uri) = $uri =~ m/^\/([\w.]+)(.*)$/;
 	#call the main child routine
 	if (!defined $command) {
 		$conn->send_error(RC_BAD_REQUEST);
@@ -43,8 +43,10 @@ sub handle {
 		$lp->play_songs($str_uri, $downsample);				
 	} elsif ($command eq 'list') {
 		$conn->send_response( MP3S::Net::TextResponse::print_list($plist, $str_uri));
-	} elsif ($command eq 'drop') {
+	} elsif ($command eq 'drop' || $command eq 'drop.m3u') {
 		$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $headerhost));
+	} elsif ($command eq 'servestream') {
+		$conn->send_response( MP3S::Net::TextResponse::print_ssjson($plist, $str_uri, $headerhost));
 	} elsif ($command eq 'stats') {
 		$conn->send_response( MP3S::Net::TextResponse::print_stats($str_uri));
 	} elsif ($command eq 'latest') {

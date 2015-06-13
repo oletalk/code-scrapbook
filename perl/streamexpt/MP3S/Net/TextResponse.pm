@@ -39,6 +39,31 @@ sub print_list {
 	$cont;
 }
 
+sub print_ssjson {
+	my ($plist, $str_uri, $headerhost) = @_;
+
+	use JSON;  # TODO: put this away somewhere
+	my $cont = undef;
+	if ($plist->process_playlist($str_uri)) {
+		my @list = $plist->list_of_songs_URIs(1);
+
+		my $hash;
+		$cont = HTTP::Response->new(RC_OK);
+		$cont->header('Content-type' => 'text/plain; charset=utf-8');
+		my $wrapper;
+		foreach my $song (@list) {
+			my $j = MP3S::Misc::Util::servestream_fmt($song->{'URI'}, $headerhost);
+			push @{$wrapper->{'backup'}{'uri'}}, $j;
+		}
+		$cont->content( to_json($wrapper, { escape_slash => 1 }) );
+	} else {
+		$cont = HTTP::Response->new(RC_NOT_FOUND);
+		$cont->content( "No matching results!");
+	}
+
+	$cont;
+}
+
 sub print_latest {
 	my ($plist, $str_uri) = @_;
 	my ($days) = $str_uri =~ /(\d+)/;

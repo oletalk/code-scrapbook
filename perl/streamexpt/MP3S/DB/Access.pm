@@ -4,7 +4,7 @@ use strict;
 use DBI;
 use MP3S::Misc::MSConf qw(config_value);
 use MP3S::Misc::Logger qw(log_info log_debug log_error);
-
+use utf8;
 
 sub new {
 	my $class = shift;
@@ -78,6 +78,7 @@ sub execute {
 	
 	my $ctr = 1;
 	foreach my $arg (@args) {
+		utf8::encode($arg);
 		my $rc = $sth->bind_param($ctr++, $arg);
 	}
 	
