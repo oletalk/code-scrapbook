@@ -1,0 +1,20 @@
+html
+  head
+    title Song Select
+    link(rel='stylesheet', href='/css/style.css')
+  body
+    form(action='/save',method='post')
+      h2 Enter a name for your playlist
+      input(type='text' name='playlistname')
+      h2 Now select the songs in the playlist:
+      label(for='srch') Search:
+      input(type='text' id='srch' name='srch')
+      style(id='search_style')
+      ul(list-style-type='none')
+        for song in list
+          - var ssearch = song.song_filepath.toLowerCase()
+          li(class='searchable' data-index=ssearch)
+            input(type='checkbox' name='blah' value=song.song_filepath)
+            | #{song.title}
+      input(type="submit")
+      script(type='text/javascript', src='/js/searchbox.js')

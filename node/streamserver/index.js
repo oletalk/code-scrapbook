@@ -7,10 +7,16 @@ var ret = 'dunno';
 
 var conString = "postgres://hitest:hipasswd@192.168.0.4/maindb";
 
+app.set('view engine', 'jade');
+
 app.get('/who', function (req, res) {
-    res.send('Hello World');
+	// render sent json with Jade, using views/basic.jade
+	res.render('basic', { title: 'Hey', message: 'Hello there!'});
 });
 
+app.get('/listtest', function (req, res) {
+	res.render('createlist', {"list":[{"song_filepath":"1", "title":"2"}, {"song_filepath":"3", "title":"5"}]});
+});
 app.get('/list', function (req, res) {
 	var results = [];
 	var result = "";
@@ -19,15 +25,14 @@ app.get('/list', function (req, res) {
 				return console.error('error fetching client from pool', err);
 			}
 
-			var sql = "select song_filepath, file_hash, coalesce(title, substring(song_filepath from '%/#\"%#\"%' for '#')) as title from mp3s_tags limit 10";
+			var sql = "select song_filepath, file_hash, case when title is null or title = '' then substring(song_filepath from '/([^/]*)$') else title end as title from mp3s_tags limit 100";
 			var query = client.query(sql);
 			query.on('row', function(row) {
-					result += "<input type='checkbox' value='" + row.song_filepath + "'> "
-							+ row.title + "<br/>";
+					results.push(row);
 					} );
 			query.on('end', function() {
 					client.end();
-					return res.send(result);
+					res.render('createlist', {"list": results});
 			});
 		});
 	});
