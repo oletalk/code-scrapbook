@@ -14,7 +14,7 @@ html
         for song in list
           - var ssearch = song.song_filepath.toLowerCase()
           li(class='searchable' data-index=ssearch)
-            input(type='checkbox' name='blah' value=song.song_filepath)
+            input(type='checkbox' name='songs' value=song.file_hash)
             | #{song.title}
       input(type="submit")
       script(type='text/javascript', src='/js/searchbox.js')
