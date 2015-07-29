@@ -1,7 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # NOTE: original IO::Socket-based code is from 2000 - http://www.perlmonks.org/?node_id=8650
 
 use strict;
+use warnings;
 use HTTP::Daemon;
 
 use MP3S::Server;
