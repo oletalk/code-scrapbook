@@ -5,7 +5,7 @@ read DUMMY
 
 echo "Checking everything's committed in git..."
 # check everything's committed
-DIFFS=$(git status --porcelain | grep '^ M' | wc -l )
+DIFFS=$(git status --porcelain . | grep '^ M' | wc -l )
 if [[ $DIFFS -ne 0 ]]; then
 	echo There are uncommitted changes - please check those in first
 	exit 1
