@@ -75,6 +75,24 @@ sub process_playlist {
     $all_ok;
 }
 
+sub reckon_URI_from_path {
+    my ($self, $path) = @_;
+    chomp $path;
+# used in TextResponse::get_adhoc_m3u and get_stored_playlist
+    my $songs = $self->find_from_path($path);
+# should just be the first result
+#return (defined $songs->[0]) ? $songs->[0]->get_URI : undef;
+    if (defined $songs) {
+        if (scalar @{$songs} < 1) {
+            log_error("No songs matching given path ${path} were found!");
+        }   
+        return $songs->[0]->get_URI;
+    } else {
+      log_error("No songs matching given path ${path} were found!");
+    }
+    return undef;
+}
+
 sub is_stale {
 	my $self = shift;
 	$self->{'song_objects'}->is_stale($self->{'rootdir'}, $self->{'gen_time'});
@@ -124,6 +142,21 @@ sub list_of_songs_URIs {
 
 	sort map ( { 'TITLE' => $_->get_URI( 'hyperlinked' => $hyperlinked ),
 			     'URI'   => $_->get_URI() } , @{ $self->{'songs'}} ); 
+}
+
+sub find_from_path {
+  my $self       = shift;
+  my (@paths)       = @_;
+  my $ret = undef;
+
+  my %search = map { $_ => 1 } @paths;
+  my @songs = $self->list_of_songs;
+  foreach my $song (@songs) {
+    if (defined $search{$song->get_uni_filename}) { # get_filename???
+      push @{$ret}, $song;
+    }
+  }
+  return $ret;
 }
 
 sub get_song {

@@ -8,6 +8,8 @@ use MP3S::Net::TextResponse;
 use MP3S::Misc::Logger qw(log_debug log_info);
 
 use HTTP::Status;
+use HTTP::Request::Params;
+use Email::MIME;
 use URI::Escape;
 
 # the body of the child process that handles a request goes here.
@@ -43,10 +45,14 @@ sub handle {
 		$lp->play_songs($str_uri, $downsample);				
 	} elsif ($command eq 'list') {
 		$conn->send_response( MP3S::Net::TextResponse::print_list($plist, $str_uri));
+	} elsif ($command eq 'list.m3u') {
+		$conn->send_response( MP3S::Net::TextResponse::print_list($plist, $str_uri, 'templates/song-list-m3u.tmpl'));
+	} elsif ($command eq 'stored') {
+        # 26/7 TODO: now test this with (a) existing playlist, (b) nonexistent playlist
+        my $response = MP3S::Net::TextResponse::get_stored_playlist($plist, $str_uri, $headerhost);
+		$conn->send_response( $response );
 	} elsif ($command eq 'drop' || $command eq 'drop.m3u') {
 		$conn->send_response( MP3S::Net::TextResponse::print_playlist($plist, $str_uri, $headerhost));
-	} elsif ($command eq 'servestream') {
-		$conn->send_response( MP3S::Net::TextResponse::print_ssjson($plist, $str_uri, $headerhost));
 	} elsif ($command eq 'stats') {
 		$conn->send_response( MP3S::Net::TextResponse::print_stats($str_uri));
 	} elsif ($command eq 'latest') {

@@ -1,0 +1,12 @@
+<!-- songs-list.tmpl -->
+<h2>Song list</h2>
+
+<!-- song list here -->
+<TMPL_IF NAME="SONGS_URIS">
+<TMPL_LOOP NAME=SONGS_URIS>
+<TMPL_VAR NAME=TITLE> <a href="/play/<TMPL_VAR NAME=URI>">D</a><br/>
+</TMPL_LOOP>
+<TMPL_ELSE>
+<h3>No results</h3>
+</TMPL_IF>
+

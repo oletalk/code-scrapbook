@@ -1,0 +1,15 @@
+<!-- songs-list.tmpl -->
+<h2>Please choose songs for your playlist</h2>
+
+<!-- song list here -->
+<TMPL_IF NAME="SONGS_URIS">
+<form action="/retplaylist" method="POST">
+<TMPL_LOOP NAME=SONGS_URIS>
+<p><input type="checkbox" name="song" value="/play/<TMPL_VAR NAME=URI>"> <TMPL_VAR NAME=TITLE></p>
+</TMPL_LOOP>
+<input type="submit" value="Generate Playlist">
+</form>
+<TMPL_ELSE>
+<h3>No results</h3>
+</TMPL_IF>
+

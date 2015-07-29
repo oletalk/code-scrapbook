@@ -1,10 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/local/bin/perl -w
 
 use strict;
 use MP3S::Misc::MSConf qw(config_value);
+our $PERL = '/usr/local/bin/perl';
 
 MP3S::Misc::MSConf::init('tests/testdata/testing.conf');
-
 my $opt_i = grep(/^-i/, @ARGV);
 my ($testcount, $successes) = (0,0);
 my $TESTDIR = 'tests';
@@ -30,7 +30,7 @@ if ($opt_i) {
 		}
 		if (-r $test) {
 			print "<< Running test $test. >>\n";
-			(system ("/usr/bin/perl -w $test") == 0) ? ($successes++) : ($failed_tests{$test} = 1);
+			(system ("$PERL -w $test") == 0) ? ($successes++) : ($failed_tests{$test} = 1);
 			$testcount++;
 		} else {
 			warn "Skipping nonexistent test $test\n";
