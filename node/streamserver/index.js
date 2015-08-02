@@ -9,6 +9,8 @@ app.set('view engine', 'jade');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.disable('view cache'); // don't cache our views
+
 
 var basicroutes = require('./routes/basic');
 var dbroutes = require('./routes/db');
