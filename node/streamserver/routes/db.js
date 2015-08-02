@@ -36,7 +36,7 @@ module.exports = (function() {
             playlistmap.set(result.rows[i].file_hash, '1');
         };
         console.log('previous result gave me ' + numRows + ' row(s).');
-      var sql = "select 0 as in_playlist, song_filepath, file_hash, case when title is null or title = '' then substring(song_filepath from '/([^/]*)$') else title end as title from mp3s_tags where file_hash is not null";
+      var sql = "select 0 as in_playlist, song_filepath, file_hash, case when title is null or title = '' then substring(song_filepath from '/([^/]*)$') else title end as title, artist from mp3s_tags where file_hash is not null";
         return cnn.client.query(sql);
       })
       .then(function(result) {
@@ -102,15 +102,13 @@ module.exports = (function() {
                     cnn.client.query('INSERT into playlist_song(playlist_id, song_filepath, song_order) select $1, song_filepath, $3 from mp3s_tags where file_hash = $2', [ p_id, entry, num++ ] );
                   });
                   console.log("Returning success message.");
-                  res.render('basic', { title: 'Save Playlist', message: 'Playlist <a href="/list/' + pname + '">' + pname + '</a> saved.'});
+                  res.render('saved', { playlist: pname });
                 }).catch(function(error) {
                   saved_ok = false;
                   console.log("Error saving new playlist: ", error);
                   // pass back useful error messages to the client
                   var errmsg = 'An error occurred trying to save your playlist. Please try again.';
-                  if (error.message.match(/duplicate/)) {
-                    errmsg = 'A playlist with that name already exists. Please try another.';
-                  }
+
                   console.log("Passing error message to client: " + errmsg);
                   res.render('basic', { title: 'Save Playlist - error', message: errmsg});
                 });

@@ -10,13 +10,17 @@ html
       label(for='srch') Search:
       input(type='text' id='srch' name='srch')
       style(id='search_style')
-      ul(list-style-type='none')
-        for song in list
-          - var ssearch = song.song_filepath.toLowerCase()
-          - var cked    = song.in_playlist == 1
-          li(class='searchable' data-index=ssearch)
-            input(type='checkbox' name='songs' checked=cked value=song.file_hash)
-            | #{song.title}
+      div(id='songlist')
+        ul(list-style-type='none')
+          for song in list
+            - var ssearch = song.song_filepath.toLowerCase()
+            - var cked    = song.in_playlist == 1
+            - var rtist = (typeof song.artist === 'undefined' || song.artist == null) ? '' : song.artist + ' - '
+            - var disptitle = song.title
+            li(class='searchable' data-index=ssearch)
+              input(type='checkbox' name='songs' checked=cked value=song.file_hash)
+              span(class='artist') #{rtist}
+              | #{disptitle}
       input(type="submit")
       input(type="reset")
       script(type='text/javascript', src='/js/searchbox.js')
