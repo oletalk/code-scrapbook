@@ -3,26 +3,45 @@ html
     title Song Select
     link(rel='stylesheet', href='/css/style.css')
   body
+    - var songids = ""
+    - var songs_in_playlist = []
     form(action='/save',method='post')
-      h2 Enter a name for your playlist
-      input(type='text' name='playlistname' value=playlist)
-      h2 Now select the songs in the playlist:
+      h2 Select the songs in the playlist:
       label(for='srch') Search:
       input(type='text' id='srch' name='srch')
       style(id='search_style')
-      div(id='songlist')
-        ul(list-style-type='none')
-          for song in list
-            - var ssearch = song.song_filepath.toLowerCase()
-            - var cked    = song.in_playlist == 1
-            - var rtist = (typeof song.artist === 'undefined' || song.artist == null) ? '' : song.artist + ' - '
-            - var disptitle = song.title
-            li(class='searchable' data-index=ssearch)
-              input(type='checkbox' onClick='addsong(this)' name='songs' checked=cked value=song.file_hash)
-              span(class='artist') #{rtist}
-              span(id=song.file_hash) #{disptitle}
-      div(id='selectedsongs')
-        ul(list-style-type='none')
+      table(id='songtable')
+        tr
+            td
+                div(id='songlist')
+                  ul(list-style-type='none')
+                    for song in list
+                      - var ssearch = song.song_filepath.toLowerCase()
+                      - var cked    = song.in_playlist > 0
+                      - var rtist = (typeof song.artist === 'undefined' || song.artist == null) ? '' : song.artist + ' - '
+                      - var disptitle = song.title
+                      - var chkId = 'list_' + song.file_hash
+                      if cked
+                        - songs_in_playlist.push({"chkId":chkId, "title":disptitle})
+                      // TODO: STILL NOT IN ORDER
+                      li(class='searchable' data-index=ssearch)
+                        input(type='checkbox' onClick='addsong(this)' name='songs' checked=cked value=song.file_hash)
+                        span(class='artist') #{rtist}
+                        span(id=song.file_hash) #{disptitle}
+            td(id='cellselectedsongs')
+              span Selected Songs (reorderable):
+              div(id='selectedsongs')
+                ol(list-style-type='none')
+                  for song in songs_in_playlist
+                    - var chkId = song.chkId
+                    li(id=chkId draggable="true" ondragstart="dragStarted(event)" ondragover="draggingOver(event)" ondrop="dropped(event)") #{song.title}
+                        - songids += (songids == "" ? "" : ",") + chkId
+    form(action='/save',method='post' onSubmit="return updatebox()")
+      h2 Enter a name for your playlist
+      input(type='text' name='playlistname' value=playlist)
+      input(id="songids" name="songids" type="hidden" value="#{songids}")
       input(type="submit")
+      input(type="button" onClick="testme()" value="List to submit test")
       input(type="reset")
       script(type='text/javascript', src='/js/searchbox.js')
+      script(type='text/javascript', src='/js/dnd.js')
