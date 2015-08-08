@@ -1,8 +1,8 @@
-var pg = require('pg');
 var Pgb = require('pg-bluebird');
 var pgb = new Pgb();
+var config = require('../config');
 
-var conString = "postgres://hitest:hipasswd@192.168.0.4/maindb";
+var conString = config.conString;
 
 module.exports = (function() {
                 'use strict';
@@ -127,26 +127,6 @@ module.exports = (function() {
           }
         });
 
-      router.get('/stats', function (req, res) {
-
-          var results = [];
-          pg.connect(conString, function(err, client, done) {
-                  if (err) {
-                      return console.error('error fetching client from pool', err);
-                  }
-                  var sql = 'SELECT category, count(*) FROM mp3s_stats GROUP BY 1;';
-                  var query = client.query(sql);
-                  query.on('row', function(row) {
-                          results.push(row);
-                      } );
-                  query.on('end', function() {
-                          client.end();
-                          return res.json(results);
-                      } );
-              });
-          //res.send(ret); // hmmm. callback for above query gets executed later than this line,
-                         // so ret will be 'dunno', not 4
-      });
       return router;
 
                 })();

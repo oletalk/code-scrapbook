@@ -18,9 +18,11 @@ html
             - var rtist = (typeof song.artist === 'undefined' || song.artist == null) ? '' : song.artist + ' - '
             - var disptitle = song.title
             li(class='searchable' data-index=ssearch)
-              input(type='checkbox' name='songs' checked=cked value=song.file_hash)
+              input(type='checkbox' onClick='addsong(this)' name='songs' checked=cked value=song.file_hash)
               span(class='artist') #{rtist}
-              | #{disptitle}
+              span(id=song.file_hash) #{disptitle}
+      div(id='selectedsongs')
+        ul(list-style-type='none')
       input(type="submit")
       input(type="reset")
       script(type='text/javascript', src='/js/searchbox.js')
