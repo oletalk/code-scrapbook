@@ -32,7 +32,8 @@ module.exports = (function() {
         var numRows = result.rows.length;
         playlistmap.clear();
         for (var i = 0; i < numRows; i++) {
-            playlistmap.set(result.rows[i].file_hash, '1');
+            playlistmap.set(result.rows[i].file_hash, result.rows[i].in_playlist);
+            console.log("Playlist map - " + result.rows[i].file_hash + " -> " + result.rows[i].in_playlist);
         };
         console.log('previous result gave me ' + numRows + ' row(s).');
       var sql = "select 0 as in_playlist, song_filepath, file_hash, case when title is null or title = '' then substring(song_filepath from '/([^/]*)$') else title end as title, artist from mp3s_tags where file_hash is not null";
@@ -44,7 +45,7 @@ module.exports = (function() {
           var datarow = result.rows[i];
           if (playlistmap.has(datarow.file_hash)) {
             console.log('Fetched playlist has entry for ' + datarow.file_hash);
-            datarow.in_playlist = 1;
+            datarow.in_playlist = playlistmap.get(datarow.file_hash);
           }
           results.push(datarow);
         };

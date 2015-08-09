@@ -22,26 +22,25 @@ html
                       - var disptitle = song.title
                       - var chkId = 'list_' + song.file_hash
                       if cked
-                        - songs_in_playlist.push({"chkId":chkId, "title":disptitle})
-                      // TODO: STILL NOT IN ORDER
+                        - songs_in_playlist[song.in_playlist - 1] = {"chkId":chkId, "title":disptitle}
                       li(class='searchable' data-index=ssearch)
                         input(type='checkbox' onClick='addsong(this)' name='songs' checked=cked value=song.file_hash)
                         span(class='artist') #{rtist}
                         span(id=song.file_hash) #{disptitle}
             td(id='cellselectedsongs')
-              span Selected Songs (reorderable):
+              span Created playlist:
               div(id='selectedsongs')
                 ol(list-style-type='none')
-                  for song in songs_in_playlist
+                  each song in songs_in_playlist
                     - var chkId = song.chkId
                     li(id=chkId draggable="true" ondragstart="dragStarted(event)" ondragover="draggingOver(event)" ondrop="dropped(event)") #{song.title}
                         - songids += (songids == "" ? "" : ",") + chkId
+              div You may reorder them if you wish.
     form(action='/save',method='post' onSubmit="return updatebox()")
       h2 Enter a name for your playlist
       input(type='text' name='playlistname' value=playlist)
       input(id="songids" name="songids" type="hidden" value="#{songids}")
       input(type="submit")
-      input(type="button" onClick="testme()" value="List to submit test")
       input(type="reset")
       script(type='text/javascript', src='/js/searchbox.js')
       script(type='text/javascript', src='/js/dnd.js')
