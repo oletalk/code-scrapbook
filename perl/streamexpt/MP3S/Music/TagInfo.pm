@@ -30,6 +30,7 @@ sub read_tags_from_db {
 		$self->{'tags'}->{$song}->{'artist'} = $artist;
 		$self->{'tags'}->{$song}->{'title'} = $title;
 		$self->{'tags'}->{$song}->{'secs'} = $secs;							
+		$self->{'tags'}->{$song}->{'hash'} = $fhash;							
 	}
 	log_info("Done reading tags from the database.");
 	
@@ -118,6 +119,14 @@ sub _get_tracktag_info {
 	}
 	
 	@ret;
+}
+
+sub get_hash {
+    my $self = shift;
+    my ($song_obj) = @_;
+
+    my ($hash) = $self->_get_tracktag_info($song_obj, 'hash');
+    return $hash;
 }
 
 sub get_tracksecs {

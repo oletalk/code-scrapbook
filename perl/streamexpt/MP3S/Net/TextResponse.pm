@@ -203,7 +203,7 @@ sub get_m3u {
 		
 		my $safe_entry = uri_escape($songURI, "^A-Za-z0-9\/\.");
 		#print "REFERENCE: " . ref($song_obj);
-		my ($tn, $ts) = $plist->get_trackinfo($song_obj);
+		my ($tn, $ts, $ta, $th ) = $plist->get_trackinfo($song_obj);
 
 		my %objhash = ();
 		if ($tn) {
@@ -211,6 +211,7 @@ sub get_m3u {
 			$objhash{TAGS} = "$tn" || $song_obj->get_filename;
 		}
 		$objhash{SONGURL} = "http://${headerhost}${safe_entry}\n";
+        log_info("Hash for song $songURI -> $th");
 		push @m3ulist, \%objhash;
 		
 	}

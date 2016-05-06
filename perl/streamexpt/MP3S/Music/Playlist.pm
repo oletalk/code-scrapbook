@@ -207,12 +207,14 @@ sub get_trackinfo {
     my $tname      = undef;
     my $tsecs      = undef;
     my $tartist    = undef;
+    my $thash      = undef;
 
     my $ti = $self->get_tag_info;
     if ($ti) {
         $tname   = $ti->get_trackname($song_obj);
         $tsecs   = $ti->get_tracksecs($song_obj);
         $tartist = $ti->get_artist($song_obj);
+        $thash = $ti->get_hash($song_obj);
 
         #if unable to find the artist/title, make song title up from filename
         if ( $tname =~ /Unknown Title/i ) {
@@ -220,7 +222,7 @@ sub get_trackinfo {
         }
 
     }
-    ( $tname, $tsecs, $tartist );
+    ( $tname, $tsecs, $tartist, $thash );
 }
 
 1;
