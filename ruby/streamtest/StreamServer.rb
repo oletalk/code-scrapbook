@@ -48,7 +48,6 @@ get '/m3u/:spec' do
     # list all the mp3s in the system which match the given spec
     # basically MP3S_ROOT/{foo}
     spec = params['spec']
-    "You want all the songs under the top level folder#{spec}!"
     song_list = list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
     response.headers['Content-Type'] = 'text/plain'
     play_list(song_list, request.env['HTTP_HOST'])
