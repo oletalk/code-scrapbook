@@ -1,7 +1,6 @@
 require 'pg'
 require_relative './config.rb'
 
-# TODO: parametrize, parametrize, parametrize
 def find_song(given_hash)
     ret = nil
     conn = PG.connect(dbname: MP3S::Config::DB_NAME, user:  MP3S::Config::DB_USER)
@@ -11,6 +10,7 @@ def find_song(given_hash)
             ret = row['song_filepath']
         end
     end
+    conn.finish
     ret
 end
 
@@ -33,6 +33,7 @@ def list_songs(partial_spec)
             ret.push({ hash: row['file_hash'], title: row['display_title'], secs: row['secs']} )
         end
     end
+    conn.finish
     ret
 end
 
@@ -45,10 +46,34 @@ def get_tag_for(hash, filename)
             ret = { artist: row['artist'], title: row['title'], secs: row['secs']}
         end
     end
+    conn.finish
     ret
 end
 
 def write_tag(hash, filename, tagobj)
     # check hash/filename is not already in database
-    # save tag info to database
+    found_song = find_song(hash)
+    if found_song.nil?
+        # save tag info to database
+        conn = PG.connect(dbname: MP3S::Config::DB_NAME, user:  MP3S::Config::DB_USER)
+        sql = %{
+            INSERT into mp3s_tags (song_filepath, file_hash, artist, title, secs)
+            VALUES ($1, $2, $3, $4, $5)
+            }.gsub(/\s+/, " ").strip
+        begin
+            conn.prepare('ins_tag1', sql)
+            conn.exec_prepared('ins_tag1', [ filename, hash, tagobj[:artist], tagobj[:title], tagobj[:secs]])
+            conn.close if conn
+        rescue PG::Error => e
+            res = e.result
+            puts "Problem saving new tag: #{e.error_field( PG::Result::PG_DIAG_MESSAGE_PRIMARY )}"
+            conn.close if conn
+        end
+    else
+        if found_song != filename
+            raise 'Given tag and hash do not match!'
+        else
+            puts 'Hash/filename already in database, nothing done.'
+        end
+    end
 end
