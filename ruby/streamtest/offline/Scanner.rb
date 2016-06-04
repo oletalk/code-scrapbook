@@ -11,9 +11,11 @@ FILESPEC = "*.{M,m}{P,p}3"
 def tag_file_with_hash(mp3file, hash)
     puts "  >>> Getting tag info for file '#{mp3file}'"
     mp3info = Mp3Info.open(mp3file)
+    songlen = mp3info.length
+    songlen = if songlen.nil? then -1 else songlen.floor end
 
     # save mp3info.tag.artist, mp3info.tag.title, mp3info.length
-    tag = { artist: mp3info.tag.artist, title: mp3info.tag.title, secs: mp3info.length }
+    tag = { artist: mp3info.tag.artist, title: mp3info.tag.title, secs: songlen }
     Db.write_tag(hash, mp3file, tag)
 end
 

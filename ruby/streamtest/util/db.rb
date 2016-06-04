@@ -72,7 +72,7 @@ module Db
                 conn.close if conn
             rescue PG::Error => e
                 res = e.result
-                puts "Problem saving new tag: #{e.error_field( PG::Result::PG_DIAG_MESSAGE_PRIMARY )}"
+                puts "Problem saving new tag: #{e}"
                 conn.close if conn
             end
         else
