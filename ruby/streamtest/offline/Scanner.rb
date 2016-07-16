@@ -5,7 +5,9 @@ require 'digest/sha1'
 require_relative '../util/db.rb'
 require_relative '../util/config.rb'
 
-FILESPEC = "*.{M,m}{P,p}3"
+#FILESPEC = "*.{M,m}{P,p}3"
+FILESPEC = "*.mp3"
+#FILESPEC = "*.ogg"
 # Scanner.rb
 
 def tag_file_with_hash(mp3file, hash)
@@ -34,12 +36,14 @@ end.parse!
 rootdir = options[:rootdir] || MP3S::Config::MP3_ROOT
 rootdir.sub!(/\/$/, '')  # no trailing slash pls
 puts "Scanning through given base directory #{rootdir}"
-files = Dir.glob(rootdir + "/" + FILESPEC )
+files = Dir.glob(rootdir + "/**/" + FILESPEC )
 
+puts "Filespec was '#{rootdir + "/**/" + FILESPEC}' files"
 if files.size == 0
     raise "No files found in given root dir #{rootdir}" 
 end
 
+puts "Files found in directory: #{files.size}"
 files.each do |f|
     # check the db for the tag
     # TODO: should probably only compute the hash in a 'long' version - check args

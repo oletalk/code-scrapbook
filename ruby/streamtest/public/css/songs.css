@@ -1,0 +1,49 @@
+ul > li {
+    display: table;
+}
+
+div.wrapper {
+    width: 1200px;
+    display: flex;
+}
+
+div#source {
+    width: 600px;
+    background: lightblue;
+}
+div#target {
+    width: 600px;
+    background: lightgreen;
+}
+#targetlist {
+    width: 400px;
+    background: #945;
+    border: 2px solid black;
+}
+ul#sourcelist li { 
+    margin-left: 30px;
+    padding: 2px 20px 2px 20px;
+    font-size: 14px; 
+    font-family: arial, sans-serif;
+    vertical-align: middle;
+    display: table-cell;
+    width: 500px; 
+    height: 30px; 
+    border: 1px solid #333; 
+    background: linear-gradient(#ccc, #aab);
+}
+
+ul#targetlist li {
+    list-style-type: none;
+    font-size: 12px;
+    font-family: arial, sans-serif;
+    padding: 2px 2px 2px 2px;
+    background-image: url('/img/x-small.png');
+    background-position: 0px 5px;
+    background-repeat: no-repeat;
+}
+
+span.playlistsong {
+    font-weight: bold;
+    position: relative; left: 15px;
+}

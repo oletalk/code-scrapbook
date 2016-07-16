@@ -1,5 +1,6 @@
 require 'pg'
-require_relative './config.rb'
+require_relative 'config'
+require_relative 'logging'
 
 module Db
 
@@ -72,14 +73,14 @@ module Db
                 conn.close if conn
             rescue PG::Error => e
                 res = e.result
-                puts "Problem saving new tag: #{e}"
+                Log.log.error "Problem saving new tag: #{e}"
                 conn.close if conn
             end
         else
             if found_song != filename
                 raise 'Given tag and hash do not match!'
             else
-                puts 'Hash/filename already in database, nothing done.'
+                Log.log.info 'Hash/filename already in database, nothing done.'
             end
         end
     end

@@ -1,17 +1,14 @@
 require 'sinatra'
-require 'logger'
 require_relative 'util/config'
 require_relative 'util/db'
 require_relative 'util/player'
 require_relative 'text/format'
 require_relative 'util/ipwl'
+require_relative 'util/logging'
 
 configure do
     set :bind, MP3S::Config::SERVER_HOST
     set :port, MP3S::Config::SERVER_PORT
-
-    $logger = Logger.new(STDOUT) # non production
-    $logger.level = Logger::INFO
 
     $ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
 end
@@ -27,10 +24,10 @@ get '/play/:hash' do |req_hash|
     # TODO: might want to invoke this check in some sort of area common to ALL requests?
     remote_ip = request.env['REMOTE_ADDR']
     action = $ipwl.action(remote_ip)
-    $logger.info("Action for #{remote_ip} is #{action}.")
+    Log.log.info("Action for #{remote_ip} is #{action}.")
 
     # stream song in output to client
-    $logger.info("Song '#{song_loc}' (#{req_hash}) requested")
+    Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
     if song_loc.nil?
         "404 Sorry, that song was not found"
     elsif !action[:allow]
@@ -40,11 +37,11 @@ get '/play/:hash' do |req_hash|
 
         # how should we play this song? if client list says downsample, do it
         command = Player.get_command(action[:downsample], song_loc)
-        $logger.info("Fetched command template, #{command}")
+        Log.log.info("Fetched command template, #{command}")
 
         played = Player.play_song(command, song_loc)
         warnings = played[:warnings]
-        $logger.warn(warnings) unless warnings.nil?
+        Log.log.warn(warnings) unless warnings.nil?
         played[:songdata]
     end
 end

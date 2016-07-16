@@ -1,9 +1,15 @@
+require 'json'
+    
 module Format
     def self.html_list(songlist)
         ret = songlist.collect{ |song| 
             %{ <a href='/play/#{song[:hash]}'>#{song[:title]}</a> }
         }.join("<br/>\n")
         ret
+    end
+
+    def self.json_list(songlist)
+        songlist.to_json
     end
 
     def self.play_list(songlist, hdr_http_host)
