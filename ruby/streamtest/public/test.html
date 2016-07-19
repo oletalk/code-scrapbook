@@ -1,54 +1,22 @@
+<!doctype html>
 <HTML>
   <HEAD>
     <TITLE>Hi there</TITLE>
     <link rel="stylesheet" type="text/css" href="css/songs.css" />
     <script src="js/angular.min.js"></script>
-    <script>
-    var app = angular.module("songList", []);
-    app.controller("myCtrl", function($scope, $http) {
-            $http.get('/json/ripped')
-            .then(function(response) {
-                $scope.songData = angular.fromJson(response.data);
-            });
-        });
-
-        // drag and drop to stash away elsewhere
-        function handleDragStart(ev) {
-           var foo = { hash: ev.target.id, title: ev.target.innerHTML };
-           ev.dataTransfer.setData("text", JSON.stringify(foo));
-        }
-
-        function allowDrop(e) {
-            e.preventDefault();
-        }
-
-        function drop(e) {
-            e.preventDefault();
-            var data = e.dataTransfer.getData("text");
-            var datajson = JSON.parse(data);
-            var targetUL = document.getElementById('target').getElementsByTagName('ul');
-            var newLI = document.createElement('li');
-            var newSPAN = document.createElement('span');
-            var LItext = document.createTextNode(datajson.title);
-            newSPAN.appendChild(LItext);
-            newSPAN.setAttribute('class', 'playlistsong');
-            newLI.appendChild(newSPAN);
-            var l = targetUL[0];
-            if (l.getElementsByClassName('playlistsong').length === 0) {
-                l.replaceChild(newLI, l.childNodes[1]);
-            } else {
-                l.appendChild(newLI);
-            }
-        }
-
-    </script>
+    <script src="js/dragdrop.js"></script>
+    <script src="js/app/app.js"></script>
+    <script src="js/app/songCtrl.js"></script>
   </HEAD>
   <BODY>
-    <div ng-app="songList" ng-controller="myCtrl">
+    <div ng-app="songList" ng-controller="songCtrl as sc">
+        <input ng-model="sc.folder" value="ripped">
+        <button ng-click="sc.getSongs()"/>Switch folder</button>
         <div class="wrapper">
             <div id="source">
                 <ul id="sourcelist" >
-                    <ng-repeat ng-repeat="x in songData">
+                    <li ng-hide="sc.songData.length">No songs found.</li>
+                    <ng-repeat ng-repeat="x in sc.songData">
                         <li id={{x.hash}} draggable="true" ondragstart="handleDragStart(event)">{{x.title}}</li>
                     </ng-repeat>
                 </ul>
