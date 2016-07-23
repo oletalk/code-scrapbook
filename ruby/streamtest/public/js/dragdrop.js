@@ -16,20 +16,36 @@ function clickImg(gid) {
     if (ul.getElementsByTagName('li').length === 0) {
         ul.appendChild(newLIwith('no songs', false));
     }
+    collectSongs();
 }
+
+function collectSongs() {
+    var allsongs = document.getElementById('target').getElementsByClassName('playlistsong');
+    var ret = [];
+    for (i = 0; i < allsongs.length; i++) {
+        ret.push({ 'hash': allsongs[i].parentElement.getAttribute('data-id') });
+    }
+    document.getElementById('listcontent').value = JSON.stringify(ret);
+}
+
+function saveSongs() { // TODO: probably do this with angular
+    alert(document.getElementById('listcontent').value );
+}
+
 function drop(e) {
     e.preventDefault();
     var data = e.dataTransfer.getData("text");
     var datajson = JSON.parse(data);
     var targetUL = document.getElementById('target').getElementsByTagName('ul');
     //var newLI = document.createElement('li');
-    var newLI = newLIwithXandGUID(datajson.title);
+    var newLI = newLIwithXandGUID(datajson.title, datajson.hash);
     var l = targetUL[0];
     if (l.getElementsByClassName('playlistsong').length === 0) {
         l.replaceChild(newLI, l.childNodes[1]);
     } else {
         l.appendChild(newLI);
     }
+    collectSongs();
 }
 
 function newLIwith(text, issong) {
@@ -46,7 +62,7 @@ function newLIwith(text, issong) {
     return newLI;
 }
 
-function newLIwithXandGUID(text) {
+function newLIwithXandGUID(text, songhash) {
     var newLI = newLIwith(text, true);
     var newid = smallguid();
     var newIMG = document.createElement('img');
@@ -54,7 +70,9 @@ function newLIwithXandGUID(text) {
     newIMG.setAttribute('alt', 'x');
     newIMG.setAttribute('onclick', 'clickImg(\'' + newid + '\')');
     newLI.setAttribute('id', newid);
-    newLI.appendChild(newIMG); // TODO: use insertBefore to get the x on the lhs
+    newLI.setAttribute('data-id', songhash);
+    // we want to insert this before the span, though
+    newLI.insertBefore(newIMG, newLI.childNodes[0]);
     return newLI;
 }
 

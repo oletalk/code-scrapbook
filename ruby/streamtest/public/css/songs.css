@@ -3,6 +3,7 @@ ul > li {
 }
 
 div.wrapper {
+margin: 20px;
     width: 1200px;
     display: flex;
 }
@@ -11,7 +12,7 @@ div#source {
     width: 600px;
     background: lightblue;
 }
-div#target {
+div#targetcontainer {
     width: 600px;
     background: lightgreen;
     position:fixed;

@@ -56,6 +56,12 @@ class StreamApp < Sinatra::Base
         Format.json_list(song_list)
     end
 
+    post '/songlist' do
+        data = JSON.parse(request.body.read.to_s)
+        Log.log.info("listname = #{data['listname']}, listcontent = #{data['listcontent']}")
+        # save these off to some song list structure in the db
+    end
+
     get '/list/:spec' do
         # list all the mp3s in the system which match the given spec
         # basically MP3S_ROOT/{foo}

@@ -8,12 +8,37 @@
     function songCtrl($http) {
         var vm = this;
         vm.folder = 'ripped';
+        vm.slistcontent = '';
         getList($http);
 
         function getList($http) {
             $http.get('/json/' + vm.folder) // TODO: VALIDATE!
             .then(function(response) {
                 vm.songData = angular.fromJson(response.data);
+            });
+        }
+
+        vm.saveList = function() {
+            // why does listname work but not slistcontent?
+            // because slistcontent wasn't populated using angular apparently :-/
+            vm.slistcontent = document.getElementById('listcontent').value;
+            //alert("playlist name: " + vm.listname + " with songs " + vm.slistcontent);
+            var req = {
+                method: 'POST',
+                url: '/songlist',
+                //url: 'http://httpbin.org/post',
+                headers: {
+                    'Content-Type': undefined
+                },
+                data: { listname: vm.listname,
+                        listcontent: vm.slistcontent
+                    }
+            }
+            $http(req)
+            .then( function(response) {
+                alert('Your playlist was saved.');
+            }, function() {
+                alert('There was an error saving your playlist. Please try again later.');
             });
         }
 
