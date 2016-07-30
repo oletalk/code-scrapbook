@@ -15,10 +15,11 @@ class StreamApp < Sinatra::Base
     use Rack::Session::Cookie, :secret => ENV['SESSION_SECRET']
 
     use Warden::Manager do |config|
-        config.serialize_into_session{|id| id }
-        config.serialize_from_session{|id| id }
+        config.serialize_into_session{|user| user.username }
+        config.serialize_from_session{|username| Db.find_user(username) }
 
-        config.scope_defaults :default
+        config.scope_defaults :default,
+        strategies: [:password]
         config.failure_app = self
     end
 
@@ -37,12 +38,13 @@ class StreamApp < Sinatra::Base
         def authenticate!
             puts 'password strategy authenticate'
             user = params["user"]
-            password = params["password"]
-            $logger = Logger.new("sinatra.log")
-            $logger.warn("hello")
-            if ['colin','foobar'].include?(user)
-                success!(user)
+            password = params["pass"]
+            x = Db.authenticate_user(user, password)
+            if x != nil
+                Log.log.info("authentication succeeded for user #{user}")
+                success!(x)
             else
+                Log.log.error("authentication failed for user #{user}")
                 fail!('could not login')
             end
         end
@@ -84,6 +86,7 @@ class StreamApp < Sinatra::Base
 #               'Pragma' => 'no-cache ',
 
     get '/list/:spec' do
+        Log.log.info("Fetching list off " + params['spec'] + " for user " + env['warden'].user.username)
         # list all the mp3s in the system which match the given spec
         # basically MP3S_ROOT/{foo}
         spec = params['spec']
@@ -108,18 +111,27 @@ class StreamApp < Sinatra::Base
 
 # authentication
     post '/protectedtest/?' do
-    env['warden'].authenticate!(:password)
-    
-        "well done, you're in!"
+        env['warden'].authenticate!(:password) # looks like i actually have to specify the strategy
+   
+    #current_user = env['warden'].user 
+    #    "well done #{current_user}, you're in!"
+        username = env['warden'].user.username
+        erb :createpls, :locals => {:name => username }
+        # TODO XHRs are not secured until i figure out how to forward on credentials to them...
     end
 
-    # TODO: can you customise the url warden punts unauthenticated users out to?
     post '/unauthenticated' do
         '<b>Login failed.</b><br/>Please <a href="login.html">try again</a>'
     end
 
+    # erb test
+    get '/test1' do
+        erb :test1
+    end
+
 # NOTE these last two methods only deal in JSON
     get '/json/:spec' do
+        Log.log.info("Fetching json list off " + params['spec'] )
         # json format for fetching list from js front end
         spec = params['spec']
         if spec == 'all'
@@ -131,8 +143,13 @@ class StreamApp < Sinatra::Base
 
     post '/songlist' do
         data = JSON.parse(request.body.read.to_s)
-        Log.log.info("listname = #{data['listname']}, listcontent = #{data['listcontent']}")
+        listname = data['listname']
+        listcontent = JSON.parse(data['listcontent']) # json within json
+        listowner = data['listowner']
+        Log.log.info("listname = #{listname}, listcontent = #{listcontent}, listowner = #{listowner}")
         # save these off to some song list structure in the db
+        Log.log.info("Number of songs in list: #{listcontent.size}")
+        Db.save_songlist(listname, listcontent, listowner)
     end
     run! if app_file == $0
 end

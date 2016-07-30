@@ -3,11 +3,74 @@ require_relative 'config'
 require_relative 'logging'
 require_relative '../data/user'
 require_relative '../excep/password'
+require_relative '../excep/playlist'
 
 module Db
 
     def self.new_connection
         PG.connect(dbname: MP3S::Config::DB_NAME, user:  MP3S::Config::DB_USER)
+    end
+
+    def self.find_songlist(name)
+        ret = nil
+        conn = new_connection
+        conn.exec_params(' SELECT id FROM mp3s_playlist WHERE name = $1', [name]) do |result|
+            result.each do |row|
+                ret = row['id']
+            end
+        end
+        conn.finish
+        ret
+    end
+
+    def self.get_songlist(name)
+        ret = nil
+        conn = new_connection
+        conn.exec_params(' SELECT song_filepath FROM mp3s_playlist_song WHERE playlist_id IN (select playlist_id FROM mp3s_playlist WHERE name = $1', [name]) do | result |
+            result.each do |row|
+                ret.push(row['song_filepath'])
+            end
+        end
+        conn.finish
+        ret
+    end
+
+    def self.save_songlist(name, content, owner)
+        ret = nil
+        conn = new_connection
+        if find_songlist(name) != nil
+            raise PlaylistCreationError.new("That songlist already exists")
+        end
+
+        sql = %{ INSERT into mp3s_playlist (name, owner)
+                 VALUES ($1, $2) }.gsub(/\s+/, " ").strip
+        begin
+            conn.prepare('add_pls1', sql)
+            conn.exec_prepared('add_pls1', [ name, owner ])
+        rescue PG::Error => e
+            res = e.result
+            Log.log.error "Problem saving new playlist: #{e}"
+            conn.close if conn
+        end
+
+        if !conn.finished?
+
+            sql = %{ INSERT into mp3s_playlist_song (playlist_id, file_hash)
+                     VALUES ((select id FROM mp3s_playlist WHERE name = $1), $2) }.gsub(/\s+/, " ").strip
+            begin
+                conn.prepare('add_pls2', sql)
+                content.each do |jsonrow|
+                    conn.exec_prepared('add_pls2', [ name, jsonrow['hash'] ])
+                end
+                conn.close if conn
+            rescue PG::Error => e
+                res = e.result
+                Log.log.error "Problem saving new playlist: #{e}"
+                conn.close if conn
+            end
+        else
+            Log.log.error "Creating playlist failed at first step so not continuing."
+        end
     end
 
     def self.find_song(given_hash)
@@ -62,24 +125,29 @@ module Db
     def self.find_user(user)
         conn = new_connection
         ret = nil
-        conn.exec_params(' SELECT username FROM users WHERE username = $1', [ user]) do | result |
+        conn.exec_params(' SELECT username,pass FROM users WHERE username = $1', [ user]) do | result |
             result.each do |row|
-                ret = User.new(row['username'])
+                ret = User.new(row['username'], row['pass'])
             end
         end
         conn.finish
         ret
     end
 
-    def self.authenticate_user(user, cryptedpass)
-        conn = new_connection
+    def self.authenticate_user(username, plainpass)
         ret = nil
-        conn.exec_params(' SELECT username FROM users WHERE username = $1 and pass = $2 ', [ user, cryptedpass ]) do | result |
-            result.each do |row|
-                ret = User.new(row['username'])
+        
+        finduser = find_user(username)
+        if (!finduser.nil?)
+            # check the password!
+            if finduser.password_matches(plainpass)
+                ret = finduser
+            else
+                Log.log.error "Wrong password for user #{username}"
             end
+        else
+            Log.log.error "Invalid user #{username}"
         end
-        conn.finish
         ret
     end
 

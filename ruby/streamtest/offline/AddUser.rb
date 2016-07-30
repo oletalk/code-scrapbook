@@ -22,8 +22,10 @@ if  user != nil && user != '' && /^[a-zA-Z]\w+$/ =~ (user)
     begin
         puts "Please enter the password: "
         newpass = STDIN.noecho(&:gets)
+        newpass.chomp!
         puts "Please re-enter that password: "
         chkpass = STDIN.noecho(&:gets)
+        chkpass.chomp!
         raise PasswordError.new('Passwords do not match') unless newpass == chkpass
         cryptedpass = BCrypt::Password.create newpass
         Db.add_user(user, cryptedpass)
