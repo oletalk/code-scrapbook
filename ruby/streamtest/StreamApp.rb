@@ -168,7 +168,7 @@ class StreamApp < Sinatra::Base
     post '/songlist' do
         data = JSON.parse(request.body.read.to_s)
         listname = data['listname']
-        listcontent = JSON.parse(data['listcontent']) # json within json
+        listcontent = data['listcontent'] # json within json
         listowner = data['listowner']
         Log.log.info("listname = #{listname}, listcontent = #{listcontent}, listowner = #{listowner}")
         # save these off to some song list structure in the db

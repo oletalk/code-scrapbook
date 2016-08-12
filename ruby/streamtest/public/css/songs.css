@@ -2,6 +2,11 @@ ul > li {
     display: table;
 }
 
+span.xoff {
+    color: #7aa;
+    font-weight: normal;
+}
+
 div.wrapper {
 margin: 20px;
     width: 1200px;
@@ -42,6 +47,28 @@ ul#targetlist li {
     padding: 2px 2px 2px 2px;
 }
 
-span.playlistsong {
+li.playlistsong {
     font-weight: bold;
+}
+
+[ng-drag] {
+    user-select: none;
+}
+[ng-drag] {
+    cursor:move;
+}
+[ng-drag].drag-over{
+    border:solid 1px red;
+}
+
+[ng-drag].dragging{
+    opacity: 0.5;
+}
+
+[ng-drop]  {
+    z-index: -9; /* doesn't work yet */
+    position: relative;
+}
+[ng-drop].drag-enter {
+    border: solid 5px red;
 }
