@@ -8,6 +8,10 @@ module Format
         ret
     end
 
+    def self.json(object)
+        object.to_json
+    end
+
     def self.json_list(songlist)
         retjson = "{}"
         encfailed = false

@@ -114,7 +114,6 @@ class StreamApp < Sinatra::Base
         env['warden'].authenticate!(:password) # looks like i actually have to specify the strategy
    
     #current_user = env['warden'].user 
-    #    "well done #{current_user}, you're in!"
         username = env['warden'].user.username
         erb :createpls, :locals => {:name => username }
         # TODO XHRs are not secured until i figure out how to forward on credentials to them...
@@ -141,6 +140,31 @@ class StreamApp < Sinatra::Base
         Format.json_list(song_list)
     end
 
+    # TODO: update your songlist (given that you are the owner)
+
+    get '/playlist_json/:name' do
+        name = params['name']
+        song_list = Db.fetch_playlist(name)
+        if song_list.size > 0
+            Format.json_list(song_list)
+        else
+            '{ "error" : "That playlist was not found" }'
+        end
+    end
+
+    # TODO: please test!
+    get '/playlist_m3u/:name' do
+        # list mp3s tied to a given playlist
+        name = params['name']
+        song_list = Db.fetch_playlist(name)
+        response.headers['Content-Type'] = 'text/plain'
+        if song_list.size > 0
+            Format.play_list(song_list, request.env['HTTP_HOST'])
+        else
+            '404 Not Found'
+        end
+    end
+
     post '/songlist' do
         data = JSON.parse(request.body.read.to_s)
         listname = data['listname']
@@ -149,7 +173,19 @@ class StreamApp < Sinatra::Base
         Log.log.info("listname = #{listname}, listcontent = #{listcontent}, listowner = #{listowner}")
         # save these off to some song list structure in the db
         Log.log.info("Number of songs in list: #{listcontent.size}")
-        Db.save_songlist(listname, listcontent, listowner)
+
+        ret = nil
+        begin
+            if (Db.check_owner_is(listname, listowner) != false) # if playlist doesn't exist we are fine
+                ret = Db.save_songlist(listname, listcontent, listowner)
+                Log.log.info("Saved playlist!")
+            else
+                ret = Format.json({error: "Playlist exists and you are not the owner"})
+            end
+        rescue PlaylistCreationError => msg
+            ret = Format.json({error: msg})
+        end
+        ret
     end
     run! if app_file == $0
 end

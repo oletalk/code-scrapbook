@@ -44,11 +44,41 @@
 
                 $http(req)
                 .then( function(response) {
-                    alert('Your playlist was saved.');
-                }, function() {
-                    alert('There was an error saving your playlist. Please try again later.');
+                    if (response.data && typeof response.data.error !== undefined) {
+                        alert('There was a problem saving your playlist: ' + response.data.error);
+                    } else {
+                        alert('Your playlist was saved.');
+                    }
+                }, function(error) {
+                    alert('There was an error saving your playlist. Please try again later. ');
                 });
             }
+        }
+
+        vm.loadList = function() {
+            $http.get('/playlist_json/' + vm.listname) // TODO: VALIDATE!
+            .then(function(response) {
+                //vm.songData = angular.fromJson(response.data);
+                if (typeof response.data !== undefined && typeof response.data.error === undefined) {
+                    var numsongs = response.data.length;
+                    if (numsongs > 0) {
+                        var songUL = document.getElementById('target').getElementsByTagName('ul')[0];
+                        while (songUL.firstChild) {
+                            songUL.removeChild(songUL.firstChild);
+                        }
+                        for (i = 0; i < numsongs; i++) {
+                            var el = response.data[i];
+                            songUL.appendChild(newLIwithXandGUID(el.title, el.hash));
+                        }
+                    }
+                } else {
+                    if (typeof response.data.error !== undefined) {
+                        alert("An error occurred: " + response.data.error);
+                    } else {
+                        alert("Empty response");
+                    }
+                }
+            });
         }
 
         vm.getSongs = function() {

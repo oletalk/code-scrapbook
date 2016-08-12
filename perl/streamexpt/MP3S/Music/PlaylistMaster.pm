@@ -82,7 +82,7 @@ sub gen_master_list {
 			my $db = MP3S::DB::Access->new;
 
 			my $res = $db->execute(qq{
-				SELECT DISTINCT song_filepath
+				SELECT DISTINCT song_filepath, file_hash
 				FROM MP3S_tags
 				WHERE song_filepath like '${arg1}%'
 				ORDER BY 1;
@@ -91,10 +91,10 @@ sub gen_master_list {
 			my $ctr = 0;
 			foreach my $row(@$res) {
 				$ctr++;
-				my ($song) = @$row;
+				my ($song, $hash) = @$row;
 				my $songpath = $song; # should have stored the 'correct' characters in the db. qx{ls -1 -b "$song"};
                 chomp $songpath;
-                push @mp3s, [ $song, $songpath ] if $song =~ /\.(mp3|ogg)$/i;
+                push @mp3s, [ $song, $songpath, $hash ] if $song =~ /\.(mp3|ogg)$/i;
 			}
 			log_info("Done figuring out song list from the tags in the database! $ctr song(s) found.");
 			
@@ -117,7 +117,7 @@ sub gen_master_list {
 		}
 
         foreach (@mp3s) {
-            my ( $song, $songpath ) = @{$_};
+            my ( $song, $songpath, $hash ) = @{$_};
             chomp $song;
 
             # strange ._Something.mp3 files in there
@@ -125,7 +125,8 @@ sub gen_master_list {
             log_debug("  Adding '$song' to song_objects list\n");
             my $sn = MP3S::Music::Song->new(
                 filename     => $song,
-                uni_filename => $songpath
+                uni_filename => $songpath,
+                hash         => $hash
             );
             $sn->set_URI_from_rootdir($arg1);
             push @ret, $sn;

@@ -3,12 +3,14 @@
   <HEAD>
     <TITLE>Hi there <%= name %></TITLE>
     <link rel="stylesheet" type="text/css" href="css/songs.css" />
-    <script src="js/angular.min.js"></script>
     <script src="js/dragdrop.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/ngDraggable.js"></script>
     <script src="js/app/app.js"></script>
     <script src="js/app/songCtrl.js"></script>
   </HEAD>
   <BODY>
+    <% if name != nil -%>
     <div ng-app="songList" ng-controller="songCtrl as sc">
         <span>Song folder: 
             <input ng-model="sc.folder" value="ripped">
@@ -31,6 +33,7 @@
                     <input id="listcontent" name="listcontent" type="hidden" />
                     <input id="username" name="username" type="hidden" value="<%= name %>" />
                     <input type="button" ng-click="sc.saveList()" value="Save"/>
+                    <input type="button" ng-click="sc.loadList()" value="Load"/>
                 </form>
                 <div id="target" ondragover="allowDrop(event)" ondrop="drop(event)">
                         <ul id="targetlist">
@@ -40,5 +43,8 @@
             </div>
         </div>
     </div>
+    <% else -%>
+    <div><b>Not logged in.</b> Please <a href="login.html">log in</a> to continue.</div>
+    <% end -%>
   </BODY>
 </HTML>

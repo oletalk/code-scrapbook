@@ -17,6 +17,11 @@ sub get_modified_time {
 	$self->{'modified_time'};
 }
 
+sub get_hash {
+    my $self = shift;
+    $self->{'hash'};
+}
+
 sub _stat_modified {
 	my ($hashref) = @_;
 	

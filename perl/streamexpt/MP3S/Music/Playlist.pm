@@ -43,9 +43,18 @@ sub process_playlist {
     my @songs = ();
     my $narrowing = ( defined $uri && $uri ne '/' );
 
+    my $is_hash = 0;
+
+    # we could be given a file hash so should locate a song by that if given
+    if ($defined $uri && $uri ne '') {
+        if ($uri =~ /^[A-Za-z0-9]+$/) {
+            $is_hash = 1;
+        }
+    }
 	my $song_objects = $self->{'song_objects'};
     foreach my $song_obj ( @{ $song_objects->songs } ) {
         my $s = $song_obj->get_uni_filename;
+        $s = $song_obj->get_hash if $is_hash;
 
         my $acceptsong = 1;
         chomp $s;

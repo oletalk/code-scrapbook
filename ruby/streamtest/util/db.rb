@@ -11,12 +11,15 @@ module Db
         PG.connect(dbname: MP3S::Config::DB_NAME, user:  MP3S::Config::DB_USER)
     end
 
-    def self.find_songlist(name)
+    def self.check_owner_is(listname, ownername)
+        # if playlist doesn't exist - nil
+        # if playlist exists and it belongs to ownername - true
+        # if playlist exists and it belongs to someone else - false
         ret = nil
         conn = new_connection
-        conn.exec_params(' SELECT id FROM mp3s_playlist WHERE name = $1', [name]) do |result|
+        conn.exec_params(' SELECT owner, id FROM mp3s_playlist WHERE name = $1', [listname ]) do |result|
             result.each do |row|
-                ret = row['id']
+                ret = (ownername == row['owner'])
             end
         end
         conn.finish
@@ -26,7 +29,7 @@ module Db
     def self.get_songlist(name)
         ret = nil
         conn = new_connection
-        conn.exec_params(' SELECT song_filepath FROM mp3s_playlist_song WHERE playlist_id IN (select playlist_id FROM mp3s_playlist WHERE name = $1', [name]) do | result |
+        conn.exec_params(' SELECT song_filepath FROM mp3s_playlist_song WHERE playlist_id IN (select playlist_id FROM mp3s_playlist WHERE name = $1 ORDER BY song_filepath', [name]) do | result |
             result.each do |row|
                 ret.push(row['song_filepath'])
             end
@@ -38,39 +41,38 @@ module Db
     def self.save_songlist(name, content, owner)
         ret = nil
         conn = new_connection
-        if find_songlist(name) != nil
-            raise PlaylistCreationError.new("That songlist already exists")
-        end
-
-        sql = %{ INSERT into mp3s_playlist (name, owner)
-                 VALUES ($1, $2) }.gsub(/\s+/, " ").strip
-        begin
-            conn.prepare('add_pls1', sql)
-            conn.exec_prepared('add_pls1', [ name, owner ])
-        rescue PG::Error => e
-            res = e.result
-            Log.log.error "Problem saving new playlist: #{e}"
-            conn.close if conn
-        end
-
-        if !conn.finished?
-
-            sql = %{ INSERT into mp3s_playlist_song (playlist_id, file_hash)
-                     VALUES ((select id FROM mp3s_playlist WHERE name = $1), $2) }.gsub(/\s+/, " ").strip
+        conn.transaction do |conn|
+            sql = %{ INSERT into mp3s_playlist (name, owner)
+                     VALUES ($1, $2) }.gsub(/\s+/, " ").strip
             begin
-                conn.prepare('add_pls2', sql)
-                content.each do |jsonrow|
-                    conn.exec_prepared('add_pls2', [ name, jsonrow['hash'] ])
-                end
-                conn.close if conn
+                conn.prepare('add_pls1', sql)
+                conn.exec_prepared('add_pls1', [ name, owner ])
             rescue PG::Error => e
                 res = e.result
                 Log.log.error "Problem saving new playlist: #{e}"
                 conn.close if conn
             end
-        else
-            Log.log.error "Creating playlist failed at first step so not continuing."
+
+            if !conn.finished?
+                sql = %{ DELETE from mp3s_playlist_song WHERE playlist_id = (select id FROM mp3s_playlist WHERE name = $1) }
+                conn.exec_params(sql, [ name ])
+                sql = %{ INSERT into mp3s_playlist_song (playlist_id, file_hash)
+                         VALUES ((select id FROM mp3s_playlist WHERE name = $1), $2) }.gsub(/\s+/, " ").strip
+                begin
+                    conn.prepare('add_pls2', sql)
+                    content.each do |jsonrow|
+                        conn.exec_prepared('add_pls2', [ name, jsonrow['hash'] ])
+                    end
+                rescue PG::Error => e
+                    res = e.result
+                    Log.log.error "Problem saving new playlist: #{e}"
+                    conn.close if conn
+                end
+            else
+                Log.log.error "Creating playlist failed at first step so not continuing."
+            end
         end
+        conn.close if conn
     end
 
     def self.find_song(given_hash)
@@ -80,6 +82,31 @@ module Db
             result.each do |row|
                 #ret = row.values_at('song_filepath', 'file_hash')
                 ret = row['song_filepath']
+            end
+        end
+        conn.finish
+        ret
+    end
+
+    def self.fetch_playlist(name)
+        ret = []
+        conn = new_connection
+        sql = %{
+            SELECT t.file_hash,
+                t.secs,
+                case 
+                    when (t.title is null or t.title = '') then substring(t.song_filepath from '[^/]*$') 
+                    else t.artist || ' - ' || t.title 
+                end as display_title 
+            FROM mp3s_tags t
+            INNER JOIN mp3s_playlist_song ps ON t.file_hash = ps.file_hash
+            INNER JOIN mp3s_playlist p ON ps.playlist_id = p.id
+            WHERE p.name = $1
+            ORDER BY display_title
+        }.gsub(/\s+/, " ").strip
+        conn.exec_params(sql, [ name ]) do | result |
+            result.each do |row|
+                ret.push({ hash: row['file_hash'], title: row['display_title'], secs: row['secs']} )
             end
         end
         conn.finish
@@ -99,6 +126,7 @@ module Db
                 end as display_title 
             FROM mp3s_tags 
             WHERE song_filepath like $1
+            ORDER by display_title
             }.gsub(/\s+/, " ").strip
         conn.exec_params(sql, [ "#{partial_spec}%" ]) do | result |
             result.each do |row|

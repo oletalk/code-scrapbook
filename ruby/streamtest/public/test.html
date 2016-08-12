@@ -1,43 +1,10 @@
 <!doctype html>
 <HTML>
   <HEAD>
-    <TITLE>Hi there</TITLE>
+    <TITLE>DEPRECATED</TITLE>
     <link rel="stylesheet" type="text/css" href="css/songs.css" />
-    <script src="js/angular.min.js"></script>
-    <script src="js/dragdrop.js"></script>
-    <script src="js/app/app.js"></script>
-    <script src="js/app/songCtrl.js"></script>
   </HEAD>
   <BODY>
-    <div ng-app="songList" ng-controller="songCtrl as sc">
-        <span>Song folder: 
-            <input ng-model="sc.folder" value="ripped">
-            <button ng-click="sc.getSongs()"/>Switch folder</button>
-        </span>
-        <div class="wrapper">
-            <div id="source">
-                <span ng-show="sc.songData.length">Filter songs: <input ng-model="sc.filter"></span>
-                <ul id="sourcelist" >
-                    <li ng-hide="sc.songData.length">No songs found.</li>
-                    <ng-repeat ng-repeat="x in sc.songData | filter:sc.filter">
-                        <li id={{x.hash}} draggable="true" ondragstart="handleDragStart(event)">{{x.title}}</li>
-                    </ng-repeat>
-                </ul>
-            </div>
-            <div id="targetcontainer">
-                <form>
-                    Your playlist title: <input ng-model="sc.listname" name="playlist" required>
-                    <!-- the below control had sc.slistcontent but it is being populated by javascript (tail end of drag 'n' drop -->
-                    <input id="listcontent" name="listcontent" type="hidden" />
-                    <input type="button" ng-click="sc.saveList()" value="Save"/>
-                </form>
-                <div id="target" ondragover="allowDrop(event)" ondrop="drop(event)">
-                        <ul id="targetlist">
-                            <li>no songs</li>
-                        </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+	Please <a href="login.html">log in</a> first
   </BODY>
 </HTML>
