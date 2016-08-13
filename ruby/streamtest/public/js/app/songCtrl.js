@@ -9,6 +9,7 @@
         var vm = this;
         vm.folder = 'ripped';
         vm.username = '';
+        vm.userPlaylists = [];
         getList($http);
 
         function getList($http) {
@@ -16,6 +17,10 @@
             .then(function(response) {
                 vm.songData = angular.fromJson(response.data);
             });
+        }
+
+        vm.echo1 = function() {
+            alert("sc.listnameFromSelect is " + JSON.stringify(vm.listnameFromSelect));
         }
 
         vm.saveList = function() {
@@ -56,8 +61,20 @@
             vm.droppedObjects1.splice(index, 1);
         }
 
+        vm.getPlaylists = function(owner) {
+            $http.get('/json_lists_for/' + owner)
+            .then(function(response) {
+                vm.userPlaylists = response.data;
+            });
+        }
+
         vm.loadList = function() {
-            $http.get('/playlist_json/' + vm.listname) // TODO: VALIDATE!
+            var lname = vm.listname;
+            if (typeof vm.listnameFromSelect !== undefined && vm.listnameFromSelect.name !== '') {
+                lname = vm.listnameFromSelect.name;
+                vm.listname = lname;
+            }
+            $http.get('/playlist_json/' + lname) // TODO: VALIDATE!
             .then(function(response) {
                 if (response.data.length > 0 ) {
                     var numsongs = response.data.length;

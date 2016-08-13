@@ -152,7 +152,12 @@ class StreamApp < Sinatra::Base
         end
     end
 
-    # TODO: please test!
+    get '/json_lists_for/:owner' do
+        owner = params['owner']
+        lists = Db.list_songlists_for(owner)
+        Format.json(lists)
+    end
+
     get '/playlist_m3u/:name' do
         # list mp3s tied to a given playlist
         name = params['name']
@@ -176,9 +181,14 @@ class StreamApp < Sinatra::Base
 
         ret = nil
         begin
-            if (Db.check_owner_is(listname, listowner) != false) # if playlist doesn't exist we are fine
-                ret = Db.save_songlist(listname, listcontent, listowner)
-                Log.log.info("Saved playlist!")
+            plschk = Db.check_owner_is(listname, listowner)
+            if (plschk != false)
+                ret = Db.save_songlist(listname, listcontent, listowner, plschk.nil?)
+                if plschk.nil?
+                    Log.log.info("Saved playlist!")
+                else
+                    Log.log.info("Updated playlist!")
+                end
             else
                 ret = Format.json({error: "Playlist exists and you are not the owner"})
             end

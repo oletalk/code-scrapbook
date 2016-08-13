@@ -26,33 +26,50 @@ module Db
         ret
     end
 
-    def self.get_songlist(name)
-        ret = nil
+    def self.list_songlists_for(owner)
+        ret = []
         conn = new_connection
-        conn.exec_params(' SELECT song_filepath FROM mp3s_playlist_song WHERE playlist_id IN (select playlist_id FROM mp3s_playlist WHERE name = $1 ORDER BY song_filepath', [name]) do | result |
+        conn.exec_params('select name from mp3s_playlist where owner = $1', [ owner ]) do | result |
             result.each do |row|
-                ret.push(row['song_filepath'])
+                ret.push({ name: row['name'] })
             end
         end
-        conn.finish
         ret
     end
 
-    def self.save_songlist(name, content, owner)
+#    def self.get_songlist(name)
+#        ret = []
+#        conn = new_connection
+#        conn.exec_params(' SELECT song_filepath FROM mp3s_playlist_song WHERE playlist_id IN (select playlist_id FROM mp3s_playlist WHERE name = $1 ORDER BY song_filepath', [name]) do | result |
+#            result.each do |row|
+#                ret.push(row['song_filepath'])
+#            end
+#        end
+#        conn.finish
+#        ret
+#    end
+
+    def self.update_songlist(name, content, owner)
+        # basic wrapper to skip the name insert
+        save_songlist(name, content, owner, false)
+    end
+
+    def self.save_songlist(name, content, owner, insertPlaylistName=true)
         ret = nil
         conn = new_connection
         conn.transaction do |conn|
-            sql = %{ INSERT into mp3s_playlist (name, owner)
-                     VALUES ($1, $2) }.gsub(/\s+/, " ").strip
-            begin
-                conn.prepare('add_pls1', sql)
-                conn.exec_prepared('add_pls1', [ name, owner ])
-            rescue PG::Error => e
-                res = e.result
-                Log.log.error "Problem saving new playlist: #{e}"
-                conn.close if conn
+            if insertPlaylistName
+                sql = %{ INSERT into mp3s_playlist (name, owner)
+                         VALUES ($1, $2) }.gsub(/\s+/, " ").strip
+                begin
+                    conn.prepare('add_pls1', sql)
+                    conn.exec_prepared('add_pls1', [ name, owner ])
+                rescue PG::Error => e
+                    res = e.result
+                    Log.log.error "Problem saving new playlist: #{e}"
+                    conn.close if conn
+                end
             end
-
             if !conn.finished?
                 sql = %{ DELETE from mp3s_playlist_song WHERE playlist_id = (select id FROM mp3s_playlist WHERE name = $1) }
                 conn.exec_params(sql, [ name ])

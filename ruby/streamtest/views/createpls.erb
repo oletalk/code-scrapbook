@@ -43,6 +43,11 @@
                         <li ng-hide="sc.droppedObjects1.length">no songs</li>
                     </ul>
                 </div>
+                <div>Your playlists: <input type="button" value="Refresh" ng-click="sc.getPlaylists('<%= name %>')"/>
+                <select ng-change="sc.loadList()" ng-model="sc.listnameFromSelect" ng-options="item.name for item in sc.userPlaylists">
+                    <option value="">Select playlist</option>
+                </select> 
+                </div>
             </div>
         </div>
     </div>
