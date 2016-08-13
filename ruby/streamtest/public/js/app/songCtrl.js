@@ -8,8 +8,8 @@
     function songCtrl($http) {
         var vm = this;
         vm.folder = 'ripped';
-        vm.slistcontent = '';
         vm.username = '';
+        vm.userPlaylists = [];
         getList($http);
 
         function getList($http) {
@@ -19,10 +19,11 @@
             });
         }
 
+        vm.echo1 = function() {
+            alert("sc.listnameFromSelect is " + JSON.stringify(vm.listnameFromSelect));
+        }
+
         vm.saveList = function() {
-            // why does listname work but not slistcontent?
-            // because slistcontent wasn't populated using angular apparently :-/
-            vm.slistcontent = document.getElementById('listcontent').value;
             vm.username = document.getElementById('username').value;
             var req = {
                 method: 'POST',
@@ -32,16 +33,16 @@
                     'Content-Type': undefined
                 },
                 data: { listname: vm.listname,
-                        listcontent: vm.slistcontent,
+                        listcontent: vm.droppedObjects1,
                         listowner: vm.username
                     }
             }
             if (isEmpty(vm.listname) || isEmpty(vm.username)) {
                 alert("The list name and owner name cannot be empty.");
-            } else if (isEmpty(vm.slistcontent) || vm.slistcontent == '[]') {
+            } else if (listcontent.length == 0) {
                 alert("The list of songs cannot be empty.");
             } else {
-
+                alert("passing this to save function: " + JSON.stringify(req));
                 $http(req)
                 .then( function(response) {
                     if (response.data && typeof response.data.error !== undefined) {
@@ -55,20 +56,32 @@
             }
         }
 
-        vm.loadList = function() {
-            $http.get('/playlist_json/' + vm.listname) // TODO: VALIDATE!
+        vm.removeSong = function(item) {
+            var index = vm.droppedObjects1.indexOf(item);
+            vm.droppedObjects1.splice(index, 1);
+        }
+
+        vm.getPlaylists = function(owner) {
+            $http.get('/json_lists_for/' + owner)
             .then(function(response) {
-                //vm.songData = angular.fromJson(response.data);
-                if (typeof response.data !== undefined && typeof response.data.error === undefined) {
+                vm.userPlaylists = response.data;
+            });
+        }
+
+        vm.loadList = function() {
+            var lname = vm.listname;
+            if (typeof vm.listnameFromSelect !== undefined && vm.listnameFromSelect.name !== '') {
+                lname = vm.listnameFromSelect.name;
+                vm.listname = lname;
+            }
+            $http.get('/playlist_json/' + lname) // TODO: VALIDATE!
+            .then(function(response) {
+                if (response.data.length > 0 ) {
                     var numsongs = response.data.length;
                     if (numsongs > 0) {
-                        var songUL = document.getElementById('target').getElementsByTagName('ul')[0];
-                        while (songUL.firstChild) {
-                            songUL.removeChild(songUL.firstChild);
-                        }
-                        for (i = 0; i < numsongs; i++) {
-                            var el = response.data[i];
-                            songUL.appendChild(newLIwithXandGUID(el.title, el.hash));
+                        vm.droppedObjects1 = [];
+                        for (var i = 0; i < response.data.length; i++) {
+                            vm.droppedObjects1.push(response.data[i]);
                         }
                     }
                 } else {
@@ -89,6 +102,15 @@
                 alert("invalid folder: " + vm.folder);
             } else {
                 getList($http);
+            }
+        }
+
+        // drag 'n' drop stuff
+        vm.droppedObjects1 = [];
+        vm.onDropComplete1 = function(data,evt) {
+            var index = vm.droppedObjects1.indexOf(data);
+            if (index == -1) {
+                vm.droppedObjects1.push(data);
             }
         }
 

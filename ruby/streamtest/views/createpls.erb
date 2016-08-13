@@ -3,7 +3,6 @@
   <HEAD>
     <TITLE>Hi there <%= name %></TITLE>
     <link rel="stylesheet" type="text/css" href="css/songs.css" />
-    <script src="js/dragdrop.js"></script>
     <script src="js/angular.min.js"></script>
     <script src="js/ngDraggable.js"></script>
     <script src="js/app/app.js"></script>
@@ -22,23 +21,32 @@
                 <ul id="sourcelist" >
                     <li ng-hide="sc.songData.length">No songs found.</li>
                     <ng-repeat ng-repeat="x in sc.songData | filter:sc.filter">
-                        <li id={{x.hash}} draggable="true" ondragstart="handleDragStart(event)">{{x.title}}</li>
+                        <li id={{x.hash}} ng-drag="true" ng-drag-data="x" data-allow-transform="true">{{x.title}}</li>
                     </ng-repeat>
                 </ul>
             </div>
             <div id="targetcontainer">
                 <form>
                     Your playlist title: <input ng-model="sc.listname" name="playlist" required>
-                    <!-- the below control had sc.slistcontent but it is being populated by javascript (tail end of drag 'n' drop -->
                     <input id="listcontent" name="listcontent" type="hidden" />
                     <input id="username" name="username" type="hidden" value="<%= name %>" />
                     <input type="button" ng-click="sc.saveList()" value="Save"/>
                     <input type="button" ng-click="sc.loadList()" value="Load"/>
                 </form>
-                <div id="target" ondragover="allowDrop(event)" ondrop="drop(event)">
-                        <ul id="targetlist">
-                            <li>no songs</li>
-                        </ul>
+                <div id="target" ng-drop="true" ng-drop-success="sc.onDropComplete1($data, $event)">
+                    <ul id="targetlist">
+                        <ng-repeat ng-repeat="obj in sc.droppedObjects1">
+                        <li class="playlistsong" data-id="{{obj.hash}}">
+                        <span class="xoff" ng-click="sc.removeSong(obj)"> x </span>{{obj.title}}
+                        </li>
+                        </ng-repeat>
+                        <li ng-hide="sc.droppedObjects1.length">no songs</li>
+                    </ul>
+                </div>
+                <div>Your playlists: <input type="button" value="Refresh" ng-click="sc.getPlaylists('<%= name %>')"/>
+                <select ng-change="sc.loadList()" ng-model="sc.listnameFromSelect" ng-options="item.name for item in sc.userPlaylists">
+                    <option value="">Select playlist</option>
+                </select> 
                 </div>
             </div>
         </div>
