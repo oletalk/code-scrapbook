@@ -10,6 +10,8 @@ FILESPEC = "*.mp3"
 #FILESPEC = "*.ogg"
 # Scanner.rb
 
+$db = Db.new
+
 def tag_file_with_hash(mp3file, hash)
     puts "  >>> Getting tag info for file '#{mp3file}'"
     mp3info = Mp3Info.open(mp3file)
@@ -18,7 +20,7 @@ def tag_file_with_hash(mp3file, hash)
 
     # save mp3info.tag.artist, mp3info.tag.title, mp3info.length
     tag = { artist: mp3info.tag.artist, title: mp3info.tag.title, secs: songlen }
-    Db.write_tag(hash, mp3file, tag)
+    $db.write_tag(hash, mp3file, tag)
 end
 
 # Options
@@ -48,7 +50,7 @@ files.each do |f|
     # check the db for the tag
     # TODO: should probably only compute the hash in a 'long' version - check args
     file_hash = Digest::SHA1.hexdigest(f)
-    tag = Db.get_tag_for(file_hash, f)
+    tag = $db.get_tag_for(file_hash, f)
     # either 1. tag exists and has data, 2. tag exists but has nils or 3. tag is nil (no record found)
     if tag.nil?
         puts "Need to find the tag for file: " + f

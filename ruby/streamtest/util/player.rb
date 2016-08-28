@@ -3,9 +3,9 @@ require 'open3'
 require_relative 'config'
 require_relative 'logging'
 
-module Player
+class Player
 
-    def self.play_song(command, song)
+    def play_song(command, song)
         escaped = Shellwords.escape( song )
         escaped.gsub!(/\'/, %q(\\\'))
         escaped.gsub!(/\&/, %q(\\\&))
@@ -16,7 +16,7 @@ module Player
         { songdata: stdout, command: cmdexec, warnings: stderr }
     end
 
-    def self.get_command(downsample, song)
+    def get_command(downsample, song)
         if downsample
             # check if downsampling mp3/ogg
             if ( song =~ /mp3$/i )

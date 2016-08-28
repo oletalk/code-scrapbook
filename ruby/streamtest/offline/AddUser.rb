@@ -16,6 +16,7 @@ OptionParser.new do |opts|
     opts.on('-v', '--verbose', 'Be verbose (currently a noop)') { options[:verbose] = true }
 end.parse!
 
+db = Db.new
 user = ARGV[0]
 if  user != nil && user != '' && /^[a-zA-Z]\w+$/ =~ (user)
     puts "OK, you want to create a new user #{user}."
@@ -28,7 +29,7 @@ if  user != nil && user != '' && /^[a-zA-Z]\w+$/ =~ (user)
         chkpass.chomp!
         raise PasswordError.new('Passwords do not match') unless newpass == chkpass
         cryptedpass = BCrypt::Password.create newpass
-        Db.add_user(user, cryptedpass)
+        db.add_user(user, cryptedpass)
     rescue UserCreationError => pe
         puts "Couldn't proceed - #{pe.message}"
         retry

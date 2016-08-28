@@ -23,8 +23,8 @@
             alert("sc.listnameFromSelect is " + JSON.stringify(vm.listnameFromSelect));
         }
 
-        vm.saveList = function() {
-            vm.username = document.getElementById('username').value;
+        vm.saveList = function(username) {
+            vm.username = username;
             var req = {
                 method: 'POST',
                 url: '/songlist',

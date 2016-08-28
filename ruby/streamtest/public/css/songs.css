@@ -9,23 +9,30 @@ span.xoff {
 
 div.wrapper {
 margin: 20px;
-    width: 1200px;
+    width: 1300px;
     display: flex;
+    overflow:hidden;
 }
 
 div#source {
     width: 600px;
     background: lightblue;
+    float: left;
+    display:block;
 }
 div#targetcontainer {
     width: 600px;
     background: lightgreen;
-    position:fixed;
+    display:block;
+    overflow: hidden;
+    z-index: 0;
 }
+
 #targetlist {
     width: 400px;
     background: #945;
     border: 2px solid black;
+    z-index: 3;
 }
 ul#sourcelist li { 
     margin-left: 30px;
@@ -38,6 +45,7 @@ ul#sourcelist li {
     height: 30px; 
     border: 1px solid #333; 
     background: linear-gradient(#ccc, #aab);
+    z-index: 4;
 }
 
 ul#targetlist li {
@@ -45,20 +53,26 @@ ul#targetlist li {
     font-size: 12px;
     font-family: arial, sans-serif;
     padding: 2px 2px 2px 2px;
+    z-index:5;
 }
 
 li.playlistsong {
     font-weight: bold;
+    z-index:6;
 }
 
 [ng-drag] {
     user-select: none;
+    z-index: 100;
 }
 [ng-drag] {
     cursor:move;
+    position: relative;
 }
 [ng-drag].drag-over{
     border:solid 1px red;
+    position: relative;
+    z-index:0;
 }
 
 [ng-drag].dragging{
@@ -66,9 +80,11 @@ li.playlistsong {
 }
 
 [ng-drop]  {
-    z-index: -9; /* doesn't work yet */
     position: relative;
+    z-index: -1;
 }
 [ng-drop].drag-enter {
     border: solid 5px red;
+    position: relative;
+    z-index: -1;
 }

@@ -30,7 +30,7 @@
                     Your playlist title: <input ng-model="sc.listname" name="playlist" required>
                     <input id="listcontent" name="listcontent" type="hidden" />
                     <input id="username" name="username" type="hidden" value="<%= name %>" />
-                    <input type="button" ng-click="sc.saveList()" value="Save"/>
+                    <input type="button" ng-click="sc.saveList('<%= name %>')" value="Save"/>
                     <input type="button" ng-click="sc.loadList()" value="Load"/>
                 </form>
                 <div id="target" ng-drop="true" ng-drop-success="sc.onDropComplete1($data, $event)">
