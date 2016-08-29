@@ -1,4 +1,4 @@
-require './util/player'
+require 'spec_helper'
 
 describe '::play_song' do
     before (:each) do

@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
-gem 'sinatra'
-gem 'logger'
-gem 'bcrypt'
-gem 'mp3info'
-gem 'pg'
-gem 'warden'
+gem 'sinatra', "~> 1.4.7"
+gem 'logger', "~> 1.2.8"
+gem 'bcrypt', "~> 3.1.11"
+gem 'mp3info', "~> 0.8.5"
+gem 'pg', "~> 0.18.4"
+gem 'warden', "~> 1.2.6"
 gem 'rspec-core'
 gem 'rspec'

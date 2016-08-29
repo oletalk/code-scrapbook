@@ -1,4 +1,4 @@
-require './util/ipwl'
+require 'spec_helper'
 
 describe '::action' do
 
@@ -9,7 +9,7 @@ describe '::action' do
 
     it 'should allow an IP we specify is to be allowed' do
         x = IPWhitelist.new({'192.168.0.1' => { allow: true }}, { allow: false} )
-        expect(x.action('192.168.0.1')).to eq({ allow: true })
+        expect(x.action('192.168.0.1')).to eq({ allow: true , downsample: false})
     end
 
     it 'should deny an IP outside the allow range we specified' do
@@ -20,12 +20,12 @@ describe '::action' do
     it 'should allow an IP within one of the ranges we specified' do
         x = IPWhitelist.new({'192.168.0.1' => { allow: true },
                              '192.168.0.4' => { allow: true }}, { allow: false} )
-        expect(x.action('192.168.0.4')).to eq({ allow: true })
+        expect(x.action('192.168.0.4')).to eq({ allow: true, downsample: false })
     end
 
     it 'should accept an IP range' do
         x = IPWhitelist.new({'192.168.0.0/24' => { allow: true }}, { allow: false } )
-        expect(x.action('192.168.0.21')).to eq({ allow: true })
+        expect(x.action('192.168.0.21')).to eq({ allow: true, downsample: false })
         expect(x.action('127.0.0.1')).to eq({ allow: false })
     end
 

@@ -1,4 +1,4 @@
-require './text/format'
+require 'spec_helper'
 
 describe 'Format::html_list' do
     it 'should return an empty list given an empty list' do

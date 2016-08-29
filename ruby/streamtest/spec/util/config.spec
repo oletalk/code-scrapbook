@@ -1,4 +1,4 @@
-require './util/clients'
+require 'spec_helper'
 
 describe 'MP3S::Config' do
     it 'should have a valid WEB_ROOT directory' do

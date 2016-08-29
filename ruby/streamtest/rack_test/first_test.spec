@@ -7,6 +7,13 @@ require './util/db'
 require './excep/playlist'
 require 'json'
 
+# deprecation warnings
+RSpec.configure do |config|
+	config.mock_with :rspec do |c|
+		c.syntax = [:should, :expect]
+	end
+end
+
 describe 'The StreamApp app' do
 	include Rack::Test::Methods
 
@@ -14,15 +21,44 @@ describe 'The StreamApp app' do
 		StreamApp
 	end
 
+	def mock_remoteip(newip)
+		allow(request).to receive(env).with("REMOTE_ADDR").and_return(newip)
+	end
+
+	def mock_player
+		@mock_player = double(Player)
+
+		# set test ranges - allow/allow with downsample/reject
+		@mock_whitelist = IPWhitelist.new({ 
+					'192.168.0.0/24' => { allow: true },  
+					'192.168.1.0/24' => { allow: true, downsample: true } },
+					{ allow: false } )
+		IPWhitelist.stub(:new).with(any_args()).and_return(@mock_whitelist)
+
+		playcmd = '/bin/cat XXXX'
+		playdscmd = '/bin/lame XXXX'
+		allow(@mock_player).to receive(:get_command).with(false, anything()).and_return(playcmd)
+		allow(@mock_player).to receive(:get_command).with(true, anything()).and_return(playdscmd)
+		allow(@mock_player).to receive(:play_song).with(playcmd, anything()).and_return({ songdata: 'foo' })
+		allow(@mock_player).to receive(:play_song).with(playdscmd, anything()).and_return({ songdata: 'foodownsampled' })
+		Player.stub(:new).with(any_args()).and_return(@mock_player)
+	end
+
     def mock_db
 		@mock_db = double(Db)
-		allow(@mock_db).to receive(:authenticate_user).and_return(User.new('fred', 'abcde', false));
+	# play
+		allow(@mock_db).to receive(:find_song).with(any_args()).and_return(nil)
+		allow(@mock_db).to receive(:find_song).with('abcdefg').and_return('/tunes/song1.mp3')
+		allow(@mock_db).to receive(:find_song).with('adf3a32').and_return('/tunes/greattune.ogg')
+		allow(@mock_db).to receive(:authenticate_user).and_return(User.new('fred', 'abcde', false))
+	# list_songs
         allow(@mock_db).to receive(:list_songs)
             .and_return([
                     { 'hash': 'abcdefg', 'title': 'My Song', 'secs': -1},
                     { 'hash': 'adf3a32', 'title': 'Great Tune', 'secs': 300},
                     { 'hash': 'fce3fca', 'title': 'A Ditty', 'secs': 220}
                    ] );
+	# other methods wrapped by endpoints
         allow(@mock_db).to receive(:list_songlists_for).and_return([ { name: 'foo' } ])
         allow(@mock_db).to receive(:check_owner_is).with('foo', 'bar').and_return(false)
         allow(@mock_db).to receive(:check_owner_is).with('foo', 'fred').and_return(true)
@@ -32,14 +68,50 @@ describe 'The StreamApp app' do
 		Db.stub(:new).with(any_args()).and_return(@mock_db)
 	end
 
-	it "returns a json list" do
+	it "fetches and plays a song given its hash" do
+		mock_player
+		mock_db
+		get '/play/abcdefg', {}, {'REMOTE_ADDR' => '192.168.0.6'}
+		expect(last_response).to be_ok
+		expect(last_response.body).to eq("foo")
+	end
+
+	it "downsamples for given ip range" do
+		mock_player
+		mock_db
+		get '/play/abcdefg', {}, {'REMOTE_ADDR' => '192.168.1.10'}
+		expect(last_response.body).to eq("foodownsampled")
+	end
+
+	it "returns a 403 given remote ip is not allowed" do
+		mock_player
+		mock_db
+		get '/play/abcdefg', {}, {'REMOTE_ADDR' => '211.211.211.211'}
+		expect(last_response.body).to start_with("403 ")
+	end
+
+	it "errors out given a bad hash" do
+		mock_player
+		mock_db
+		get '/play/foobar', {}, {'REMOTE_ADDR' => '192.168.0.6'}
+		expect(last_response.body).to start_with("404 ")
+	end
+
+	it "returns a json list of songs" do
         mock_db
         get '/json/ripped'
 		expect(last_response).to be_ok
         expect(last_response.body).to eq("[{\"title\":\"My Song\",\"hash\":\"abcdefg\"},{\"title\":\"Great Tune\",\"hash\":\"adf3a32\"},{\"title\":\"A Ditty\",\"hash\":\"fce3fca\"}]")
     end
 
-    # TODO - test for posting a new playlist
+	it "returns list of playlists for a given user" do
+        mock_db
+		get '/json_lists_for/colin'
+		expect(last_response).to be_ok
+        expect(last_response.body).to eq("[{\"name\":\"foo\"}]")
+	end
+
+    # wrapper around db validation of playlist save function
     it "checks user playlist before saving" do
         mock_db
         [{arg1:'foo', arg2:'bar', res:"{\"error\":\"Playlist exists and you are not the owner\"}"}, 
@@ -51,12 +123,6 @@ describe 'The StreamApp app' do
         end
     end
 
-	it "fetches json lists" do
-        mock_db
-		get '/json_lists_for/colin'
-		expect(last_response).to be_ok
-        expect(last_response.body).to eq("[{\"name\":\"foo\"}]")
-	end
 end
 
 

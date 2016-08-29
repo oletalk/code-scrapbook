@@ -23,6 +23,10 @@ class IPWhitelist
         if ret.nil?
             ret = @deflt
         end
+        if ret[:allow] && !ret.key?(:downsample)
+            ret[:downsample] = false
+        end
+
         ret
     end
 end

@@ -1,4 +1,4 @@
-require './util/clients'
+require 'spec_helper'
 
 describe 'MP3S::Clients::List' do
     it 'should have a non-empty ip list' do

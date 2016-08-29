@@ -12,7 +12,7 @@ class StreamApp < Sinatra::Base
     set :port, MP3S::Config::SERVER_PORT
     enable :sessions
 
-    use Rack::Session::Cookie, :secret => ENV['SESSION_SECRET']
+    use Rack::Session::Cookie, :secret => MP3S::Config::RSC
 
     use Warden::Manager do |config|
         config.serialize_into_session{|user| user.username }

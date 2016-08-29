@@ -9,7 +9,7 @@
     <script src="js/app/songCtrl.js"></script>
   </HEAD>
   <BODY>
-    <% if name != nil -%>
+    <% if name != nil %>
     <div ng-app="songList" ng-controller="songCtrl as sc">
         <span>Song folder: 
             <input ng-model="sc.folder" value="ripped">
@@ -51,8 +51,8 @@
             </div>
         </div>
     </div>
-    <% else -%>
+    <% else %>
     <div><b>Not logged in.</b> Please <a href="login.html">log in</a> to continue.</div>
-    <% end -%>
+    <% end %>
   </BODY>
 </HTML>
