@@ -7,6 +7,7 @@
     <script src="js/ngDraggable.js"></script>
     <script src="js/app/app.js"></script>
     <script src="js/app/songCtrl.js"></script>
+    <script src="js/app/songFilters.js"></script>
   </HEAD>
   <BODY>
     <% if name != nil %>
@@ -15,15 +16,24 @@
             <input ng-model="sc.folder" value="ripped">
             <button ng-click="sc.getSongs()"/>Switch folder</button>
         </span>
+		<div class="loading" ng-show="sc.loading">Loading...please wait</div>
         <div class="wrapper">
             <div id="source">
-                <span ng-show="sc.songData.length">Filter songs: <input ng-model="sc.filter"></span>
+				<div ng-if="sc.songData && sc.songData.length > 0">
+				<button ng-repeat="i in sc.getNumberAsArray(sc.numberOfPages()) track by $index"
+						ng-click="sc.setCurrentPage($index)">{{$index + 1}}</button>
                 <ul id="sourcelist" >
-                    <li ng-hide="sc.songData.length">No songs found.</li>
-                    <ng-repeat ng-repeat="x in sc.songData | filter:sc.filter">
+                    <!--  filter for below was filter:sc.filter" -->
+                    <ng-repeat ng-repeat="x in sc.songData | startFrom: sc.currentPage * sc.pageSize | limitTo:sc.pageSize">
                         <li id={{x.hash}} ng-drag="true" ng-drag-data="x" data-allow-transform="true">{{x.title}}</li>
                     </ng-repeat>
                 </ul>
+				</div>
+				<div ng-if="sc.songData && sc.songData.length == 0">
+                	<ul id="sourcelist" >
+                    	<li>No songs found.</li>
+					</ul>
+				</div>
             </div>
             <div id="targetcontainer">
                 <form>

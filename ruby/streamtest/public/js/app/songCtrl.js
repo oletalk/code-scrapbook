@@ -9,13 +9,34 @@
         var vm = this;
         vm.folder = 'ripped';
         vm.username = '';
+		vm.loading = true;
         vm.userPlaylists = [];
         getList($http);
+
+		// Pagination in controller
+		vm.currentPage = 0;
+		vm.pageSize = 25;
+		vm.setCurrentPage = function(currentPage) {
+			vm.currentPage = currentPage;
+		}
+
+		vm.getNumberAsArray = function(num) {
+			return new Array(num);
+		}
+
+		vm.numberOfPages = function() {
+			return Math.ceil(vm.songData.length / vm.pageSize);
+		}
+
+
 
         function getList($http) {
             $http.get('/json/' + vm.folder) // TODO: VALIDATE!
             .then(function(response) {
                 vm.songData = angular.fromJson(response.data);
+				// TODO 2: what if the number of songs fetched is very large?
+				// maybe paginate? fetch limited number? backend-based search?
+				vm.loading = false;
             });
         }
 
@@ -74,6 +95,7 @@
                 lname = vm.listnameFromSelect.name;
                 vm.listname = lname;
             }
+			vm.loading = true;
             $http.get('/playlist_json/' + lname) // TODO: VALIDATE!
             .then(function(response) {
                 if (response.data.length > 0 ) {
@@ -84,12 +106,14 @@
                             vm.droppedObjects1.push(response.data[i]);
                         }
                     }
+					vm.loading = false;
                 } else {
                     if (typeof response.data.error !== undefined) {
                         alert("An error occurred: " + response.data.error);
                     } else {
                         alert("Empty response");
                     }
+					vm.loading = false;
                 }
             });
         }
@@ -101,6 +125,7 @@
             if (m = alphanu.exec(vm.folder) === null) {
                 alert("invalid folder: " + vm.folder);
             } else {
+				vm.loading = true;
                 getList($http);
             }
         }

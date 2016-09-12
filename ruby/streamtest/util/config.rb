@@ -7,8 +7,9 @@ module MP3S
 	    DB_NAME = 'maindb'
 	    DB_USER = 'web'
         PLAY_RAW = '/bin/cat XXXX'
-        PLAY_DOWNSAMPLED_MP3 = '/usr/local/bin/lame --mp3input -b 32 XXXX - '
-	    PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null'
+        PLAY_DOWNSAMPLED_MP3 = '/usr/local/bin/lame --nohist --mp3input -b 32 XXXX - '
+	    PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - '
+        # PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null'
 		RSC = 'BCE$21^&'
         LOGFILE = 'streamserver.log'
     end

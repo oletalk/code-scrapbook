@@ -51,6 +51,7 @@ class StreamApp < Sinatra::Base
     end
 
 	before do
+		cache_control :public, :must_revalidate, :max_age => 60
 		@ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
 		@db   = Db.new
 		@player = Player.new
@@ -72,7 +73,6 @@ class StreamApp < Sinatra::Base
         elsif !action[:allow]
             "403 Access denied"
         else
-            response.headers['Cache-Control'] = 'no-cache'
 
             # how should we play this song? if client list says downsample, do it
             command = @player.get_command(action[:downsample], song_loc)
@@ -85,9 +85,6 @@ class StreamApp < Sinatra::Base
             played[:songdata]
         end
     end
-
-#          'Cache-Control' => 'no-cache ',
-#               'Pragma' => 'no-cache ',
 
     get '/list/:spec' do
         Log.log.info("Fetching list off " + params['spec'] + " for user " + env['warden'].user.username)
