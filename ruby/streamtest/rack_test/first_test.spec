@@ -99,14 +99,14 @@ describe 'The StreamApp app' do
 
 	it "returns a json list of songs" do
         mock_db
-        get '/json/ripped'
+        get '/json/ripped', {}, {'REMOTE_ADDR' => '192.168.0.1'}
 		expect(last_response).to be_ok
         expect(last_response.body).to eq("[{\"title\":\"My Song\",\"hash\":\"abcdefg\"},{\"title\":\"Great Tune\",\"hash\":\"adf3a32\"},{\"title\":\"A Ditty\",\"hash\":\"fce3fca\"}]")
     end
 
 	it "returns list of playlists for a given user" do
         mock_db
-		get '/json_lists_for/colin'
+		get '/json_lists_for/colin', {}, {'REMOTE_ADDR' => '192.168.0.1'}
 		expect(last_response).to be_ok
         expect(last_response.body).to eq("[{\"name\":\"foo\"}]")
 	end
@@ -118,7 +118,7 @@ describe 'The StreamApp app' do
          {arg1:'bar', arg2:'baz', res: ""},
          {arg1:'foo', arg2:'fred', res: "{\"error\":\"creation failed\"}"}].each do |item|
             body = { listname: item[:arg1], 'listowner': item[:arg2], 'listcontent': [{hash: 'abcdef1'}, {hash: '123456a'}]}.to_json
-            post '/songlist', body, {'Content-Type' => 'application/json'}
+            post '/songlist', body, {'Content-Type' => 'application/json', 'REMOTE_ADDR' => '192.168.0.1'}
             expect(last_response.body).to eq(item[:res])
         end
     end

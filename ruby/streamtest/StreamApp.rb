@@ -55,6 +55,14 @@ class StreamApp < Sinatra::Base
 		@ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
 		@db   = Db.new
 		@player = Player.new
+
+        remote_ip = request.env['REMOTE_ADDR']
+        action = @ipwl.action(remote_ip)
+        Log.log.info("Action for #{remote_ip} is #{action}.")
+		if !action[:allow]
+			halt 403, {'Content-Type' => 'text/plain'}, '403 Access Denied'
+		end
+		request.env['downsample'] = action[:downsample]
 	end
 
     get '/play/:hash' do |req_hash|
@@ -62,20 +70,17 @@ class StreamApp < Sinatra::Base
         song_loc = @db.find_song(req_hash)
 
         # TODO: might want to invoke this check in some sort of area common to ALL requests?
-        remote_ip = request.env['REMOTE_ADDR']
-        action = @ipwl.action(remote_ip)
-        Log.log.info("Action for #{remote_ip} is #{action}.")
 
         # stream song in output to client
         Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
         if song_loc.nil?
             "404 Sorry, that song was not found"
-        elsif !action[:allow]
-            "403 Access denied"
         else
 
             # how should we play this song? if client list says downsample, do it
-            command = @player.get_command(action[:downsample], song_loc)
+		    do_downsample = request.env['downsample']
+			Log.log.info("Downsample info from the request: #{do_downsample}")
+            command = @player.get_command(do_downsample, song_loc)
             Log.log.info("Fetched command template, #{command}")
 
             $stdout.sync = true
@@ -87,7 +92,7 @@ class StreamApp < Sinatra::Base
     end
 
     get '/list/:spec' do
-        Log.log.info("Fetching list off " + params['spec'] + " for user " + env['warden'].user.username)
+        Log.log.info("Fetching list off " + params['spec'])
         # list all the mp3s in the system which match the given spec
         # basically MP3S_ROOT/{foo}
         spec = params['spec']
