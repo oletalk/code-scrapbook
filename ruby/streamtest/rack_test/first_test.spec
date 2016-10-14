@@ -83,6 +83,13 @@ describe 'The StreamApp app' do
 		expect(last_response.body).to eq("foodownsampled")
 	end
 
+	it "returns a 403 if a downsampled client asks for non-downsampled content" do
+		mock_player
+		mock_db
+		get '/play/abcdefg', {}, {'REMOTE_ADDR' => '192.168.1.10'}
+		expect(last_response.body).to start_with("403 ")
+	end
+
 	it "returns a 403 given remote ip is not allowed" do
 		mock_player
 		mock_db
