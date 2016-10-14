@@ -79,7 +79,7 @@ describe 'The StreamApp app' do
 	it "downsamples for given ip range" do
 		mock_player
 		mock_db
-		get '/play/abcdefg', {}, {'REMOTE_ADDR' => '192.168.1.10'}
+		get '/play/abcdefg/downsampled', {}, {'REMOTE_ADDR' => '192.168.1.10'}
 		expect(last_response.body).to eq("foodownsampled")
 	end
 

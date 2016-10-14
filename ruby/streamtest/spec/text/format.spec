@@ -8,7 +8,7 @@ describe 'Format::html_list' do
 
     it 'should create a link for one item properly' do
         x = [ { hash: 'abcdef12', title:'Awesome Song 1' } ]
-        expect(Format.html_list(x)).to eq %{ <a href='/play/abcdef12'>Awesome Song 1</a> }
+        expect(Format.html_list(x, true)).to eq %{ <a href='/play/abcdef12/downsampled'>Awesome Song 1</a> }
     end
 
     it 'should create links separated correctly' do

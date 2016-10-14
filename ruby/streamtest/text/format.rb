@@ -1,9 +1,13 @@
 require 'json'
     
 module Format
-    def self.html_list(songlist)
+    def self.html_list(songlist, downsampled=false)
+		ds = ""
+		if downsampled
+			ds = "/downsampled"
+		end
         ret = songlist.collect{ |song| 
-            %{ <a href='/play/#{song[:hash]}'>#{song[:title]}</a> }
+            %{ <a href='/play/#{song[:hash]}#{ds}'>#{song[:title]}</a> }
         }.join("<br/>\n")
         ret
     end
@@ -34,11 +38,15 @@ module Format
         retjson
     end
 
-    def self.play_list(songlist, hdr_http_host)
+    def self.play_list(songlist, hdr_http_host, downsampled=false)
+		ds = ""
+		if downsampled
+			ds = "/downsampled"
+		end
         ret = "#EXTM3U\n"
         ret << songlist.collect{ |song|
             "#EXTINF:#{song[:secs]},#{song[:title]}\n" +
-            "http://#{hdr_http_host}/play/#{song[:hash]}"
+            "http://#{hdr_http_host}/play/#{song[:hash]}#{ds}"
         }.join("\n")
     end
 end

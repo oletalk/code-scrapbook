@@ -51,7 +51,7 @@ class StreamApp < Sinatra::Base
     end
 
 	before do
-		cache_control :public, :must_revalidate, :max_age => 60
+		cache_control :public, :must_revalidate, :max_age => MP3S::Config::CACHE_SECS
 		@ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
 		@db   = Db.new
 		@player = Player.new
@@ -63,6 +63,35 @@ class StreamApp < Sinatra::Base
 			halt 403, {'Content-Type' => 'text/plain'}, '403 Access Denied'
 		end
 		request.env['downsample'] = action[:downsample]
+	end
+
+	get '/play/:hash/downsampled' do |req_hash|
+        song_loc = @db.find_song(req_hash)
+
+        # stream song in output to client
+        Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
+        if song_loc.nil?
+            "404 Sorry, that song was not found"
+        else
+
+            # asked for downsampled version
+		    do_downsample = request.env['downsample']
+			Log.log.info("Downsample info from the request: #{do_downsample}")
+            # check the headers just in case downsampling prefs don't match actual request
+			if (!do_downsample)
+				Log.log.error("Action for client is not to downsample but it is asking for downsampled song")
+				"403 Forbidden"
+			else
+				command = @player.get_command(do_downsample, song_loc)
+				Log.log.info("Fetched command template, #{command}")
+
+				$stdout.sync = true
+				played = @player.play_song(command, song_loc)
+				warnings = played[:warnings]
+				Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
+				played[:songdata]
+			end
+        end
 	end
 
     get '/play/:hash' do |req_hash|
@@ -80,14 +109,20 @@ class StreamApp < Sinatra::Base
             # how should we play this song? if client list says downsample, do it
 		    do_downsample = request.env['downsample']
 			Log.log.info("Downsample info from the request: #{do_downsample}")
-            command = @player.get_command(do_downsample, song_loc)
-            Log.log.info("Fetched command template, #{command}")
+			# check the headers just in case downsampling prefs don't match actual request
+			if (do_downsample)
+				Log.log.error("Action for client is to downsample but it is asking for raw file")
+				"403 Forbidden"
+			else
+				command = @player.get_command(do_downsample, song_loc)
+				Log.log.info("Fetched command template, #{command}")
 
-            $stdout.sync = true
-            played = @player.play_song(command, song_loc)
-            warnings = played[:warnings]
-            Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
-            played[:songdata]
+				$stdout.sync = true
+				played = @player.play_song(command, song_loc)
+				warnings = played[:warnings]
+				Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
+				played[:songdata]
+			end
         end
     end
 
@@ -100,7 +135,7 @@ class StreamApp < Sinatra::Base
             spec = ''
         end
         song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
-        Format.html_list(song_list)
+        Format.html_list(song_list, request.env['downsample'])
     end
 
     get '/m3u/:spec' do
@@ -112,7 +147,7 @@ class StreamApp < Sinatra::Base
         end
         song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
         response.headers['Content-Type'] = 'text/plain'
-        Format.play_list(song_list, request.env['HTTP_HOST'])
+        Format.play_list(song_list, request.env['HTTP_HOST'], request.env['downsample'])
     end
 
 # authentication
