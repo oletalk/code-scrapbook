@@ -22,6 +22,7 @@
 				<div ng-if="sc.songData && sc.songData.length > 0">
 				<button ng-repeat="i in sc.getNumberAsArray(sc.numberOfPages()) track by $index"
 						ng-click="sc.setCurrentPage($index)">{{$index + 1}}</button>
+				<div ng-if="sc.currentPage && sc.currentPage >= 0">Page {{ sc.currentPage+1 }}</div>
                 <ul id="sourcelist" >
                     <!--  filter for below was filter:sc.filter" -->
                     <ng-repeat ng-repeat="x in sc.songData | startFrom: sc.currentPage * sc.pageSize | limitTo:sc.pageSize">
@@ -38,6 +39,8 @@
             <div id="targetcontainer">
                 <form>
                     Your playlist title: <input ng-model="sc.listname" name="playlist" required>
+					<br/>
+					Playlist url: /playlist_m3u/{{ sc.listname }}<br/>
                     <input id="listcontent" name="listcontent" type="hidden" />
                     <input id="username" name="username" type="hidden" value="<%= name %>" />
                     <input type="button" ng-click="sc.saveList('<%= name %>')" value="Save"/>
