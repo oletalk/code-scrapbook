@@ -205,7 +205,7 @@ class StreamApp < Sinatra::Base
         song_list = @db.fetch_playlist(name)
         response.headers['Content-Type'] = 'text/plain'
         if song_list.size > 0
-            Format.play_list(song_list, request.env['HTTP_HOST'])
+            Format.play_list(song_list, request.env['HTTP_HOST'], request.env['downsample'])
         else
             '404 Not Found'
         end
