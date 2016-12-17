@@ -1,10 +1,10 @@
 ## any options? Progress bar?
 
-require_relative '../util/db'
+require_relative '../util/db_song'
 
 ERROR_LIMIT = 25
 
-db = Db.new
+db = SongDb.new
 puts 'Inspecting all songs in the db...'
 song_list = db.list_songs("#{MP3S::Config::MP3_ROOT}/")
 puts "Number of songs: #{song_list.size}"

@@ -1,7 +1,9 @@
 require 'sinatra/base'
 require 'warden'
 require_relative 'util/config'
-require_relative 'util/db'
+require_relative 'util/db_song'
+require_relative 'util/db_songlist'
+require_relative 'util/db_user'
 require_relative 'util/player'
 require_relative 'text/format'
 require_relative 'util/ipwl'
@@ -16,7 +18,7 @@ class StreamApp < Sinatra::Base
 
     use Warden::Manager do |config|
         config.serialize_into_session{|user| user.username }
-        config.serialize_from_session{|username| Db.new.find_user(username) }
+        config.serialize_from_session{|username| UserDb.new.find_user(username) }
 
         config.scope_defaults :default,
         strategies: [:password]
@@ -39,7 +41,7 @@ class StreamApp < Sinatra::Base
             puts 'password strategy authenticate'
             user = params["user"]
             password = params["pass"]
-            x = Db.new.authenticate_user(user, password)
+            x = UserDb.new.authenticate_user(user, password)
             if x != nil
                 Log.log.info("authentication succeeded for user #{user}")
                 success!(x)
@@ -53,7 +55,9 @@ class StreamApp < Sinatra::Base
 	before do
 		cache_control :public, :must_revalidate, :max_age => MP3S::Config::CACHE_SECS
 		@ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
-		@db   = Db.new
+		@userdb   = UserDb.new
+		@songdb   = SongDb.new
+		@songlistdb = SongListDb.new
 		@player = Player.new
 
         remote_ip = request.env['REMOTE_ADDR']
@@ -66,7 +70,7 @@ class StreamApp < Sinatra::Base
 	end
 
 	get '/play/:hash/downsampled' do |req_hash|
-        song_loc = @db.find_song(req_hash)
+        song_loc = @songdb.find_song(req_hash)
 
         # stream song in output to client
         Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
@@ -96,7 +100,7 @@ class StreamApp < Sinatra::Base
 
     get '/play/:hash' do |req_hash|
         # go find the song with this hash - see _pgtest.rb
-        song_loc = @db.find_song(req_hash)
+        song_loc = @songdb.find_song(req_hash)
 
         # TODO: might want to invoke this check in some sort of area common to ALL requests?
 
@@ -134,7 +138,7 @@ class StreamApp < Sinatra::Base
         if spec == 'all'
             spec = ''
         end
-        song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
+        song_list = @songdb.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
         Format.html_list(song_list, request.env['downsample'])
     end
 
@@ -145,7 +149,7 @@ class StreamApp < Sinatra::Base
         if spec == 'all'
             spec = ''
         end
-        song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
+        song_list = @songdb.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
         response.headers['Content-Type'] = 'text/plain'
         Format.play_list(song_list, request.env['HTTP_HOST'], request.env['downsample'])
     end
@@ -177,7 +181,7 @@ class StreamApp < Sinatra::Base
         if spec == 'all'
             spec = ''
         end
-        song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
+        song_list = @songdb.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
         Format.json_list(song_list)
     end
 
@@ -185,7 +189,7 @@ class StreamApp < Sinatra::Base
 
     get '/playlist_json/:name' do
         name = params['name']
-        song_list = @db.fetch_playlist(name)
+        song_list = @songlistdb.fetch_playlist(name)
         if song_list.size > 0
             Format.json_list(song_list)
         else
@@ -195,14 +199,14 @@ class StreamApp < Sinatra::Base
 
     get '/json_lists_for/:owner' do
         owner = params['owner']
-        lists = @db.list_songlists_for(owner)
+        lists = @songlistdb.list_songlists_for(owner)
         Format.json(lists)
     end
 
     get '/playlist_m3u/:name' do
         # list mp3s tied to a given playlist
         name = params['name']
-        song_list = @db.fetch_playlist(name)
+        song_list = @songlistdb.fetch_playlist(name)
         response.headers['Content-Type'] = 'text/plain'
         if song_list.size > 0
             Format.play_list(song_list, request.env['HTTP_HOST'], request.env['downsample'])
@@ -222,9 +226,9 @@ class StreamApp < Sinatra::Base
 
         ret = nil
         begin
-            plschk = @db.check_owner_is(listname, listowner)
+            plschk = @songlistdb.check_owner_is(listname, listowner)
             if (plschk != false)
-                ret = @db.save_songlist(listname, listcontent, listowner, plschk.nil?)
+                ret = @songlistdb.save_songlist(listname, listcontent, listowner, plschk.nil?)
                 if plschk.nil?
                     Log.log.info("Saved playlist!")
                 else

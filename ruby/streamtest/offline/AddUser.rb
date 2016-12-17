@@ -3,7 +3,7 @@ require 'bcrypt'
 require 'io/console'
 
 require_relative '../excep/password.rb'
-require_relative '../util/db.rb'
+require_relative '../util/db_user.rb'
 require_relative '../util/config.rb'
 
 # Adduser.rb
@@ -16,7 +16,7 @@ OptionParser.new do |opts|
     opts.on('-v', '--verbose', 'Be verbose (currently a noop)') { options[:verbose] = true }
 end.parse!
 
-db = Db.new
+db = UserDb.new
 user = ARGV[0]
 if  user != nil && user != '' && /^[a-zA-Z]\w+$/ =~ (user)
     puts "OK, you want to create a new user #{user}."

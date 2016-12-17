@@ -45,27 +45,31 @@ describe 'The StreamApp app' do
 	end
 
     def mock_db
-		@mock_db = double(Db)
+		@mock_songdb = double(SongDb)
+		@mock_songlistdb = double(SongListDb)
+		@mock_userdb = double(UserDb)
 	# play
-		allow(@mock_db).to receive(:find_song).with(any_args()).and_return(nil)
-		allow(@mock_db).to receive(:find_song).with('abcdefg').and_return('/tunes/song1.mp3')
-		allow(@mock_db).to receive(:find_song).with('adf3a32').and_return('/tunes/greattune.ogg')
-		allow(@mock_db).to receive(:authenticate_user).and_return(User.new('fred', 'abcde', false))
+		allow(@mock_songdb).to receive(:find_song).with(any_args()).and_return(nil)
+		allow(@mock_songdb).to receive(:find_song).with('abcdefg').and_return('/tunes/song1.mp3')
+		allow(@mock_songdb).to receive(:find_song).with('adf3a32').and_return('/tunes/greattune.ogg')
+		allow(@mock_userdb).to receive(:authenticate_user).and_return(User.new('fred', 'abcde', false))
 	# list_songs
-        allow(@mock_db).to receive(:list_songs)
+        allow(@mock_songdb).to receive(:list_songs)
             .and_return([
                     { 'hash': 'abcdefg', 'title': 'My Song', 'secs': -1},
                     { 'hash': 'adf3a32', 'title': 'Great Tune', 'secs': 300},
                     { 'hash': 'fce3fca', 'title': 'A Ditty', 'secs': 220}
                    ] );
 	# other methods wrapped by endpoints
-        allow(@mock_db).to receive(:list_songlists_for).and_return([ { name: 'foo' } ])
-        allow(@mock_db).to receive(:check_owner_is).with('foo', 'bar').and_return(false)
-        allow(@mock_db).to receive(:check_owner_is).with('foo', 'fred').and_return(true)
-        allow(@mock_db).to receive(:check_owner_is).with('bar', 'baz').and_return(true)
-        allow(@mock_db).to receive(:save_songlist).with('foo', anything(), 'fred', false).and_raise(PlaylistCreationError.new('creation failed'))
-        allow(@mock_db).to receive(:save_songlist).with('bar', anything(), 'baz', false).and_return(true)
-		Db.stub(:new).with(any_args()).and_return(@mock_db)
+        allow(@mock_songlistdb).to receive(:list_songlists_for).and_return([ { name: 'foo' } ])
+        allow(@mock_songlistdb).to receive(:check_owner_is).with('foo', 'bar').and_return(false)
+        allow(@mock_songlistdb).to receive(:check_owner_is).with('foo', 'fred').and_return(true)
+        allow(@mock_songlistdb).to receive(:check_owner_is).with('bar', 'baz').and_return(true)
+        allow(@mock_songlistdb).to receive(:save_songlist).with('foo', anything(), 'fred', false).and_raise(PlaylistCreationError.new('creation failed'))
+        allow(@mock_songlistdb).to receive(:save_songlist).with('bar', anything(), 'baz', false).and_return(true)
+		SongDb.stub(:new).with(any_args()).and_return(@mock_songdb)
+		SongListDb.stub(:new).with(any_args()).and_return(@mock_songlistdb)
+		UserDb.stub(:new).with(any_args()).and_return(@mock_userdb)
 	end
 
 	it "fetches and plays a song given its hash" do
