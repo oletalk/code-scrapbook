@@ -1,5 +1,5 @@
 package tests::mocks::MockTagInfo;
-use base MP3S::Music::TagInfo;
+use parent MP3S::Music::TagInfo;
 
 use MP3S::Misc::Logger qw(log_info);
 use strict;

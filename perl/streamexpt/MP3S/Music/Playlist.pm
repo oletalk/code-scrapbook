@@ -46,7 +46,7 @@ sub process_playlist {
     my $is_hash = 0;
 
     # we could be given a file hash so should locate a song by that if given
-    if ($defined $uri && $uri ne '') {
+    if (defined($uri) && $uri ne '') {
         if ($uri =~ /^[A-Za-z0-9]+$/) {
             $is_hash = 1;
         }

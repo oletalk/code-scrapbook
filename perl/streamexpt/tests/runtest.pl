@@ -2,9 +2,9 @@
 
 use strict;
 use MP3S::Misc::MSConf qw(config_value);
-our $PERL = '/usr/local/bin/perl';
+our $PERL = '/usr/bin/env perl';
 
-MP3S::Misc::MSConf::init('tests/testdata/testing.conf');
+MP3S::Misc::MSConf::init('tests/testdata/testing-withdb.conf');
 my $opt_i = grep(/^-i/, @ARGV);
 my ($testcount, $successes) = (0,0);
 my $TESTDIR = 'tests';

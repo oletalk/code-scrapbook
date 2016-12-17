@@ -3,7 +3,7 @@ use Exporter 'import';
 use MP3S::Misc::Logger qw(log_info);
 @EXPORT_OK = qw (count_stat_n output_stats_n get_uptime_n);
 
-use base MP3S::Misc::Stats;
+use parent MP3S::Misc::Stats;
 use strict;
 
 our $starttime;
