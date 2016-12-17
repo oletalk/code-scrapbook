@@ -1,5 +1,4 @@
 require 'pg'
-require_relative 'config'
 require_relative 'logging'
 require_relative '../data/user'
 require_relative '../excep/password'
