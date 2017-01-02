@@ -55,6 +55,10 @@ files.each do |f|
     if tag.nil?
         puts "Need to find the tag for file: " + f
         # compute and write the tag!
-        tag_file_with_hash(f, file_hash)
+        begin
+            tag_file_with_hash(f, file_hash)
+        rescue
+            puts "Unable to tag file " + f
+        end
     end
 end
