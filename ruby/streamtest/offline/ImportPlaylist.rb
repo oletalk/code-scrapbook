@@ -1,5 +1,6 @@
 require 'optparse'
 require_relative '../util/dbbase'
+require_relative '../util/db_songlist'
 
 ERROR_LIMIT = 25
 
@@ -17,9 +18,14 @@ end
 
 errors = {}
 
+# Defaults
+$verbose = false
+$replace = false
+
 # Options
 options = {}
 playlist = nil
+playlistname = nil
     OptionParser.new do |opts|
     opts.banner = "Usage: ImportPlaylist.rb <path to playlist file> [options]"
     opts.on('-f', '--from f', 'First line (starting from 1) to process (default 1)') { |f| 
@@ -29,11 +35,18 @@ playlist = nil
         options[:to] = t
     }
     opts.on('-p', '--playlist p', 'playlist file to read') { |p| playlist = p }
+    opts.on('-r', '--replace', 'replace') { $replace = true }
+    opts.on('-n', '--name n', 'name to give playlist (1 word)') { |p| playlistname = p }
     opts.on('-v', '--verbose', 'Verbose') { $verbose = true }
 end.parse!
 
 if playlist.nil?
     puts "Playlist file not provided (use -p)"
+    Kernel.exit(1)
+end
+
+if playlistname.nil?
+    puts "Please name your playlist (using -n)"
     Kernel.exit(1)
 end
 
@@ -61,7 +74,7 @@ text=File.open(playlist).read # what if file doesn't exist?
 text.gsub!(/\r\n?/, "\n")
 # go through playlist, storing files found with their hashes
 #so we can do the playlist easily later on
-tags = {}
+tags = []
 found = 0
 text.each_line { |line|
     line.gsub!(/\s+$/, "")
@@ -71,10 +84,18 @@ text.each_line { |line|
     line_num += 1
     if hashes.key?(line)
         # TODO: add to custom playlist
+        tags.push({'hash' => hashes[line]})
+        if $verbose
+            puts "Found song #{line}"
+        end
         found += 1
     else
-        puts "Didn't find hash for '#{line}'"
+        errors[line] = "not found" 
     end
 }
 
 puts "Found #{found} out of #{line_num} song(s)."
+#puts "Resulting tags: #{tags}"
+puts "Saving songlist of #{tags.size} now."
+
+SongListDb.new.save_songlist(playlistname, tags, 'colin', !$replace) # need an owner, hardcoded colin for now
