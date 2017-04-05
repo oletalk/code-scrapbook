@@ -1,13 +1,10 @@
 extern crate rand;
+extern crate clap;
 use std::fs::File;
 use std::io::Read;
 use std::collections::HashMap;
+use clap::App;
 use rand::{thread_rng, Rng};
-
-// TODO: pass these in as parameters
-static SOURCE: &'static str = "test.txt";
-static OMITFILE: &'static str = "omitfile.txt";
-
 
 fn filecontents(filename: &str) -> Result<String,std::io::Error> {
     let mut data = String::new();
@@ -17,14 +14,25 @@ fn filecontents(filename: &str) -> Result<String,std::io::Error> {
 }
 
 fn main() {
+    // get arguments
+    let matches = App::new("Random songlist generator")
+                    .version("0.9")
+                    .author("Colin M. <oletalk@gmail.com>")
+                    .about("Shuffles a playlist")
+                    .args_from_usage(
+                        "-s, --source=[SOURCEFILE] 'Sets the source file containing song file paths'
+                         -o, --omitfile=[OMITFILE] 'List of songs to omit from the generated list'")
+                    .get_matches();
+    let source_arg = matches.value_of("source").unwrap();
+    let omitfile_arg = matches.value_of("omitfile").unwrap_or("");
 
     // read songfile - unwrap to a panic! is fine...
-    let songfile = filecontents(SOURCE).unwrap();
+    let songfile = filecontents(source_arg).unwrap();
     let mut lines: Vec<&str> = songfile.lines().collect();
     println!("I got {} lines from your source file.", lines.len());
 
     // read omitfile TODO: it's ok if there's none, don't make it panic!
-    let omitfile = match filecontents(OMITFILE) {
+    let omitfile = match filecontents(omitfile_arg) {
         Ok(data) => data,
         Err(_) => "".to_string()
     };
