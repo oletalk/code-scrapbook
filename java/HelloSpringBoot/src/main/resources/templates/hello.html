@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Upload a file to S3</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+    <body>
+        <div th:if="${message}">
+            <h2 th:text="${message}"/>
+	</div>
+
+        <form action="hello" th:action="@{/hello/upload}" method="post" enctype="multipart/form-data">
+            Please upload your file: <input type="file" name="file" id="file"/>
+            <input type="submit"/>
+        </form>
+    </body>
+</html>

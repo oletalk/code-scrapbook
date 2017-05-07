@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.oletalk.hellospringboot.service;
+package net.oletalk.hellospringboot.exception;
 
 /**
  *
  * @author colin
  */
-public interface HelloService {
-    
-    public String getGreeting(String person);
-    
+public class S3Exception extends Exception {
+    public S3Exception(String message) {
+        super(message);
+    }
 }
