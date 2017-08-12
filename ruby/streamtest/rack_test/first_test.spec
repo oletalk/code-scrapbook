@@ -39,7 +39,7 @@ describe 'The StreamApp app' do
 		playdscmd = '/bin/lame XXXX'
 		allow(@mock_player).to receive(:get_command).with(false, anything()).and_return(playcmd)
 		allow(@mock_player).to receive(:get_command).with(true, anything()).and_return(playdscmd)
-		allow(@mock_player).to receive(:play_song).with(playcmd, anything()).and_return({ songdata: 'foo' })
+        allow(@mock_player).to receive(:play_song).with(playcmd, anything()).and_return({ songdata: 'foo' })
 		allow(@mock_player).to receive(:play_song).with(playdscmd, anything()).and_return({ songdata: 'foodownsampled' })
 		Player.stub(:new).with(any_args()).and_return(@mock_player)
 	end
@@ -47,9 +47,10 @@ describe 'The StreamApp app' do
     def mock_db
 		@mock_db = double(Db)
 	# play
-		allow(@mock_db).to receive(:find_song).with(any_args()).and_return(nil)
-		allow(@mock_db).to receive(:find_song).with('abcdefg').and_return('/tunes/song1.mp3')
-		allow(@mock_db).to receive(:find_song).with('adf3a32').and_return('/tunes/greattune.ogg')
+		allow(@mock_db).to receive(:record_stat).with(any_args())
+		allow(@mock_db).to receive(:find_song).with(any_args()).and_return({ })
+		allow(@mock_db).to receive(:find_song).with('abcdefg').and_return({ :song_filepath => '/tunes/song1.mp3'})
+		allow(@mock_db).to receive(:find_song).with('adf3a32').and_return({ :song_filepath => '/tunes/greattune.ogg' })
 		allow(@mock_db).to receive(:authenticate_user).and_return(User.new('fred', 'abcde', false))
 	# list_songs
         allow(@mock_db).to receive(:list_songs)
