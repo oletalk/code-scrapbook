@@ -12,6 +12,6 @@ module MP3S
 	    PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - '
         # PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null'
 		RSC = 'BCE$21^&'
-        LOGFILE = 'streamserver.log'
+        LOGFILE = '/var/tmp/streamserver.log'
     end
 end

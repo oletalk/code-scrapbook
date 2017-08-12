@@ -211,7 +211,7 @@ class Db
         # for pre-9.5 versions of PostgreSQL
         @conn = new_connection
         sql = "update mp3s_stats set count = count+1 where category = $1 and item = $2;"
-        sqli = "insert into mp3s_stats(category, item, count) values ($1, $2, 1);"
+        sqli = "insert into mp3s_stats(category, item, count) select $1::varchar, $2::varchar, 1 where not exists (select 1 from mp3s_stats where category = $1 and item = $2);" # upserts before 9.5 :-(
 
         if item == nil
             Log.log.error "Item for category #{category} not recorded because it is nil"
