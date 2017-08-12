@@ -11,6 +11,8 @@ class StreamApp < Sinatra::Base
     set :bind, MP3S::Config::SERVER_HOST
     set :port, MP3S::Config::SERVER_PORT
     enable :sessions
+    enable :logging
+    enable :dump_errors
 
     use Rack::Session::Cookie, :secret => MP3S::Config::RSC
 
@@ -66,7 +68,8 @@ class StreamApp < Sinatra::Base
 	end
 
 	get '/play/:hash/downsampled' do |req_hash|
-        song_loc = @db.find_song(req_hash)
+        songdata = @db.find_song(req_hash)
+        song_loc = songdata[:song_filepath]
 
         # stream song in output to client
         Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
@@ -89,6 +92,8 @@ class StreamApp < Sinatra::Base
 				played = @player.play_song(command, song_loc)
 				warnings = played[:warnings]
 				Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
+                @db.record_stat('SONG', song_loc)
+                @db.record_stat('ARTIST', songdata[:artist])
 				played[:songdata]
 			end
         end
@@ -96,9 +101,8 @@ class StreamApp < Sinatra::Base
 
     get '/play/:hash' do |req_hash|
         # go find the song with this hash - see _pgtest.rb
-        song_loc = @db.find_song(req_hash)
-
-        # TODO: might want to invoke this check in some sort of area common to ALL requests?
+        songdata = @db.find_song(req_hash)
+        song_loc = songdata[:song_filepath]
 
         # stream song in output to client
         Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
@@ -121,6 +125,8 @@ class StreamApp < Sinatra::Base
 				played = @player.play_song(command, song_loc)
 				warnings = played[:warnings]
 				Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
+                @db.record_stat('SONG', song_loc)
+                @db.record_stat('ARTIST', songdata[:artist])
 				played[:songdata]
 			end
         end
@@ -178,7 +184,14 @@ class StreamApp < Sinatra::Base
             spec = ''
         end
         song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{spec}")
-        Format.json_list(song_list)
+        begin
+            Format.json_list(song_list)
+        rescue => ex
+            env['rack.errors'].puts ex
+            env['rack.errors'].puts ex.backtrace.join("\n")
+            env['rack.errors'].flush
+        end
+
     end
 
     # TODO: update your songlist (given that you are the owner)

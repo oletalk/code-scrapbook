@@ -43,7 +43,6 @@ class Db
     end
 
     def save_songlist(name, content, owner, insertPlaylistName=true)
-        ret = nil
         @conn = new_connection
         @conn.transaction do |conn|
             if insertPlaylistName
@@ -83,10 +82,14 @@ class Db
     def find_song(given_hash)
         ret = nil
         @conn = new_connection
-        @conn.exec_params(' SELECT song_filepath FROM mp3s_tags WHERE file_hash = $1', [given_hash]) do | result |
+        @conn.exec_params(' SELECT song_filepath, artist, title FROM mp3s_tags WHERE file_hash = $1', [given_hash]) do | result |
             result.each do |row|
                 #ret = row.values_at('song_filepath', 'file_hash')
-                ret = row['song_filepath']
+                ret = { 
+                    :song_filepath => row['song_filepath'],
+                    :artist        => row['artist'],
+                    :title         => row['title'],
+                }
             end
         end
         @conn.finish
@@ -197,13 +200,36 @@ class Db
             @conn.exec_prepared('add_user1', [ user, cryptedpass ])
             @conn.close if @conn
         rescue PG::Error => e
-            res = e.result
             Log.log.error "Problem saving new user: #{e}"
             @conn.close if @conn
         end
 
     end
 
+    def record_stat(category, item)
+        # tip from https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
+        # for pre-9.5 versions of PostgreSQL
+        @conn = new_connection
+        sql = "update mp3s_stats set count = count+1 where category = $1 and item = $2;"
+        sqli = "insert into mp3s_stats(category, item, count) values ($1, $2, 1);"
+
+        if item == nil
+            Log.log.error "Item for category #{category} not recorded because it is nil"
+        else
+            begin
+                @conn.prepare('record_stat1', sql)
+                res = @conn.exec_prepared('record_stat1', [ category, item ])
+                if res.ntuples() == 0
+                    @conn.prepare('record_stat2', sqli)
+                    @conn.exec_prepared('record_stat2', [ category, item ])
+                end
+                @conn.close if @conn
+            rescue PG::Error => e
+                Log.log.error "Problem recording stat: #{e}"
+                @conn.close if @conn
+            end
+        end
+    end
     def write_tag(hash, filename, tagobj)
         # check hash/filename is not already in database
         found_song = find_song(hash)
@@ -219,7 +245,6 @@ class Db
                 @conn.exec_prepared('ins_tag1', [ filename, hash, tagobj[:artist], tagobj[:title], tagobj[:secs]])
                 @conn.close if @conn
             rescue PG::Error => e
-                res = e.result
                 Log.log.error "Problem saving new tag: #{e}"
                 @conn.close if @conn
             end
