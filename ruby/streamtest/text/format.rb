@@ -20,7 +20,9 @@ module Format
         retjson = "{}"
         encfailed = false
         begin
-            safesonglist = songlist.map{ |foo| 
+            safesonglist = songlist
+                .map{ |e| e[:title].nil? ? {title:'untitled'} : e }
+                .map{ |foo| 
                 { title: foo[:title].encode('UTF-8', {
                     :invalid => :replace,
                     :undef   => :replace,
