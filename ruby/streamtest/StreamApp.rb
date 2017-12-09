@@ -194,6 +194,16 @@ class StreamApp < Sinatra::Base
 
     end
 
+    get '/search_json/:name' do
+        name = params['name']
+        song_list = @db.fetch_search(name)
+        if song_list.size > 0
+            Format.json_list(song_list)
+        else
+            '{ "error" : "That playlist was not found" }'
+        end
+    end
+
     # TODO: update your songlist (given that you are the owner)
 
     get '/playlist_json/:name' do

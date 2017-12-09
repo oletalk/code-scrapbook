@@ -10,6 +10,30 @@ class Db
     def new_connection
         PG.connect(dbname: MP3S::Config::DB_NAME, user:  MP3S::Config::DB_USER)
     end
+    
+    def fetch_search(search)
+        ret = nil
+        @conn = new_connection
+        sql = %{
+            SELECT 
+                file_hash, 
+                secs,
+                case 
+                    when (title is null or title = '') then substring(song_filepath from '[^/]*$') 
+                    else artist || ' - ' || title 
+                end as display_title 
+            FROM mp3s_tags 
+            WHERE song_filepath like $1
+            ORDER by display_title
+            }.gsub(/\s+/, " ").strip
+        @conn.exec_params(sql, [ "%#{search}%" ]) do |result|
+            result.each do |row|
+                ret.push({ hash: row['file_hash'], title: row['display_title'], secs: row['secs']} )
+            end
+        end
+        @conn.finish
+        ret
+    end
 
     def check_owner_is(listname, ownername)
         # if playlist doesn't exist - nil
