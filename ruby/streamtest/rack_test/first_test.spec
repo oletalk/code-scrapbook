@@ -60,6 +60,7 @@ describe 'The StreamApp app' do
                     { 'hash': 'fce3fca', 'title': 'A Ditty', 'secs': 220}
                    ] );
 	# other methods wrapped by endpoints
+		allow(@mock_db).to receive(:fetch_search).and_return([  { 'hash': 'fce3fca', 'title': 'A Ditty', 'secs': 220} ] )
         allow(@mock_db).to receive(:list_songlists_for).and_return([ { name: 'foo' } ])
         allow(@mock_db).to receive(:check_owner_is).with('foo', 'bar').and_return(false)
         allow(@mock_db).to receive(:check_owner_is).with('foo', 'fred').and_return(true)
@@ -111,6 +112,13 @@ describe 'The StreamApp app' do
 		expect(last_response).to be_ok
         expect(last_response.body).to eq("[{\"title\":\"My Song\",\"hash\":\"abcdefg\"},{\"title\":\"Great Tune\",\"hash\":\"adf3a32\"},{\"title\":\"A Ditty\",\"hash\":\"fce3fca\"}]")
     end
+
+	it "fetches a list of songs matching a search" do
+        mock_db
+        get '/search_json/song', {}, {'REMOTE_ADDR' => '192.168.0.1'}
+		expect(last_response).to be_ok
+		expect(last_response.body).to eq("[{\"title\":\"A Ditty\",\"hash\":\"fce3fca\"}]")
+	end
 
 	it "returns list of playlists for a given user" do
         mock_db
