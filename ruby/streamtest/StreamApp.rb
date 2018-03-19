@@ -194,6 +194,17 @@ class StreamApp < Sinatra::Base
 
     end
 
+    get '/search/:name' do
+        name = params['name']
+        song_list = @db.fetch_search(name)
+        if song_list.size > 0
+            response.headers['Content-Type'] = 'text/plain'
+            Format.play_list(song_list, request.env['HTTP_HOST'], request.env['downsample'])
+            else
+            '{ "error" : "That playlist was not found" }'
+        end
+    end
+
     get '/search_json/:name' do
         name = params['name']
         song_list = @db.fetch_search(name)

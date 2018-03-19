@@ -8,7 +8,7 @@ module MP3S
             '192.168.0.0/24' => { allow: true, downsample: false },
             '109.148.232.0/24' => { allow: true, downsample: true },
             '82.118.92.0/24' => { allow: true, downsample: true },
-            '199.253.246.0/24' => { allow: true, downsample: true }
+            '130.209.164.0/24' => { allow: true, downsample: true }
         }
 
         Default = { allow: false }

@@ -12,7 +12,7 @@ class Db
     end
     
     def fetch_search(search)
-        ret = nil
+        ret = []
         @conn = new_connection
         sql = %{
             SELECT 
@@ -23,7 +23,7 @@ class Db
                     else artist || ' - ' || title 
                 end as display_title 
             FROM mp3s_tags 
-            WHERE song_filepath like $1
+            WHERE upper(song_filepath) like upper($1)
             ORDER by display_title
             }.gsub(/\s+/, " ").strip
         @conn.exec_params(sql, [ "%#{search}%" ]) do |result|
