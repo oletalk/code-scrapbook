@@ -221,6 +221,7 @@ class StreamApp < Sinatra::Base
         name = params['name']
         song_list = @db.fetch_playlist(name)
         if song_list.size > 0
+            response.headers['Cache-Control'] = 'no-cache'
             Format.json_list(song_list)
         else
             '{ "error" : "That playlist was not found" }'
@@ -230,6 +231,7 @@ class StreamApp < Sinatra::Base
     get '/json_lists_for/:owner' do
         owner = params['owner']
         lists = @db.list_songlists_for(owner)
+        response.headers['Cache-Control'] = 'no-cache'
         Format.json(lists)
     end
 
