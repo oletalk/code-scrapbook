@@ -234,7 +234,7 @@ class Db
     def record_stat(category, item)
         # NOTE does not work on pre-9.5 versions of PostgreSQL
         @conn = new_connection
-        sql = "insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set plays = plays+1, last_played = current_timestamp;"
+        sql = "insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set plays = mp3s_stats.plays+1, last_played = current_timestamp;"
 
         if item == nil
             Log.log.error "Item for category #{category} not recorded because it is nil"
