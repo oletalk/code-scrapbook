@@ -4,7 +4,7 @@ module MP3S
         MP3_ROOT = '/opt/gulfport/mp3'
         SERVER_HOST = '0.0.0.0'
         SERVER_PORT = 2345
-	    DB_NAME = 'maindb'
+	    DB_NAME = 'postgres'
 	    DB_USER = 'web'
         CACHE_SECS = 259200
         PLAY_RAW = '/bin/cat XXXX'

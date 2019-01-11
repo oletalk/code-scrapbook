@@ -217,6 +217,7 @@ class Db
             raise UserCreationError.new("That user already exists")
         end
 
+        @conn = new_connection
         sql = %{ INSERT into users (username, pass)
                  VALUES ($1, $2) }.gsub(/\s+/, " ").strip
         begin
@@ -231,11 +232,9 @@ class Db
     end
 
     def record_stat(category, item)
-        # tip from https://stackoverflow.com/questions/17267417/how-to-upsert-merge-insert-on-duplicate-update-in-postgresql
-        # for pre-9.5 versions of PostgreSQL
+        # NOTE does not work on pre-9.5 versions of PostgreSQL
         @conn = new_connection
-        sql = "update mp3s_stats set count = count+1 where category = $1 and item = $2;"
-        sqli = "insert into mp3s_stats(category, item, count) select $1::varchar, $2::varchar, 1 where not exists (select 1 from mp3s_stats where category = $1 and item = $2);" # upserts before 9.5 :-(
+        sql = "insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set count = count+1, last_played = current_timestamp;"
 
         if item == nil
             Log.log.error "Item for category #{category} not recorded because it is nil"
@@ -243,10 +242,6 @@ class Db
             begin
                 @conn.prepare('record_stat1', sql)
                 res = @conn.exec_prepared('record_stat1', [ category, item ])
-                if res.ntuples() == 0
-                    @conn.prepare('record_stat2', sqli)
-                    @conn.exec_prepared('record_stat2', [ category, item ])
-                end
                 @conn.close if @conn
             rescue PG::Error => e
                 Log.log.error "Problem recording stat: #{e}"
