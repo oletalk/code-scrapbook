@@ -35,6 +35,27 @@ class Db
         ret
     end
 
+    def fetch_lastweek_songs
+      ret = []
+      @conn = new_connection
+      sql = %{
+        SELECT 
+          substring(s.item from '[^/]*$') item, last_played, t.file_hash 
+        FROM mp3s_stats s, mp3s_tags t 
+        WHERE s.category = 'SONG' 
+        AND s.item = t.song_filepath 
+        AND last_played > current_date - INTERVAL '7 days' 
+        ORDER BY last_played DESC
+      }.gsub(/\s+/, " ").strip
+      @conn.exec_params(sql) do |result|
+          result.each do |row|
+              ret.push({ item: row['item'], last_played: row['last_played'], file_hash: row['file_hash']} )
+          end
+      end
+      @conn.finish
+      ret
+    end
+
     def check_owner_is(listname, ownername)
         # if playlist doesn't exist - nil
         # if playlist exists and it belongs to ownername - true

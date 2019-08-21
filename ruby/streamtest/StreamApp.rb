@@ -194,6 +194,16 @@ class StreamApp < Sinatra::Base
 
     end
 
+    get '/lastweek_json' do
+      lastweek_list = @db.fetch_lastweek_songs
+      if lastweek_list != nil && lastweek_list.size > 0
+        response.headers['Content-Type'] = 'text/plain'
+        Format.json(lastweek_list)
+      else
+        '{ "error" : "No songs found from last week" }'
+      end
+    end
+
     get '/search/:name' do
         name = params['name']
         song_list = @db.fetch_search(name)
