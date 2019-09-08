@@ -162,7 +162,15 @@ class StreamApp < Sinatra::Base
    
     #current_user = env['warden'].user 
         username = env['warden'].user.username
-        erb :createpls, :locals => {:name => username }
+        user_action = params['action']
+        Log.log.info("Action is " + user_action)
+        if user_action == 'playlist'
+            erb :createpls, :locals => {:name => username }
+        elsif user_action == 'week'
+            erb :maintweek, :locals => {:name => username }
+        else
+            '404 Not Found'
+        end
         # TODO XHRs are not secured until i figure out how to forward on credentials to them...
     end
 
