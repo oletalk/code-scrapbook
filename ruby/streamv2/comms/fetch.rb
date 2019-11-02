@@ -11,8 +11,12 @@ class Fetch
 
   end
   
-  def fetch(hash)
-    url = @base_url + hash
+  def fetch(hash, downsample: false)
+    ds_extra = ""
+    if downsample
+      ds_extra = "/downsampled"
+    end
+    url = @base_url + hash + ds_extra
     response = HTTParty.get(url, format: :plain)
     response.body
   end

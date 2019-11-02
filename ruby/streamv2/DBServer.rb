@@ -22,6 +22,18 @@ class DBServer < Sinatra::Base
   
   get '/play/:hash' do |req_hash|
     # locate hash in db
+    do_downsample = request.env['downsample']
+    process_songdata(req_hash, do_downsample)
+   
+  end
+  
+  get '/play/:hash/downsampled' do |req_hash|
+    # locate hash in db
+    do_downsample = request.env['downsample']
+    process_songdata(req_hash, do_downsample, true)
+  end
+  
+  def process_songdata(req_hash, do_downsample, req_downsample=false)
     songdata = @db.find_song(req_hash)
     if songdata.nil?
       "404 Sorry, that song was not found"
@@ -30,14 +42,20 @@ class DBServer < Sinatra::Base
   
       Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
 
-      do_downsample = request.env['downsample']
       Log.log.info("Downsample info from the request: #{do_downsample}")
-      if (do_downsample)
+      songresponse(req_hash, song_loc, req_downsample)
+    end
+  end
+  
+  
+  def songresponse(req_hash, song_loc, downsample=false )
+    
+    if (downsample)
         Log.log.error("Action for client is to downsample but it is asking for raw file")
         "403 Forbidden"
       else
         # play it (stream server will be calling this method)
-        command = @player.get_command(do_downsample, song_loc)
+        command = @player.get_command(downsample, song_loc)
         Log.log.info("Fetched command template, #{command}")
         
         $stdout.sync = true
@@ -47,14 +65,7 @@ class DBServer < Sinatra::Base
         # TODO record stats
         played[:songdata]
       end
-
-
-    end
-  
   end
   
-  get '/play/:hash/downsampled' do |req_hash|
-    "fetch hash #{req_hash} downsampled"
-  end
   run! if app_file == $0
 end
