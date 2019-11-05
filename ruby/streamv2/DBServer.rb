@@ -3,6 +3,7 @@ require_relative 'util/config'
 require_relative 'util/db'
 require_relative 'util/player'
 require_relative 'util/logging'
+require_relative 'text/format'
 
 # this server should not be publicly accessible
 class DBServer < Sinatra::Base
@@ -18,7 +19,25 @@ class DBServer < Sinatra::Base
     @player = Player.new
     
   end
+    
+  get '/search/:name' do |name|
+    song_list = @db.fetch_search(name)
+    if song_list.size > 0
+      Format.play_list(song_list, request.env['HTTP_HOST'], request.env["downsample"])
+    else
+      '{ "error" : "That playlist was not found" }'
+    end
+    
+  end
   
+  
+  get '/list/:spec' do |req_spec|
+    if req_spec == 'all'
+      req_spec = ''
+    end
+    song_list = @db.list_songs("#{MP3S::Config::MP3_ROOT}/#{req_spec}")
+    Format.play_list(song_list, request.env['HTTP_HOST'], request.env['downsample'])
+  end
   
   get '/play/:hash' do |req_hash|
     # locate hash in db

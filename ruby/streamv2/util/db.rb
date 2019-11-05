@@ -23,4 +23,42 @@ class Db
     @conn.finish
     ret
   end
+  
+  def list_songs(partial_spec)
+    ret = []
+    @conn = new_connection
+    sql = %{
+      SELECT
+          file_hash,
+          secs,
+          case
+              when (title is null or title = '') then substring(song_filepath from '[^/]*')
+              else artist || ' - ' || title
+          end as display_title
+      FROM mp3s_tags
+      WHERE song_filepath like $1
+      ORDER by display_title
+    }.gsub(/\s+/, " ").strip
+    
+    @conn.exec_params(sql, [ "#{partial_spec}%" ]) do | result |
+      result.each do |row|
+        ret.push({ hash: row['file_hash'], title: row['display_title'], secs: row['secs']} )
+      end
+    end
+    @conn.finish
+    ret
+  end
+  
+  def fetch_search(search)
+    ret = []
+    @conn = new_connection
+    sql = %{}.gsub(/\s+/, " ").strip
+    @conn.exec_params(sql, [ "%#{search}%" ]) do | result |
+      result.each do | row |
+        ret.push({ hash: row['file_hash'], title: row['display_title'], secs: row['secs']} )
+      end
+    end
+    @conn.finish
+  end
+  
 end

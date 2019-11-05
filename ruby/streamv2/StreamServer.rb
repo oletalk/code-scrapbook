@@ -48,5 +48,20 @@ class StreamServer < Sinatra::Base
       f.fetch(req_hash, downsample: true)
     end
   end
+  
+  get '/m3u/:spec' do
+    spec = params['spec']
+    f = Fetch.new
+    response.headers['Content-Type'] = 'text/plain'
+    f.list(spec)
+  end
+  
+  get '/search/:name' do
+    name = params['name']
+    response.headers['Content-Type'] = 'text/plain'
+    f.search(name)
+  end
+  
+  
   run! if app_file == $0
 end
