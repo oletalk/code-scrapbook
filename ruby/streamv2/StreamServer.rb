@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'sysrandom/securerandom'
 require_relative 'util/config'
 require_relative 'comms/fetch'
 require_relative 'util/ipwl'
@@ -13,10 +14,31 @@ class StreamServer < Sinatra::Base
   enable :dump_errors
   
   # init stuff
+  configure do
+    set :session_secret, ENV.fetch('SESSION_SECRET') { SecureRandom.hex(64) }
+    f = Fetch.new
+    result = f.start(ENV.fetch('HMAC_SECRET'))
+    if result != 'OK'
+      puts " *******************************************************************"
+      puts " *                                                                 *"
+      puts " * ERROR! Did not establish connection with DBServer! Check logs.  *"
+      puts " *                                                                 *"
+      puts " *******************************************************************"
+
+    else
+      puts "Successfully connected to DBServer!"
+    end
+  end
+  
+  
+  # before each request...
   before do
     @ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
-    
+
     remote_ip = request.env['REMOTE_ADDR']
+    if @ipwl == nil
+      puts "ipwl is nil"
+    end
     action = @ipwl.action(remote_ip)
     Log.log.info("Action for #{remote_ip} is #{action}.")
     if !action[:allow]
@@ -32,8 +54,8 @@ class StreamServer < Sinatra::Base
     else
   
   # PASS REQUEST ON TO DB MODULE
-      f = Fetch.new
-      f.fetch(req_hash)
+    f = Fetch.new
+    f.fetch(req_hash)
     end
   end
   
@@ -44,19 +66,20 @@ class StreamServer < Sinatra::Base
     else
   
   # PASS REQUEST ON TO DB MODULE
-      f = Fetch.new
-      f.fetch(req_hash, downsample: true)
+    f = Fetch.new
+    f.fetch(req_hash, downsample: true)
     end
   end
   
   get '/m3u/:spec' do
     spec = params['spec']
-    f = Fetch.new
     response.headers['Content-Type'] = 'text/plain'
+    f = Fetch.new
     f.list(spec)
   end
   
   get '/search/:name' do
+    f = Fetch.new
     name = params['name']
     response.headers['Content-Type'] = 'text/plain'
     f.search(name)

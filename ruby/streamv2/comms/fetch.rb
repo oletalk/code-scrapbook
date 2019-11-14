@@ -1,4 +1,5 @@
 require 'httparty'
+require 'jwt'
 require_relative '../util/logging'
 require_relative '../util/config'
 
@@ -12,7 +13,6 @@ class Fetch
   def initialize
     @base_url = 'http://' + MP3S::Config::DB_SERVER_HOST + ':' + MP3S::Config::DB_SERVER_PORT.to_s
     Log.log.info "Fetching mechanism loaded base url of #{@base_url}"
-
   end
   
   def fetch(hash, downsample: false)
@@ -31,8 +31,16 @@ class Fetch
     go_get(@base_url + SEARCH + name)
   end
   
+  def start(stuff)
+    @hmac_secret = stuff
+    payload = { data: MP3S::Config::SHARED_SECRET }
+    token = JWT.encode payload, @hmac_secret, 'HS256'
+    go_get(@base_url + '/pass/' + token)
+  end
+  
   def go_get(url)
     begin
+      
       response = HTTParty.get(url, format: :plain)
       case response.code
         when 200

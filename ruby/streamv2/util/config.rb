@@ -4,6 +4,7 @@ module MP3S
         MP3_ROOT = '/opt/gulfport/mp3'
         SERVER_HOST = '0.0.0.0'
         SERVER_PORT = 2350
+        SHARED_SECRET = 'stuff'
         DB_SERVER_HOST = '192.168.0.2'
         DB_SERVER_PORT = 2351
 	    DB_NAME = 'postgres'
