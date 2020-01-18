@@ -109,7 +109,8 @@ class DBServer < Sinatra::Base
           played = @player.play_song(command, song_loc)
           warnings = played[:warnings]
           Log.log warn(warnings) unless (warnings.nil? or warnings == '')
-          # TODO record stats
+          # TODO record stats for artist/title if there
+          @db.record_stat('SONG', song_loc)
           played[:songdata]
     end
   end
