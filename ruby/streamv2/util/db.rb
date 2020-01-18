@@ -5,7 +5,7 @@ require_relative 'logging'
 class Db
   
   def new_connection
-    PG.connect(dbname: MP3S::Config::DB_NAME, user: MP3S::Config::DB_USER)
+    PG.connect(dbname: MP3S::Config::DB::NAME, user: MP3S::Config::DB::USER)
   end
   
   def find_song(given_hash)

@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require 'sysrandom/securerandom'
 require_relative 'util/config'
 require_relative 'comms/fetch'
 require_relative 'util/ipwl'
@@ -7,15 +6,12 @@ require_relative 'util/ipwl'
 # so, this server should be publicly accessible
 # but the other, with access to the mp3s, shouldn't
 class StreamServer < Sinatra::Base
-  set :bind, MP3S::Config::SERVER_HOST
-  set :port, MP3S::Config::SERVER_PORT
-  enable :sessions
-  enable :logging
+  set :bind, MP3S::Config::Net::SERVER_HOST
+  set :port, MP3S::Config::Net::SERVER_PORT
   enable :dump_errors
   
   # init stuff
   configure do
-    set :session_secret, ENV.fetch('SESSION_SECRET') { SecureRandom.hex(64) }
     f = Fetch.new
     result = f.start(ENV.fetch('HMAC_SECRET'))
     if result != 'OK'
@@ -48,33 +44,16 @@ class StreamServer < Sinatra::Base
   end
 
   get '/play/:hash' do |req_hash|
-    if @downsample
-      Log.log.error "ip whitelist indicates we should request downsampled tunes"
-      halt 403, {'Content-Type' => 'text/plain'}, '403 Access Denied'
-    else
-  
-  # PASS REQUEST ON TO DB MODULE
+    # PASS REQUEST ON TO DB MODULE
     f = Fetch.new
-    f.fetch(req_hash)
-    end
-  end
-  
-  get '/play/:hash/downsampled' do |req_hash|
-    if !@downsample
-      Log.log.error "ip whitelist indicates we should NOT request downsampled tunes"
-      halt 403, {'Content-Type' => 'text/plain'}, '403 Access Denied'
-    else
-  
-  # PASS REQUEST ON TO DB MODULE
-    f = Fetch.new
-    f.fetch(req_hash, downsample: true)
-    end
+    f.fetch(req_hash, downsample: @downsample)
   end
   
   get '/m3u/:spec' do
     spec = params['spec']
     response.headers['Content-Type'] = 'text/plain'
     f = Fetch.new
+    f.set_hostheader(request.env['HTTP_HOST'])
     f.list(spec)
   end
   

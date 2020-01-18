@@ -20,15 +20,15 @@ class Player
         if downsample
             # check if downsampling mp3/ogg
             if ( song =~ /mp3$/i )
-                command = MP3S::Config::PLAY_DOWNSAMPLED_MP3
+                command = MP3S::Config::Play::DOWNSAMPLED_MP3
             elsif ( song =~ /ogg$/i )
-                command = MP3S::Config::PLAY_DOWNSAMPLED_OGG
+                command = MP3S::Config::Play::DOWNSAMPLED_OGG
             else
                 Log.log.error ("No idea how to downsample given file type #{song}")
                 command = nil
             end
         else
-            command = MP3S::Config::PLAY_RAW
+            command = MP3S::Config::Play::RAW
         end
         command
     end

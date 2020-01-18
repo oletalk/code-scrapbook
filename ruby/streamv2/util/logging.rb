@@ -4,7 +4,7 @@ require 'logger'
 class Log
     def self.log
         if @logger.nil?
-            logfile_loc = MP3S::Config::LOGFILE
+            logfile_loc = MP3S::Config::Misc::LOGFILE
             if logfile_loc.nil?
                 @logger = Logger.new STDOUT
             else

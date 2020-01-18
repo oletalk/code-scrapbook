@@ -1,5 +1,5 @@
-#\ -p 2350 -o 0.0.0.0 -q
-require './StreamServer'
+#\ -p 2351 -o 0.0.0.0 -q
+require './DBServer'
 #require 'rack/cache'
 
 #use Rack::Cache,
@@ -7,4 +7,4 @@ require './StreamServer'
 #    :entitystore => 'file:/var/tmp/rack/body',
 #    :verbose => true
 
-run StreamServer
+run DBServer
