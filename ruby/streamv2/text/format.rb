@@ -1,15 +1,19 @@
 require 'json'
-    
+
 module Format
     def self.html_list(songlist, downsampled=false)
 		ds = ""
 		if downsampled
 			ds = "/downsampled"
 		end
-        ret = songlist.collect{ |song| 
+        ret = songlist.collect{ |song|
             %{ <a href='/play/#{song[:hash]}#{ds}'>#{song[:title]}</a> }
         }.join("<br/>\n")
         ret
+    end
+
+    def self.display_playlist(input)
+      input.to_s
     end
 
     def self.json(object)
@@ -22,12 +26,12 @@ module Format
         begin
             safesonglist = songlist
                 .map{ |e| e[:title].nil? ? {title:'untitled'} : e }
-                .map{ |foo| 
+                .map{ |foo|
                 { title: foo[:title].encode('UTF-8', {
                     :invalid => :replace,
                     :undef   => :replace,
                     :replace => '?'
-                }), 
+                }),
                   hash: foo[:hash] }
             }
             retjson = safesonglist.to_json

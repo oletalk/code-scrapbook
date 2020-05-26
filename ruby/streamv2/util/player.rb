@@ -13,6 +13,8 @@ class Player
         cmdexec = command.sub(/XXXX/, escaped)
         Log.log.info("Command to send: #{cmdexec}")
         stdout, stderr, status = Open3.capture3("#{cmdexec}", binmode: true)
+        Log.log.info("return status: #{status}, stdout.length = #{stdout.length}, stderr.length = #{stderr.length}")
+        puts stderr if stderr
         { songdata: stdout, command: cmdexec, warnings: stderr }
     end
 

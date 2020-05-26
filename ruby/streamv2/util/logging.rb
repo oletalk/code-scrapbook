@@ -14,4 +14,8 @@ class Log
         end
         @logger
     end
+
+    def self.init(file_loc)
+      @logger = Logger.new( file_loc )
+    end
 end

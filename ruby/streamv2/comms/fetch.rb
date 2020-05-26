@@ -4,20 +4,30 @@ require_relative '../util/logging'
 require_relative '../util/config'
 
 class Fetch
-  
+
   PLAY = '/play/'
   LIST = '/list/'
+  PLAYLIST = '/playlist/'
+  PLAYLISTS = '/playlists'
   SEARCH = '/search/'
-  
+
   # get the address of the mp3 server from config
   def initialize
     @base_url = 'http://' + MP3S::Config::DB::SERVER_HOST + ':' + MP3S::Config::DB::SERVER_PORT.to_s
     @hostheader = nil
     Log.log.info "Fetching mechanism loaded base url of #{@base_url}"
   end
-  
+
   def set_hostheader(hh)
     @hostheader = hh
+  end
+
+  def playlist(playlist_id)
+    if playlist_id.nil?
+      go_get(@base_url + PLAYLISTS)
+    else
+      go_get(@base_url + PLAYLIST + playlist_id)
+    end
   end
 
   def fetch(hash, downsample: false)
@@ -27,27 +37,28 @@ class Fetch
     end
     go_get(@base_url + PLAY + hash + ds_extra)
   end
-  
+
   def list(spec, downsample: false)
     stg = go_get(@base_url + LIST + spec)
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
   end
-  
+
   def search(name)
-    go_get(@base_url + SEARCH + name)
+    stg = go_get(@base_url + SEARCH + name)
+    stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
   end
-  
+
   def start(stuff)
     @hmac_secret = stuff
     payload = { data: MP3S::Config::Misc::SHARED_SECRET }
     token = JWT.encode payload, @hmac_secret, 'HS256'
     go_get(@base_url + '/pass/' + token)
   end
-  
+
   def go_get(url)
     begin
-      
+
       response = HTTParty.get(url, format: :plain)
       Log.log.debug("Requested url: #{url}")
       case response.code
@@ -65,6 +76,6 @@ class Fetch
       'no connection X-( '
     end
   end
-  
-  
+
+
 end

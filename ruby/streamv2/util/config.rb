@@ -22,6 +22,7 @@ module MP3S
           SHARED_SECRET = 'stuff'
 		      RSC = 'BCE$21^&'
           LOGFILE = '/var/tmp/streamer_server.log'
+          DB_LOGFILE = '/var/tmp/db_server.log'
         end
     end
 end
