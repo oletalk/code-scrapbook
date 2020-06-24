@@ -5,7 +5,14 @@
   </HEAD>
   <BODY>
     <% if @playlist %>
-    <%= @foo %>
+    Select your playlist:
+      <ol>
+      <% @foo.each do |opt| %>
+      <li><a href="/playlist/<%= opt['id'] %>" >
+        <%= opt['name'] %>
+      </a></li>
+      <% end %>
+      </ol>
     <% else %>
     Sorry, you don't have permission to manage playlists.
     <% end %>

@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'json'
 require_relative 'util/config'
 require_relative 'comms/fetch'
 require_relative 'util/ipwl'
@@ -46,8 +47,14 @@ class StreamServer < Sinatra::Base
 
   get '/playlist/manage' do
     f = Fetch.new
-    @foo = f.playlist(nil)
+    @foo = JSON.parse(f.playlist(nil))
     erb :manage
+  end
+
+  get '/playlist/:id' do |id|
+    f = Fetch.new
+    @foo = JSON.parse(f.playlist(id))
+    erb :list
   end
 
   get '/play/:hash' do |req_hash|
@@ -64,12 +71,24 @@ class StreamServer < Sinatra::Base
     f.list(spec)
   end
 
-  get '/search/:name' do
+  get '/m3u/search/:name' do
     f = Fetch.new
+    f.set_hostheader(request.env['HTTP_HOST'])
     name = params['name']
     response.headers['Content-Type'] = 'text/plain'
-    f.search(name)
+    f.search(name, 'm3u')
   end
+
+#json
+  get '/search/:name' do
+    f = Fetch.new
+    f.set_hostheader(request.env['HTTP_HOST'])
+    name = params['name']
+    response.headers['Content-Type'] = 'text/plain'
+    puts f.search(name, nil)
+    f.search(name, nil)
+  end
+
 
 
   run! if app_file == $0

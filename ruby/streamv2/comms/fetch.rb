@@ -1,5 +1,6 @@
 require 'httparty'
 require 'jwt'
+
 require_relative '../util/logging'
 require_relative '../util/config'
 
@@ -40,13 +41,18 @@ class Fetch
 
   def list(spec, downsample: false)
     stg = go_get(@base_url + LIST + spec)
+    stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
   end
 
-  def search(name)
-    stg = go_get(@base_url + SEARCH + name)
-    stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
+  def search(name, format)
+    if format == 'm3u'
+      stg = go_get(@base_url + SEARCH + 'm3u/' + name)
+    else
+      stg = go_get(@base_url + SEARCH + name)
+    end
+    stg
   end
 
   def start(stuff)

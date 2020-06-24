@@ -20,7 +20,10 @@ class Db
 
   def fetch_playlist(playlist_id)
     sql = %{
-      select ps.file_hash, artist, title, song_filepath
+      select ps.file_hash, case
+          when (title is null or title = '') then split_part(right(song_filepath, position('/' IN REVERSE(song_filepath))-1), '.', 1)
+          else artist || ' - ' || title
+      end as display_title
       from mp3s_playlist_song ps, mp3s_tags t
       where ps.file_hash = t.file_hash
       and ps.playlist_id = $1
@@ -31,8 +34,8 @@ class Db
       sql: sql,
       params: [ playlist_id ],
       result_map: {
-        id: true,
-        name: true
+        file_hash: true,
+        display_title: true
       },
       description: "fetching playlists"
     )

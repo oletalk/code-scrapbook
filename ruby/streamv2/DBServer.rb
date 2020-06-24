@@ -33,14 +33,16 @@ class DBServer < Sinatra::Base
 
   get '/playlists' do
     @db.fetch_playlists
-    Format.display_playlist(@db.fetch_playlists)
+    Format.json(@db.fetch_playlists)
   end
 
   get '/playlist/:id' do |id|
-    @playlist = @db.fetch_playlist(id)
+    Format.json(@db.fetch_playlist(id))
   end
 
-  get '/search/:name' do |name|
+  #post '/playlist/:id/save'
+
+  get '/search/m3u/:name' do |name|
     song_list = @db.fetch_search(name)
     if song_list.size > 0
       Format.play_list(song_list, request.env['HTTP_HOST'])
@@ -50,6 +52,16 @@ class DBServer < Sinatra::Base
 
   end
 
+  get '/search/:name' do |name|
+    song_list = @db.fetch_search(name)
+    if song_list.size > 0
+      puts song_list
+      Format.json(song_list)
+    else
+      '{ "error" : "That playlist was not found" }'
+    end
+
+  end
 
   get '/list/:spec' do |req_spec|
     if req_spec == 'all'
