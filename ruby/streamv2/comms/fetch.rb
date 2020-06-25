@@ -12,6 +12,8 @@ class Fetch
   PLAYLISTS = '/playlists'
   SEARCH = '/search/'
 
+  PLAYLIST_SAVE = '/playlist/save'
+
   # get the address of the mp3 server from config
   def initialize
     @base_url = 'http://' + MP3S::Config::DB::SERVER_HOST + ':' + MP3S::Config::DB::SERVER_PORT.to_s
@@ -26,9 +28,19 @@ class Fetch
   def playlist(playlist_id)
     if playlist_id.nil?
       go_get(@base_url + PLAYLISTS)
+    elsif playlist_id == 'new'
+      go_get(@base_url + PLAYLIST + 'new')
     else
       go_get(@base_url + PLAYLIST + playlist_id)
     end
+  end
+
+  def savelist(playlist_id, playlist_name, playlist_songids)
+    # pid pname songids
+    go_post(@base_url + PLAYLIST_SAVE, {
+      pid: playlist_id, pname: playlist_name, songids: playlist_songids
+      })
+
   end
 
   def fetch(hash, downsample: false)
@@ -60,6 +72,28 @@ class Fetch
     payload = { data: MP3S::Config::Misc::SHARED_SECRET }
     token = JWT.encode payload, @hmac_secret, 'HS256'
     go_get(@base_url + '/pass/' + token)
+  end
+
+  def go_post(url, params)
+    begin
+
+      response = HTTParty.post(url, body: params)
+      Log.log.debug("Requested url: #{url}")
+      Log.log.debug(" -> #{params}")
+      case response.code
+        when 200
+          response.body
+        when 404
+          Log.log.error("*** NOT FOUND: #{url}")
+          '404 Not Found'
+        when 500...600
+          Log.log.error("DBServer had an error!")
+          '500 Internal error'
+      end
+    rescue Errno::ECONNREFUSED => e
+      Log.log.error "Couldn't connect to DBServer :-( "
+      'no connection X-( '
+    end
   end
 
   def go_get(url)

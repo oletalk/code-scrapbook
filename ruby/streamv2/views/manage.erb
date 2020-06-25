@@ -2,6 +2,7 @@
 <HTML>
   <HEAD>
     <TITLE>manage playlists</TITLE>
+    <link rel="stylesheet" href="/css/playlist.css">
   </HEAD>
   <BODY>
     <% if @playlist %>
@@ -12,6 +13,7 @@
         <%= opt['name'] %>
       </a></li>
       <% end %>
+      <li><a href="/playlist_new">Create new</a></li>
       </ol>
     <% else %>
     Sorry, you don't have permission to manage playlists.

@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'json'
+require 'cgi'
 require_relative 'util/config'
 require_relative 'comms/fetch'
 require_relative 'util/ipwl'
@@ -45,15 +46,41 @@ class StreamServer < Sinatra::Base
     @downsample = action[:downsample]
   end
 
+  post '/playlist/save' do
+    playlist_id = params['pid']
+    playlist_name = params['pname']
+    playlist_songids = params['songids']
+    if playlist_songids.nil?
+      'Error: no playlist songs provided :-/'
+    else
+      f = Fetch.new
+      f.savelist(playlist_id, playlist_name, playlist_songids)
+      redirect '/playlist/manage'
+    end
+  end
+
   get '/playlist/manage' do
     f = Fetch.new
     @foo = JSON.parse(f.playlist(nil))
     erb :manage
   end
 
+  get '/playlist_new' do
+    f = Fetch.new
+    @foo = []
+    res = f.playlist('new')
+    @playlist_id = f.playlist('new').to_i
+    Log.log.debug "New playlist will have an id of #{@playlist_id} (from #{res})"
+    erb :list
+  end
+
   get '/playlist/:id' do |id|
     f = Fetch.new
     @foo = JSON.parse(f.playlist(id))
+    puts @foo
+    # each row has the playlist name (yeah, i know...)
+    @pname = @foo[0]['name']
+    @playlist_id = id
     erb :list
   end
 
@@ -83,7 +110,7 @@ class StreamServer < Sinatra::Base
   get '/search/:name' do
     f = Fetch.new
     f.set_hostheader(request.env['HTTP_HOST'])
-    name = params['name']
+    name = CGI.escape(params['name'])
     response.headers['Content-Type'] = 'text/plain'
     puts f.search(name, nil)
     f.search(name, nil)

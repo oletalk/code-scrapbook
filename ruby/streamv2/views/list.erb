@@ -2,24 +2,60 @@
 <HTML>
   <HEAD>
     <TITLE>edit playlist</TITLE>
-
-
+    <link rel="stylesheet" href="/css/playlist.css">
   </HEAD>
   <BODY>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin>
     </script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin>
     </script>
+    <script language="javascript">
+
+      // FIXME: these menu items can't be selected again!
+      function removeSelected() {
+        var sel = document.getElementById('playlist');
+        var toremove = []
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].selected) {
+            toremove.push(sel.options[i].id);
+          }
+        }
+
+        for (var r = 0; r < toremove.length; r++) {
+          var sel = document.getElementById(toremove[r]);
+          sel.remove();
+        }
+
+      }
+
+      function preSubmit() {
+        // we want all the items, not just the selected ones.
+        var hashes = "";
+        var sel = document.getElementById('playlist');
+        for (var i = 0; i < sel.options.length; i++) {
+          if (i != 0) {
+            hashes += ",";
+          }
+          hashes += sel.options[i].id;
+        }
+        document.forms[0].songids.value = hashes;
+      }
+    </script>
+
     <% if @playlist %>
     Playlist content:
-    <form>
-      <select name="playlist" multiple>
+    <form action="/playlist/save" onSubmit="preSubmit()" method="POST">
+      <input type="text" name="pname" placeholder="Playlist name..." value="<%= @pname %>" />
+      <select id="playlist" name="playlist" multiple>
         <% @foo.each do |song| %>
         <option id="<%= song['file_hash'] %>" name="<%= song['file_hash'] %>" >
           <%= song['display_title'] %>
         </option>
         <% end %>
       </select>
+      <input type="hidden" name="songids" value="" />
+      <input type="hidden" name="pid" value="<%= @playlist_id %>" />
+      <input type="button" onClick="removeSelected()" value="Remove" />
       <input type="submit" value="Save" />
     </form>
 

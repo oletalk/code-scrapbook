@@ -31,6 +31,17 @@ class DBServer < Sinatra::Base
     end
   end
 
+
+  get '/playlist/new' do
+    res = @db.get_new_playlist_id
+    res
+  end
+
+  get '/playlist/:id/del' do |id|
+    @db.delete_playlist(p_id)
+    'Delete complete'
+  end
+
   get '/playlists' do
     @db.fetch_playlists
     Format.json(@db.fetch_playlists)
@@ -40,7 +51,15 @@ class DBServer < Sinatra::Base
     Format.json(@db.fetch_playlist(id))
   end
 
-  #post '/playlist/:id/save'
+  post '/playlist/save' do
+    p_id = params['pid']
+    p_name = params['pname']
+    playlist_songids = params['songids']
+    puts 'songids: ' + playlist_songids
+    a_songs = playlist_songids.split(',')
+    @db.save_playlist(p_id, p_name, a_songs)
+    'Save complete'
+  end
 
   get '/search/m3u/:name' do |name|
     song_list = @db.fetch_search(name)

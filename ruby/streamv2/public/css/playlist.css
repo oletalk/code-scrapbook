@@ -1,0 +1,52 @@
+body {
+  background-color: #fff3e0;
+  font-family: sans-serif, Arial;
+}
+
+div#search_section {
+  width: 300px;
+}
+
+ul.click {
+  list-style-type: none;
+  padding: 0;
+  border: 1px solid #555;
+  background-color: #f5dd88;
+  cursor: pointer;
+}
+ul.click > li {
+  color: #715634;
+  padding: 2px 4px;
+  border-bottom: 1px solid #555;
+  background-color: inherit;
+  animation: slide-up 0.4s ease;
+}
+
+ul.click > li.inlist {
+  list-style-type: disc;
+}
+
+a {
+  font-weight: bold;
+}
+
+ul.click > li :hover {
+  background-color: #553344;
+  -o-transition:background 0.2s ease-in;
+  -moz-transition:background 0.2s ease-in;
+  -webkit-transition:background 0.2s ease-in;
+  transition: background 0.2s ease-in;
+  color: #f5dd88;
+}
+
+/* when new items appear they slide in from below */
+@keyframes slide-up {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
