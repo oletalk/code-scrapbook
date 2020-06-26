@@ -7,14 +7,28 @@
   <BODY>
     <% if @playlist %>
     Select your playlist:
-      <ol>
+    <table class="playlists">
       <% @foo.each do |opt| %>
-      <li><a href="/playlist/<%= opt['id'] %>" >
-        <%= opt['name'] %>
-      </a></li>
+      <tr>
+        <td class="playlist_name"><%= opt['name'] %></td>
+        <td><a href="/playlist/m3u/<%= opt['name']%>">m3u</a></td>
+        <td><a href="/playlist/<%= opt['id']%>">edit</a></td>
+        <td><a class="confirmit" href="/playlist/<%= opt['id']%>/delete">delete</a></td>
+      </tr>
       <% end %>
-      <li><a href="/playlist_new">Create new</a></li>
-      </ol>
+      <tr><td colspan="4"><a href="/playlist_new">Create new</a></td></tr>
+    </table>
+
+    <script type="text/javascript">
+      var elems = document.getElementsByClassName('confirmit');
+      var confirmIt = function (e) {
+          if (!confirm('Are you sure you want to delete the playlist?')) e.preventDefault();
+      };
+      for (var i = 0, l = elems.length; i < l; i++) {
+          elems[i].addEventListener('click', confirmIt, false);
+      }
+    </script>
+
     <% else %>
     Sorry, you don't have permission to manage playlists.
     <% end %>

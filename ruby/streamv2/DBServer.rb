@@ -38,7 +38,7 @@ class DBServer < Sinatra::Base
   end
 
   get '/playlist/:id/del' do |id|
-    @db.delete_playlist(p_id)
+    @db.delete_playlist(id)
     'Delete complete'
   end
 

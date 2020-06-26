@@ -35,6 +35,11 @@ class Fetch
     end
   end
 
+  def dellist(playlist_id)
+    go_get(@base_url + PLAYLIST + playlist_id + '/del')
+    'Delete complete'
+  end
+
   def savelist(playlist_id, playlist_name, playlist_songids)
     # pid pname songids
     go_post(@base_url + PLAYLIST_SAVE, {
@@ -112,6 +117,7 @@ class Fetch
         Log.log.error("*** NOT FOUND: #{url}")
         '404 Not Found'
       when 500...600
+        puts 'DBServer had an error - check its logs'
         Log.log.error("DBServer had an error!")
         '500 Internal error'
     end

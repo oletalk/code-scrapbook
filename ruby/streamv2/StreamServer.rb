@@ -84,6 +84,12 @@ class StreamServer < Sinatra::Base
     erb :list
   end
 
+  get '/playlist/:id/delete' do |id|
+    f = Fetch.new
+    f.dellist(id)
+    redirect '/playlist/manage'
+end
+
   get '/play/:hash' do |req_hash|
     # PASS REQUEST ON TO DB MODULE
     f = Fetch.new

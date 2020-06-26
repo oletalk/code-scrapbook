@@ -3,13 +3,29 @@ body {
   font-family: sans-serif, Arial;
 }
 
+table tr > td:first-child {
+    min-width: 100px;
+}
+
+table.playlists {
+  padding-top: 15px;
+  border-spacing: 0px;
+}
+table.playlists tr:nth-child(even) {
+  background-color: antiquewhite;
+}
+table.playlists tr > td {
+  padding: 3px;
+}
 div.layout {
   padding: 5px;
 }
 div#search_section {
   width: 300px;
 }
-
+select#playlist {
+  min-width: 100px;
+}
 ul.click {
   list-style-type: none;
   padding: 0;

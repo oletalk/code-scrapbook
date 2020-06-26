@@ -35,12 +35,14 @@ class BaseDb
         end
     rescue PG::Error => e
         error_description = description
-        puts '*** SQL Syntax Error ***'
+        puts '*** SQL Error occurred ***'
         if error_description == nil
           Log.log.error "Problem performing operation: #{e}"
         else
           Log.log.error "Problem #{error_description}: #{e}"
         end
+        raise e
+    ensure
         @conn.close if @conn
     end
   end
