@@ -9,5 +9,5 @@ gem 'pg', "~> 1.2.3"
 gem 'rack-cache', :require => 'rack/cache'
 gem 'rack-test'
 gem 'rspec-core'
-gem 'rack', "~> 2.1.4"
+gem 'rack', ">= 2.1.4"
 gem 'rspec'

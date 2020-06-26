@@ -52,7 +52,7 @@ DEPENDENCIES
   logger (~> 1.4.2)
   mp3info (~> 0.8.5)
   pg (~> 1.2.3)
-  rack (~> 2.1.4)
+  rack (>= 2.1.4)
   rack-cache
   rack-test
   rspec
