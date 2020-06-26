@@ -5,6 +5,23 @@ require_relative 'basedb' # common db methods
 
 class Db < BaseDb
 
+  #SQL snippet constants
+  TITLE_TERM_SNIPPET = %{
+    case
+        when (title is null or title = '') then substring(song_filepath from '[^/]*$')
+        else COALESCE(artist, 'unknown') || ' - ' || COALESCE(title, 'unknown')
+    end as display_title
+  }
+
+  TAG_SELECT_SNIPPET = %{
+  SELECT
+      file_hash,
+      secs,
+      #{TITLE_TERM_SNIPPET}
+  FROM mp3s_tags
+          }.gsub(/\s+/, " ").strip
+
+  # method defs
   def fetch_playlists
     sql = 'select id, name from mp3s_playlist order by name'
     res = collection_from_sql(
@@ -35,25 +52,30 @@ class Db < BaseDb
     ret
   end
 
-  def fetch_playlist(playlist_id)
+  def fetch_playlist(playlist_id, by: 'id')
+    if by == 'name'
+      criteria = 'p.name'
+    else
+      criteria = 'ps.playlist_id'
+    end
+
     sql = %{
-      select p.name, ps.file_hash, case
-          when (title is null or title = '') then split_part(right(song_filepath, position('/' IN REVERSE(song_filepath))-1), '.', 1)
-          else artist || ' - ' || title
-      end as display_title
+      select p.name, ps.file_hash, secs,
+      #{TITLE_TERM_SNIPPET}
       from mp3s_playlist p, mp3s_playlist_song ps, mp3s_tags t
       where ps.file_hash = t.file_hash
       and p.id = ps.playlist_id
-      and ps.playlist_id = $1
+      and #{criteria} = $1
     }.gsub(/\s+/, " ").strip
-
+    #puts "sql: #{sql}"
     collection_from_sql(
       sql: sql,
       params: [ playlist_id ],
       result_map: {
         name: true,
-        file_hash: true,
-        display_title: true
+        hash: "file_hash",
+        secs: true,
+        title: "display_title"
       },
       description: "fetching playlists"
     )
@@ -129,14 +151,7 @@ class Db < BaseDb
 
   def list_songs(partial_spec)
     sql = %{
-      SELECT
-          file_hash,
-          secs,
-          case
-              when (title is null or title = '') then split_part(right(song_filepath, position('/' IN REVERSE(song_filepath))-1), '.', 1)
-              else artist || ' - ' || title
-          end as display_title
-      FROM mp3s_tags
+      #{TAG_SELECT_SNIPPET}
       WHERE song_filepath like $1
       ORDER by display_title
     }.gsub(/\s+/, " ").strip
@@ -152,17 +167,11 @@ class Db < BaseDb
       description: "fetching song list"
     )
   end
-
+  # TODO: write method for fetching playlist
+  # (need DBServer, fetch, StreamServer methods too)
   def fetch_search(search)
     sql = %{
-    SELECT
-        file_hash,
-        secs,
-        case
-            when (title is null or title = '') then substring(song_filepath from '[^/]*$')
-            else COALESCE(artist, 'unknown') || ' - ' || COALESCE(title, 'unknown')
-        end as display_title
-    FROM mp3s_tags
+    #{TAG_SELECT_SNIPPET}
     WHERE upper(song_filepath) like upper($1)
     ORDER by display_title
             }.gsub(/\s+/, " ").strip

@@ -48,7 +48,9 @@ class DBServer < Sinatra::Base
   end
 
   get '/playlist/:id' do |id|
-    Format.json(@db.fetch_playlist(id))
+    x = @db.fetch_playlist(id)
+    puts "fetch_playlist result #{x}"
+    Format.json(x)
   end
 
   post '/playlist/save' do
@@ -80,6 +82,11 @@ class DBServer < Sinatra::Base
       '{ "error" : "That playlist was not found" }'
     end
 
+  end
+
+  get '/playlist/m3u/:name' do |pls_name|
+    x = @db.fetch_playlist(pls_name, by: 'name')
+    Format.play_list(x, request.env['HTTP_HOST'])
   end
 
   get '/list/:spec' do |req_spec|

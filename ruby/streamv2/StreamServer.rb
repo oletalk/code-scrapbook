@@ -90,6 +90,13 @@ class StreamServer < Sinatra::Base
     f.fetch(req_hash, downsample: @downsample)
   end
 
+  get '/playlist/m3u/:name' do |name|
+    response.headers['Content-Type'] = 'text/plain'
+    f = Fetch.new
+    f.set_hostheader(request.env['HTTP_HOST'])
+    f.playlist_m3u(name)
+  end
+
   get '/m3u/:spec' do
     spec = params['spec']
     response.headers['Content-Type'] = 'text/plain'

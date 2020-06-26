@@ -1,3 +1,5 @@
+require 'pg'
+
 class BaseDb
   # GENERIC SQL FETCH - use only for *parametrised* statements.
   def collection_from_sql(sql: , params: , result_map: , description:)
@@ -33,6 +35,7 @@ class BaseDb
         end
     rescue PG::Error => e
         error_description = description
+        puts '*** SQL Syntax Error ***'
         if error_description == nil
           Log.log.error "Problem performing operation: #{e}"
         else

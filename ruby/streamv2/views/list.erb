@@ -5,9 +5,9 @@
     <link rel="stylesheet" href="/css/playlist.css">
   </HEAD>
   <BODY>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin>
+    <script src="/js/ext-static/react.development.js" crossorigin>
     </script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin>
+    <script src="/js/ext-static/react-dom.development.js" crossorigin>
     </script>
     <script language="javascript">
 
@@ -24,6 +24,18 @@
         for (var r = 0; r < toremove.length; r++) {
           var sel = document.getElementById(toremove[r]);
           sel.remove();
+          // check if the menu item should be reactivated in the dropdown
+          // (it may not be there)
+          var dd_sel = document.getElementById('s_' + toremove[r])
+          if (dd_sel != null) {
+            var oldText = dd_sel.innerText;
+            // FIXME: I can't just re-add 'addToList' function as
+            // it doesn't seem to recognise it if I refer to it outside the js :-/
+            var str = "<a onClick=\"alert('Unable to re-add this song. Please save and come back to this playlist.')\">" + oldText + "</a>";
+            alert(str);
+            dd_sel.innerHTML = str;
+
+          }
         }
 
       }
@@ -43,13 +55,16 @@
     </script>
 
     <% if @playlist %>
-    Playlist content:
     <form action="/playlist/save" onSubmit="preSubmit()" method="POST">
-      <input type="text" name="pname" placeholder="Playlist name..." value="<%= @pname %>" />
+      <div class='layout'>
+        <label for="playlist_name">Playlist name: </label>
+        <input id="playlist_name" type="text" name="pname" placeholder="Playlist name..." value="<%= @pname %>" />
+      </div>
+      <div class='layout'>
       <select id="playlist" name="playlist" multiple>
         <% @foo.each do |song| %>
-        <option id="<%= song['file_hash'] %>" name="<%= song['file_hash'] %>" >
-          <%= song['display_title'] %>
+        <option id="<%= song['hash'] %>" name="<%= song['hash'] %>" >
+          <%= song['title'] %>
         </option>
         <% end %>
       </select>
@@ -57,9 +72,10 @@
       <input type="hidden" name="pid" value="<%= @playlist_id %>" />
       <input type="button" onClick="removeSelected()" value="Remove" />
       <input type="submit" value="Save" />
+      </div>
     </form>
 
-    <div id="search_section">
+    <div class="layout" id="search_section">
     </div>
     <script src="/js/ext-static/axios.min.js"></script>
     <script src="/js/playlist_functions.js"></script>

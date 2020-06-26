@@ -51,6 +51,13 @@ class Fetch
     go_get(@base_url + PLAY + hash + ds_extra)
   end
 
+  def playlist_m3u(spec, downsample: false)
+    stg = go_get(@base_url + PLAYLIST + 'm3u/' + spec)
+    stg = stg.force_encoding('UTF-8')
+    # TODO: need to replace internal HTTP_HOST - following is v hacky...
+    stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
+  end
+
   def list(spec, downsample: false)
     stg = go_get(@base_url + LIST + spec)
     stg = stg.force_encoding('UTF-8')
@@ -75,45 +82,38 @@ class Fetch
   end
 
   def go_post(url, params)
-    begin
+    handle_httparty_call(url) do
+      HTTParty.post(url, body: params)
+    end
+  end
 
-      response = HTTParty.post(url, body: params)
+  def go_get(url)
+    handle_httparty_call(url) do
+      HTTParty.get(url, format: :plain)
+    end
+  end
+
+  def handle_httparty_call(url)
+    begin
+      response = yield
       Log.log.debug("Requested url: #{url}")
-      Log.log.debug(" -> #{params}")
-      case response.code
-        when 200
-          response.body
-        when 404
-          Log.log.error("*** NOT FOUND: #{url}")
-          '404 Not Found'
-        when 500...600
-          Log.log.error("DBServer had an error!")
-          '500 Internal error'
-      end
+      do_answer(response)
     rescue Errno::ECONNREFUSED => e
       Log.log.error "Couldn't connect to DBServer :-( "
       'no connection X-( '
     end
   end
 
-  def go_get(url)
-    begin
-
-      response = HTTParty.get(url, format: :plain)
-      Log.log.debug("Requested url: #{url}")
-      case response.code
-        when 200
-          response.body
-        when 404
-          Log.log.error("*** NOT FOUND: #{url}")
-          '404 Not Found'
-        when 500...600
-          Log.log.error("DBServer had an error!")
-          '500 Internal error'
-      end
-    rescue Errno::ECONNREFUSED => e
-      Log.log.error "Couldn't connect to DBServer :-( "
-      'no connection X-( '
+  def do_answer(response)
+    case response.code
+      when 200
+        response.body
+      when 404
+        Log.log.error("*** NOT FOUND: #{url}")
+        '404 Not Found'
+      when 500...600
+        Log.log.error("DBServer had an error!")
+        '500 Internal error'
     end
   end
 

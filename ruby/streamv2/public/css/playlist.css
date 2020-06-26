@@ -3,6 +3,9 @@ body {
   font-family: sans-serif, Arial;
 }
 
+div.layout {
+  padding: 5px;
+}
 div#search_section {
   width: 300px;
 }
