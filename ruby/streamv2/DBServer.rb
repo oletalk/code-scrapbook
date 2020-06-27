@@ -1,5 +1,6 @@
 require 'sinatra/base'
 require 'jwt'
+require 'cgi'
 require_relative 'util/config'
 require_relative 'util/db'
 require_relative 'util/player'
@@ -31,84 +32,6 @@ class DBServer < Sinatra::Base
     end
   end
 
-
-  get '/playlist/new' do
-    res = @db.get_new_playlist_id
-    res
-  end
-
-  get '/playlist/:id/del' do |id|
-    @db.delete_playlist(id)
-    'Delete complete'
-  end
-
-  get '/playlists' do
-    @db.fetch_playlists
-    Format.json(@db.fetch_playlists)
-  end
-
-  get '/playlist/:id' do |id|
-    x = @db.fetch_playlist(id)
-    puts "fetch_playlist result #{x}"
-    Format.json(x)
-  end
-
-  post '/playlist/save' do
-    p_id = params['pid']
-    p_name = params['pname']
-    playlist_songids = params['songids']
-    puts 'songids: ' + playlist_songids
-    a_songs = playlist_songids.split(',')
-    @db.save_playlist(p_id, p_name, a_songs)
-    'Save complete'
-  end
-
-  get '/search/m3u/:name' do |name|
-    song_list = @db.fetch_search(name)
-    if song_list.size > 0
-      Format.play_list(song_list, request.env['HTTP_HOST'])
-    else
-      '{ "error" : "That playlist was not found" }'
-    end
-
-  end
-
-  get '/search/:name' do |name|
-    song_list = @db.fetch_search(name)
-    if song_list.size > 0
-      puts song_list
-      Format.json(song_list)
-    else
-      '{ "error" : "That playlist was not found" }'
-    end
-
-  end
-
-  get '/playlist/m3u/:name' do |pls_name|
-    x = @db.fetch_playlist(pls_name, by: 'name')
-    Format.play_list(x, request.env['HTTP_HOST'])
-  end
-
-  get '/list/:spec' do |req_spec|
-    if req_spec == 'all'
-      req_spec = ''
-    end
-    song_list = @db.list_songs("#{MP3S::Config::Net::MP3_ROOT}/#{req_spec}")
-    Format.play_list(song_list, request.env['HTTP_HOST'])
-  end
-
-  get '/play/:hash' do |req_hash|
-    # locate hash in db
-    $stdout.sync = true
-    process_songdata(req_hash)
-  end
-
-  get '/play/:hash/downsampled' do |req_hash|
-    # locate hash in db
-    $stdout.sync = true
-    process_songdata(req_hash, true)
-  end
-
   get '/pass/:jwt' do |token|
     hmac_secret = ENV.fetch('HMAC_SECRET')
     begin
@@ -130,6 +53,80 @@ class DBServer < Sinatra::Base
     rescue JWT::VerificationError
       Log.log.error "Verification from #@remote_ip failed"
       'FAIL'
+    end
+  end
+
+  get '/list/:spec' do |req_spec|
+    if req_spec == 'all'
+      req_spec = ''
+    end
+    song_list = @db.list_songs("#{MP3S::Config::Net::MP3_ROOT}/#{req_spec}")
+    Format.play_list(song_list, request.env['HTTP_HOST'])
+  end
+
+  get '/playlist/m3u/:name' do |pls_name|
+    x = @db.fetch_playlist(pls_name, by: 'name')
+    Format.play_list(x, request.env['HTTP_HOST'])
+  end
+
+  get '/play/:hash' do |req_hash|
+    # locate hash in db
+    $stdout.sync = true
+    process_songdata(req_hash)
+  end
+
+  get '/play/:hash/downsampled' do |req_hash|
+    # locate hash in db
+    $stdout.sync = true
+    process_songdata(req_hash, true)
+  end
+
+  get '/playlist/:id' do |id|
+    x = @db.fetch_playlist(id)
+    Format.json(x)
+  end
+
+  get '/playlist/:id/del' do |id|
+    @db.delete_playlist(id)
+    'Delete complete'
+  end
+
+  get '/playlist/new' do
+    res = @db.get_new_playlist_id
+    res
+  end
+
+  post '/playlist/save' do
+    p_id = params['pid']
+    p_name = params['pname']
+    playlist_songids = params['songids']
+    puts 'songids: ' + playlist_songids
+    a_songs = playlist_songids.split(',')
+    @db.save_playlist(p_id, p_name, a_songs)
+    'Save complete'
+  end
+
+  get '/playlists' do
+    @db.fetch_playlists
+    Format.json(@db.fetch_playlists)
+  end
+
+  get '/search/:name' do |name|
+    song_list = @db.fetch_search(CGI::unescape(name))
+    if song_list.size > 0
+      puts song_list
+      Format.json(song_list)
+    else
+      '{ "error" : "That playlist was not found" }'
+    end
+  end
+
+  get '/search/m3u/:name' do |name|
+    song_list = @db.fetch_search(CGI::unescape(name))
+    if song_list.size > 0
+      Format.play_list(song_list, request.env['HTTP_HOST'])
+    else
+      '{ "error" : "That playlist was not found" }'
     end
   end
 

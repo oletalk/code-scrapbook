@@ -12,6 +12,8 @@ class StreamServer < Sinatra::Base
   set :port, MP3S::Config::Net::SERVER_PORT
   enable :dump_errors
 
+  MAX_ITEM_LENGTH = 30
+
   # init stuff
   configure do
     f = Fetch.new
@@ -76,8 +78,7 @@ class StreamServer < Sinatra::Base
 
   get '/playlist/:id' do |id|
     f = Fetch.new
-    @foo = JSON.parse(f.playlist(id))
-    puts @foo
+    @foo = shorten_titles(JSON.parse(f.playlist(id)))
     # each row has the playlist name (yeah, i know...)
     @pname = @foo[0]['name']
     @playlist_id = id
@@ -129,7 +130,20 @@ end
     f.search(name, nil)
   end
 
-
+  helpers do
+    def shorten_titles(result_map)
+      ret = []
+      result_map.each do |row|
+        returned_row = row
+        title = returned_row['title']
+        if !title.nil? && title.size > MAX_ITEM_LENGTH
+          returned_row['title'] = title[0..MAX_ITEM_LENGTH-4] + '...'
+        end
+        ret.push(returned_row)
+      end
+      ret
+    end
+  end
 
   run! if app_file == $0
 end

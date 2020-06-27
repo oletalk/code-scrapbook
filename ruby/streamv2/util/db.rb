@@ -167,12 +167,13 @@ class Db < BaseDb
       description: "fetching song list"
     )
   end
-  # TODO: write method for fetching playlist
-  # (need DBServer, fetch, StreamServer methods too)
+
   def fetch_search(search)
     sql = %{
     #{TAG_SELECT_SNIPPET}
-    WHERE upper(song_filepath) like upper($1)
+    WHERE (upper(song_filepath) like upper($1)
+       OR  upper(title) like upper($1)
+       OR  upper(artist) like upper($1))
     ORDER by display_title
             }.gsub(/\s+/, " ").strip
 
@@ -188,6 +189,29 @@ class Db < BaseDb
 )
   end
 
+  def write_tag(hash, filename, tagobj)
+    # check hash/filename is not already in database
+    found_songs = find_song(hash)
+    if found_songs.nil? || found_songs.size == 0
+      connect_for('writing tag') do
+        sql = %{
+            INSERT into mp3s_tags
+            (song_filepath, file_hash, artist, title,secs)
+            VALUES ($1, $2, $3, $4, $5)
+            }.gsub(/\s+/, " ").strip
+        @conn.prepare('write_tag1', sql)
+        res = @conn.exec_prepared('write_tag1', [
+          filename, hash, tagobj[:artist],
+          tagobj[:title], tagobj[:secs]])
+      end
+    else
+      if found_songs[0]['song_filepath'] != filename
+        raise 'Given tag and hash do not match!'
+      else
+        Log.log.info 'Hash/filename already in database, nothing done.'
+      end
+    end
+  end
 end
 
 class DbError < StandardError
