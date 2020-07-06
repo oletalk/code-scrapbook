@@ -7,8 +7,14 @@ class Log
             logfile_loc = MP3S::Config::Misc::LOGFILE
             if logfile_loc.nil?
                 @logger = Logger.new STDOUT
+                @logger.formatter = proc do |severity, datetime, progname, msg|
+                   "#{datetime} #{progname} #{severity}: #{msg}\n"
+                end
             else
                 @logger = Logger.new( logfile_loc )
+                @logger.formatter = proc do |severity, datetime, progname, msg|
+                  "#{datetime} #{progname} #{severity}: #{msg}\n"
+                end
             end
             @logger.level = Logger::INFO # TODO: make configurable
         end

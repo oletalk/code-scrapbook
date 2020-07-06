@@ -39,9 +39,9 @@ class Db < BaseDb
   def get_new_playlist_id
     sql = 'select max(id) + 1 as next_id from mp3s_playlist'
     ret = nil
-    connect_for('finding next playlist id') do
+    connect_for('finding next playlist id') do |conn|
 
-      res = @conn.exec(sql) do | result |
+      res = conn.exec(sql) do | result |
        result.each do |result_row|
          ret = result_row['next_id']
        end
@@ -82,24 +82,24 @@ class Db < BaseDb
   end
 
   def delete_playlist(p_id)
-    connect_for('deleting playlist') do
+    connect_for('deleting playlist') do |conn|
       sql = "delete from mp3s_playlist_song where playlist_id = $1"
-      @conn.prepare('delete_list', sql)
-      res = @conn.exec_prepared('delete_list', [ p_id ])
+      conn.prepare('delete_list', sql)
+      res = conn.exec_prepared('delete_list', [ p_id ])
 
       sql = "delete from mp3s_playlist where id = $1"
-      @conn.prepare('delete_entry', sql)
-      res = @conn.exec_prepared('delete_entry', [ p_id ])
+      conn.prepare('delete_entry', sql)
+      res = conn.exec_prepared('delete_entry', [ p_id ])
 
     end
   end
 
   def save_playlist(p_id, p_name, a_songs)
-    connect_for('saving playlist') do
+    connect_for('saving playlist') do |conn|
       # STEP 1 - remove old playlist entries
       sql = "delete from mp3s_playlist_song where playlist_id = $1"
-      @conn.prepare('delete_list', sql)
-      res = @conn.exec_prepared('delete_list', [ p_id ])
+      conn.prepare('delete_list', sql)
+      res = conn.exec_prepared('delete_list', [ p_id ])
 
       # STEP 2 - insert (or update name of) playlist main record
       sql = %{
@@ -109,14 +109,14 @@ class Db < BaseDb
         do update
         set name = excluded.name
       }.gsub(/\s+/, " ").strip
-      @conn.prepare('update_listrec', sql)
-      res = @conn.exec_prepared('update_listrec', [ p_id, p_name ])
+      conn.prepare('update_listrec', sql)
+      res = conn.exec_prepared('update_listrec', [ p_id, p_name ])
 
       # STEP 3 - insert playlist entries
       sql = "insert into mp3s_playlist_song(playlist_id, file_hash) values ($1, $2)"
-      @conn.prepare('insert_ps1', sql)
+      conn.prepare('insert_ps1', sql)
       a_songs.each do |sid|
-        res = @conn.exec_prepared('insert_ps1', [ p_id, sid ])
+        res = conn.exec_prepared('insert_ps1', [ p_id, sid ])
       end
     end # connect_for
   end
@@ -126,10 +126,10 @@ class Db < BaseDb
       if item == nil
           Log.log.error "Item for category #{category} not recorded because it is nil"
       else
-        connect_for('recording statistic') do
+        connect_for('recording statistic') do |conn|
           sql = "insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set plays = mp3s_stats.plays+1, last_played = current_timestamp;"
-          @conn.prepare('record_stat1', sql)
-          res = @conn.exec_prepared('record_stat1', [ category, item ])
+          conn.prepare('record_stat1', sql)
+          res = conn.exec_prepared('record_stat1', [ category, item ])
         end
       end
   end
@@ -193,14 +193,14 @@ class Db < BaseDb
     # check hash/filename is not already in database
     found_songs = find_song(hash)
     if found_songs.nil? || found_songs.size == 0
-      connect_for('writing tag') do
+      connect_for('writing tag') do |conn|
         sql = %{
             INSERT into mp3s_tags
             (song_filepath, file_hash, artist, title,secs)
             VALUES ($1, $2, $3, $4, $5)
             }.gsub(/\s+/, " ").strip
-        @conn.prepare('write_tag1', sql)
-        res = @conn.exec_prepared('write_tag1', [
+        conn.prepare('write_tag1', sql)
+        res = conn.exec_prepared('write_tag1', [
           filename, hash, tagobj[:artist],
           tagobj[:title], tagobj[:secs]])
       end

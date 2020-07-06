@@ -4,7 +4,7 @@ require 'cgi'
 require_relative 'util/config'
 require_relative 'comms/fetch'
 require_relative 'util/ipwl'
-
+require_relative 'helpers/ss_playlist'
 # so, this server should be publicly accessible
 # but the other, with access to the mp3s, shouldn't
 class StreamServer < Sinatra::Base
@@ -12,7 +12,7 @@ class StreamServer < Sinatra::Base
   set :port, MP3S::Config::Net::SERVER_PORT
   enable :dump_errors
 
-  MAX_ITEM_LENGTH = 30
+  register Sinatra::PlaylistEditorGUI
 
   # init stuff
   configure do
@@ -48,73 +48,21 @@ class StreamServer < Sinatra::Base
     @downsample = action[:downsample]
   end
 
-  post '/playlist/save' do
-    playlist_id = params['pid']
-    playlist_name = params['pname']
-    playlist_songids = params['songids']
-    if playlist_songids.nil?
-      'Error: no playlist songs provided :-/'
-    else
-      f = Fetch.new
-      f.savelist(playlist_id, playlist_name, playlist_songids)
-      redirect '/playlist/manage'
-    end
-  end
-
-  get '/playlist/manage' do
-    f = Fetch.new
-    @foo = JSON.parse(f.playlist(nil))
-    erb :manage
-  end
-
-  get '/playlist_new' do
-    f = Fetch.new
-    @foo = []
-    res = f.playlist('new')
-    @playlist_id = f.playlist('new').to_i
-    Log.log.debug "New playlist will have an id of #{@playlist_id} (from #{res})"
-    erb :list
-  end
-
-  get '/playlist/:id' do |id|
-    f = Fetch.new
-    @foo = shorten_titles(JSON.parse(f.playlist(id)))
-    # each row has the playlist name (yeah, i know...)
-    @pname = @foo[0]['name']
-    @playlist_id = id
-    erb :list
-  end
-
-  get '/playlist/:id/delete' do |id|
-    f = Fetch.new
-    f.dellist(id)
-    redirect '/playlist/manage'
-end
-
   get '/play/:hash' do |req_hash|
     # PASS REQUEST ON TO DB MODULE
     f = Fetch.new
     f.fetch(req_hash, downsample: @downsample)
   end
 
-  get '/playlist/m3u/:name' do |name|
-    response.headers['Content-Type'] = 'text/plain'
-    f = Fetch.new
-    f.set_hostheader(request.env['HTTP_HOST'])
-    f.playlist_m3u(name)
-  end
-
   get '/m3u/:spec' do
     spec = params['spec']
     response.headers['Content-Type'] = 'text/plain'
-    f = Fetch.new
-    f.set_hostheader(request.env['HTTP_HOST'])
+    f = Fetch.new(request.env['HTTP_HOST'])
     f.list(spec)
   end
 
   get '/m3u/search/:name' do
-    f = Fetch.new
-    f.set_hostheader(request.env['HTTP_HOST'])
+    f = Fetch.new(request.env['HTTP_HOST'])
     name = params['name']
     response.headers['Content-Type'] = 'text/plain'
     f.search(name, 'm3u')
@@ -122,27 +70,10 @@ end
 
 #json
   get '/search/:name' do
-    f = Fetch.new
-    f.set_hostheader(request.env['HTTP_HOST'])
+    f = Fetch.new(request.env['HTTP_HOST'])
     name = CGI.escape(params['name'])
     response.headers['Content-Type'] = 'text/plain'
-    puts f.search(name, nil)
     f.search(name, nil)
-  end
-
-  helpers do
-    def shorten_titles(result_map)
-      ret = []
-      result_map.each do |row|
-        returned_row = row
-        title = returned_row['title']
-        if !title.nil? && title.size > MAX_ITEM_LENGTH
-          returned_row['title'] = title[0..MAX_ITEM_LENGTH-4] + '...'
-        end
-        ret.push(returned_row)
-      end
-      ret
-    end
   end
 
   run! if app_file == $0

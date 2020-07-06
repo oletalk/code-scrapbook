@@ -6,8 +6,8 @@ class BaseDb
     ret = []
 
     #result_map is like { "hash" => "file_hash", "title" => "display_title"}
-    connect_for(description) do
-      @conn.exec_params(sql, params) do | result |
+    connect_for(description) do |conn|
+      conn.exec_params(sql, params) do | result |
         result.each do |result_row|
           new_row = {}
           result_map.each do |key,result_key|
@@ -29,21 +29,22 @@ class BaseDb
 
   def connect_for(description)
     begin
-        @conn = new_connection
-        @conn.transaction do
-          yield # <-- do your @conn.exec and result processing and whatever here
+        conn = new_connection
+        conn.transaction do
+          # pass the connection to the block being called
+          # so it can use conn.exec and result processing and whatever here
+          yield conn
         end
     rescue PG::Error => e
-        error_description = description
         puts '*** SQL Error occurred ***'
-        if error_description == nil
+        if description == nil
           Log.log.error "Problem performing operation: #{e}"
         else
-          Log.log.error "Problem #{error_description}: #{e}"
+          Log.log.error "Problem #{description}: #{e}"
         end
         raise e
     ensure
-        @conn.close if @conn
+        conn.close if conn
     end
   end
 
