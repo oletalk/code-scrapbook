@@ -1,11 +1,9 @@
 require_relative '../../util/db'
 require 'pg'
 
-
-#.and_yield({id:1, name:'lll'})
-
 def mock_pg
   @connclosed = false
+  @triggered_txn = false
   @mock_pg_result = double(PG::Result)
 
   allow(@mock_pg_result).to receive(:each) \
@@ -15,14 +13,33 @@ def mock_pg
   @mock_pg_conn = double(PG::Connection)
   allow(@mock_pg_conn).to receive(:exec_params).with('sql1',nil).and_yield(@mock_pg_result)
   allow(@mock_pg_conn).to receive(:exec_params).with('badsql',nil).and_raise(PG::Error)
+  allow(@mock_pg_conn).to receive(:prepare).with(any_args()) { }
+  allow(@mock_pg_conn).to receive(:exec_prepared).with('something', nil) { }
+  allow(@mock_pg_conn).to receive(:transaction).and_yield() { @triggered_txn = true }
   allow(@mock_pg_conn).to receive(:close) { @connclosed = true }
-  allow(@mock_pg_conn).to receive(:transaction).and_yield() {}
 
   allow(PG).to receive(:connect).with(any_args()).and_return(@mock_pg_conn)
 
 end
 
+# note the methods tested are from BaseDb but we should be instantiating Db instead
 describe Db do
+  context "given connect_for block" do
+    it "performs a transaction" do
+      mock_pg
+
+      actual = nil
+      db = Db.new
+      db.connect_for('stuff') do |conn|
+        conn.prepare('something', 'sql2')
+        res = conn.exec_prepared('something', nil)
+      end
+      expect(@connclosed).to eq(true)
+      expect(@triggered_txn).to eq(true)
+    end
+
+  end
+
   context "given basic collection_from_sql query" do
 
     it "returns an expected result" do

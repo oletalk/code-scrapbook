@@ -17,7 +17,13 @@ class StreamServer < Sinatra::Base
   # init stuff
   configure do
     f = Fetch.new
-    result = f.start(ENV.fetch('HMAC_SECRET'))
+    r = ENV.fetch('HMAC_SECRET')
+    if r.nil?
+      p "hmac_secret set via the environment"
+    end
+    hmac_secret = r.nil? ? r : File.read(".hmac").gsub("\n", '')
+
+    result = f.start(hmac_secret)
     if result != 'OK'
       puts " *******************************************************************"
       puts " *                                                                 *"
@@ -61,7 +67,7 @@ class StreamServer < Sinatra::Base
     f.list(spec)
   end
 
-  get '/m3u/search/:name' do
+  get '/search/m3u/:name' do
     f = Fetch.new(request.env['HTTP_HOST'])
     name = params['name']
     response.headers['Content-Type'] = 'text/plain'

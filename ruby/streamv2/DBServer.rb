@@ -1,11 +1,11 @@
 require 'sinatra/base'
-require 'jwt'
 require 'cgi'
 require_relative 'util/config'
 require_relative 'util/db'
 require_relative 'util/player'
 require_relative 'util/logging'
 require_relative 'text/format'
+require_relative 'comms/connector'
 
 # this server should not be publicly accessible
 class DBServer < Sinatra::Base
@@ -15,15 +15,22 @@ class DBServer < Sinatra::Base
 
   # init stuff
   configure do
-    @@streamserver = nil
+    r = ENV.fetch('HMAC_SECRET')
+    if r.nil?
+      p "hmac_secret set via the environment"
+    end
+    hmac_secret = r.nil? ? r : File.read(".hmac").gsub("\n", '')
+    @@connector = Connector.new(MP3S::Config::Misc::SHARED_SECRET, hmac_secret)
   end
 
   before do
     @db   = Db.new
     @player = Player.new
     Log.init( MP3S::Config::Misc::DB_LOGFILE )
-    @remote_ip = request.env['REMOTE_ADDR']
-    if @remote_ip != @@streamserver
+    #@remote_ip = request.env['REMOTE_ADDR']
+    @remote_ip = request.env['HTTP_HOST']
+    #puts @remote_ip
+    if !@@connector.streamserver_is?(@remote_ip)
       pass if request.path_info.start_with? '/pass/'
 
       puts 'Remote IP mismatch! Denying request.'
@@ -33,26 +40,14 @@ class DBServer < Sinatra::Base
   end
 
   get '/pass/:jwt' do |token|
-    hmac_secret = ENV.fetch('HMAC_SECRET')
-    begin
-      if @@streamserver.nil?
-        Log.log.info "Stream server connected from #@remote_ip"
-      else
-        Log.log.error "Extraneous connection from #@remote_ip"
-        halt 401, 'Stream server is already connected elsewhere :-P'
-      end
+    #   def set_streamserver(hosthdr, token)
 
-      decoded_token = JWT.decode token, hmac_secret, true, { algorithm: 'HS256' }
-      pass = decoded_token[0]['data']
-      if pass == MP3S::Config::Misc::SHARED_SECRET
-        puts 'Shared secret is OK!'
-        Log.log.info "Stream server successfully verified from #@remote_ip"
-        @@streamserver = @remote_ip #TODO something else?
-     end
-      'OK'
-    rescue JWT::VerificationError
-      Log.log.error "Verification from #@remote_ip failed"
-      'FAIL'
+    begin
+      if @@connector.set_streamserver?(request.env['HTTP_HOST'], token)
+        'OK'
+      else
+        'FAIL'
+      end
     end
   end
 
@@ -100,7 +95,7 @@ class DBServer < Sinatra::Base
     p_id = params['pid']
     p_name = params['pname']
     playlist_songids = params['songids']
-    puts 'songids: ' + playlist_songids
+    # puts 'songids: ' + playlist_songids
     a_songs = playlist_songids.split(',')
     @db.save_playlist(p_id, p_name, a_songs)
     'Save complete'
@@ -114,7 +109,6 @@ class DBServer < Sinatra::Base
   get '/search/:name' do |name|
     song_list = @db.fetch_search(CGI::unescape(name))
     if song_list.size > 0
-      puts song_list
       Format.json(song_list)
     else
       '{ "error" : "That playlist was not found" }'
@@ -153,6 +147,10 @@ class DBServer < Sinatra::Base
       end
     end
 
+    def self.set_hmac_secret(hs)
+      @@connector.set_hmac_secret(hs)
+    end
+
     def songresponse(req_hash, song_loc, downsample=false )
 
           # play it (stream server will be calling this method)
@@ -161,7 +159,7 @@ class DBServer < Sinatra::Base
 
           # $stdout.sync = true
           played = @player.play_song(command, song_loc)
-          puts "songdata length: #{played[:songdata].length}"
+          # puts "songdata length: #{played[:songdata].length}"
           warnings = played[:warnings]
           Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
           played[:songdata]
