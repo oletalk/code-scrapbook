@@ -9,7 +9,7 @@ class IPWhitelist
     end
 
     def action(clientip)
-        ret = nil
+        ret = @deflt
         cip = IPAddr.new(clientip)
         # check for first matching value
         @list.each { |ip,action|
@@ -20,9 +20,6 @@ class IPWhitelist
             end
         }
         # return hash with action and whether to downsample or not
-        if ret.nil?
-            ret = @deflt
-        end
         if ret[:allow] && !ret.key?(:downsample)
             ret[:downsample] = false
         end

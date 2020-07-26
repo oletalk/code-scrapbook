@@ -24,6 +24,49 @@ class Search extends React.Component {
    return ret;
  }
 
+ hideTooltip = () => {
+   let sel = document.getElementById('song_tooltip');
+   sel.classList.remove('tooltipshow');
+   sel.classList.add('tooltip');
+
+   let selcont = document.getElementById('song_tooltip_container');
+   selcont.classList.remove('tooltipshow');
+   selcont.classList.add('tooltip');
+
+   sel.innerText = "";
+ }
+
+ displayTooltip = (hash) => {
+   axios.get('/info/' + hash)
+   .then(function (response) {
+     if (Array.isArray(response.data)) {
+       let songitem = response.data[0];
+       let sel = document.getElementById('song_tooltip');
+       let selcont = document.getElementById('song_tooltip_container');
+
+       if (songitem !== undefined) {
+         let si_plays = songitem['plays'];
+         let si_lp = songitem['last_played'];
+         sel.innerText = "Plays: " + si_plays + "\nLast played: " + si_lp;
+         //sel.classList.remove('tooltip');
+         //sel.classList.add('tooltipshow');
+         selcont.classList.remove('tooltip');
+         selcont.classList.add('tooltipshow');
+       } else {
+         sel.innerText = "Song was not recently played.\n";
+         //sel.classList.remove('tooltip');
+         //sel.classList.add('tooltipshow');
+         selcont.classList.remove('tooltip');
+         selcont.classList.add('tooltipshow');
+
+       }
+     }
+   }) // ...then function response ...
+   .catch(function(error) {
+     console.log('ERROR! ' + error)
+   })
+ }
+
  addToList = (hash) => {
    var sel = document.getElementById(hash); // should have s_ in front
    if (sel != null) {
@@ -77,6 +120,12 @@ class Search extends React.Component {
                    id: "s_" + si_hash,
                    key: si
                       }, e('a', {
+                        onMouseOver: function() {
+                          a.displayTooltip(si_hash);
+                        },
+                        onMouseOut: function() {
+                          a.hideTooltip();
+                        },
                         onClick: function() {
                           a.addToList("s_" + si_hash);
                         } //end onclick
@@ -117,6 +166,17 @@ class Search extends React.Component {
         className: 'click'
       }, this.state.songs
     )
+    ,e( // 3rd child: tooltip
+      'div', {
+        id: 'song_tooltip_container',
+        className: 'tooltip'
+      }, e(
+        'span', {
+          id: 'song_tooltip',
+          className: 'tooltiptext'
+        }
+      )
+    ) // ...end of tooltip
   );
  }
 }

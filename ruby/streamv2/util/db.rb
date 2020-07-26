@@ -1,9 +1,11 @@
 require 'pg'
 require_relative 'config'
 require_relative 'logging'
-require_relative 'basedb' # common db methods
+require_relative 'basedb' # module of common db methods
+require_relative '../text/manip'
 
-class Db < BaseDb
+class Db
+  include BaseDb
 
   #SQL snippet constants
   TITLE_TERM_SNIPPET = %{
@@ -13,13 +15,13 @@ class Db < BaseDb
     end as display_title
   }
 
-  TAG_SELECT_SNIPPET = %{
+  TAG_SELECT_SNIPPET = Manip.collapse(%{
   SELECT
       file_hash,
       secs,
       #{TITLE_TERM_SNIPPET}
   FROM mp3s_tags
-          }.gsub(/\s+/, " ").strip
+          })
 
   # method defs
   def fetch_playlists
@@ -34,6 +36,28 @@ class Db < BaseDb
       description: "fetching playlists"
     )
     res
+  end
+
+  def get_info_json(hash)
+    sql = Manip.collapse(%{
+      select plays, last_played
+      from mp3s_stats
+      where category = 'SONG'
+      and item =
+        (select song_filepath
+         from mp3s_tags
+         where file_hash = $1)
+            })
+    collection_from_sql(
+      sql: sql,
+      params: [ hash ],
+      result_map: {
+        plays: true,
+        last_played: true
+      },
+      description: "fetching song info"
+    )
+
   end
 
   def get_new_playlist_id
@@ -59,14 +83,15 @@ class Db < BaseDb
       criteria = 'ps.playlist_id'
     end
 
-    sql = %{
+    sql = Manip.collapse(%{
       select p.name, ps.file_hash, secs,
       #{TITLE_TERM_SNIPPET}
       from mp3s_playlist p, mp3s_playlist_song ps, mp3s_tags t
       where ps.file_hash = t.file_hash
       and p.id = ps.playlist_id
       and #{criteria} = $1
-    }.gsub(/\s+/, " ").strip
+      order by entry_order
+    })
     #puts "sql: #{sql}"
     collection_from_sql(
       sql: sql,
@@ -102,21 +127,23 @@ class Db < BaseDb
       res = conn.exec_prepared('delete_list', [ p_id ])
 
       # STEP 2 - insert (or update name of) playlist main record
-      sql = %{
+      sql = Manip.collapse(%{
         insert into mp3s_playlist (id, name, owner)
         values ($1, $2, 'public')
         on conflict (id)
         do update
         set name = excluded.name
-      }.gsub(/\s+/, " ").strip
+      })
       conn.prepare('update_listrec', sql)
       res = conn.exec_prepared('update_listrec', [ p_id, p_name ])
 
       # STEP 3 - insert playlist entries
-      sql = "insert into mp3s_playlist_song(playlist_id, file_hash) values ($1, $2)"
+      sql = "insert into mp3s_playlist_song(playlist_id, file_hash, entry_order) values ($1, $2, $3)"
       conn.prepare('insert_ps1', sql)
+      entry_order = 0
       a_songs.each do |sid|
-        res = conn.exec_prepared('insert_ps1', [ p_id, sid ])
+        entry_order += 1
+        res = conn.exec_prepared('insert_ps1', [ p_id, sid, entry_order ])
       end
     end # connect_for
   end
@@ -150,11 +177,11 @@ class Db < BaseDb
   end
 
   def list_songs(partial_spec)
-    sql = %{
+    sql = Manip.collapse(%{
       #{TAG_SELECT_SNIPPET}
       WHERE song_filepath like $1
       ORDER by display_title
-    }.gsub(/\s+/, " ").strip
+    })
 
     collection_from_sql(
       sql: sql,
@@ -169,13 +196,13 @@ class Db < BaseDb
   end
 
   def fetch_search(search)
-    sql = %{
+    sql = Manip.collapse(%{
     #{TAG_SELECT_SNIPPET}
     WHERE (upper(song_filepath) like upper($1)
        OR  upper(title) like upper($1)
        OR  upper(artist) like upper($1))
     ORDER by display_title
-            }.gsub(/\s+/, " ").strip
+            })
 
     collection_from_sql(
       sql: sql,
@@ -194,11 +221,11 @@ class Db < BaseDb
     found_songs = find_song(hash)
     if found_songs.nil? || found_songs.size == 0
       connect_for('writing tag') do |conn|
-        sql = %{
+        sql = Manip.collapse(%{
             INSERT into mp3s_tags
             (song_filepath, file_hash, artist, title,secs)
             VALUES ($1, $2, $3, $4, $5)
-            }.gsub(/\s+/, " ").strip
+            })
         conn.prepare('write_tag1', sql)
         res = conn.exec_prepared('write_tag1', [
           filename, hash, tagobj[:artist],

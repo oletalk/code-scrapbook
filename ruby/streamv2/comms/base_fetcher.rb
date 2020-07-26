@@ -39,7 +39,7 @@ class BaseFetcher
       do_answer(response)
     rescue Errno::ECONNREFUSED => e
       Log.log.error "Couldn't connect to DBServer :-( "
-      'no connection X-( '
+      '500 Internal Error'
     end
   end
 

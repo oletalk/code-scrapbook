@@ -4,6 +4,7 @@ require_relative '../DBServer'
 require 'test/unit'
 require 'rack/test'
 require 'json'
+require_relative '../data/played'
 require_relative '../util/db'
 require_relative '../util/player'
 require_relative '../util/config'
@@ -33,19 +34,31 @@ describe 'The DBServer backend app' do
 		allow(@mock_db).to receive(:find_song).with("x20hashx20") {
 			[{song_filepath: '/path/to/song', artist: 'Fun Time', title: 'Fun Song'}]
 		}
+		allow(@mock_db).to receive(:list_songs).with("#{MP3S::Config::Net::MP3_ROOT}/tunes2019") {
+			[{hash: "9388fevh", secs: "334", title: "Something"},
+			 {hash: "599h05t9", secs: "210", title: "A Remix"}]
+
+		}
 		allow(@mock_db).to receive(:record_stat) do | stat_type, stat_value |
 			@recordstats.push("#{stat_type}: #{stat_value}")
 		end
 		Db.stub(:new).and_return(@mock_db)
 
 		@mock_player = double(Player)
+
 		allow(@mock_player).to receive(:get_command).with(false,"/path/to/song") { "cat" }
 		allow(@mock_player).to receive(:get_command).with(true,"/path/to/song") { "strings" }
+		allow(@mock_player).to receive(:songresponse).with("x20hashx20", "/path/to/song", false) {
+			"songcontentsbinarydatafoobar"
+		}
+		allow(@mock_player).to receive(:songresponse).with("x20hashx20", "/path/to/song", true) {
+			"cmprsedsng"
+		}
 		allow(@mock_player).to receive(:play_song).with("cat", "/path/to/song") {
-			{songdata: "songcontentsbinarydatafoobar", command: "cat /path/to/song", warnings: nil}
+			Played.new("songcontentsbinarydatafoobar", "cat /path/to/song")
 		}
 		allow(@mock_player).to receive(:play_song).with("strings", "/path/to/song") {
-			{songdata: "cmprsedsng", command: "strings /path/to/song", warnings: nil}
+			Played.new("cmprsedsng", "strings /path/to/song")
 		}
 
 
@@ -118,6 +131,20 @@ describe 'The DBServer backend app' do
 		expect(@recordstats).to eq(["SONG: /path/to/song", "ARTIST: Fun Time", "TITLE: Fun Song"])
 
 	end
+
+	it "generates a folder playlist" do
+		mock_db
+		expected_m3u = "#EXTM3U\n" \
+									+ "#EXTINF:334,Something\n" \
+									+ "http://192.168.0.6:8080/play/9388fevh\n" \
+									+ "#EXTINF:210,A Remix\n" \
+									+ "http://192.168.0.6:8080/play/599h05t9"
+		get '/list/tunes2019', {}, {'HTTP_HOST' => '192.168.0.6:8080'}
+		expect(last_response).to be_ok
+		expect(last_response.body).to eq(expected_m3u)
+
+	end
+
 
 	it "rejects a response not from the connected streamserver" do
 		mock_db

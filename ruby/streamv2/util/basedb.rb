@@ -1,6 +1,6 @@
 require 'pg'
 
-class BaseDb
+module BaseDb
   # GENERIC SQL FETCH - use only for *parametrised* statements.
   def collection_from_sql(sql: , params: , result_map: , description:)
     ret = []

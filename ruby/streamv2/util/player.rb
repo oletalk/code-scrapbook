@@ -2,8 +2,21 @@ require 'shellwords'
 require 'open3'
 require_relative 'config'
 require_relative 'logging'
+require_relative '../data/played'
 
 class Player
+
+    def songresponse(req_hash, song_loc, downsample=false )
+        # play it (stream server will be calling this method)
+        command = self.get_command(downsample, song_loc)
+        Log.log.info("Fetched command template, #{command}")
+
+        played = self.play_song(command, song_loc)
+        w = played.warnings
+        Log.log.warn(w) unless (w.nil? or w == '')
+        played.songdata
+    end
+
 
     def play_song(command, song)
         escaped = Shellwords.escape( song )
@@ -14,8 +27,8 @@ class Player
         Log.log.info("Command to send: #{cmdexec}")
         stdout, stderr, status = Open3.capture3("#{cmdexec}", binmode: true)
         Log.log.info("return status: #{status}, stdout.length = #{stdout.length}, stderr.length = #{stderr.length}")
-        puts stderr if stderr
-        { songdata: stdout, command: cmdexec, warnings: stderr }
+        puts stderr unless stderr.to_s.strip.empty?
+        Played.new(stdout, cmdexec, stderr)
     end
 
     def get_command(downsample, song)

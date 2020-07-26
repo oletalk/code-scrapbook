@@ -3,6 +3,7 @@ require 'json'
 require 'cgi'
 require_relative 'util/config'
 require_relative 'comms/fetch'
+require_relative 'comms/connector'
 require_relative 'util/ipwl'
 require_relative 'helpers/ss_playlist'
 # so, this server should be publicly accessible
@@ -17,20 +18,13 @@ class StreamServer < Sinatra::Base
   # init stuff
   configure do
     f = Fetch.new
-    r = ENV.fetch('HMAC_SECRET')
-    if r.nil?
-      p "hmac_secret set via the environment"
-    end
-    hmac_secret = r.nil? ? r : File.read(".hmac").gsub("\n", '')
-
-    result = f.start(hmac_secret)
+    result = f.start(Connector.get_hmac_secret)
     if result != 'OK'
       puts " *******************************************************************"
       puts " *                                                                 *"
       puts " * ERROR! Did not establish connection with DBServer! Check logs.  *"
       puts " *                                                                 *"
       puts " *******************************************************************"
-
     else
       puts "Successfully connected to DBServer!"
     end

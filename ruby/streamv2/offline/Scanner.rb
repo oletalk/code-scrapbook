@@ -5,9 +5,9 @@ require 'digest/sha1'
 require_relative '../util/db.rb'
 require_relative '../util/config.rb'
 
-#FILESPEC = "*.{M,m}{P,p}3"
+FILESPEC = "*.{M,m}{P,p}3"
 #FILESPEC = "*.mp3"
-FILESPEC = "*.ogg"
+#FILESPEC = "*.ogg"
 # Scanner.rb
 
 $db = Db.new

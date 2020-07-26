@@ -6,7 +6,7 @@ require 'json'
 module Sinatra
   module PlaylistEditorGUI
 
-    MAX_ITEM_LENGTH = 30
+    MAX_ITEM_LENGTH = 80
 
     def self.registered(app)
 
@@ -47,7 +47,7 @@ module Sinatra
 
       app.get '/playlist/:id' do |id|
         f = Fetch.new
-        @foo = Manip.shorten_titles(JSON.parse(f.playlist(id)), MAX_ITEM_LENGTH)
+        @foo = Manip::shorten_titles(JSON.parse(f.playlist(id)), MAX_ITEM_LENGTH)
         # each row has the playlist name (yeah, i know...)
         @pname = @foo[0]['name']
         @playlist_id = id
@@ -60,7 +60,10 @@ module Sinatra
         redirect '/playlist/manage'
       end
 
-
+      app.get '/info/:hash' do |hash|
+        f = Fetch.new
+        f.info(hash)
+      end
 
     end
 

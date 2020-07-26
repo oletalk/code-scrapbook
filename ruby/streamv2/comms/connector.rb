@@ -43,4 +43,27 @@ class Connector
     end
     ret
   end
+
+  def self.get_hmac_secret
+    r = nil
+    begin
+      # First look in the environment
+      r = ENV.fetch('HMAC_SECRET')
+      if r.nil?
+        p "hmac_secret set via the environment"
+      end
+    rescue KeyError
+      p "no hmac_secret in the environment"
+      # Look in the .hmac file in the project root
+
+      hmac_path = "#{Dir.pwd}/.hmac"
+      if File.exists? hmac_path
+        r = File.read(hmac_path).gsub("\n", '')
+      else
+        abort("No HMAC_SECRET found")
+      end
+    end
+
+    r
+  end
 end

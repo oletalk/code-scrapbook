@@ -4,8 +4,10 @@ require_relative 'util/config'
 require_relative 'util/db'
 require_relative 'util/player'
 require_relative 'util/logging'
+require_relative 'text/manip'
 require_relative 'text/format'
 require_relative 'comms/connector'
+require_relative 'data/song'
 
 # this server should not be publicly accessible
 class DBServer < Sinatra::Base
@@ -15,12 +17,10 @@ class DBServer < Sinatra::Base
 
   # init stuff
   configure do
-    r = ENV.fetch('HMAC_SECRET')
-    if r.nil?
-      p "hmac_secret set via the environment"
-    end
-    hmac_secret = r.nil? ? r : File.read(".hmac").gsub("\n", '')
-    @@connector = Connector.new(MP3S::Config::Misc::SHARED_SECRET, hmac_secret)
+    @@connector = Connector.new(
+      MP3S::Config::Misc::SHARED_SECRET,
+      Connector.get_hmac_secret
+    )
   end
 
   before do
@@ -102,8 +102,17 @@ class DBServer < Sinatra::Base
   end
 
   get '/playlists' do
-    @db.fetch_playlists
+    #db.fetch_playlists
     Format.json(@db.fetch_playlists)
+  end
+
+  get '/info/:hash' do |hash|
+    info = @db.get_info_json(hash)
+    info.each do |row|
+      p row
+      row[:last_played] = Manip.date_from_db(row[:last_played])
+    end
+    Format.json(info)
   end
 
   get '/search/:name' do |name|
@@ -131,19 +140,17 @@ class DBServer < Sinatra::Base
       if songdata.nil?
         "404 Sorry, that song was not found"
       else
-        songrow = songdata[0]
-        song_loc = songrow[:song_filepath]
-        song_artist = songrow[:artist]
-        song_title = songrow[:title]
+        songrow = Song.new(songdata[0])
+        #     see the mapping in data/song.rb
 
-        Log.log.info("Song '#{song_loc}' (#{req_hash}) requested")
+        Log.log.info("Song '#{songrow.location}' (#{req_hash}) requested")
 
         # record stats
         # $stdout.sync = true
-        @db.record_stat('SONG', song_loc)
-        @db.record_stat('ARTIST', song_artist)
-        @db.record_stat('TITLE', song_title)
-        songresponse(req_hash, song_loc, req_downsample)
+        @db.record_stat('SONG', songrow.location)
+        @db.record_stat('ARTIST', songrow.artist)
+        @db.record_stat('TITLE', songrow.title)
+        @player.songresponse(req_hash, songrow.location, req_downsample)
       end
     end
 
@@ -151,19 +158,6 @@ class DBServer < Sinatra::Base
       @@connector.set_hmac_secret(hs)
     end
 
-    def songresponse(req_hash, song_loc, downsample=false )
-
-          # play it (stream server will be calling this method)
-          command = @player.get_command(downsample, song_loc)
-          Log.log.info("Fetched command template, #{command}")
-
-          # $stdout.sync = true
-          played = @player.play_song(command, song_loc)
-          # puts "songdata length: #{played[:songdata].length}"
-          warnings = played[:warnings]
-          Log.log.warn(warnings) unless (warnings.nil? or warnings == '')
-          played[:songdata]
-    end
   end
 
   run! if app_file == $0
