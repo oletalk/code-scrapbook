@@ -1,4 +1,3 @@
-require 'shellwords'
 require 'open3'
 require_relative 'config'
 require_relative 'logging'
@@ -19,11 +18,11 @@ class Player
 
 
     def play_song(command, song)
-        escaped = Shellwords.escape( song )
-        escaped.gsub!(/\'/, %q(\\\'))
-        escaped.gsub!(/\&/, %q(\\\&))
+        escaped = song
+        escaped.gsub!(/\"/, %q(\\\"))
+        arg_song = %{"#{escaped}"}
 
-        cmdexec = command.sub(/XXXX/, escaped)
+        cmdexec = command.sub(/XXXX/, arg_song)
         Log.log.info("Command to send: #{cmdexec}")
         stdout, stderr, status = Open3.capture3("#{cmdexec}", binmode: true)
         Log.log.info("return status: #{status}, stdout.length = #{stdout.length}, stderr.length = #{stderr.length}")
