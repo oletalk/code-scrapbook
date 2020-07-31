@@ -9,6 +9,13 @@ RSpec::Core::RakeTask.new(:itest) do |t|
     t.pattern = Dir.glob('rack_test/*.rb')
 end
 
+RSpec::Core::RakeTask.new(:ss_unit) do |t|
+    lst = Dir.glob('spec/data/*.rb')
+    lst.push(Dir.glob('spec/text/*.rb'))
+    lst.push('spec/util/player_spec.rb')
+    t.pattern = lst
+end
+
 RSpec::Core::RakeTask.new(:ss) do |t|
     t.pattern = ['rack_test/stream_server_spec.rb']
 end

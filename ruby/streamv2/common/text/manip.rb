@@ -1,5 +1,6 @@
 require_relative '../util/config'
 require_relative '../util/logging'
+require 'date'
 
 module Manip
 
@@ -25,7 +26,7 @@ module Manip
     begin
       dte = DateTime.parse(str)
       ret = dte.strftime(MP3S::Config::Misc::DATE_FORMAT)
-    rescue ArgumentError => e 
+    rescue ArgumentError => e
       Log.log.error("Problem parsing given date: #{e}")
     end
     ret
