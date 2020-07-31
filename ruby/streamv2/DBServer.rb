@@ -1,13 +1,13 @@
 require 'sinatra/base'
 require 'cgi'
-require_relative 'util/config'
-require_relative 'util/db'
-require_relative 'util/player'
-require_relative 'util/logging'
-require_relative 'text/manip'
-require_relative 'text/format'
-require_relative 'comms/connector'
-require_relative 'data/song'
+require_relative 'common/util/config'
+require_relative 'dbserver/util/db'
+require_relative 'dbserver/util/player'
+require_relative 'common/util/logging'
+require_relative 'common/text/manip'
+require_relative 'common/text/format'
+require_relative 'common/comms/connector'
+require_relative 'dbserver/data/song'
 
 # this server should not be publicly accessible
 class DBServer < Sinatra::Base

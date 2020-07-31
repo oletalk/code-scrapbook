@@ -1,4 +1,4 @@
-require_relative '../../util/player'
+require_relative '../../dbserver/util/player'
 
 
 

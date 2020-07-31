@@ -1,4 +1,4 @@
-require_relative '../../text/format'
+require_relative '../../common/text/format'
 
 describe Format do
   context "given an empty list" do

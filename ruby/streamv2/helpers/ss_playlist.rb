@@ -1,6 +1,6 @@
 require 'sinatra/base'
-require_relative '../comms/fetch'
-require_relative '../text/manip'
+require_relative '../common/comms/fetch'
+require_relative '../common/text/manip'
 require 'json'
 
 module Sinatra

@@ -4,10 +4,10 @@ require_relative '../DBServer'
 require 'test/unit'
 require 'rack/test'
 require 'json'
-require_relative '../data/played'
-require_relative '../util/db'
-require_relative '../util/player'
-require_relative '../util/config'
+require_relative '../dbserver/data/played'
+require_relative '../dbserver/util/db'
+require_relative '../dbserver/util/player'
+require_relative '../common/util/config'
 
 # deprecation warnings
 #RSpec.configure do |config|

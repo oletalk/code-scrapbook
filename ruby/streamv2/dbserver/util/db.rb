@@ -1,8 +1,8 @@
 require 'pg'
-require_relative 'config'
-require_relative 'logging'
+require_relative '../../common/util/config'
+require_relative '../../common/util/logging'
 require_relative 'basedb' # module of common db methods
-require_relative '../text/manip'
+require_relative '../../common/text/manip'
 
 class Db
   include BaseDb

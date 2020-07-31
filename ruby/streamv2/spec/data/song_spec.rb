@@ -1,4 +1,4 @@
-require_relative '../../data/song'
+require_relative '../../dbserver/data/song'
 
 
 

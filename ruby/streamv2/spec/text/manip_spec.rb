@@ -1,4 +1,4 @@
-require_relative '../../text/manip'
+require_relative '../../common/text/manip'
 
 describe Manip do
   context "given a postgresql date result" do

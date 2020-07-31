@@ -4,7 +4,7 @@ require_relative '../StreamServer'
 require 'test/unit'
 require 'rack/test'
 require 'json'
-require_relative '../comms/fetch'
+require_relative '../common/comms/fetch'
 
 # deprecation warnings
 RSpec.configure do |config|

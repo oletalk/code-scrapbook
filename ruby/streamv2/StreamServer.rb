@@ -1,10 +1,10 @@
 require 'sinatra/base'
 require 'json'
 require 'cgi'
-require_relative 'util/config'
-require_relative 'comms/fetch'
-require_relative 'comms/connector'
-require_relative 'util/ipwl'
+require_relative 'common/util/config'
+require_relative 'common/comms/fetch'
+require_relative 'common/comms/connector'
+require_relative 'streamserver/util/ipwl'
 require_relative 'helpers/ss_playlist'
 # so, this server should be publicly accessible
 # but the other, with access to the mp3s, shouldn't

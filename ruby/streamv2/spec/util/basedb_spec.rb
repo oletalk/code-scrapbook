@@ -1,4 +1,4 @@
-require_relative '../../util/db'
+require_relative '../../dbserver/util/db'
 require 'pg'
 
 def mock_pg

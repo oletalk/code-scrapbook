@@ -1,6 +1,6 @@
 require 'open3'
-require_relative 'config'
-require_relative 'logging'
+require_relative '../../common/util/config'
+require_relative '../../common/util/logging'
 require_relative '../data/played'
 
 class Player
