@@ -197,17 +197,26 @@ class Db
 
   def fetch_search(search)
     sql = Manip.collapse(%{
-    #{TAG_SELECT_SNIPPET}
-    WHERE (upper(song_filepath) like upper($1)
+      SELECT
+          plays, last_played,
+          file_hash,
+          secs,
+          #{TITLE_TERM_SNIPPET}
+      FROM mp3s_tags t
+      LEFT OUTER JOIN mp3s_stats s
+      ON s.item = t.song_filepath
+        WHERE (upper(song_filepath) like upper($1)
        OR  upper(title) like upper($1)
        OR  upper(artist) like upper($1))
-    ORDER by display_title
+    ORDER by COALESCE(plays, 0) desc, display_title
             })
 
     collection_from_sql(
       sql: sql,
       params: [ "%#{search}%" ],
       result_map: {
+        plays: true,
+        last_played: true,
         hash: "file_hash",
         secs: true,
         title: "display_title"

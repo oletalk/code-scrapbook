@@ -118,6 +118,12 @@ class DBServer < Sinatra::Base
   get '/search/:name' do |name|
     song_list = @db.fetch_search(CGI::unescape(name))
     if song_list.size > 0
+      song_list.each do |row|
+        lp = row[:last_played]
+        unless lp.nil?
+          row[:last_played] = Manip.date_from_db(lp)
+        end
+      end
       Format.json(song_list)
     else
       '{ "error" : "That playlist was not found" }'

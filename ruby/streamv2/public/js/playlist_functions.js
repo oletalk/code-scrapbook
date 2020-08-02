@@ -36,35 +36,25 @@ class Search extends React.Component {
    sel.innerText = "";
  }
 
- displayTooltip = (hash) => {
-   axios.get('/info/' + hash)
-   .then(function (response) {
-     if (Array.isArray(response.data)) {
-       let songitem = response.data[0];
-       let sel = document.getElementById('song_tooltip');
-       let selcont = document.getElementById('song_tooltip_container');
+ displayTooltip = (text) => {
+   let sel = document.getElementById('song_tooltip');
 
-       if (songitem !== undefined) {
-         let si_plays = songitem['plays'];
-         let si_lp = songitem['last_played'];
-         sel.innerText = "Plays: " + si_plays + "\nLast played: " + si_lp;
-         //sel.classList.remove('tooltip');
-         //sel.classList.add('tooltipshow');
-         selcont.classList.remove('tooltip');
-         selcont.classList.add('tooltipshow');
-       } else {
-         sel.innerText = "Song was not recently played.\n";
-         //sel.classList.remove('tooltip');
-         //sel.classList.add('tooltipshow');
-         selcont.classList.remove('tooltip');
-         selcont.classList.add('tooltipshow');
+   sel.innerText = text;
 
-       }
-     }
-   }) // ...then function response ...
-   .catch(function(error) {
-     console.log('ERROR! ' + error)
-   })
+   sel.classList.remove('tooltip');
+   sel.classList.add('tooltipshow');
+
+   let selcont = document.getElementById('song_tooltip_container');
+   selcont.classList.remove('tooltip');
+   selcont.classList.add('tooltipshow');
+
+ }
+
+ markChanges = () => {
+   let dt = document.title;
+   if (dt.indexOf('[') == -1) {
+     document.title = "[changes made] " + document.title;
+   }
  }
 
  addToList = (hash) => {
@@ -81,6 +71,7 @@ class Search extends React.Component {
        let dd_identifier = hash.split('_')
        newOption.id = dd_identifier[1]; // without the s_!
        playlist.add(newOption);
+       this.markChanges();
      }
    } else {
      alert("Sorry, I was unable to find that song.");
@@ -99,6 +90,8 @@ class Search extends React.Component {
            let songitem = response.data[si];
            let si_hash = songitem['hash'];
            let si_title = songitem['title'];
+           let si_plays = songitem['plays'];
+           let si_last_played = songitem['last_played'];
            if (si_title == null) {
              si_title = '???';
            }
@@ -121,12 +114,17 @@ class Search extends React.Component {
                    key: si
                       }, e('a', {
                         onMouseOver: function() {
-                          a.displayTooltip(si_hash);
+                          if (si_plays !== null) {
+                            a.displayTooltip("Plays: " + si_plays + "\nLast Played:" + si_last_played);
+                          } else {
+                            a.displayTooltip("Song was not recently played.");
+                          }
                         },
                         onMouseOut: function() {
                           a.hideTooltip();
                         },
                         onClick: function() {
+                          a.hideTooltip();
                           a.addToList("s_" + si_hash);
                         } //end onclick
                       }, si_title ) //end element <a>
