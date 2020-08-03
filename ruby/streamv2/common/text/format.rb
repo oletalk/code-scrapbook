@@ -23,15 +23,19 @@ module Format
     def self.json_list(songlist)
         retjson = "{}"
         encfailed = false
+        # had to rewrite encode below because 2.7 has deprecation warning about
+        # using the last argument as keyword parameters
+        # see https://piechowski.io/post/last-arg-keyword-deprecated-ruby-2-7/
+        utf8replace = {
+            :invalid => :replace,
+            :undef   => :replace,
+            :replace => '?'
+        }
         begin
             safesonglist = songlist
                 .map{ |e| e[:title].nil? ? {title:'untitled'} : e }
                 .map{ |foo|
-                { title: foo[:title].encode('UTF-8', {
-                    :invalid => :replace,
-                    :undef   => :replace,
-                    :replace => '?'
-                }),
+                { title: foo[:title].encode('UTF-8', **utf8replace),
                   hash: foo[:hash] }
             }
             retjson = safesonglist.to_json
