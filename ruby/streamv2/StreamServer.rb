@@ -6,6 +6,7 @@ require_relative 'common/comms/fetch'
 require_relative 'common/comms/connector'
 require_relative 'streamserver/util/ipwl'
 require_relative 'helpers/ss_playlist'
+require_relative 'helpers/ss_tageditor'
 # so, this server should be publicly accessible
 # but the other, with access to the mp3s, shouldn't
 class StreamServer < Sinatra::Base
@@ -14,6 +15,7 @@ class StreamServer < Sinatra::Base
   enable :dump_errors
 
   register Sinatra::PlaylistEditorGUI
+  register Sinatra::TagEditorGUI
 
   # init stuff
   configure do

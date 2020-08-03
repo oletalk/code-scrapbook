@@ -10,8 +10,14 @@ class Fetch < BaseFetcher
   PLAYLIST = '/playlist/'
   PLAYLISTS = '/playlists'
   SEARCH = '/search/'
+  TAG = '/tag/'
 
   PLAYLIST_SAVE = '/playlist/save'
+  TAG_SAVE = '/tag/save'
+
+  def tag(hash)
+    go_get(TAG + hash)
+  end
 
   def playlist(playlist_id)
     if playlist_id.nil?
@@ -32,6 +38,12 @@ class Fetch < BaseFetcher
     # pid pname songids
     go_post(PLAYLIST_SAVE, {
       pid: playlist_id, pname: playlist_name, songids: playlist_songids
+      })
+  end
+
+  def savetag(tag_artist, tag_title, tag_hash, playlist_id)
+    go_post(TAG_SAVE, {
+      artist: tag_artist, title: tag_title, hash: tag_hash, playlist: playlist_id
       })
   end
 

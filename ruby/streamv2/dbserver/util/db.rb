@@ -60,6 +60,25 @@ class Db
 
   end
 
+  def get_tag_info(hash)
+    sql = Manip.collapse(%{
+      select artist, title,
+       #{TITLE_TERM_SNIPPET}
+       from mp3s_tags where file_hash = $1
+    })
+
+    collection_from_sql(
+      sql: sql,
+      params: [ hash ],
+      result_map: {
+        artist: true,
+        title: true,
+        display_title: true
+      },
+      description: "fetching tag for song"
+    )
+  end
+
   def get_new_playlist_id
     sql = 'select max(id) + 1 as next_id from mp3s_playlist'
     ret = nil
@@ -223,6 +242,21 @@ class Db
       },
       description: "fetching search result"
 )
+  end
+
+  def save_tag(t_artist, t_title, t_hash)
+
+    sql = Manip.collapse(%{
+      update mp3s_tags
+      set artist = $1, title = $2
+      where file_hash = $3
+      })
+    connect_for('saving tag') do |conn|
+      conn.prepare('save_tag1', sql)
+      res = conn.exec_prepared('save_tag1', [
+        t_artist, t_title, t_hash
+        ])
+    end
   end
 
   def write_tag(hash, filename, tagobj)

@@ -97,6 +97,10 @@
         }
       }
 
+      function edittag(hash) {
+        window.location = '/tag/' + hash + "/<%= @playlist_id %>";
+      }
+
       function preDelete() {
         return confirm("Are you sure you want to delete this playlist??");
       }
@@ -138,7 +142,7 @@
               <td>
       <select id="playlist" onClick="toggleMoveButtons()" name="playlist" multiple>
         <% @foo.each do |song| %>
-        <option id="<%= song['hash'] %>" name="<%= song['hash'] %>" >
+        <option ondblclick="edittag('<%= song['hash'] %>')" id="<%= song['hash'] %>" name="<%= song['hash'] %>" >
           <%= song['title'] %>
         </option>
         <% end %>
@@ -158,6 +162,7 @@
       </div>
     </form>
 
+    <div class="info">To see the artist/title information currently stored for a song, double-click it. </div>
     <div class="layout" id="search_section">
     </div>
     <script src="/js/ext-static/axios.min.js"></script>

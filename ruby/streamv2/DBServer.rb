@@ -139,6 +139,22 @@ class DBServer < Sinatra::Base
     end
   end
 
+  get '/tag/:hash' do |hash|
+    tag_info = @db.get_tag_info(hash)
+    Format.json(tag_info)
+  end
+
+  #      artist: tag_artist, title: tag_title, hash: tag_hash, playlist: playlist_id
+  post '/tag/save' do
+    t_artist = params['artist']
+    t_title = params['title']
+    t_hash = params['hash']
+
+    @db.save_tag(t_artist, t_title, t_hash)
+    'Save complete'
+  end
+
+
   helpers do
     def process_songdata(req_hash, req_downsample=false)
       songdata = @db.find_song(req_hash)
