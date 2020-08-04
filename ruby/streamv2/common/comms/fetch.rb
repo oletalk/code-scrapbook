@@ -6,7 +6,6 @@ class Fetch < BaseFetcher
 
   PLAY = '/play/'
   LIST = '/list/'
-  INFO = '/info/'
   PLAYLIST = '/playlist/'
   PLAYLISTS = '/playlists'
   SEARCH = '/search/'
@@ -60,11 +59,6 @@ class Fetch < BaseFetcher
     stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
-  end
-
-  def info(hash)
-    stg = go_get(INFO + hash)
-    stg
   end
 
   def list(spec, downsample: false)

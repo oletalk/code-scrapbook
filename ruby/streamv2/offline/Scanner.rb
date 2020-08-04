@@ -2,8 +2,8 @@ require 'taglib' # should do mp3s and oggs
 require 'optparse'
 require 'digest/sha1'
 
-require_relative '../util/db.rb'
-require_relative '../util/config.rb'
+require_relative '../dbserver/util/db.rb'
+require_relative '../common/util/config.rb'
 
 FILESPEC = "*.{M,m}{P,p}3"
 #FILESPEC = "*.mp3"
@@ -35,7 +35,7 @@ end
 options = {}
 OptionParser.new do |opts|
     opts.banner = "Usage: Scanner.rb [options]"
-
+    opts.on('-d', '--date', 'Stamp tag dates with the file dates') { options[:dates] = true }
     opts.on('-l', '--long', 'Long process, check ALL files in directory for tags') { options[:long] = true }
     opts.on('-rDIR', '--rootdir=DIR', 'Specify the root directory') { |v| options[:rootdir] = v }
 end.parse!
@@ -77,6 +77,11 @@ files.each do |f|
         taggedfiles += 1
     else
       dbfilepath = tag[:song_filepath]
+      if options[:dates]
+        dte = File.mtime(safe_filename).strftime('%Y-%m-%d')
+        $db.update_tag_date(file_hash, dte)
+      end
+
       if dbfilepath != safe_filename
         puts "*** NOTE! Tag for #{safe_filename} is not the same as the one in the db!"
         puts "   db filepath   : #{dbfilepath}"

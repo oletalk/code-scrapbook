@@ -79,6 +79,9 @@ ul.click > li.inlist {
   list-style-type: disc;
 }
 
+li.title_1 {
+  font-style: oblique;
+}
 
 .tooltip .tooltiptext {
   visibility: hidden;

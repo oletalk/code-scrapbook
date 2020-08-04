@@ -92,6 +92,7 @@ class Search extends React.Component {
            let si_title = songitem['title'];
            let si_plays = songitem['plays'];
            let si_last_played = songitem['last_played'];
+           let si_derived = songitem['title_derived'];
            if (si_title == null) {
              si_title = '???';
            }
@@ -111,6 +112,7 @@ class Search extends React.Component {
                selectedSongs.push(
                  e('li', {
                    id: "s_" + si_hash,
+                   className: "title_" + si_derived,
                    key: si
                       }, e('a', {
                         onMouseOver: function() {

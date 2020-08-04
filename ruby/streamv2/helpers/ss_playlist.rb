@@ -60,11 +60,6 @@ module Sinatra
         redirect '/playlist/manage'
       end
 
-      app.get '/info/:hash' do |hash|
-        f = Fetch.new
-        f.info(hash)
-      end
-
     end
 
   end

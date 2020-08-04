@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 gem 'sinatra', "~> 2.0.8.1"
 gem 'jwt', "~> 2.2.1"
 gem 'logger', "~> 1.4.2"
-gem 'mp3info', "~> 0.8.5"
+gem 'taglib-ruby', "~> 1.0.1"
 gem 'httparty', "~> 0.18.1"
 gem 'pg', "~> 1.2.3"
 #gem 'pg', "~> 0.18.4"

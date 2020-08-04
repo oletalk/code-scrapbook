@@ -14,6 +14,12 @@ class Db
         else COALESCE(artist, 'unknown') || ' - ' || COALESCE(title, 'unknown')
     end as display_title
   }
+  DERIVED_TITLE_SNIPPET = %{
+    case
+    when (title is null or title = '') then 1
+      else 0
+    end as title_derived
+  }
 
   TAG_SELECT_SNIPPET = Manip.collapse(%{
   SELECT
@@ -220,7 +226,8 @@ class Db
           plays, last_played,
           file_hash,
           secs,
-          #{TITLE_TERM_SNIPPET}
+          #{TITLE_TERM_SNIPPET},
+          #{DERIVED_TITLE_SNIPPET}
       FROM mp3s_tags t
       LEFT OUTER JOIN mp3s_stats s
       ON s.item = t.song_filepath
@@ -238,7 +245,8 @@ class Db
         last_played: true,
         hash: "file_hash",
         secs: true,
-        title: "display_title"
+        title: "display_title",
+        title_derived: true
       },
       description: "fetching search result"
 )
@@ -257,6 +265,15 @@ class Db
         t_artist, t_title, t_hash
         ])
     end
+  end
+
+  def update_tag_date(file_hash, dte)
+    sql = 'update mp3s_tags set date_added = $1 where file_hash = $2'
+    connect_for('updating date on tag') do |conn|
+      conn.prepare('update_tag1', sql)
+      res = conn.exec_prepared('update_tag1', [ dte, file_hash ])
+    end
+
   end
 
   def write_tag(hash, filename, tagobj)
