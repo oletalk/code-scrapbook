@@ -80,7 +80,7 @@ class DBServer < Sinatra::Base
   # so 'new' gets picked up here rather than below and passed as an id
   get '/playlist/new' do
     res = @db.get_new_playlist_id
-    res
+    "#{res}"
   end
 
   get '/playlist/:id' do |id|

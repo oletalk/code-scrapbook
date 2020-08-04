@@ -37,7 +37,10 @@ describe 'The DBServer backend app' do
 		allow(@mock_db).to receive(:list_songs).with("#{MP3S::Config::Net::MP3_ROOT}/tunes2019") {
 			[{hash: "9388fevh", secs: "334", title: "Something"},
 			 {hash: "599h05t9", secs: "210", title: "A Remix"}]
-
+    }
+    allow(@mock_db).to receive(:get_new_playlist_id) { 10 }
+		allow(@mock_db).to receive(:fetch_playlist).with("2") {
+			[{name: "random", hash: "9388fevh", secs: "334", title: "Something"}]
 		}
 		allow(@mock_db).to receive(:record_stat) do | stat_type, stat_value |
 			@recordstats.push("#{stat_type}: #{stat_value}")
@@ -131,6 +134,25 @@ describe 'The DBServer backend app' do
 		expect(@recordstats).to eq(["SONG: /path/to/song", "ARTIST: Fun Time", "TITLE: Fun Song"])
 
 	end
+
+  it "fetches a blank id for new playlist" do
+    mock_db
+
+    get '/playlist/new', {}, {'HTTP_HOST' => '192.168.0.6:8080'}
+    expect(last_response).to be_ok
+    expect(last_response.body).to eq('10')
+
+  end
+
+  it "fetches an existing playlist" do
+  	mock_db
+
+		expected_playlist = "[{\"name\":\"random\",\"hash\":\"9388fevh\",\"secs\":\"334\",\"title\":\"Something\"}]"
+		get '/playlist/2', {}, {'HTTP_HOST' => '192.168.0.6:8080'}
+		expect(last_response).to be_ok
+		expect(last_response.body).to eq(expected_playlist)
+
+  end
 
 	it "generates a folder playlist" do
 		mock_db
