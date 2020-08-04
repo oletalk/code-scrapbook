@@ -76,6 +76,13 @@ class DBServer < Sinatra::Base
     process_songdata(req_hash, true)
   end
 
+  # this needs to be BEFORE the other /playlist routes
+  # so 'new' gets picked up here rather than below and passed as an id
+  get '/playlist/new' do
+    res = @db.get_new_playlist_id
+    res
+  end
+
   get '/playlist/:id' do |id|
     x = @db.fetch_playlist(id)
     Format.json(x)
@@ -84,11 +91,6 @@ class DBServer < Sinatra::Base
   get '/playlist/:id/del' do |id|
     @db.delete_playlist(id)
     'Delete complete'
-  end
-
-  get '/playlist/new' do
-    res = @db.get_new_playlist_id
-    res
   end
 
   post '/playlist/save' do
