@@ -117,6 +117,19 @@ class DBServer < Sinatra::Base
     Format.json(info)
   end
 
+  get '/search/random/:number' do |number|
+    song_list = @db.fetch_all_tags
+    num = number.to_i
+    if num > song_list.size
+      num = song_list.size
+    end
+    ret = []
+    num.times do
+      ret.push( song_list.delete(song_list[Random.rand(song_list.size)]) )
+    end
+    Format.json(ret)
+  end
+
   get '/search/:name' do |name|
     song_list = @db.fetch_search(CGI::unescape(name))
     if song_list.size > 0

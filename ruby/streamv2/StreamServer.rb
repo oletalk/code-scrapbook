@@ -56,26 +56,29 @@ class StreamServer < Sinatra::Base
     f.fetch(req_hash, downsample: @downsample)
   end
 
-  get '/m3u/:spec' do
-    spec = params['spec']
+  get '/m3u/:spec' do |spec|
     response.headers['Content-Type'] = 'text/plain'
     f = Fetch.new(request.env['HTTP_HOST'])
     f.list(spec)
   end
 
-  get '/search/m3u/:name' do
+  get '/search/m3u/:name' do |name|
     f = Fetch.new(request.env['HTTP_HOST'])
-    name = params['name']
     response.headers['Content-Type'] = 'text/plain'
     f.search(name, 'm3u')
   end
 
 #json
-  get '/search/:name' do
+  get '/search/:name' do |name|
     f = Fetch.new(request.env['HTTP_HOST'])
-    name = CGI.escape(params['name'])
+    name = CGI.escape(name)
     response.headers['Content-Type'] = 'text/plain'
     f.search(name, nil)
+  end
+
+  get '/random/:number' do |number|
+    f = Fetch.new(request.env['HTTP_HOST'])
+    f.randomlist(number)
   end
 
   run! if app_file == $0

@@ -220,6 +220,28 @@ class Db
     )
   end
 
+  def fetch_all_tags
+    sql = Manip.collapse(%{
+      SELECT
+          file_hash,
+          secs,
+          #{TITLE_TERM_SNIPPET}
+      FROM mp3s_tags
+    ORDER by display_title
+            })
+
+    collection_from_sql(
+      sql: sql,
+      params: nil,
+      result_map: {
+        hash: "file_hash",
+        secs: true,
+        title: "display_title",
+      },
+      description: "fetching all tags"
+)
+  end
+
   def fetch_search(search)
     sql = Manip.collapse(%{
       SELECT

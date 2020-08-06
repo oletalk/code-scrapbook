@@ -68,6 +68,11 @@ class Fetch < BaseFetcher
     stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
   end
 
+  def randomlist(number)
+    stg = go_get(SEARCH + 'random/' + number.to_s)
+    stg
+  end
+
   def search(name, format)
     if format == 'm3u'
       stg = go_get(SEARCH + 'm3u/' + name)

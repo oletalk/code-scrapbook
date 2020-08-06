@@ -1,6 +1,6 @@
 'use strict';
 const e = React.createElement;
-const MAX_ITEM_LENGTH = 30;
+const MAX_ITEM_LENGTH = 50;
 const MAX_LIST_LENGTH = 30;
 
 class Search extends React.Component {
@@ -78,6 +78,53 @@ class Search extends React.Component {
    }
  }
 
+ // Line item displayed when it's already in the playlist
+ inactiveLineItem = (a, item) => {
+   return e('li', {
+     id: "s_" + item.hash,
+     key: item.counter
+   }, item.title )
+ }
+
+ // Line item displayed when it's not in the playlist.
+ // It allows you to click and add it to the playlist, or hover over and see play stats on it.
+ activeLineItem = (a, item) => {
+   return e('li', {
+     id: "s_" + item.hash,
+     className: "title_" + item.derived,
+     key: item.counter
+        }, e('a', {
+          onMouseOver: function() {
+            if (item.plays !== null) {
+              a.displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
+            } else {
+              a.displayTooltip("Song was not recently played.");
+            }
+          },
+          onMouseOut: function() {
+            a.hideTooltip();
+          },
+          onClick: function() {
+            a.hideTooltip();
+            a.addToList("s_" + item.hash);
+          } //end onclick
+        }, item.title ) //end element <a>
+
+   ) //end element <li>
+ }
+
+ fixTitle = (title) => {
+   let ret = title;
+   if (ret == null) {
+     ret = '???';
+   }
+   if (ret.length > MAX_ITEM_LENGTH) {
+     ret = ret.substr(0,MAX_ITEM_LENGTH - 3) + "...";
+   }
+   return ret;
+ }
+
+
  handleInputChange = (ev) => {
    var a = this;
    var str = ev.target.value;
@@ -88,53 +135,20 @@ class Search extends React.Component {
        if (Array.isArray(response.data)) {
          for (let si = 0; si < response.data.length; si++) {
            let songitem = response.data[si];
-           let si_hash = songitem['hash'];
-           let si_title = songitem['title'];
-           let si_plays = songitem['plays'];
-           let si_last_played = songitem['last_played'];
-           let si_derived = songitem['title_derived'];
-           if (si_title == null) {
-             si_title = '???';
-           }
-           if (si_title.length > MAX_ITEM_LENGTH) {
-             si_title = si_title.substr(0,MAX_ITEM_LENGTH - 3) + "...";
-           }
+           let item = {
+              counter: si,
+              hash: songitem['hash'],
+              title: a.fixTitle(songitem['title']),
+              plays: songitem['plays'],
+              last_played: songitem['last_played'],
+              derived: songitem['title_derived']
+            };
+
            if (selectedSongs.length <= MAX_LIST_LENGTH) {
 
-             if (a.itemAlreadyInPlaylist('s_' + si_hash)) {
-               selectedSongs.push(
-                 e('li', {
-                   id: "s_" + si_hash,
-                   key: si
-                 }, si_title )
-               )
-             } else {
-               selectedSongs.push(
-                 e('li', {
-                   id: "s_" + si_hash,
-                   className: "title_" + si_derived,
-                   key: si
-                      }, e('a', {
-                        onMouseOver: function() {
-                          if (si_plays !== null) {
-                            a.displayTooltip("Plays: " + si_plays + "\nLast Played:" + si_last_played);
-                          } else {
-                            a.displayTooltip("Song was not recently played.");
-                          }
-                        },
-                        onMouseOut: function() {
-                          a.hideTooltip();
-                        },
-                        onClick: function() {
-                          a.hideTooltip();
-                          a.addToList("s_" + si_hash);
-                        } //end onclick
-                      }, si_title ) //end element <a>
-
-               ) //end element <li>
-             ) //end push... JS parens are exhausting
-           } //end of else block (69)
-
+             selectedSongs.push( a.itemAlreadyInPlaylist('s_' + item.hash) ?
+               a.inactiveLineItem(a, item) : a.activeLineItem(a, item)
+             )
 
          } // end if (selectedSongs) (60)
        } // end for loop

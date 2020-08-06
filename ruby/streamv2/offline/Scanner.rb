@@ -22,7 +22,11 @@ def tag_file_with_hash(mp3file, hash)
             songlen = if songlen.nil? then -1 else songlen.floor end
 
             # save mp3info.tag.artist, mp3info.tag.title, mp3info.length
-            tag = { artist: tag.artist, title: tag.title, secs: songlen }
+            safe_artist = tag.artist
+            if safe_artist.length > 100
+              safe_artist = safe_artist[0..99]
+            end
+            tag = { artist: safe_artist, title: tag.title, secs: songlen }
             $db.write_tag(hash, mp3file, tag)
           end
         end
