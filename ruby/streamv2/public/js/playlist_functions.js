@@ -1,4 +1,5 @@
 'use strict';
+
 const e = React.createElement;
 const MAX_ITEM_LENGTH = 50;
 const MAX_LIST_LENGTH = 30;
@@ -48,7 +49,7 @@ class Search extends React.Component {
    selcont.classList.remove('tooltip');
    selcont.classList.add('tooltipshow');
 
- }
+}
 
  markChanges = () => {
    let dt = document.title;
@@ -78,47 +79,14 @@ class Search extends React.Component {
    }
  }
 
- // Line item displayed when it's already in the playlist
- inactiveLineItem = (a, item) => {
-   return e('li', {
-     id: "s_" + item.hash,
-     key: item.counter
-   }, item.title )
- }
 
- // Line item displayed when it's not in the playlist.
- // It allows you to click and add it to the playlist, or hover over and see play stats on it.
- activeLineItem = (a, item) => {
-   return e('li', {
-     id: "s_" + item.hash,
-     className: "title_" + item.derived,
-     key: item.counter
-        }, e('a', {
-          onMouseOver: function() {
-            if (item.plays !== null) {
-              a.displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
-            } else {
-              a.displayTooltip("Song was not recently played.");
-            }
-          },
-          onMouseOut: function() {
-            a.hideTooltip();
-          },
-          onClick: function() {
-            a.hideTooltip();
-            a.addToList("s_" + item.hash);
-          } //end onclick
-        }, item.title ) //end element <a>
-
-   ) //end element <li>
- }
 
  fixTitle = (title) => {
    let ret = title;
-   if (ret == null) {
-     ret = '???';
-   }
-   if (ret.length > MAX_ITEM_LENGTH) {
+  if (ret == null) {
+   ret = '???';
+  }
+  if (ret.length > MAX_ITEM_LENGTH) {
      ret = ret.substr(0,MAX_ITEM_LENGTH - 3) + "...";
    }
    return ret;
@@ -146,8 +114,10 @@ class Search extends React.Component {
 
            if (selectedSongs.length <= MAX_LIST_LENGTH) {
 
+             let lineItemProps = {key: item.counter, containingSearch: a, dataSource: item};
              selectedSongs.push( a.itemAlreadyInPlaylist('s_' + item.hash) ?
-               a.inactiveLineItem(a, item) : a.activeLineItem(a, item)
+               e(InactiveLineItem, lineItemProps, null) :
+               e(ActiveLineItem,   lineItemProps, null)
              )
 
          } // end if (selectedSongs) (60)
@@ -180,7 +150,15 @@ class Search extends React.Component {
         className: 'click'
       }, this.state.songs
     )
-    ,e( // 3rd child: tooltip
+    ,e(TooltipBox, null, null)
+  );
+ }
+}
+
+// Line item displayed when it's already in the playlist
+class TooltipBox extends React.Component {
+  render() {
+    return e( // 3rd child: tooltip
       'div', {
         id: 'song_tooltip_container',
         className: 'tooltip'
@@ -190,11 +168,51 @@ class Search extends React.Component {
           className: 'tooltiptext'
         }
       )
-    ) // ...end of tooltip
-  );
- }
+    )
+  }
 }
 
+
+class InactiveLineItem extends React.Component {
+  render() {
+    let item = this.props.dataSource;
+    return e('li', {
+      id: "s_" + item.hash,
+    }, item.title )
+  }
+}
+
+// Line item displayed when it's not in the playlist.
+// It allows you to click and add it to the playlist, or hover over and see play stats on it.
+class ActiveLineItem extends React.Component {
+  render() {
+    {
+      let item = this.props.dataSource;
+      let a = this;
+      return e('li', {
+        id: "s_" + item.hash,
+        className: "title_" + item.derived,
+           }, e('a', {
+             onMouseOver: function() {
+               if (item.plays !== null) {
+                 a.props.containingSearch.displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
+               } else {
+                 a.props.containingSearch.displayTooltip("Song was not recently played.");
+               }
+             },
+             onMouseOut: function() {
+               a.props.containingSearch.hideTooltip();
+             },
+             onClick: function() {
+               a.props.containingSearch.hideTooltip();
+               a.props.containingSearch.addToList("s_" + item.hash);
+             } //end onclick
+           }, item.title ) //end element <a>
+
+      ) //end element <li>
+    }
+  }
+}
 // TODO: write something to fetch and parse playlist search (/search/blah)
 const domContainer = document.querySelector('#search_section');
 ReactDOM.render(e(Search), domContainer);
