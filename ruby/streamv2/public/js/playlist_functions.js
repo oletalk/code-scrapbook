@@ -10,75 +10,6 @@ class Search extends React.Component {
    songs: []
  }
 
- // NOTE: do not pass raw id here. uses s_<id> for checks.
- itemAlreadyInPlaylist = (hash) => {
-   var ret = false;
-
-   let sel = document.getElementById('playlist');
-   for (var i = 0; i < sel.options.length; i++) {
-     let opt = sel.options[i];
-     let dd_identifier = hash.split('_')
-     if (opt.id == dd_identifier[1]) { // without the s_...
-       ret = true;
-     }
-   }
-   return ret;
- }
-
- hideTooltip = () => {
-   let sel = document.getElementById('song_tooltip');
-   sel.classList.remove('tooltipshow');
-   sel.classList.add('tooltip');
-
-   let selcont = document.getElementById('song_tooltip_container');
-   selcont.classList.remove('tooltipshow');
-   selcont.classList.add('tooltip');
-
-   sel.innerText = "";
- }
-
- displayTooltip = (text) => {
-   let sel = document.getElementById('song_tooltip');
-
-   sel.innerText = text;
-
-   sel.classList.remove('tooltip');
-   sel.classList.add('tooltipshow');
-
-   let selcont = document.getElementById('song_tooltip_container');
-   selcont.classList.remove('tooltip');
-   selcont.classList.add('tooltipshow');
-
-}
-
- markChanges = () => {
-   let dt = document.title;
-   if (dt.indexOf('[') == -1) {
-     document.title = "[changes made] " + document.title;
-   }
- }
-
- addToList = (hash) => {
-   var sel = document.getElementById(hash); // should have s_ in front
-   if (sel != null) {
-     if (this.itemAlreadyInPlaylist(hash)) {
-       alert('Sorry, the playlist already has this item.');
-     } else {
-       var playlist = document.getElementById('playlist');
-       var newOption = document.createElement('option');
-       newOption.text = sel.innerText;
-       sel.innerHTML = sel.innerText;
-       //alert(hash);
-       let dd_identifier = hash.split('_')
-       newOption.id = dd_identifier[1]; // without the s_!
-       playlist.add(newOption);
-       this.markChanges();
-     }
-   } else {
-     alert("Sorry, I was unable to find that song.");
-   }
- }
-
 
  addRandomSongs = (num) => {
    var a = this;
@@ -93,9 +24,8 @@ class Search extends React.Component {
 
          if (selectedSongs.length <= MAX_LIST_LENGTH) {
 
-           let lineItemProps = {key: item.counter, containingSearch: a, dataSource: item};
            selectedSongs.push(
-             e(LineItem, lineItemProps, null)
+             e(LineItem, {key: item.counter, dataSource: item}, null)
            )
 
          }
@@ -127,9 +57,8 @@ class Search extends React.Component {
 
            if (selectedSongs.length <= MAX_LIST_LENGTH) {
 
-             let lineItemProps = {key: item.counter, containingSearch: a, dataSource: item};
              selectedSongs.push(
-               e(LineItem, lineItemProps, null)
+               e(LineItem, {key: item.counter, dataSource: item}, null)
              )
 
          }
@@ -202,7 +131,7 @@ class LineItem extends React.Component {
   render() {
     let item = this.props.dataSource;
 
-    if (this.props.containingSearch.itemAlreadyInPlaylist('s_' + item.hash)) {
+    if (itemAlreadyInPlaylist('s_' + item.hash)) {
       // inactive one
 
       return e('li', {
@@ -211,13 +140,12 @@ class LineItem extends React.Component {
 
     } else {
       // active one
-      let linkProps = {song: item, containingSearch: this.props.containingSearch};
 
       return e('li', {
         id: "s_" + item.hash,
         className: "title_" + item.derived,
            },
-           e(SongLink, linkProps, null)
+           e(SongLink, {song: item}, null)
 
       )
 
@@ -229,53 +157,27 @@ class LineItem extends React.Component {
 class SongLink extends React.Component {
   render() {
     let item = this.props.song;
-    let search = this.props.containingSearch;
     return e('a', {
       onMouseOver: function() {
         if (item.plays !== undefined) {
-          search.displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
+          displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
         } else {
-          search.displayTooltip("Song was not recently played.");
+          displayTooltip("Song was not recently played.");
         }
       },
       onMouseOut: function() {
-        search.hideTooltip();
+        hideTooltip();
       },
       onClick: function() {
-        search.hideTooltip();
-        search.addToList("s_" + item.hash);
+        hideTooltip();
+        addToList("s_" + item.hash);
       } //end onclick
     }, item.title )
   }
 }
 
-function fixTitle (title) {
-  let ret = title;
-   if (ret == null) {
-    ret = '???';
-   }
-   if (ret.length > MAX_ITEM_LENGTH) {
-      ret = ret.substr(0,MAX_ITEM_LENGTH - 3) + "...";
-    }
-    return ret;
-}
 
-function nonnull(str) {
-    return (str !== undefined && str !== null) ? str : undefined;
-}
 
-function songFromJson (si, json) {
-  let songitem = json;
-  let item = {
-     counter: si,
-     hash: songitem['hash'],
-     title: fixTitle(songitem['title']),
-     plays: nonnull(songitem['plays']),
-     last_played: nonnull(songitem['last_played']),
-     derived: nonnull(songitem['title_derived'])
-   };
-   return item;
-}
 
 // TODO: write something to fetch and parse playlist search (/search/blah)
 const domContainer = document.querySelector('#search_section');
