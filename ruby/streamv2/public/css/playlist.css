@@ -79,6 +79,10 @@ ul.click > li.inlist {
   list-style-type: disc;
 }
 
+input#randomBtn {
+    margin-left: 20px;
+}
+
 li.title_1 {
   font-style: oblique;
 }

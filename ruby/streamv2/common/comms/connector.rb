@@ -19,9 +19,20 @@ class Connector
 
   def set_streamserver?(hosthdr, token)
     ret = false
+    skiplogin = false
     begin
-      if @streamserver.nil?
-        Log.log.info "Stream server connected from #{hosthdr}"
+
+      Log.log.info "Stream server connected from #{hosthdr}"
+
+      unless @streamserver.nil?
+        unless streamserver_is? hosthdr
+          Log.log.error "Already connected to another stream server! Denying."
+          ret = false
+          skiplogin = true
+        end
+      end
+
+      unless skiplogin
         decoded_token = JWT.decode token, @hmac_secret, true, { algorithm: 'HS256' }
         pass = decoded_token[0]['data']
         Log.log.info "pass: #{pass}"
@@ -32,8 +43,8 @@ class Connector
             @streamserver = hosthdr #TODO something else?
             ret = true
         else
-          Log.log.error "Extraneous connection from #{hosthdr}"
-          ret = false
+           puts 'Shared secret not ok!'
+           Log.log.info "Stream server verification failed from #{hosthdr}"
         end
       end
     rescue JWT::VerificationError => e

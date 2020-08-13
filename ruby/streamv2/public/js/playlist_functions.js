@@ -80,18 +80,38 @@ class Search extends React.Component {
  }
 
 
+ addRandomSongs = (num) => {
+   var a = this;
+   var selectedSongs = [];
 
- fixTitle = (title) => {
-   let ret = title;
-  if (ret == null) {
-   ret = '???';
-  }
-  if (ret.length > MAX_ITEM_LENGTH) {
-     ret = ret.substr(0,MAX_ITEM_LENGTH - 3) + "...";
-   }
-   return ret;
+   axios.get('/random/' + num)
+   .then(function(response) {
+     if (Array.isArray(response.data)) {
+       for (let si = 0; si < response.data.length; si++) {
+         let item = songFromJson(si, response.data[si]);
+         //console.log(item);
+
+         if (selectedSongs.length <= MAX_LIST_LENGTH) {
+
+           let lineItemProps = {key: item.counter, containingSearch: a, dataSource: item};
+           selectedSongs.push(
+             e(LineItem, lineItemProps, null)
+           )
+
+         }
+
+       }
+     }
+     a.setState({
+       query: '',
+       songs: selectedSongs
+     });
+
+   })
+   .catch(function(error) {
+     console.log('ERROR! ' + error)
+   })
  }
-
 
  handleInputChange = (ev) => {
    var a = this;
@@ -101,28 +121,21 @@ class Search extends React.Component {
      axios.get('/search/' + str)
      .then(function (response) { // process search results
        if (Array.isArray(response.data)) {
+
          for (let si = 0; si < response.data.length; si++) {
-           let songitem = response.data[si];
-           let item = {
-              counter: si,
-              hash: songitem['hash'],
-              title: a.fixTitle(songitem['title']),
-              plays: songitem['plays'],
-              last_played: songitem['last_played'],
-              derived: songitem['title_derived']
-            };
+           let item = songFromJson(si, response.data[si]);
 
            if (selectedSongs.length <= MAX_LIST_LENGTH) {
 
              let lineItemProps = {key: item.counter, containingSearch: a, dataSource: item};
-             selectedSongs.push( a.itemAlreadyInPlaylist('s_' + item.hash) ?
-               e(InactiveLineItem, lineItemProps, null) :
-               e(ActiveLineItem,   lineItemProps, null)
+             selectedSongs.push(
+               e(LineItem, lineItemProps, null)
              )
 
-         } // end if (selectedSongs) (60)
-       } // end for loop
-     } // end if (Array...)
+         }
+       }
+     }
+
        console.log("Songs collected: " + selectedSongs.length);
        a.setState({
          query: str,
@@ -133,18 +146,32 @@ class Search extends React.Component {
        console.log('ERROR! ' + error)
      })
    }
- }
+ } // handleInputChange (function)
 
  render() {
    return e(
      'div', {},
-     e( // 1st child: input
-       'input',
-    { type: 'text',
-      placeholder: 'Search for song to add...',
-      value: this.state.query.value,
-      onChange: (ev) => this.handleInputChange(ev)
-    })
+     e( // 1st child: span (of inputs)
+     'span', {},
+
+       e( // 1st child: input
+         'input',
+          { type: 'text',
+            placeholder: 'Search for song to add...',
+            value: this.state.query.value,
+            onChange: (ev) => this.handleInputChange(ev)
+          }
+        ),
+        e(
+          'input', {
+            type: 'button',
+            id: "randomBtn",
+            onClick: (ev) => this.addRandomSongs(10),
+            value: 'Random'
+          }
+        ), null
+
+  )
      , e( // 2nd child: select
       'ul', {
         className: 'click'
@@ -155,7 +182,6 @@ class Search extends React.Component {
  }
 }
 
-// Line item displayed when it's already in the playlist
 class TooltipBox extends React.Component {
   render() {
     return e( // 3rd child: tooltip
@@ -172,47 +198,85 @@ class TooltipBox extends React.Component {
   }
 }
 
-
-class InactiveLineItem extends React.Component {
+class LineItem extends React.Component {
   render() {
     let item = this.props.dataSource;
-    return e('li', {
-      id: "s_" + item.hash,
+
+    if (this.props.containingSearch.itemAlreadyInPlaylist('s_' + item.hash)) {
+      // inactive one
+
+      return e('li', {
+        id: "s_" + item.hash,
+      }, item.title )
+
+    } else {
+      // active one
+      let linkProps = {song: item, containingSearch: this.props.containingSearch};
+
+      return e('li', {
+        id: "s_" + item.hash,
+        className: "title_" + item.derived,
+           },
+           e(SongLink, linkProps, null)
+
+      )
+
+    }
+
+  }
+}
+
+class SongLink extends React.Component {
+  render() {
+    let item = this.props.song;
+    let search = this.props.containingSearch;
+    return e('a', {
+      onMouseOver: function() {
+        if (item.plays !== undefined) {
+          search.displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
+        } else {
+          search.displayTooltip("Song was not recently played.");
+        }
+      },
+      onMouseOut: function() {
+        search.hideTooltip();
+      },
+      onClick: function() {
+        search.hideTooltip();
+        search.addToList("s_" + item.hash);
+      } //end onclick
     }, item.title )
   }
 }
 
-// Line item displayed when it's not in the playlist.
-// It allows you to click and add it to the playlist, or hover over and see play stats on it.
-class ActiveLineItem extends React.Component {
-  render() {
-    {
-      let item = this.props.dataSource;
-      let a = this;
-      return e('li', {
-        id: "s_" + item.hash,
-        className: "title_" + item.derived,
-           }, e('a', {
-             onMouseOver: function() {
-               if (item.plays !== null) {
-                 a.props.containingSearch.displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
-               } else {
-                 a.props.containingSearch.displayTooltip("Song was not recently played.");
-               }
-             },
-             onMouseOut: function() {
-               a.props.containingSearch.hideTooltip();
-             },
-             onClick: function() {
-               a.props.containingSearch.hideTooltip();
-               a.props.containingSearch.addToList("s_" + item.hash);
-             } //end onclick
-           }, item.title ) //end element <a>
-
-      ) //end element <li>
+function fixTitle (title) {
+  let ret = title;
+   if (ret == null) {
+    ret = '???';
+   }
+   if (ret.length > MAX_ITEM_LENGTH) {
+      ret = ret.substr(0,MAX_ITEM_LENGTH - 3) + "...";
     }
-  }
+    return ret;
 }
+
+function nonnull(str) {
+    return (str !== undefined && str !== null) ? str : undefined;
+}
+
+function songFromJson (si, json) {
+  let songitem = json;
+  let item = {
+     counter: si,
+     hash: songitem['hash'],
+     title: fixTitle(songitem['title']),
+     plays: nonnull(songitem['plays']),
+     last_played: nonnull(songitem['last_played']),
+     derived: nonnull(songitem['title_derived'])
+   };
+   return item;
+}
+
 // TODO: write something to fetch and parse playlist search (/search/blah)
 const domContainer = document.querySelector('#search_section');
 ReactDOM.render(e(Search), domContainer);

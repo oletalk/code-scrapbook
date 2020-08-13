@@ -22,6 +22,7 @@ class StreamServer < Sinatra::Base
     f = Fetch.new
     result = f.start(Connector.get_hmac_secret)
     if result != 'OK'
+      Log.log.error("Fetch start returned: '#{result}'")
       puts " *******************************************************************"
       puts " *                                                                 *"
       puts " * ERROR! Did not establish connection with DBServer! Check logs.  *"

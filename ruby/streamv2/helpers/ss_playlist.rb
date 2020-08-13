@@ -31,7 +31,7 @@ module Sinatra
         else
           f = Fetch.new
           f.savelist(playlist_id, playlist_name, playlist_songids)
-          redirect '/playlist/manage'
+          redirect "/playlist/#{playlist_id}"
         end
       end
 
