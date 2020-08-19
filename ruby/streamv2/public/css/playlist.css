@@ -99,11 +99,12 @@ li.title_1 {
 div.tooltipshow {
   position: relative;
   left: 250px;
+  top: -75px;
+  background-color: #555;
 }
 span.tooltipshow {
   position: relative;
-  top: -75px;
-  background-color: #555;
+  /* background-color: #555; */
   color: white;
   text-align: left;
   font-size:14px;

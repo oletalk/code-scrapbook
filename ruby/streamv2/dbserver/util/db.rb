@@ -247,7 +247,7 @@ class Db
       SELECT
           plays, last_played,
           file_hash,
-          secs,
+          secs, date_added,
           #{TITLE_TERM_SNIPPET},
           #{DERIVED_TITLE_SNIPPET}
       FROM mp3s_tags t
@@ -267,6 +267,7 @@ class Db
         last_played: true,
         hash: "file_hash",
         secs: true,
+        date_added: true,
         title: "display_title",
         title_derived: true
       },

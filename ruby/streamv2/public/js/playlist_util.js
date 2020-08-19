@@ -20,11 +20,20 @@ function songFromJson (si, json) {
      counter: si,
      hash: songitem['hash'],
      title: fixTitle(songitem['title']),
+     date_added: nonnull(songitem['date_added']),
      plays: nonnull(songitem['plays']),
      last_played: nonnull(songitem['last_played']),
      derived: nonnull(songitem['title_derived'])
    };
    return item;
+}
+
+function positionTooltip(e) {
+  let y = e.clientY;
+  let tooltipDiv = document.getElementById('song_tooltip_container');
+  tooltipDiv.style.position = 'absolute';
+  tooltipDiv.style.top = (y + 20) + 'px';
+
 }
 
 function hideTooltip () {

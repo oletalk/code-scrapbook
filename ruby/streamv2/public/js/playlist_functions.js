@@ -158,9 +158,14 @@ class SongLink extends React.Component {
   render() {
     let item = this.props.song;
     return e('a', {
-      onMouseOver: function() {
+      onMouseOver: function(e) {
+        positionTooltip(e);
         if (item.plays !== undefined) {
-          displayTooltip("Plays: " + item.plays + "\nLast Played:" + item.last_played);
+
+
+          displayTooltip("Plays: " + item.plays
+          + "\nLast Played:" + item.last_played
+          + "\nDate added:" + item.date_added);
         } else {
           displayTooltip("Song was not recently played.");
         }
