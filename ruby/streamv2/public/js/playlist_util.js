@@ -51,7 +51,7 @@ function hideTooltip () {
 function displayTooltip (text) {
   let sel = document.getElementById('song_tooltip');
 
-  sel.innerText = text;
+  sel.innerHTML = text;
 
   sel.classList.remove('tooltip');
   sel.classList.add('tooltipshow');

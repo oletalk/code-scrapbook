@@ -19,7 +19,8 @@ module MP3S
           # PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null'
 		    end
 		    module Misc
-          DATE_FORMAT = '%a %-d %b, %I:%M %P'
+          TIMESTAMP_FORMAT = '%a %-d %b %Y, %I:%M %P'
+          DATE_FORMAT = '%a %-d %b %Y'
           SHARED_SECRET = 'stuff'
 		      RSC = 'BCE$21^&'
           LOGFILE = '/var/tmp/streamer_server.log'

@@ -135,8 +135,10 @@ class DBServer < Sinatra::Base
     if song_list.size > 0
       song_list.each do |row|
         lp = row[:last_played]
+        da = row[:date_added]
         unless lp.nil?
-          row[:last_played] = Manip.date_from_db(lp)
+          row[:last_played] = Manip.timestamp_from_db(lp)
+          row[:date_added] = Manip.date_from_db(da)
         end
       end
       Format.json(song_list)

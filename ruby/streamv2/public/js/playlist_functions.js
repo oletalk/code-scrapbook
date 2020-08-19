@@ -163,9 +163,9 @@ class SongLink extends React.Component {
         if (item.plays !== undefined) {
 
 
-          displayTooltip("Plays: " + item.plays
-          + "\nLast Played:" + item.last_played
-          + "\nDate added:" + item.date_added);
+          displayTooltip("<b>Plays:</b> " + item.plays
+          + "<br/><b>Last Played:</b>" + item.last_played
+          + "<br/><b>Date added:</b>" + item.date_added);
         } else {
           displayTooltip("Song was not recently played.");
         }

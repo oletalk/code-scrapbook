@@ -21,11 +21,21 @@ module Manip
     str.gsub(/\s+/, " ").strip
   end
 
-  def self.date_from_db(str) # str is of the form '2020-07-03 11:27:15.296414'
+  def self.date_from_db(str) # str is of the form '2020-07-03'
+    date_from(str, MP3S::Config::Misc::DATE_FORMAT)
+  end
+
+  def self.timestamp_from_db(str) # str is of the form '2020-07-03 11:27:15.296414'
+    date_from(str, MP3S::Config::Misc::TIMESTAMP_FORMAT)
+  end
+
+  private
+
+  def self.date_from(str, format_str)
     ret = nil
     begin
       dte = DateTime.parse(str)
-      ret = dte.strftime(MP3S::Config::Misc::DATE_FORMAT)
+      ret = dte.strftime(format_str)
     rescue ArgumentError => e
       Log.log.error("Problem parsing given date: #{e}")
     end
