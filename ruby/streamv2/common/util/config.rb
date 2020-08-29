@@ -2,6 +2,7 @@ module MP3S
     module Config
         module Caching
           CAPACITY = 20
+        end
         module Net
           WEB_ROOT = './public'
           MP3_ROOT = '/opt/gulfport/mp3'
