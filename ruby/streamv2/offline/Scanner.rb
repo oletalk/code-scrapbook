@@ -36,10 +36,10 @@ def tag_file_with_hash(mp3file, hash)
 end
 
 # Options
-options = {}
+options = {dates:true}
 OptionParser.new do |opts|
     opts.banner = "Usage: Scanner.rb [options]"
-    opts.on('-d', '--date', 'Stamp tag dates with the file dates') { options[:dates] = true }
+    opts.on('-n', '--no-date', 'DO NOT stamp tag dates with the file dates') { options[:dates] = false }
     opts.on('-l', '--long', 'Long process, check ALL files in directory for tags') { options[:long] = true }
     opts.on('-rDIR', '--rootdir=DIR', 'Specify the root directory') { |v| options[:rootdir] = v }
 end.parse!
@@ -53,7 +53,7 @@ puts "Scanning through given base directory #{rootdir}"
 files = Dir.glob(rootdir + "/**/" + FILESPEC )
 
 puts "Filespec was '#{rootdir + "/**/" + FILESPEC}' files"
-if files.size == 0
+if files.empty?
     raise "No files found in given root dir #{rootdir}"
 end
 

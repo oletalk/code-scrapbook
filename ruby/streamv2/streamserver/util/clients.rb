@@ -7,7 +7,7 @@ module MP3S
         List = {
             '192.168.0.0/24' => {
               allow: true,
-              downsample: false,
+              downsample: true,
               playlist: true },
             '109.148.232.0/24' => { allow: true, downsample: true },
             '82.118.92.0/24' => { allow: true, downsample: true },

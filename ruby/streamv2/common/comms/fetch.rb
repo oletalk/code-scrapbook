@@ -1,8 +1,10 @@
 require_relative '../util/logging'
 require_relative '../util/config'
 require_relative 'base_fetcher'
+require_relative '../util/cacheable'
 
 class Fetch < BaseFetcher
+  include Cacheable
 
   PLAY = '/play/'
   LIST = '/list/'
@@ -13,6 +15,7 @@ class Fetch < BaseFetcher
 
   PLAYLIST_SAVE = '/playlist/save'
   TAG_SAVE = '/tag/save'
+
 
   def tag(hash)
     go_get(TAG + hash)
@@ -48,10 +51,17 @@ class Fetch < BaseFetcher
 
   def fetch(hash, downsample: false)
     ds_extra = ""
+    data = ""
+
     if downsample
       ds_extra = "/downsampled"
+      cacheddata = do_cached(hash) { go_get(PLAY + hash + ds_extra)  }
+      data = cacheddata.songdata
+    else
+      data = go_get(PLAY + hash + ds_extra)
     end
-    go_get(PLAY + hash + ds_extra)
+    p "data size: #{data.length}"
+    data
   end
 
   def playlist_m3u(spec, downsample: false)

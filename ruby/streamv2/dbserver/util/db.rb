@@ -302,7 +302,7 @@ class Db
   def write_tag(hash, filename, tagobj)
     # check hash/filename is not already in database
     found_songs = find_song(hash)
-    if found_songs.nil? || found_songs.size == 0
+    if found_songs.nil? || found_songs.empty?
       connect_for('writing tag') do |conn|
         sql = Manip.collapse(%{
             INSERT into mp3s_tags

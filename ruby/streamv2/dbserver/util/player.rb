@@ -33,9 +33,10 @@ class Player
     def get_command(downsample, song)
         if downsample
             # check if downsampling mp3/ogg
-            if ( song =~ /mp3$/i )
+            case song
+            when /mp3$/i
                 command = MP3S::Config::Play::DOWNSAMPLED_MP3
-            elsif ( song =~ /ogg$/i )
+            when /ogg$/i
                 command = MP3S::Config::Play::DOWNSAMPLED_OGG
             else
                 Log.log.error ("No idea how to downsample given file type #{song}")

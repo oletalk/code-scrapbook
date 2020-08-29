@@ -3,11 +3,13 @@ require 'jwt'
 
 require_relative '../util/logging'
 require_relative '../util/config'
+require_relative '../../streamserver/data/songcache'
 
 class BaseFetcher
 
   # get the address of the mp3 server from config
   def initialize(hh = nil)
+
     @base_url = 'http://' + MP3S::Config::DB::SERVER_HOST + ':' + MP3S::Config::DB::SERVER_PORT.to_s
     @hostheader = hh
     Log.log.info "Fetching mechanism loaded base url of #{@base_url}"
