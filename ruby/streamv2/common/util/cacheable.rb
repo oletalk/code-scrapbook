@@ -1,9 +1,10 @@
 require_relative '../../streamserver/data/songcache'
+require_relative 'config'
 
 
 module Cacheable
 
-  @@cache = SongCache.new(capacity: 10)
+  @@cache = SongCache.new(capacity: MP3S::Config::Caching::CAPACITY)
 
   def do_cached(hash)
     ret = nil

@@ -12,6 +12,7 @@ class SongCache
 
   def store(hash, songdata)
     # TODO what if the cache already has an item in the 'hash' bucket?
+    # Cacheable doesn't allow that to happen
     @list[hash] = SongCacheItem.new(songdata)
     if @list.size > @capacity
       # find oldest item
