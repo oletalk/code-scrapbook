@@ -6,44 +6,31 @@ require_relative 'dbserver/util/player'
 require_relative 'common/util/logging'
 require_relative 'common/text/manip'
 require_relative 'common/text/format'
-require_relative 'common/comms/connector'
+#require_relative 'common/comms/connector'
+require_relative 'common/comms/connected'
 require_relative 'dbserver/data/song'
 
 # this server should not be publicly accessible
 class DBServer < Sinatra::Base
+  include Connected
+
   set :bind, MP3S::Config::DB::SERVER_HOST
   set :port, MP3S::Config::DB::SERVER_PORT
   enable :dump_errors
-
-  # init stuff
-  configure do
-    @@connector = Connector.new(
-      MP3S::Config::Misc::SHARED_SECRET,
-      Connector.get_hmac_secret
-    )
-  end
 
   before do
     @db   = Db.new
     @player = Player.new
     Log.init( MP3S::Config::Misc::DB_LOGFILE )
-    #@remote_ip = request.env['REMOTE_ADDR']
-    @remote_ip = request.env['HTTP_HOST']
-    #puts @remote_ip
-    if !@@connector.streamserver_is?(@remote_ip)
-      pass if request.path_info.start_with? '/pass/'
 
-      puts 'Remote IP mismatch! Denying request.'
-      Log.log.error "Remote IP not streamserver! #@remote_ip"
-      halt
-    end
+    halt unless allowed(request)
   end
 
   get '/pass/:jwt' do |token|
     #   def set_streamserver(hosthdr, token)
 
     begin
-      if @@connector.set_streamserver?(request.env['HTTP_HOST'], token)
+      if set_streamserver?(request, token)
         'OK'
       else
         'FAIL'

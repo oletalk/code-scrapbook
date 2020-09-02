@@ -22,4 +22,8 @@ module Cacheable
     ret
   end
 
+  def cachefill
+    @@cache.fill
+  end
+
 end

@@ -46,9 +46,9 @@ class BaseFetcher
   end
 
   def do_answer(response)
-    case response.code
+    case response.code # HTTP uses response.status.code
       when 200
-        response.body
+        response.body.to_s
       when 404
         Log.log.error("*** NOT FOUND: #{url}")
         '404 Not Found'

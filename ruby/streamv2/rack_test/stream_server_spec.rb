@@ -29,7 +29,7 @@ describe 'The StreamServer app' do
 		allow(@mock_fetch).to receive(:start).with(any_args()) { 'OK' }
 		allow(@mock_fetch).to receive(:fetch).with('abcdefg', downsample: false) { 'foo' }
 		allow(@mock_fetch).to receive(:search).with('hijkl', nil) { 'searchresult' }
-		Fetch.stub(:new).with(any_args()).and_return(@mock_fetch)
+		Fetch.stub(:new).and_return(@mock_fetch)
 
 		# set test ranges - allow/allow with downsample/reject
 		@mock_whitelist = IPWhitelist.new({
@@ -64,6 +64,5 @@ describe 'The StreamServer app' do
 		expect(last_response).to be_ok
 		expect(last_response.body).to eq("searchresult")
 	end
-
 
 end

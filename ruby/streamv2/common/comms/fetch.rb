@@ -1,53 +1,18 @@
 require_relative '../util/logging'
 require_relative '../util/config'
 require_relative 'base_fetcher'
+require_relative 'fetch_playlist_mixin'
 require_relative '../util/cacheable'
 
 class Fetch < BaseFetcher
   include Cacheable
+  include FetchPlaylistMixin
 
   PLAY = '/play/'
   LIST = '/list/'
   PLAYLIST = '/playlist/'
-  PLAYLISTS = '/playlists'
   SEARCH = '/search/'
-  TAG = '/tag/'
 
-  PLAYLIST_SAVE = '/playlist/save'
-  TAG_SAVE = '/tag/save'
-
-
-  def tag(hash)
-    go_get(TAG + hash)
-  end
-
-  def playlist(playlist_id)
-    if playlist_id.nil?
-      go_get(PLAYLISTS)
-    elsif playlist_id == 'new'
-      go_get(PLAYLIST + 'new')
-    else
-      go_get(PLAYLIST + playlist_id)
-    end
-  end
-
-  def dellist(playlist_id)
-    go_get(PLAYLIST + playlist_id + '/del')
-    'Delete complete'
-  end
-
-  def savelist(playlist_id, playlist_name, playlist_songids)
-    # pid pname songids
-    go_post(PLAYLIST_SAVE, {
-      pid: playlist_id, pname: playlist_name, songids: playlist_songids
-      })
-  end
-
-  def savetag(tag_artist, tag_title, tag_hash, playlist_id)
-    go_post(TAG_SAVE, {
-      artist: tag_artist, title: tag_title, hash: tag_hash, playlist: playlist_id
-      })
-  end
 
   def fetch(hash, downsample: false)
     ds_extra = ""
@@ -60,7 +25,6 @@ class Fetch < BaseFetcher
     else
       data = go_get(PLAY + hash + ds_extra)
     end
-    p "data size: #{data.length}"
     data
   end
 
@@ -76,11 +40,6 @@ class Fetch < BaseFetcher
     stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(/http:\/\/\d+\.\d+\.\d+\.\d+:\d+\//, 'http://' + @hostheader + '/')
-  end
-
-  def randomlist(number)
-    stg = go_get(SEARCH + 'random/' + number.to_s)
-    stg
   end
 
   def search(name, format)
