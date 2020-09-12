@@ -77,6 +77,8 @@
             let a = s.options[i];
             s.remove(i);
             s.add(a, i-1);
+            markChanges();
+
             // use select.add and select.remove
             s.selectedIndex = i - 1;
           } else {
@@ -94,6 +96,8 @@
             let a = s.options[i];
             s.remove(i);
             s.add(a, i+1);
+            markChanges();
+
             // use select.add and select.remove
             s.selectedIndex = i + 1;
           }

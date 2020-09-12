@@ -27,15 +27,7 @@ class DBServer < Sinatra::Base
   end
 
   get '/pass/:jwt' do |token|
-    #   def set_streamserver(hosthdr, token)
-
-    begin
-      if set_streamserver?(request, token)
-        'OK'
-      else
-        'FAIL'
-      end
-    end
+    set_streamserver?(request, token) ? 'OK' : 'FAIL'
   end
 
   get '/list/:spec' do |req_spec|
