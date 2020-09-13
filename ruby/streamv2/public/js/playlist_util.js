@@ -69,40 +69,38 @@ function markChanges () {
   }
 }
 
-// NOTE: do not pass raw id here. uses s_<id> for checks.
-function itemAlreadyInPlaylist (hash) {
-  var ret = false;
 
-  let sel = document.getElementById('playlist');
-  for (var i = 0; i < sel.options.length; i++) {
-    let opt = sel.options[i];
-    let dd_identifier = hash.split('_')
-    if (opt.id == dd_identifier[1]) { // without the s_...
-      ret = true;
-    }
+// from the original HTML doc
+function checkBeforeLeaving() {
+  if (document.title.indexOf('[') != -1) {
+    return confirm("You made changes to the playlist. Are you sure you want to leave?");
   }
-  return ret;
 }
 
 
 
-function addToList (hash) {
-  var sel = document.getElementById(hash); // should have s_ in front
-  if (sel != null) {
-    if (itemAlreadyInPlaylist(hash)) {
-      alert('Sorry, the playlist already has this item.');
-    } else {
-      var playlist = document.getElementById('playlist');
-      var newOption = document.createElement('option');
-      newOption.text = sel.innerText;
-      sel.innerHTML = sel.innerText;
-      //alert(hash);
-      let dd_identifier = hash.split('_')
-      newOption.id = dd_identifier[1]; // without the s_!
-      playlist.add(newOption);
-      markChanges();
-    }
-  } else {
-    alert("Sorry, I was unable to find that song.");
+function preDelete() {
+  return confirm("Are you sure you want to delete this playlist??");
+}
+function preSubmit() {
+  // we want all the items, not just the selected ones.
+  var hashes = "";
+  var namefield = document.getElementById('playlist_name')
+  if (namefield.value == '') {
+    alert('Please input a playlist name');
+    return false;
   }
+  var sel = document.getElementById('playlist');
+  if (sel.options.length < 2) {
+    alert('Please add at least 2 items to the playlist');
+    return false;
+  }
+  for (var i = 0; i < sel.options.length; i++) {
+    if (i != 0) {
+      hashes += ",";
+    }
+    hashes += sel.options[i].id;
+  }
+  document.forms[0].songids.value = hashes;
+  return true;
 }

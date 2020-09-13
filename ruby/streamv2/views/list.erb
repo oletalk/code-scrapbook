@@ -9,132 +9,10 @@
     </script>
     <script src="/js/ext-static/react-dom.development.js" crossorigin>
     </script>
-    <script language="javascript">
 
-      function checkBeforeLeaving() {
-        if (document.title.indexOf('[') != -1) {
-          return confirm("You made changes to the playlist. Are you sure you want to leave?");
-        }
-      }
-
-      // FIXME: these menu items can't be selected again!
-      function removeSelected() {
-        var sel = document.getElementById('playlist');
-        var toremove = []
-        for (var i = 0; i < sel.options.length; i++) {
-          if (sel.options[i].selected) {
-            toremove.push(sel.options[i].id);
-          }
-        }
-
-        for (var r = 0; r < toremove.length; r++) {
-          var sel = document.getElementById(toremove[r]);
-          sel.remove();
-          // check if the menu item should be reactivated in the dropdown
-          // (it may not be there)
-          var dd_sel = document.getElementById('s_' + toremove[r])
-          if (dd_sel != null) {
-            var oldText = dd_sel.innerText;
-            // FIXME: I can't just re-add 'addToList' function as
-            // it doesn't seem to recognise it if I refer to it outside the js :-/
-            var str = "<a onClick=\"alert('Unable to re-add this song. Please save and come back to this playlist.')\">" + oldText + "</a>";
-            dd_sel.innerHTML = str;
-
-          }
-        }
-
-      }
-
-      function toggleMoveButtons() {
-        let s = document.getElementById('playlist');
-        let i = s.selectedIndex;
-        let n = s.options.length;
-
-        let upBtn = document.getElementById('move-up');
-        let downBtn = document.getElementById('move-down');
-        if (i == -1) {
-          upBtn.classList.add('disabled');
-          downBtn.classList.add('disabled');
-        } else {
-          if (i == 0) {
-            upBtn.classList.add('disabled');
-            downBtn.classList.remove('disabled');
-          } else if (i == n - 1) {
-            upBtn.classList.remove('disabled');
-            downBtn.classList.add('disabled');
-          } else {
-            upBtn.classList.remove('disabled');
-            downBtn.classList.remove('disabled');
-          }
-        }
-
-      }
-      function moveUp() {
-        let s = document.getElementById('playlist');
-        let i = s.selectedIndex;
-        if (i != -1) {
-          if (i > 0) {
-            let a = s.options[i];
-            s.remove(i);
-            s.add(a, i-1);
-            markChanges();
-
-            // use select.add and select.remove
-            s.selectedIndex = i - 1;
-          } else {
-            alert("Already at top of list!");
-            toggleMoveButtons();
-          }
-        }
-      }
-
-      function moveDown() {
-        let s = document.getElementById('playlist');
-        let i = s.selectedIndex;
-        if (i < s.options.length - 1) {
-          if (i < s.options.length - 1) {
-            let a = s.options[i];
-            s.remove(i);
-            s.add(a, i+1);
-            markChanges();
-
-            // use select.add and select.remove
-            s.selectedIndex = i + 1;
-          }
-        } else {
-          alert("Already at bottom of list!");
-          toggleMoveButtons();
-        }
-      }
-
+    <script type="text/javascript">
       function edittag(hash) {
         window.location = '/tag/' + hash + "/<%= @playlist_id %>";
-      }
-
-      function preDelete() {
-        return confirm("Are you sure you want to delete this playlist??");
-      }
-      function preSubmit() {
-        // we want all the items, not just the selected ones.
-        var hashes = "";
-        var namefield = document.getElementById('playlist_name')
-        if (namefield.value == '') {
-          alert('Please input a playlist name');
-          return false;
-        }
-        var sel = document.getElementById('playlist');
-        if (sel.options.length < 2) {
-          alert('Please add at least 2 items to the playlist');
-          return false;
-        }
-        for (var i = 0; i < sel.options.length; i++) {
-          if (i != 0) {
-            hashes += ",";
-          }
-          hashes += sel.options[i].id;
-        }
-        document.forms[0].songids.value = hashes;
-        return true;
       }
     </script>
 
@@ -177,6 +55,7 @@
     </div>
     <script src="/js/ext-static/axios.min.js"></script>
     <script src="/js/playlist_util.js"></script>
+    <script src="/js/playlist_ui.js"></script>
     <script src="/js/playlist_functions.js"></script>
     <% else %>
     Sorry, you don't have permission to manage playlists.
