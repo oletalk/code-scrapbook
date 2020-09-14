@@ -59,6 +59,9 @@ select#playlist {
   min-width: 250px;
   width: 95%;
   resize: vertical;
+  font-family: Arial,sans-serif;
+  font-size:small;
+  background: peachpuff;
 }
 ul.click {
   list-style-type: none;
