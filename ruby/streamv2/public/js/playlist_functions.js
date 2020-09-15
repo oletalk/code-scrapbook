@@ -128,9 +128,19 @@ class TooltipBox extends React.Component {
 }
 
 class LineItem extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.refreshHandler = this.refreshHandler.bind(this);
+  }
+
+  refreshHandler() {
+    this.forceUpdate();
+  }
   render() {
     let item = this.props.dataSource;
 
+    //if (!this.state.active) {
     if (itemAlreadyInPlaylist('s_' + item.hash)) {
       // inactive one
 
@@ -145,7 +155,10 @@ class LineItem extends React.Component {
         id: "s_" + item.hash,
         className: "title_" + item.derived,
            },
-           e(SongLink, {song: item}, null)
+           e(SongLink, {
+             song: item,
+             refreshHandler: this.refreshHandler
+           }, null)
 
       )
 
@@ -157,6 +170,7 @@ class LineItem extends React.Component {
 class SongLink extends React.Component {
   render() {
     let item = this.props.song;
+    let a = this;
     return e('a', {
       onMouseOver: function(e) {
         positionTooltip(e);
@@ -176,6 +190,7 @@ class SongLink extends React.Component {
       onClick: function() {
         hideTooltip();
         addToList("s_" + item.hash);
+        a.props.refreshHandler();
       } //end onclick
     }, item.title )
   }

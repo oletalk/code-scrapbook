@@ -14,12 +14,12 @@ function removeSelected() {
     // check if the menu item should be reactivated in the dropdown
     // (it may not be there)
     var dd_sel = document.getElementById('s_' + toremove[r])
-    if (dd_sel != null) {
+    if (dd_sel != null) { // TODO: do not touch the React list! find another way to do this
       var oldText = dd_sel.innerText;
       // FIXME: I can't just re-add 'addToList' function as
       // it doesn't seem to recognise it if I refer to it outside the js :-/
       var str = "<a onClick=\"alert('Unable to re-add this song. Please save and come back to this playlist.')\">" + oldText + "</a>";
-      dd_sel.innerHTML = str;
+      dd_sel.innerHTML = str; // FIXME
 
     }
   }
@@ -114,7 +114,7 @@ function addToList (hash) {
       var playlist = document.getElementById('playlist');
       var newOption = document.createElement('option');
       newOption.text = sel.innerText;
-      sel.innerHTML = sel.innerText;
+      //sel.innerHTML = sel.innerText; // don't touch stuff managed by React!!
       //alert(hash);
       let dd_identifier = hash.split('_')
       newOption.id = dd_identifier[1]; // without the s_!
