@@ -1,4 +1,6 @@
 import React from 'react';
+import SongLink from './SongLink.jsx';
+
 
 class LineItem extends React.Component {
   constructor(props) {
@@ -12,10 +14,18 @@ class LineItem extends React.Component {
 
   render() {
     let item = this.props.dataSource;
-
-    return (
-      <li id={'s_' + item.hash}>{item.title}</li>
+    return (itemAlreadyInPlaylist('s_' + item.hash) ?
+      (
+        <li id={'s_' + item.hash}>{item.title}</li>
+      )
+      :
+      (
+        <li id={'s_' + item.hash} className={'title_' + item.derived}>
+          <SongLink song={item} refreshHandler={this.refreshHandler} />
+        </li>
+      )
     );
+
 
   }
 }

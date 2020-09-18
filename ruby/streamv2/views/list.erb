@@ -5,10 +5,6 @@
     <link rel="stylesheet" href="/css/playlist.css">
   </HEAD>
   <BODY>
-    <script src="/js/ext-static/react.development.js" crossorigin>
-    </script>
-    <script src="/js/ext-static/react-dom.development.js" crossorigin>
-    </script>
 
     <script type="text/javascript">
       function edittag(hash) {
@@ -53,10 +49,9 @@
     <div class="info">To see the artist/title information currently stored for a song, double-click it. </div>
     <div class="layout" id="search_section">
     </div>
-    <script src="/js/ext-static/axios.min.js"></script>
     <script src="/js/playlist_util.js"></script>
     <script src="/js/playlist_ui.js"></script>
-    <script src="/js/playlist_functions.js"></script>
+    <script src="/js/spa/bundle.js"></script>
     <% else %>
     Sorry, you don't have permission to manage playlists.
     <% end %>

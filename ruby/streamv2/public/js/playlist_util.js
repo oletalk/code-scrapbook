@@ -1,4 +1,7 @@
 // ------------- non-react stuff -----------------
+const MAX_ITEM_LENGTH = 50;
+
+
 function fixTitle (title) {
   let ret = title;
    if (ret == null) {

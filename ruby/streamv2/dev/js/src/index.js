@@ -8,5 +8,5 @@ const e = React.createElement;
 
 ReactDOM.render(
   e(Search, {}),
-  document.getElementById('searchbox')
+  document.getElementById('search_section')
 );

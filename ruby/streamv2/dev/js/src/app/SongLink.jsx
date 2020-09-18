@@ -5,7 +5,7 @@ class SongLink extends React.Component {
     let item = this.props.song;
     return (
         <a onMouseOver={this.positionTooltip}>
-          {this.props.title}
+          {item.title}
         </a>
     );
   }
