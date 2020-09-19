@@ -11,23 +11,24 @@ class SongLink extends React.Component {
     this.tooltipHide = this.tooltipHide.bind(this);
     this.tooltipMove = this.tooltipMove.bind(this);
     this.tooltipShow = this.tooltipShow.bind(this);
+    //this.getTooltip  = this.getTooltip.bind(this);
 
+  }
+
+  getTooltip() {
+    return this.props.outerSearch.tooltipBox;
   }
 
   tooltipHide() {
-    var linkedTooltip = this.props.outerSearch.tooltipBox;
-    linkedTooltip.hide();
+    this.getTooltip().hide();
   }
 
   tooltipMove(e) {
-    var linkedTooltip = this.props.outerSearch.tooltipBox;
-    console.log('calling from SongLink');
-    linkedTooltip.move(e);
+    this.getTooltip().move(e);
   }
 
   tooltipShow(text) {
-    var linkedTooltip = this.props.outerSearch.tooltipBox;
-    linkedTooltip.show(text);
+    this.getTooltip().show(text);
   }
 
   onClickFunc() {
@@ -37,9 +38,9 @@ class SongLink extends React.Component {
   }
 
   mouseOverFunc(e) {
-    this.tooltipMove(e); // TODO: implement the tooltipMove, tooltipHide, tooltipShow functions
+    this.tooltipMove(e);
     let item = this.props.song;
-    if (this.props.song !== undefined) {
+    if (typeof item !== 'undefined' && typeof item.plays !== 'undefined') {
       this.tooltipShow("<b>Plays:</b> " + item.plays
           + "<br/><b>Last Played:</b>" + item.last_played
           + "<br/><b>Date added:</b>" + item.date_added);
@@ -51,7 +52,7 @@ class SongLink extends React.Component {
 
   render() {
     let item = this.props.song;
-    // TODO: remove tooltip code from playlist_util.js!
+
     return (
         <a onMouseOver={(e) => this.mouseOverFunc(e) } onMouseOut={this.tooltipHide}
            onClick={this.onClickFunc}>

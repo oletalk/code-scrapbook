@@ -104,8 +104,11 @@ div.tooltipshow {
   left: 250px;
   top: -75px;
   background-color: #555;
+  visibility: visible;
 }
 span.tooltipshow {
+  visibility: visible;
+
   position: relative;
   /* background-color: #555; */
   color: white;

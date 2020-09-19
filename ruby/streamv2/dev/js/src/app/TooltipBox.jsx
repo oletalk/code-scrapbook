@@ -5,7 +5,8 @@ class TooltipBox extends React.Component {
     super(props);
     this.state = {
       content: '',
-      visib: 'tooltip',
+      visibOuter: 'tooltip',
+      visibInner: 'tooltip',
       y: 200
     };
     this.hide = this.hide.bind(this);
@@ -24,30 +25,32 @@ class TooltipBox extends React.Component {
   hide() {
     this.setState({
       content: '',
-      visib: 'tooltip'
+      visibOuter: 'tooltip',
+      visibInner: 'tooltiptext'
     });
   }
 
   show(text) {
-    console.log(' -> received show() message');
-    console.log('    content: ' + text);
+    //console.log(' -> received show() message');
     this.setState({
       content: text,
-      visib: 'tooltipshow'
+      visibOuter: 'tooltipshow',
+      visibInner: 'tooltipshow'
     });
   }
 
 
   render() {
-    var divStyle = {
-        position: 'absolute',
-        top: (this.state.y + 20) + 'px'
-      };
+    var top = (this.state.y + 20) + 'px';
+    // according to https://reactjs.org/docs/dom-elements.html
+    // setting innerHTML is dangerous
+    var tooltipText = {__html: this.state.content};
+
     return (
-      <div id='song_tooltip_container' className={this.state.visib} style={divStyle}>
-        <span id='song_tooltip' className={this.state.visib}>
-          {this.state.content.value}
-        </span>
+      <div id='song_tooltip_container' className={this.state.visibOuter}
+          style={{position:'absolute', top}}>
+        <span id='song_tooltip' className={this.state.visibInner}
+        dangerouslySetInnerHTML={tooltipText} />
       </div>
     );
   }
