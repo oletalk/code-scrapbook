@@ -21,7 +21,7 @@ class LineItem extends React.Component {
       :
       (
         <li id={'s_' + item.hash} className={'title_' + item.derived}>
-          <SongLink song={item} refreshHandler={this.refreshHandler} />
+          <SongLink outerSearch={this.props.outerSearch} song={item} refreshHandler={this.refreshHandler} />
         </li>
       )
     );

@@ -31,7 +31,7 @@ class Search extends React.Component {
             let item = songFromJson(si, response.data[si]);
             if (selectedSongs.length <= MAX_LIST_LENGTH) {
               selectedSongs.push(
-                <LineItem key={item.counter} dataSource={item} />
+                <LineItem outerSearch={a} key={item.counter} dataSource={item} />
               )
 
           }
@@ -53,6 +53,7 @@ class Search extends React.Component {
 
 
   render() {
+    // TODO: need to link the TooltipBox to (generated) LineItems somehow
     return (
       <div>
         <span>
@@ -65,7 +66,7 @@ class Search extends React.Component {
         <ul className='click'>
           {this.state.songs}
         </ul>
-        <TooltipBox />
+        <TooltipBox outerSearch={this} />
       </div>
     );
   }
