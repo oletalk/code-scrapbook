@@ -18,6 +18,17 @@ class Search extends React.Component {
     this.addRandomSongs = this.addRandomSongs.bind(this);
   }
 
+  lineItems (arr) {
+    var si = 0;
+
+    return arr.slice(0, MAX_LIST_LENGTH).map(
+      (row) => {
+        let item = songFromJson(++si, row);
+        return <LineItem outerSearch={this} key={item.counter} dataSource={item} />
+      }
+    )
+  }
+
   addRandomSongs (num) {
     var a = this;
     var selectedSongs = [];
@@ -25,15 +36,7 @@ class Search extends React.Component {
     axios.get('/random/' + num)
     .then(function(response) {
       if (Array.isArray(response.data)) {
-        for (let si = 0; si < response.data.length; si++) {
-          let item = songFromJson(si, response.data[si]);
-
-          if (selectedSongs.length <= MAX_LIST_LENGTH) {
-            selectedSongs.push(
-              <LineItem outerSearch={a} key={item.counter} dataSource={item} />
-            )
-          }
-        }
+        selectedSongs = a.lineItems(response.data);
       }
 
       a.setState({
@@ -54,25 +57,16 @@ class Search extends React.Component {
       .then(function (response) { // process search results
         if (Array.isArray(response.data)) {
 
-          for (let si = 0; si < response.data.length; si++) {
-            let item = songFromJson(si, response.data[si]);
-            if (selectedSongs.length <= MAX_LIST_LENGTH) {
-              selectedSongs.push(
-                <LineItem outerSearch={a} key={item.counter} dataSource={item} />
-              )
+          selectedSongs = a.lineItems(response.data);
 
-          }
-        } // for...
+          console.log('Got ' + selectedSongs.length + ' song(s).');
+          a.setState({
+            query: '',
+            songs: selectedSongs
+          });
 
-        console.log('Got ' + selectedSongs.length + ' song(s).');
-        a.setState({
-          query: '',
-          songs: selectedSongs
-        });
-
-
-      } // if ...
-    });
+        } // if ...
+      });
 
 
   }
@@ -80,7 +74,6 @@ class Search extends React.Component {
 
 
   render() {
-    // TODO: need to link the TooltipBox to (generated) LineItems somehow
     return (
       <div>
         <span>
