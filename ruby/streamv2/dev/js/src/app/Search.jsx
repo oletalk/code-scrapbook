@@ -3,6 +3,7 @@ import axios from 'axios';
 import TooltipBox from './TooltipBox.jsx';
 import LineItem from './LineItem.jsx';
 
+
 const MAX_LIST_LENGTH = 30;
 
 class Search extends React.Component {
@@ -14,6 +15,32 @@ class Search extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.addRandomSongs = this.addRandomSongs.bind(this);
+  }
+
+  addRandomSongs (num) {
+    var a = this;
+    var selectedSongs = [];
+
+    axios.get('/random/' + num)
+    .then(function(response) {
+      if (Array.isArray(response.data)) {
+        for (let si = 0; si < response.data.length; si++) {
+          let item = songFromJson(si, response.data[si]);
+
+          if (selectedSongs.length <= MAX_LIST_LENGTH) {
+            selectedSongs.push(
+              <LineItem outerSearch={a} key={item.counter} dataSource={item} />
+            )
+          }
+        }
+      }
+
+      a.setState({
+        query: '',
+        songs: selectedSongs
+      });
+    })
   }
 
   handleInputChange (ev) {
@@ -57,10 +84,11 @@ class Search extends React.Component {
     return (
       <div>
         <span>
-          <input type='text' placeholder='Search for song to add...'
+          <input id='criteria' type='text' placeholder='Search for song to add...'
           value={this.state.query.value}
           onChange={(e) => this.handleInputChange(e) } />
           <input type='button' id='randomBtn' value='Random'
+          onClick={(e) => this.addRandomSongs(10) }
           />
         </span>
         <ul className='click'>
