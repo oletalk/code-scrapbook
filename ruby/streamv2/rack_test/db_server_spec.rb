@@ -38,6 +38,16 @@ describe 'The DBServer backend app' do
 			[{hash: "9388fevh", secs: "334", title: "Something"},
 			 {hash: "599h05t9", secs: "210", title: "A Remix"}]
     }
+		allow(@mock_db).to receive(:fetch_all_tags) {
+			[{ hash: 'sdljkflkj', secs: '200', title: 'A Tune' }, \
+			 { hash: '4908gt08g', secs: '133', title: 'Something' }, \
+			 { hash: 'sfaesfafd', secs: '132', title: 'Tune three' }, \
+ 			 { hash: '56y6drtger', secs: '212', title: 'Music' }, \
+			 { hash: 'ergtgdrgt6hy', secs: '23', title: 'Another' }, \
+ 			 { hash: '346t345es', secs: '121', title: 'Last tune' }]
+
+		 }
+
     allow(@mock_db).to receive(:get_new_playlist_id) { 10 }
 		allow(@mock_db).to receive(:fetch_playlist).with("2") {
 			[{name: "random", hash: "9388fevh", secs: "334", title: "Something"}]
@@ -167,6 +177,17 @@ describe 'The DBServer backend app' do
 
 	end
 
+	it "fetches a random list" do
+		mock_db
+
+		get '/search/random/3', {}, {'HTTP_HOST' => '192.168.0.6:8080'}
+		expect(last_response).to be_ok
+		#expect 3 tunes, but can't test for content because they'll be in random order
+		actual = last_response.body
+		expect(actual.scan(/\{.*?\}/).size).to eq(3)   # 3 json objects
+		expect(actual.scan(/\"hash\"/).size).to eq(3)  # each with a hash
+		expect(actual.scan(/\"title\"/).size).to eq(3) # and a title
+	end
 
 	it "rejects a response not from the connected streamserver" do
 		mock_db
@@ -176,10 +197,5 @@ describe 'The DBServer backend app' do
 		expect(last_response.body).to eq("")
 
 	end
-
-
-
-	# TODO write /play/:hash test
-
 
 end
