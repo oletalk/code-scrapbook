@@ -29,11 +29,32 @@ class Search extends React.Component {
     )
   }
 
+  addLatestSongs () {
+    var a = this;
+    var selectedSongs = [];
+
+    axios.get('/query/latest')
+    .then(function(response) {
+      if (Array.isArray(response.data)) {
+        selectedSongs = a.lineItems(response.data);
+      }
+      if (selectedSongs.length > 0) {
+        a.setState({
+          query: '',
+          songs: selectedSongs
+        });
+      } else {
+        alert('Sorry, no new songs have been added in the past month.');
+      }
+
+    })
+  }
+
   addRandomSongs (num) {
     var a = this;
     var selectedSongs = [];
 
-    axios.get('/random/' + num)
+    axios.get('/query/random/' + num)
     .then(function(response) {
       if (Array.isArray(response.data)) {
         selectedSongs = a.lineItems(response.data);
@@ -80,6 +101,9 @@ class Search extends React.Component {
           <input id='criteria' type='text' placeholder='Search for song to add...'
           value={this.state.query.value}
           onChange={(e) => this.handleInputChange(e) } />
+          <input type='button' id='latestBtn' value='Latest'
+          onClick={(e) => this.addLatestSongs() }
+          />
           <input type='button' id='randomBtn' value='Random'
           onClick={(e) => this.addRandomSongs(10) }
           />

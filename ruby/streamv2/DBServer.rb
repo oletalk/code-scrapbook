@@ -90,13 +90,21 @@ class DBServer < Sinatra::Base
   get '/info/:hash' do |hash|
     info = @db.get_info_json(hash)
     info.each do |row|
-      p row
       row[:last_played] = Manip.date_from_db(row[:last_played])
     end
     Format.json(info)
   end
 
-  get '/search/random/:number' do |number|
+  get '/query/latest' do
+    song_list = @db.fetch_latest_tags
+    song_list.each do |row|
+      row[:date_added] = Manip.date_from_db(row[:date_added])
+    end
+
+    Format.json(song_list)
+  end
+
+  get '/query/random/:number' do |number|
     song_list = @db.fetch_all_tags
     num = number.to_i
     if num > song_list.size
@@ -104,7 +112,10 @@ class DBServer < Sinatra::Base
     end
     ret = []
     num.times do
-      ret.push( song_list.delete(song_list[Random.rand(song_list.size)]) )
+      randomrow = song_list.delete(song_list[Random.rand(song_list.size)])
+      da = randomrow[:date_added]
+      randomrow[:date_added] = Manip.date_from_db(da) unless da.nil?
+      ret.push( randomrow )
     end
     Format.json(ret)
   end
@@ -115,10 +126,9 @@ class DBServer < Sinatra::Base
       song_list.each do |row|
         lp = row[:last_played]
         da = row[:date_added]
-        unless lp.nil?
-          row[:last_played] = Manip.timestamp_from_db(lp)
-          row[:date_added] = Manip.date_from_db(da)
-        end
+
+        row[:date_added] = Manip.date_from_db(da) unless da.nil?
+        row[:last_played] = Manip.timestamp_from_db(lp) unless lp.nil?
       end
       Format.json(song_list)
     else

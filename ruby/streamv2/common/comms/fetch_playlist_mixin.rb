@@ -5,6 +5,7 @@ module FetchPlaylistMixin
   TAG = '/tag/'
   PLAYLIST_SAVE = '/playlist/save'
   TAG_SAVE = '/tag/save'
+  QUERY = '/query/'
   SEARCH = '/search/'
 
 
@@ -30,8 +31,12 @@ module FetchPlaylistMixin
       })
   end
 
+  def latestsongs
+    go_get(QUERY + 'latest')
+  end
+
   def randomlist(number)
-    stg = go_get(SEARCH + 'random/' + number.to_s)
+    stg = go_get(QUERY + 'random/' + number.to_s)
     stg
   end
 

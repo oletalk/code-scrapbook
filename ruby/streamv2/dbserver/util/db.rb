@@ -220,9 +220,35 @@ class Db
     )
   end
 
+  def fetch_latest_tags
+    sql = Manip.collapse(%{
+      SELECT
+          date_added,
+          file_hash,
+          secs,
+          #{TITLE_TERM_SNIPPET}
+      FROM mp3s_tags
+      where date_added > current_date - interval '1 month'
+      order by date_added desc, song_filepath
+      })
+
+      collection_from_sql(
+        sql: sql,
+        params: nil,
+        result_map: {
+          date_added: true,
+          hash: "file_hash",
+          secs: true,
+          title: "display_title",
+        },
+        description: "fetching latest tags"
+    )
+  end
+
   def fetch_all_tags
     sql = Manip.collapse(%{
       SELECT
+          date_added,
           file_hash,
           secs,
           #{TITLE_TERM_SNIPPET}
@@ -234,6 +260,7 @@ class Db
       sql: sql,
       params: nil,
       result_map: {
+        date_added: true,
         hash: "file_hash",
         secs: true,
         title: "display_title",

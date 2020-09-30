@@ -180,7 +180,7 @@ describe 'The DBServer backend app' do
 	it "fetches a random list" do
 		mock_db
 
-		get '/search/random/3', {}, {'HTTP_HOST' => '192.168.0.6:8080'}
+		get '/query/random/3', {}, {'HTTP_HOST' => '192.168.0.6:8080'}
 		expect(last_response).to be_ok
 		#expect 3 tunes, but can't test for content because they'll be in random order
 		actual = last_response.body

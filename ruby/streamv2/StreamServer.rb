@@ -77,7 +77,12 @@ class StreamServer < Sinatra::Base
     f.search(name, nil)
   end
 
-  get '/random/:number' do |number|
+  get '/query/latest' do
+    f = Fetch.new(request.env['HTTP_HOST'])
+    f.latestsongs
+  end
+
+  get '/query/random/:number' do |number|
     f = Fetch.new(request.env['HTTP_HOST'])
     f.randomlist(number)
   end

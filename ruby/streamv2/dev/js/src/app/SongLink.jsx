@@ -40,12 +40,14 @@ class SongLink extends React.Component {
   mouseOverFunc(e) {
     this.tooltipMove(e);
     let item = this.props.song;
-    if (typeof item !== 'undefined' && typeof item.plays !== 'undefined') {
-      this.tooltipShow("<b>Plays:</b> " + item.plays
-          + "<br/><b>Last Played:</b>" + item.last_played
-          + "<br/><b>Date added:</b>" + item.date_added);
+
+    if (typeof item !== 'undefined') {
+      let itemplays = (typeof item.plays !== 'undefined')
+          ? ("<b>Plays:</b> " + item.plays + "<br/><b>Last Played:</b>" + item.last_played)
+          : "<i>Song hasn't recently been played</i>"
+      this.tooltipShow(itemplays + "<br/><b>Date added:</b>" + item.date_added);
     } else {
-      this.tooltipShow("Song was not recently played.");
+      this.tooltipShow("No song information available.");
     }
 
   }
