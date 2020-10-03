@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import TooltipBox from './TooltipBox.jsx';
 import LineItem from './LineItem.jsx';
+import FetchButton from './FetchButton.jsx';
 
 
 const MAX_LIST_LENGTH = 30;
@@ -15,7 +16,10 @@ class Search extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.addRandomSongs = this.addRandomSongs.bind(this);
+    this.lineItems = this.lineItems.bind(this);
+
+    // callbacks
+    this.addSongs = this.addSongs.bind(this);
   }
 
   lineItems (arr) {
@@ -29,42 +33,13 @@ class Search extends React.Component {
     )
   }
 
-  addLatestSongs () {
-    var a = this;
-    var selectedSongs = [];
-
-    axios.get('/query/latest')
-    .then(function(response) {
-      if (Array.isArray(response.data)) {
-        selectedSongs = a.lineItems(response.data);
-      }
-      if (selectedSongs.length > 0) {
-        a.setState({
-          query: '',
-          songs: selectedSongs
-        });
-      } else {
-        alert('Sorry, no new songs have been added in the past month.');
-      }
-
-    })
-  }
-
-  addRandomSongs (num) {
-    var a = this;
-    var selectedSongs = [];
-
-    axios.get('/query/random/' + num)
-    .then(function(response) {
-      if (Array.isArray(response.data)) {
-        selectedSongs = a.lineItems(response.data);
-      }
-
-      a.setState({
-        query: '',
-        songs: selectedSongs
-      });
-    })
+  // callback from the buttons
+  // you need to apply lineItems to s.data
+  addSongs(s) {
+    this.setState({
+      query: '',
+      songs: this.lineItems(s.data)
+    });
   }
 
   handleInputChange (ev) {
@@ -101,11 +76,13 @@ class Search extends React.Component {
           <input id='criteria' type='text' placeholder='Search for song to add...'
           value={this.state.query.value}
           onChange={(e) => this.handleInputChange(e) } />
-          <input type='button' id='latestBtn' value='Latest'
-          onClick={(e) => this.addLatestSongs() }
+          <FetchButton
+            id='latestBtn' name='Latest' axiosCall='/query/latest'
+            callback={this.addSongs} noSongsFound='No songs were added in the past month'
           />
-          <input type='button' id='randomBtn' value='Random'
-          onClick={(e) => this.addRandomSongs(10) }
+          <FetchButton
+            id='randomBtn' name='Random' axiosCall='/query/random/10'
+            callback={this.addSongs}
           />
         </span>
         <ul className='click'>
