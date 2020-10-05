@@ -16,36 +16,23 @@ class Search extends React.Component {
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.lineItems = this.lineItems.bind(this);
-
     // callbacks
     this.addSongs = this.addSongs.bind(this);
   }
 
-  lineItems (arr) {
-    var si = 0;
-
-    return arr.slice(0, MAX_LIST_LENGTH).map(
-      (row) => {
-        let item = songFromJson(++si, row);
-        return <LineItem outerSearch={this} key={item.counter} dataSource={item} />
-      }
-    )
-  }
-
   // callback from the buttons
-  // you need to apply lineItems to s.data
   addSongs(s) {
+    let itemList = s.data;
+    itemList = itemList.slice(0,MAX_LIST_LENGTH);
     this.setState({
       query: '',
-      songs: this.lineItems(s.data)
+      songs: s.data
     });
   }
 
   handleInputChange (ev) {
 
     var a = this;
-    var selectedSongs = [];
     var str = ev.target.value;
 
     if (str.length > 3) {
@@ -53,9 +40,9 @@ class Search extends React.Component {
       .then(function (response) { // process search results
         if (Array.isArray(response.data)) {
 
-          selectedSongs = a.lineItems(response.data);
-
+          let selectedSongs = response.data;
           console.log('Got ' + selectedSongs.length + ' song(s).');
+          selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH);
           a.setState({
             query: '',
             songs: selectedSongs
@@ -86,7 +73,12 @@ class Search extends React.Component {
           />
         </span>
         <ul className='click'>
-          {this.state.songs}
+
+          {this.state.songs.map((row, index) => {
+            let item = songFromJson(index, row);
+            return <LineItem outerSearch={this} key={item.counter} dataSource={item} />
+          })}
+
         </ul>
         <TooltipBox outerSearch={this} />
       </div>
