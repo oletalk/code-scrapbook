@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 // props: name, id, axiosCall, callback, noSongsFound
 class FetchButton extends React.Component {
@@ -40,12 +41,18 @@ class FetchButton extends React.Component {
   render() {
     return (
       <input type='button' id={this.props.id} value={this.props.name}
-      onClick={(e) => this.performAxiosCall() }
+      onClick={() => this.performAxiosCall() }
       />
     );
 
 
   }
+}
+
+FetchButton.propTypes = {
+  axiosCall: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
 }
 
 

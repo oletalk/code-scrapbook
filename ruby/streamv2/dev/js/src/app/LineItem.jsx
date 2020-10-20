@@ -1,5 +1,6 @@
 import React from 'react';
 import SongLink from './SongLink.jsx';
+import PropTypes from 'prop-types';
 
 
 class LineItem extends React.Component {
@@ -28,6 +29,11 @@ class LineItem extends React.Component {
 
 
   }
+}
+
+LineItem.propTypes = {
+  dataSource: PropTypes.object.isRequired,
+  outerSearch: PropTypes.object.isRequired,
 }
 
 export default LineItem;

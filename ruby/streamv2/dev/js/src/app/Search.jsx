@@ -26,7 +26,7 @@ class Search extends React.Component {
     itemList = itemList.slice(0,MAX_LIST_LENGTH);
     this.setState({
       query: '',
-      songs: s.data
+      songs: itemList
     });
   }
 

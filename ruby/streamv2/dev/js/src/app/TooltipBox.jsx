@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class TooltipBox extends React.Component {
   constructor(props) {
@@ -54,6 +55,10 @@ class TooltipBox extends React.Component {
       </div>
     );
   }
+}
+
+TooltipBox.propTypes = {
+  outerSearch: PropTypes.object.isRequired,
 }
 
 export default TooltipBox;
