@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { addToList } from './js/playlist_ui.js'
 
 class SongLink extends React.Component {
   constructor(props) {
@@ -66,9 +67,9 @@ class SongLink extends React.Component {
 }
 
 SongLink.propTypes = {
-  outerSearch: PropTypes.object.isOptional,
-  song: PropTypes.object.isOptional,
-  refreshHandler: PropTypes.object.isRequired,
+  outerSearch: PropTypes.object,
+  song: PropTypes.object,
+  refreshHandler: PropTypes.func,
 
 };
 export default SongLink;

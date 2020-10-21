@@ -1,6 +1,7 @@
 import React from 'react';
 import SongLink from './SongLink.jsx';
 import PropTypes from 'prop-types';
+import { itemAlreadyInPlaylist } from './js/playlist_ui.js'
 
 
 class LineItem extends React.Component {

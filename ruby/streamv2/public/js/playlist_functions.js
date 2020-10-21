@@ -1,204 +1,96 @@
 'use strict';
 
-const e = React.createElement;
-const MAX_ITEM_LENGTH = 50;
-const MAX_LIST_LENGTH = 30;
-
-class Search extends React.Component {
- state = {
-   query: '',
-   songs: []
- }
-
-
- addRandomSongs = (num) => {
-   var a = this;
-   var selectedSongs = [];
-
-   axios.get('/random/' + num)
-   .then(function(response) {
-     if (Array.isArray(response.data)) {
-       for (let si = 0; si < response.data.length; si++) {
-         let item = songFromJson(si, response.data[si]);
-         //console.log(item);
-
-         if (selectedSongs.length <= MAX_LIST_LENGTH) {
-
-           selectedSongs.push(
-             e(LineItem, {key: item.counter, dataSource: item}, null)
-           )
-
-         }
-
-       }
-     }
-     a.setState({
-       query: '',
-       songs: selectedSongs
-     });
-
-   })
-   .catch(function(error) {
-     console.log('ERROR! ' + error)
-   })
- }
-
- handleInputChange = (ev) => {
-   var a = this;
-   var str = ev.target.value;
-   var selectedSongs = [];
-   if (str.length > 3) {
-     axios.get('/search/' + str)
-     .then(function (response) { // process search results
-       if (Array.isArray(response.data)) {
-
-         for (let si = 0; si < response.data.length; si++) {
-           let item = songFromJson(si, response.data[si]);
-
-           if (selectedSongs.length <= MAX_LIST_LENGTH) {
-
-             selectedSongs.push(
-               e(LineItem, {key: item.counter, dataSource: item}, null)
-             )
-
-         }
-       }
-     }
-
-       console.log("Songs collected: " + selectedSongs.length);
-       a.setState({
-         query: str,
-         songs: selectedSongs
-       });
-     }) // ...then function response ...
-     .catch(function(error) {
-       console.log('ERROR! ' + error)
-     })
-   }
- } // handleInputChange (function)
-
- render() {
-   return e(
-     'div', {},
-     e( // 1st child: span (of inputs)
-     'span', {},
-
-       e( // 1st child: input
-         'input',
-          { type: 'text',
-            placeholder: 'Search for song to add...',
-            value: this.state.query.value,
-            onChange: (ev) => this.handleInputChange(ev)
-          }
-        ),
-        e(
-          'input', {
-            type: 'button',
-            id: "randomBtn",
-            onClick: (ev) => this.addRandomSongs(10),
-            value: 'Random'
-          }
-        ), null
-
-  )
-     , e( // 2nd child: select
-      'ul', {
-        className: 'click'
-      }, this.state.songs
-    )
-    ,e(TooltipBox, null, null)
-  );
- }
-}
-
-class TooltipBox extends React.Component {
-  render() {
-    return e( // 3rd child: tooltip
-      'div', {
-        id: 'song_tooltip_container',
-        className: 'tooltip'
-      }, e(
-        'span', {
-          id: 'song_tooltip',
-          className: 'tooltiptext'
-        }
-      )
-    )
-  }
-}
-
-class LineItem extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.refreshHandler = this.refreshHandler.bind(this);
-  }
-
-  refreshHandler() {
-    this.forceUpdate();
-  }
-  render() {
-    let item = this.props.dataSource;
-
-    //if (!this.state.active) {
-    if (itemAlreadyInPlaylist('s_' + item.hash)) {
-      // inactive one
-
-      return e('li', {
-        id: "s_" + item.hash,
-      }, item.title )
-
-    } else {
-      // active one
-
-      return e('li', {
-        id: "s_" + item.hash,
-        className: "title_" + item.derived,
-           },
-           e(SongLink, {
-             song: item,
-             refreshHandler: this.refreshHandler
-           }, null)
-
-      )
-
+// FIXME: these menu items can't be selected again!
+function removeSelected() {
+  var sel = document.getElementById('playlist');
+  var toremove = []
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].selected) {
+      toremove.push(sel.options[i].id);
     }
+  }
 
+  for (var r = 0; r < toremove.length; r++) {
+    var sel = document.getElementById(toremove[r]);
+    sel.remove();
+    // TODO: any way to refresh search list at that point?
+    // when you type another search term it will do it
+  }
+
+}
+function toggleMoveButtons() {
+  let s = document.getElementById('playlist');
+  let i = s.selectedIndex;
+  let n = s.options.length;
+
+  let upBtn = document.getElementById('move-up');
+  let downBtn = document.getElementById('move-down');
+  if (i == -1) {
+    upBtn.classList.add('disabled');
+    downBtn.classList.add('disabled');
+  } else {
+    if (i == 0) {
+      upBtn.classList.add('disabled');
+      downBtn.classList.remove('disabled');
+    } else if (i == n - 1) {
+      upBtn.classList.remove('disabled');
+      downBtn.classList.add('disabled');
+    } else {
+      upBtn.classList.remove('disabled');
+      downBtn.classList.remove('disabled');
+    }
+  }
+
+}
+
+function moveUp() {
+  let s = document.getElementById('playlist');
+  let i = s.selectedIndex;
+  if (i != -1) {
+    if (i > 0) {
+      let a = s.options[i];
+      s.remove(i);
+      s.add(a, i-1);
+      markChanges();
+
+      // use select.add and select.remove
+      s.selectedIndex = i - 1;
+    } else {
+      alert("Already at top of list!");
+      toggleMoveButtons();
+    }
   }
 }
 
-class SongLink extends React.Component {
-  render() {
-    let item = this.props.song;
-    let a = this;
-    return e('a', {
-      onMouseOver: function(e) {
-        positionTooltip(e);
-        if (item.plays !== undefined) {
-
-
-          displayTooltip("<b>Plays:</b> " + item.plays
-          + "<br/><b>Last Played:</b>" + item.last_played
-          + "<br/><b>Date added:</b>" + item.date_added);
-        } else {
-          displayTooltip("Song was not recently played.");
-        }
-      },
-      onMouseOut: function() {
-        hideTooltip();
-      },
-      onClick: function() {
-        hideTooltip();
-        addToList("s_" + item.hash);
-        a.props.refreshHandler();
-      } //end onclick
-    }, item.title )
+function markChanges () {
+  let dt = document.title;
+  if (dt.indexOf('[') == -1) {
+    document.title = "[changes made] " + document.title;
   }
 }
 
 
+function moveDown() {
+  let s = document.getElementById('playlist');
+  let i = s.selectedIndex;
+  if (i < s.options.length - 1) {
+    if (i < s.options.length - 1) {
+      let a = s.options[i];
+      s.remove(i);
+      s.add(a, i+1);
+      markChanges();
 
+      // use select.add and select.remove
+      s.selectedIndex = i + 1;
+    }
+  } else {
+    alert("Already at bottom of list!");
+    toggleMoveButtons();
+  }
+}
 
-// TODO: write something to fetch and parse playlist search (/search/blah)
-const domContainer = document.querySelector('#search_section');
-ReactDOM.render(e(Search), domContainer);
+function checkBeforeLeaving() {
+  if (document.title.indexOf('[') != -1) {
+    return confirm("You made changes to the playlist. Are you sure you want to leave?");
+  }
+}
