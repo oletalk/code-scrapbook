@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
-gem 'sinatra', "~> 2.0.8.1"
-gem 'jwt', "~> 2.2.1"
+gem 'sinatra', "~> 2.1.0"
+gem 'jwt', "~> 2.2.2"
 gem 'logger', "~> 1.4.2"
 gem 'taglib-ruby', "~> 1.0.1"
 gem 'httparty', "~> 0.18.1"
