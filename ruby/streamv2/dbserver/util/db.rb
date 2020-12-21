@@ -145,6 +145,11 @@ class Db
   end
 
   def save_playlist(p_id, p_name, a_songs)
+    p "going to insert #{a_songs.length} songs to playlist #{p_id}"
+    if a_songs.length == 0
+      p "WARNING!! song list passed to me is empty"
+      raise "empty song list"
+    end
     connect_for('saving playlist') do |conn|
       # STEP 1 - remove old playlist entries
       sql = "delete from mp3s_playlist_song where playlist_id = $1"
@@ -169,6 +174,7 @@ class Db
       a_songs.each do |sid|
         entry_order += 1
         res = conn.exec_prepared('insert_ps1', [ p_id, sid, entry_order ])
+        p "inserting song #{entry_order}"
       end
     end # connect_for
   end

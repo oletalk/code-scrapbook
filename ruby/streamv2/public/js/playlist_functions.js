@@ -88,7 +88,31 @@ function moveDown() {
     toggleMoveButtons();
   }
 }
-
+function preSubmit() {
+  // we want all the items, not just the selected ones.
+  var hashes = "";
+  var namefield = document.getElementById('playlist_name')
+  if (namefield.value == '') {
+    alert('Please input a playlist name');
+    return false;
+  }
+  var sel = document.getElementById('playlist');
+  if (sel.options.length < 2) {
+    alert('Please add at least 2 items to the playlist');
+    return false;
+  }
+  for (var i = 0; i < sel.options.length; i++) {
+    if (i != 0) {
+      hashes += ",";
+    }
+    hashes += sel.options[i].id;
+  }
+  document.forms[0].songids.value = hashes;
+  return true;
+}
+function preDelete() {
+  return confirm("Are you sure you want to delete this playlist??");
+}
 function checkBeforeLeaving() {
   if (document.title.indexOf('[') != -1) {
     return confirm("You made changes to the playlist. Are you sure you want to leave?");
