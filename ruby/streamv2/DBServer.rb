@@ -90,6 +90,7 @@ class DBServer < Sinatra::Base
         lp = row[:modified]
         row[:last_played] = Manip.timestamp_from_db(lp) unless lp.nil?
       end
+    end
     Format.json(song_list)
   end
 
