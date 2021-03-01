@@ -31,13 +31,14 @@ class Db
 
   # method defs
   def fetch_playlists
-    sql = 'select id, name from mp3s_playlist order by name'
+    sql = 'select id, name, date_modified from mp3s_playlist order by name'
     res = collection_from_sql(
       sql: sql,
       params: nil,
       result_map: {
         id: true,
-        name: true
+        name: true,
+        date_modified: "modified"
       },
       description: "fetching playlists"
     )
@@ -109,7 +110,7 @@ class Db
     end
 
     sql = Manip.collapse(%{
-      select p.name, ps.file_hash, secs, date_modified
+      select p.name, ps.file_hash, secs
       #{TITLE_TERM_SNIPPET}
       from mp3s_playlist p, mp3s_playlist_song ps, mp3s_tags t
       where ps.file_hash = t.file_hash
@@ -123,7 +124,6 @@ class Db
       params: [ playlist_id ],
       result_map: {
         name: true,
-        date_modified: "modified",
         hash: "file_hash",
         secs: true,
         title: "display_title"
