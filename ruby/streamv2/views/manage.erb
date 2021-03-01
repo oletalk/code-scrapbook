@@ -9,13 +9,22 @@
     Select your playlist:
     <table class="playlists">
       <% @foo.each do |opt| %>
-      <tr>
-        <td class="playlist_name"><%= opt['name'] %></td>
-        <td><a href="/playlist/m3u/<%= opt['name']%>">m3u</a></td>
-        <td><a href="/playlist/<%= opt['id']%>">edit</a></td>
-        <td><a class="confirmit" href="/playlist/<%= opt['id']%>/delete">delete</a></td>
-        <td class="playlist_name"><%= opt['modified'] %></td>
-      </tr>
+
+      <tr><td>
+      <table class="playlist_entry">
+        <tr>
+          <td class="playlist_name"><%= opt['name'] %></td>
+          <td rowspan='2'><div class="actions"><a href="/playlist/m3u/<%= opt['name']%>">m3u</a></div>
+            <div class="actions"><a href="/playlist/<%= opt['id']%>">edit</a></div>
+            <div class="actions"><a class="confirmit" href="/playlist/<%= opt['id']%>/delete">delete</a></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="playlist_modified"><%= opt['modified'] %></td>
+        </tr>
+       </table>
+      </td></tr>
+
       <% end %>
       <tr><td colspan="4"><a href="/playlist_new">Create new</a></td></tr>
     </table>

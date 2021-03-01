@@ -7,6 +7,20 @@ table tr > td:first-child {
     min-width: 100px;
 }
 
+table.playlists > tr {
+  border: 1px solid #000000;
+}
+.playlist_name {
+  font-style: normal;
+  font-weight: bold;
+  font-size: large;
+}
+
+.playlist_modified {
+  font-style: italic;
+  font-size: small;
+}
+
 div.info {
   font-size: 14px;
   background: #efe6dd;
@@ -42,8 +56,15 @@ table.playlists {
   padding-top: 15px;
   border-spacing: 0px;
 }
-table.playlists tr:nth-child(even) {
-  background-color: antiquewhite;
+
+div.actions:hover {
+  background: #f9ac32;
+  transition: background 0.5s ease-out;
+}
+table.playlist_entry {
+  border: 1px solid black;
+  background-color: #FBAB7E;
+  background-image: linear-gradient(79deg, #FBAB7E 0%, #F7CE68 53%);
 }
 table.playlists tr > td {
   padding: 3px;
