@@ -84,7 +84,13 @@ class DBServer < Sinatra::Base
 
   get '/playlists' do
     #db.fetch_playlists
-    Format.json(@db.fetch_playlists)
+    song_list = @db.fetch_playlists
+    if song_list.size > 0
+      song_list.each do |row|
+        lp = row[:modified]
+        row[:last_played] = Manip.timestamp_from_db(lp) unless lp.nil?
+      end
+    Format.json(song_list)
   end
 
   get '/info/:hash' do |hash|
