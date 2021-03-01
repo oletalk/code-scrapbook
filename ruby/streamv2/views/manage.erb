@@ -11,6 +11,7 @@
       <% @foo.each do |opt| %>
       <tr>
         <td class="playlist_name"><%= opt['name'] %></td>
+        <td class="playlist_name"><%= opt['modified'] %></td>
         <td><a href="/playlist/m3u/<%= opt['name']%>">m3u</a></td>
         <td><a href="/playlist/<%= opt['id']%>">edit</a></td>
         <td><a class="confirmit" href="/playlist/<%= opt['id']%>/delete">delete</a></td>

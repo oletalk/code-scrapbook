@@ -109,7 +109,7 @@ class Db
     end
 
     sql = Manip.collapse(%{
-      select p.name, ps.file_hash, secs,
+      select p.name, ps.file_hash, secs, date_modified
       #{TITLE_TERM_SNIPPET}
       from mp3s_playlist p, mp3s_playlist_song ps, mp3s_tags t
       where ps.file_hash = t.file_hash
@@ -123,6 +123,7 @@ class Db
       params: [ playlist_id ],
       result_map: {
         name: true,
+        date_modified: "modified",
         hash: "file_hash",
         secs: true,
         title: "display_title"
