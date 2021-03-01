@@ -38,7 +38,7 @@ class Db
       result_map: {
         id: true,
         name: true,
-        date_modified: "modified"
+        modified: "date_modified"
       },
       description: "fetching playlists"
     )
