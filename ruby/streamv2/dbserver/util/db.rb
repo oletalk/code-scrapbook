@@ -176,6 +176,11 @@ class Db
         res = conn.exec_prepared('insert_ps1', [ p_id, sid, entry_order ])
         p "inserting song #{entry_order}"
       end
+
+      # STEP 4 - update playlist entry with new modified date
+      sql = "update mp3s_playlist set date_modified = current_timestamp where id = $1"
+      conn.prepare('update_pl', sql)
+      res = conn.exec_prepared('update_pl', [ p_id] )
     end # connect_for
   end
 
