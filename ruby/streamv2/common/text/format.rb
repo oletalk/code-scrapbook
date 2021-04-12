@@ -45,6 +45,9 @@ module Format
             p $!.error_char.encoding
         end
             # TODO: handle encfailed somehow
+            # NOTE: you shouldn't get these if your database is UTF-8
+            # e.g. createdb mydb -E utf8 -T template0
+
         retjson
     end
 
