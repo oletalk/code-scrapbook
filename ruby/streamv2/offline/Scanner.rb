@@ -12,9 +12,9 @@ FILESPEC = '*.{M,m}{P,p}3'
 # FILESPEC = "*.ogg"
 # Scanner.rb
 
-$db = Db.new
+db = Db.new
 
-def tag_file_with_hash(mp3file, hash)
+def tag_file_with_hash(db, mp3file, hash)
   puts "  >>> Getting tag info for file '#{mp3file}'"
   begin
     TagLib::FileRef.open(mp3file) do |mp3info|
@@ -27,7 +27,7 @@ def tag_file_with_hash(mp3file, hash)
         safe_artist = tag.artist
         safe_artist = safe_artist[0..99] if safe_artist.length > 100
         tag = { artist: safe_artist, title: tag.title, secs: songlen }
-        $db.write_tag(hash, mp3file, tag)
+        db.write_tag(hash, mp3file, tag)
       end
     end
   rescue StandardError => e
@@ -70,18 +70,18 @@ files.each do |f|
   # check the db for the tag
   # TODO: should probably only compute the hash in a 'long' version - check args
   file_hash = Digest::SHA1.hexdigest(safe_filename)
-  tag = $db.find_song(file_hash)[0]
+  tag = db.find_song(file_hash)[0]
   # either 1. tag exists and has data, 2. tag exists but has nils or 3. tag is nil (no record found)
   if tag.nil?
     puts "Need to find the tag for file: #{safe_filename}"
     # compute and write the tag!
-    tag_file_with_hash(safe_filename, file_hash)
+    tag_file_with_hash(db, safe_filename, file_hash)
     taggedfiles += 1
   else
     dbfilepath = tag[:song_filepath]
     if options[:dates]
       dte = File.mtime(safe_filename).strftime('%Y-%m-%d')
-      $db.update_tag_date(file_hash, dte)
+      db.update_tag_date(file_hash, dte)
     end
 
     if dbfilepath != safe_filename

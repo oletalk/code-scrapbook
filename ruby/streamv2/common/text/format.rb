@@ -44,6 +44,7 @@ module Format
       p $ERROR_INFO.error_char.encoding
     end
     # TODO: handle encfailed somehow
+    puts "Encoding failed" if encfailed
     retjson
   end
 
