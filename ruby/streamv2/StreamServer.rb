@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sinatra/base'
 require 'json'
 require 'cgi'
@@ -23,30 +25,25 @@ class StreamServer < Sinatra::Base
     result = f.start(Connector.get_hmac_secret)
     if result != 'OK'
       Log.log.error("Fetch start returned: '#{result}'")
-      puts " *******************************************************************"
-      puts " *                                                                 *"
-      puts " * ERROR! Did not establish connection with DBServer! Check logs.  *"
-      puts " *                                                                 *"
-      puts " *******************************************************************"
+      puts ' *******************************************************************'
+      puts ' *                                                                 *'
+      puts ' * ERROR! Did not establish connection with DBServer! Check logs.  *'
+      puts ' *                                                                 *'
+      puts ' *******************************************************************'
     else
-      puts "Successfully connected to DBServer!"
+      puts 'Successfully connected to DBServer!'
     end
   end
-
 
   # before each request...
   before do
     @ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
 
     remote_ip = request.env['REMOTE_ADDR']
-    if @ipwl == nil
-      puts "ipwl is nil"
-    end
+    puts 'ipwl is nil' if @ipwl.nil?
     action = @ipwl.action(remote_ip)
     Log.log.info("Action for #{remote_ip} is #{action}.")
-    if !action[:allow]
-      halt 403, {'Content-Type' => 'text/plain'}, '403 Access Denied'
-    end
+    halt 403, { 'Content-Type' => 'text/plain' }, '403 Access Denied' unless action[:allow]
     @playlist = action[:playlist]
     @downsample = action[:downsample]
   end
@@ -69,7 +66,7 @@ class StreamServer < Sinatra::Base
     f.search(name, 'm3u')
   end
 
-#json
+  # json
   get '/search/:name' do |name|
     f = Fetch.new(request.env['HTTP_HOST'])
     name = CGI.escape(name)
@@ -87,5 +84,5 @@ class StreamServer < Sinatra::Base
     f.randomlist(number)
   end
 
-  run! if app_file == $0
+  run! if app_file == $PROGRAM_NAME
 end

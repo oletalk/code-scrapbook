@@ -8,3 +8,4 @@ gem 'rack-test'
 gem 'rspec-core'
 gem 'rack', ">= 2.1.4"
 gem 'rspec'
+gem 'webrick'

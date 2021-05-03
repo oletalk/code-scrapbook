@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'jwt'
 require_relative '../util/logging'
 
 class Connector
-
   def initialize(ss, hs)
     @shared_secret = ss
     @hmac_secret = hs
@@ -21,15 +22,12 @@ class Connector
     ret = false
     skiplogin = false
     begin
-
       Log.log.info "Stream server connected from #{hosthdr}"
 
-      unless @streamserver.nil?
-        unless streamserver_is? hosthdr
-          Log.log.error "Already connected to another stream server! Denying."
-          ret = false
-          skiplogin = true
-        end
+      if !@streamserver.nil? && !(streamserver_is? hosthdr)
+        Log.log.error 'Already connected to another stream server! Denying.'
+        ret = false
+        skiplogin = true
       end
 
       unless skiplogin
@@ -38,13 +36,13 @@ class Connector
         Log.log.info "pass: #{pass}"
         Log.log.info "hmac_secret: #{@hmac_secret}"
         if pass == @shared_secret
-            puts 'Shared secret is OK!'
-            Log.log.info "Stream server successfully verified from #{hosthdr}"
-            @streamserver = hosthdr #TODO something else?
-            ret = true
+          puts 'Shared secret is OK!'
+          Log.log.info "Stream server successfully verified from #{hosthdr}"
+          @streamserver = hosthdr # TODO: something else?
+          ret = true
         else
-           puts 'Shared secret not ok!'
-           Log.log.info "Stream server verification failed from #{hosthdr}"
+          puts 'Shared secret not ok!'
+          Log.log.info "Stream server verification failed from #{hosthdr}"
         end
       end
     rescue JWT::VerificationError => e
@@ -60,18 +58,16 @@ class Connector
     begin
       # First look in the environment
       r = ENV.fetch('HMAC_SECRET')
-      if r.nil?
-        p "hmac_secret set via the environment"
-      end
+      p 'hmac_secret set via the environment' if r.nil?
     rescue KeyError
-      p "no hmac_secret in the environment"
+      p 'no hmac_secret in the environment'
       # Look in the .hmac file in the project root
 
       hmac_path = "#{Dir.pwd}/.hmac"
-      if File.exists? hmac_path
+      if File.exist? hmac_path
         r = File.read(hmac_path).gsub("\n", '')
       else
-        abort("No HMAC_SECRET found")
+        abort('No HMAC_SECRET found')
       end
     end
 

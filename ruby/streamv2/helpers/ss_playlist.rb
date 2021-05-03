@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sinatra/base'
 require_relative '../common/comms/fetch'
 require_relative '../common/text/manip'
@@ -5,11 +7,9 @@ require 'json'
 
 module Sinatra
   module PlaylistEditorGUI
-
     MAX_ITEM_LENGTH = 80
 
     def self.registered(app)
-
       app.get '/playlist/m3u/:name' do |name|
         response.headers['Content-Type'] = 'text/plain'
         f = Fetch.new(request.env['HTTP_HOST'])
@@ -35,7 +35,6 @@ module Sinatra
         end
       end
 
-
       app.get '/playlist_new' do
         f = Fetch.new
         @foo = []
@@ -47,7 +46,7 @@ module Sinatra
 
       app.get '/playlist/:id' do |id|
         f = Fetch.new
-        @foo = Manip::shorten_titles(JSON.parse(f.playlist(id)), MAX_ITEM_LENGTH)
+        @foo = Manip.shorten_titles(JSON.parse(f.playlist(id)), MAX_ITEM_LENGTH)
         # each row has the playlist name (yeah, i know...)
         @pname = @foo[0]['name']
         @playlist_id = id
@@ -59,9 +58,7 @@ module Sinatra
         f.dellist(id)
         redirect '/playlist/manage'
       end
-
     end
-
   end
   register PlaylistEditorGUI
 end

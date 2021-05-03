@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pg'
 require_relative '../../common/util/config'
 require_relative '../../common/util/logging'
@@ -7,7 +9,7 @@ require_relative '../../common/text/manip'
 class Db
   include BaseDb
 
-  #SQL snippet constants
+  # SQL snippet constants
   TITLE_TERM_SNIPPET = %{
     case
         when (title is null or title = '') then substring(song_filepath from '[^/]*$')
@@ -21,28 +23,27 @@ class Db
     end as title_derived
   }
 
-  TAG_SELECT_SNIPPET = Manip.collapse(%{
+  TAG_SELECT_SNIPPET = Manip.collapse(%(
   SELECT
       file_hash,
       secs,
       #{TITLE_TERM_SNIPPET}
   FROM mp3s_tags
-          })
+          ))
 
   # method defs
   def fetch_playlists
     sql = 'select id, name, date_modified from mp3s_playlist order by name'
-    res = collection_from_sql(
+    collection_from_sql(
       sql: sql,
       params: nil,
       result_map: {
         id: true,
         name: true,
-        modified: "date_modified"
+        modified: 'date_modified'
       },
-      description: "fetching playlists"
+      description: 'fetching playlists'
     )
-    res
   end
 
   def get_info_json(hash)
@@ -57,32 +58,31 @@ class Db
             })
     collection_from_sql(
       sql: sql,
-      params: [ hash ],
+      params: [hash],
       result_map: {
         plays: true,
         last_played: true
       },
-      description: "fetching song info"
+      description: 'fetching song info'
     )
-
   end
 
   def get_tag_info(hash)
-    sql = Manip.collapse(%{
+    sql = Manip.collapse(%(
       select artist, title,
        #{TITLE_TERM_SNIPPET}
        from mp3s_tags where file_hash = $1
-    })
+    ))
 
     collection_from_sql(
       sql: sql,
-      params: [ hash ],
+      params: [hash],
       result_map: {
         artist: true,
         title: true,
         display_title: true
       },
-      description: "fetching tag for song"
+      description: 'fetching tag for song'
     )
   end
 
@@ -90,26 +90,24 @@ class Db
     sql = 'select max(id) + 1 as next_id from mp3s_playlist'
     ret = nil
     connect_for('finding next playlist id') do |conn|
-
-      res = conn.exec(sql) do | result |
-       result.each do |result_row|
-         ret = result_row['next_id']
-       end
-     end
-
+      res = conn.exec(sql) do |result|
+        result.each do |result_row|
+          ret = result_row['next_id']
+        end
+      end
     end
 
     ret
   end
 
   def fetch_playlist(playlist_id, by: 'id')
-    if by == 'name'
-      criteria = 'p.name'
-    else
-      criteria = 'ps.playlist_id'
-    end
+    criteria = if by == 'name'
+                 'p.name'
+               else
+                 'ps.playlist_id'
+               end
 
-    sql = Manip.collapse(%{
+    sql = Manip.collapse(%(
       select p.name, ps.file_hash, secs,
       #{TITLE_TERM_SNIPPET}
       from mp3s_playlist p, mp3s_playlist_song ps, mp3s_tags t
@@ -117,45 +115,44 @@ class Db
       and p.id = ps.playlist_id
       and #{criteria} = $1
       order by entry_order
-    })
-    #puts "sql: #{sql}"
+    ))
+    # puts "sql: #{sql}"
     collection_from_sql(
       sql: sql,
-      params: [ playlist_id ],
+      params: [playlist_id],
       result_map: {
         name: true,
-        hash: "file_hash",
+        hash: 'file_hash',
         secs: true,
-        title: "display_title"
+        title: 'display_title'
       },
-      description: "fetching playlists"
+      description: 'fetching playlists'
     )
   end
 
   def delete_playlist(p_id)
     connect_for('deleting playlist') do |conn|
-      sql = "delete from mp3s_playlist_song where playlist_id = $1"
+      sql = 'delete from mp3s_playlist_song where playlist_id = $1'
       conn.prepare('delete_list', sql)
-      res = conn.exec_prepared('delete_list', [ p_id ])
+      res = conn.exec_prepared('delete_list', [p_id])
 
-      sql = "delete from mp3s_playlist where id = $1"
+      sql = 'delete from mp3s_playlist where id = $1'
       conn.prepare('delete_entry', sql)
-      res = conn.exec_prepared('delete_entry', [ p_id ])
-
+      res = conn.exec_prepared('delete_entry', [p_id])
     end
   end
 
   def save_playlist(p_id, p_name, a_songs)
     p "going to insert #{a_songs.length} songs to playlist #{p_id}"
-    if a_songs.length == 0
-      p "WARNING!! song list passed to me is empty"
-      raise "empty song list"
+    if a_songs.length.zero?
+      p 'WARNING!! song list passed to me is empty'
+      raise 'empty song list'
     end
     connect_for('saving playlist') do |conn|
       # STEP 1 - remove old playlist entries
-      sql = "delete from mp3s_playlist_song where playlist_id = $1"
+      sql = 'delete from mp3s_playlist_song where playlist_id = $1'
       conn.prepare('delete_list', sql)
-      res = conn.exec_prepared('delete_list', [ p_id ])
+      res = conn.exec_prepared('delete_list', [p_id])
 
       # STEP 2 - insert (or update name of) playlist main record
       sql = Manip.collapse(%{
@@ -166,36 +163,36 @@ class Db
         set name = excluded.name
       })
       conn.prepare('update_listrec', sql)
-      res = conn.exec_prepared('update_listrec', [ p_id, p_name ])
+      res = conn.exec_prepared('update_listrec', [p_id, p_name])
 
       # STEP 3 - insert playlist entries
-      sql = "insert into mp3s_playlist_song(playlist_id, file_hash, entry_order) values ($1, $2, $3)"
+      sql = 'insert into mp3s_playlist_song(playlist_id, file_hash, entry_order) values ($1, $2, $3)'
       conn.prepare('insert_ps1', sql)
       entry_order = 0
       a_songs.each do |sid|
         entry_order += 1
-        res = conn.exec_prepared('insert_ps1', [ p_id, sid, entry_order ])
+        res = conn.exec_prepared('insert_ps1', [p_id, sid, entry_order])
         p "inserting song #{entry_order}"
       end
 
       # STEP 4 - update playlist entry with new modified date
-      sql = "update mp3s_playlist set date_modified = current_timestamp where id = $1"
+      sql = 'update mp3s_playlist set date_modified = current_timestamp where id = $1'
       conn.prepare('update_pl', sql)
-      res = conn.exec_prepared('update_pl', [ p_id] )
-    end # connect_for
+      res = conn.exec_prepared('update_pl', [p_id])
+    end
   end
 
   def record_stat(category, item)
-      # NOTE does not work on pre-9.5 versions of PostgreSQL
-      if item == nil
-          Log.log.error "Item for category #{category} not recorded because it is nil"
-      else
-        connect_for('recording statistic') do |conn|
-          sql = "insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set plays = mp3s_stats.plays+1, last_played = current_timestamp;"
-          conn.prepare('record_stat1', sql)
-          res = conn.exec_prepared('record_stat1', [ category, item ])
-        end
+    # NOTE: does not work on pre-9.5 versions of PostgreSQL
+    if item.nil?
+      Log.log.error "Item for category #{category} not recorded because it is nil"
+    else
+      connect_for('recording statistic') do |conn|
+        sql = 'insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set plays = mp3s_stats.plays+1, last_played = current_timestamp;'
+        conn.prepare('record_stat1', sql)
+        res = conn.exec_prepared('record_stat1', [category, item])
       end
+    end
   end
 
   def find_song(given_hash)
@@ -209,31 +206,31 @@ class Db
         artist: true,
         title: true
       },
-      description: "finding song"
+      description: 'finding song'
     )
   end
 
   def list_songs(partial_spec)
-    sql = Manip.collapse(%{
+    sql = Manip.collapse(%(
       #{TAG_SELECT_SNIPPET}
       WHERE song_filepath like $1
       ORDER by display_title
-    })
+    ))
 
     collection_from_sql(
       sql: sql,
-      params: [ "#{partial_spec}%" ],
+      params: ["#{partial_spec}%"],
       result_map: {
-        hash: "file_hash",
+        hash: 'file_hash',
         secs: true,
-        title: "display_title"
+        title: 'display_title'
       },
-      description: "fetching song list"
+      description: 'fetching song list'
     )
   end
 
   def fetch_latest_tags
-    sql = Manip.collapse(%{
+    sql = Manip.collapse(%(
       SELECT
           date_added,
           file_hash,
@@ -242,23 +239,23 @@ class Db
       FROM mp3s_tags
       where date_added > current_date - interval '1 month'
       order by date_added desc, song_filepath
-      })
+      ))
 
-      collection_from_sql(
-        sql: sql,
-        params: nil,
-        result_map: {
-          date_added: true,
-          hash: "file_hash",
-          secs: true,
-          title: "display_title",
-        },
-        description: "fetching latest tags"
+    collection_from_sql(
+      sql: sql,
+      params: nil,
+      result_map: {
+        date_added: true,
+        hash: 'file_hash',
+        secs: true,
+        title: 'display_title'
+      },
+      description: 'fetching latest tags'
     )
   end
 
   def fetch_all_tags
-    sql = Manip.collapse(%{
+    sql = Manip.collapse(%(
       SELECT
           date_added,
           file_hash,
@@ -266,19 +263,19 @@ class Db
           #{TITLE_TERM_SNIPPET}
       FROM mp3s_tags
     ORDER by display_title
-            })
+            ))
 
     collection_from_sql(
       sql: sql,
       params: nil,
       result_map: {
         date_added: true,
-        hash: "file_hash",
+        hash: 'file_hash',
         secs: true,
-        title: "display_title",
+        title: 'display_title'
       },
-      description: "fetching all tags"
-)
+      description: 'fetching all tags'
+    )
   end
 
   def fetch_search(search)
@@ -300,32 +297,31 @@ class Db
 
     collection_from_sql(
       sql: sql,
-      params: [ "%#{search}%" ],
+      params: ["%#{search}%"],
       result_map: {
         plays: true,
         last_played: true,
-        hash: "file_hash",
+        hash: 'file_hash',
         secs: true,
         date_added: true,
-        title: "display_title",
+        title: 'display_title',
         title_derived: true
       },
-      description: "fetching search result"
-)
+      description: 'fetching search result'
+    )
   end
 
   def save_tag(t_artist, t_title, t_hash)
-
-    sql = Manip.collapse(%{
+    sql = Manip.collapse(%(
       update mp3s_tags
       set artist = $1, title = $2
       where file_hash = $3
-      })
+      ))
     connect_for('saving tag') do |conn|
       conn.prepare('save_tag1', sql)
       res = conn.exec_prepared('save_tag1', [
-        t_artist, t_title, t_hash
-        ])
+                                 t_artist, t_title, t_hash
+                               ])
     end
   end
 
@@ -333,9 +329,8 @@ class Db
     sql = 'update mp3s_tags set date_added = $1 where file_hash = $2'
     connect_for('updating date on tag') do |conn|
       conn.prepare('update_tag1', sql)
-      res = conn.exec_prepared('update_tag1', [ dte, file_hash ])
+      res = conn.exec_prepared('update_tag1', [dte, file_hash])
     end
-
   end
 
   def write_tag(hash, filename, tagobj)
@@ -350,15 +345,14 @@ class Db
             })
         conn.prepare('write_tag1', sql)
         res = conn.exec_prepared('write_tag1', [
-          filename, hash, tagobj[:artist],
-          tagobj[:title], tagobj[:secs]])
+                                   filename, hash, tagobj[:artist],
+                                   tagobj[:title], tagobj[:secs]
+                                 ])
       end
+    elsif found_songs[0]['song_filepath'] != filename
+      raise 'Given tag and hash do not match!'
     else
-      if found_songs[0]['song_filepath'] != filename
-        raise 'Given tag and hash do not match!'
-      else
-        Log.log.info 'Hash/filename already in database, nothing done.'
-      end
+      Log.log.info 'Hash/filename already in database, nothing done.'
     end
   end
 end

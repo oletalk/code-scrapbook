@@ -1,35 +1,34 @@
+# frozen_string_literal: true
+
 require_relative '../util/config'
 require_relative '../util/logging'
 require 'date'
 
 module Manip
-
   def self.shorten_titles(result_map, max_length)
     ret = []
     result_map.each do |row|
       returned_row = row
       title = returned_row['title']
-      if !title.nil? && title.size > max_length
-        returned_row['title'] = title[0..max_length-4] + '...'
-      end
+      returned_row['title'] = "#{title[0..max_length - 4]}..." if !title.nil? && title.size > max_length
       ret.push(returned_row)
     end
     ret
   end
 
   def self.collapse(str)
-    str.gsub(/\s+/, " ").strip
+    str.gsub(/\s+/, ' ').strip
   end
 
-  def self.date_from_db(str) # str is of the form '2020-07-03'
+  # str is of the form '2020-07-03'
+  def self.date_from_db(str)
     date_from(str, MP3S::Config::Misc::DATE_FORMAT)
   end
 
-  def self.timestamp_from_db(str) # str is of the form '2020-07-03 11:27:15.296414'
+  # str is of the form '2020-07-03 11:27:15.296414'
+  def self.timestamp_from_db(str)
     date_from(str, MP3S::Config::Misc::TIMESTAMP_FORMAT)
   end
-
-  private
 
   def self.date_from(str, format_str)
     ret = nil

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SongCacheItem
   attr_reader :songdata, :ts
 
@@ -12,9 +14,7 @@ class SongCacheItem
 
   def inspect
     songdata_trunc = @songdata
-    if songdata_trunc.length > 40
-      songdata_trunc = "*binary data* #{@songdata.length} bytes"
-    end
+    songdata_trunc = "*binary data* #{@songdata.length} bytes" if songdata_trunc.length > 40
     "songdata: #{songdata_trunc}, ts: #{@ts}"
   end
 end

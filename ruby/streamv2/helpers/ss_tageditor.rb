@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sinatra/base'
 require_relative '../common/comms/fetch'
 require_relative '../common/text/manip'
@@ -5,7 +7,6 @@ require 'json'
 
 module Sinatra
   module TagEditorGUI
-
     def self.registered(app)
       app.get '/tag/:hash/:pid' do |hash, pid|
         f = Fetch.new
@@ -26,10 +27,9 @@ module Sinatra
         else
           f = Fetch.new
           f.savetag(tag_artist, tag_title, tag_hash, playlist_id)
-          redirect '/playlist/' + playlist_id
+          redirect "/playlist/#{playlist_id}"
         end
       end
-
     end
   end
   register TagEditorGUI

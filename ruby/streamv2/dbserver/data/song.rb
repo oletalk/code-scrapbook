@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class Song
-  attr_reader  :location, :artist, :title
+  attr_reader :location, :artist, :title
 
   def initialize(songrow)
     @location = songrow[:song_filepath]
