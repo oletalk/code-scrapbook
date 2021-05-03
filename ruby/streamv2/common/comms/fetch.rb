@@ -30,14 +30,14 @@ class Fetch < BaseFetcher
   end
 
   def playlist_m3u(spec, downsample: false)
-    stg = go_get("#{PLAYLIST}m3u/#{spec}")
+    stg = go_get("#{PLAYLIST}m3u/#{spec}").dup
     stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(%r{http://\d+\.\d+\.\d+\.\d+:\d+/}, "http://#{@hostheader}/")
   end
 
   def list(spec, downsample: false)
-    stg = go_get(LIST + spec)
+    stg = go_get(LIST + spec).dup
     stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(%r{http://\d+\.\d+\.\d+\.\d+:\d+/}, "http://#{@hostheader}/")
