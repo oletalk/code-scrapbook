@@ -1,0 +1,25 @@
+# Copied from https://gist.github.com/jhass/a5ae80d87f18e53e7b56 on 3/5/21
+
+# Commonly used screens these days easily fit more than 80 characters.
+Metrics/LineLength:
+  Max: 120
+
+# Too short methods lead to extraction of single-use methods, which can make
+# the code easier to read (by naming things), but can also clutter the class
+Metrics/MethodLength: 
+  Max: 20
+
+# The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
+Metrics/ClassLength:
+  Max: 1500
+
+# No space makes the method definition shorter and differentiates
+# from a regular assignment.
+Style/SpaceAroundEqualsInParameterDefault:
+  EnforcedStyle: no_space
+
+  # Fail is an alias of raise. Avoid aliases, it's more cognitive load for no gain.
+# The argument that fail should be used to abort the program is wrong too,
+# there's Kernel#abort for that.
+Style/SignalException:
+  EnforcedStyle: only_raise

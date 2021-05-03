@@ -24,7 +24,7 @@ describe Manip do
   context 'given a bad date result' do
     it 'returns nil' do
       # check the format of the expected result against your config
-      expected = 'Fri 3 Jul, 11:27 am'
+      # expected = 'Fri 3 Jul, 11:27 am'
       input_d = 'dsfsdf'
       expect(Manip.date_from_db(input_d)).to eq(nil)
     end

@@ -6,6 +6,7 @@ require_relative '../../common/util/logging'
 require_relative 'basedb' # module of common db methods
 require_relative '../../common/text/manip'
 
+# This class contains SQL statements used within DBServer and StreamServer (via Fetch)
 class Db
   include BaseDb
 
@@ -134,11 +135,11 @@ class Db
     connect_for('deleting playlist') do |conn|
       sql = 'delete from mp3s_playlist_song where playlist_id = $1'
       conn.prepare('delete_list', sql)
-      res = conn.exec_prepared('delete_list', [p_id])
+      conn.exec_prepared('delete_list', [p_id])
 
       sql = 'delete from mp3s_playlist where id = $1'
       conn.prepare('delete_entry', sql)
-      res = conn.exec_prepared('delete_entry', [p_id])
+      conn.exec_prepared('delete_entry', [p_id])
     end
   end
 

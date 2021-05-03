@@ -2,6 +2,7 @@
 
 require 'pg'
 
+# Class that handles basic connections to db including wrapping txns in a block
 module BaseDb
   # GENERIC SQL FETCH - use only for *parametrised* statements.
   def collection_from_sql(sql:, params:, result_map:, description:)
