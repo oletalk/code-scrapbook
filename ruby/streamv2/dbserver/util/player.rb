@@ -18,7 +18,7 @@ class Player
   end
 
   def play_song(command, song)
-    escaped = song
+    escaped = +song
     escaped.gsub!(/"/, %q(\\\"))
     arg_song = %("#{escaped}")
 

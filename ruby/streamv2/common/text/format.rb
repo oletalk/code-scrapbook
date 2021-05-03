@@ -50,7 +50,7 @@ module Format
   def self.play_list(songlist, hdr_http_host, downsampled = false)
     ds = ''
     ds = '/downsampled' if downsampled
-    ret = "#EXTM3U\n"
+    ret = +"#EXTM3U\n"
     ret << songlist.collect do |song|
       "#EXTINF:#{song[:secs]},#{song[:title]}\n" \
         "http://#{hdr_http_host}/play/#{song[:hash]}#{ds}"
