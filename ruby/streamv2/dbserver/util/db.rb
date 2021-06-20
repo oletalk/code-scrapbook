@@ -91,7 +91,7 @@ class Db
     sql = 'select max(id) + 1 as next_id from mp3s_playlist'
     ret = nil
     connect_for('finding next playlist id') do |conn|
-      res = conn.exec(sql) do |result|
+      conn.exec(sql) do |result|
         result.each do |result_row|
           ret = result_row['next_id']
         end
@@ -167,7 +167,8 @@ class Db
       res = conn.exec_prepared('update_listrec', [p_id, p_name])
 
       # STEP 3 - insert playlist entries
-      sql = 'insert into mp3s_playlist_song(playlist_id, file_hash, entry_order) values ($1, $2, $3)'
+      sql = 'insert into mp3s_playlist_song(playlist_id, file_hash, entry_order)
+             values ($1, $2, $3)'
       conn.prepare('insert_ps1', sql)
       entry_order = 0
       a_songs.each do |sid|
@@ -189,9 +190,10 @@ class Db
       Log.log.error "Item for category #{category} not recorded because it is nil"
     else
       connect_for('recording statistic') do |conn|
-        sql = 'insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item) do update set plays = mp3s_stats.plays+1, last_played = current_timestamp;'
+        sql = 'insert into mp3s_stats (category, item) values ($1, $2) on conflict (category, item)
+               do update set plays = mp3s_stats.plays+1, last_played = current_timestamp;'
         conn.prepare('record_stat1', sql)
-        res = conn.exec_prepared('record_stat1', [category, item])
+        conn.exec_prepared('record_stat1', [category, item])
       end
     end
   end
@@ -320,9 +322,7 @@ class Db
       ))
     connect_for('saving tag') do |conn|
       conn.prepare('save_tag1', sql)
-      res = conn.exec_prepared('save_tag1', [
-                                 t_artist, t_title, t_hash
-                               ])
+      conn.exec_prepared('save_tag1', [t_artist, t_title, t_hash])
     end
   end
 
@@ -330,7 +330,7 @@ class Db
     sql = 'update mp3s_tags set date_added = $1 where file_hash = $2'
     connect_for('updating date on tag') do |conn|
       conn.prepare('update_tag1', sql)
-      res = conn.exec_prepared('update_tag1', [dte, file_hash])
+      conn.exec_prepared('update_tag1', [dte, file_hash])
     end
   end
 
@@ -345,10 +345,10 @@ class Db
             VALUES ($1, $2, $3, $4, $5)
             })
         conn.prepare('write_tag1', sql)
-        res = conn.exec_prepared('write_tag1', [
-                                   filename, hash, tagobj[:artist],
-                                   tagobj[:title], tagobj[:secs]
-                                 ])
+        conn.exec_prepared('write_tag1', [
+                            filename, hash, tagobj[:artist],
+                            tagobj[:title], tagobj[:secs]
+                          ])
       end
     elsif found_songs[0]['song_filepath'] != filename
       raise 'Given tag and hash do not match!'

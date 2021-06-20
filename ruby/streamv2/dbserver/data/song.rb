@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Class for song metadata
 class Song
   attr_reader :location, :artist, :title
 

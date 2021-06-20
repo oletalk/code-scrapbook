@@ -7,11 +7,12 @@ require_relative '../util/logging'
 require_relative '../util/config'
 require_relative '../../streamserver/data/songcache'
 
+# Base class to split out basic 'fetch' functions
 class BaseFetcher
   # get the address of the mp3 server from config
-  def initialize(hh = nil)
+  def initialize(hhdr=nil)
     @base_url = "http://#{MP3S::Config::DB::SERVER_HOST}:#{MP3S::Config::DB::SERVER_PORT}"
-    @hostheader = hh
+    @hostheader = hhdr
     Log.log.info "Fetching mechanism loaded base url of #{@base_url}"
   end
 
@@ -39,7 +40,7 @@ class BaseFetcher
     Log.log.debug("Requested url: #{url}")
     do_answer(response)
   rescue Errno::ECONNREFUSED => e
-    Log.log.error "Couldn't connect to DBServer :-( "
+    Log.log.error "Couldn't connect to DBServer :-( - #{e}"
     '500 Internal Error'
   end
 

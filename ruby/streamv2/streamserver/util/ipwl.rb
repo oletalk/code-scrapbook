@@ -3,6 +3,7 @@
 require 'ipaddr'
 require_relative 'clients'
 
+# An IP whitelist for allowing access to the stream server
 class IPWhitelist
   def initialize(iplist, default)
     @list = iplist # see clients.rb for expected structure

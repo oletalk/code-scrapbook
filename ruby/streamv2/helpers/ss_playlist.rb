@@ -6,6 +6,7 @@ require_relative '../common/text/manip'
 require 'json'
 
 module Sinatra
+  # REST methods for the playlist editor pages (/playlist/manage)
   module PlaylistEditorGUI
     MAX_ITEM_LENGTH = 80
 

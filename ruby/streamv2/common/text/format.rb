@@ -2,8 +2,9 @@
 
 require 'json'
 
+# Class for formatting functions
 module Format
-  def self.html_list(songlist, downsampled = false)
+  def self.html_list(songlist, downsampled=false)
     ds = ''
     ds = '/downsampled' if downsampled
     songlist.collect do |song|
@@ -44,7 +45,7 @@ module Format
       p $ERROR_INFO.error_char.encoding
     end
     # TODO: handle encfailed somehow
-    puts "Encoding failed" if encfailed
+    puts 'Encoding failed' if encfailed
     retjson
   end
 

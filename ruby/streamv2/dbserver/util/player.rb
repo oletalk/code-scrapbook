@@ -5,6 +5,7 @@ require_relative '../../common/util/config'
 require_relative '../../common/util/logging'
 require_relative '../data/played'
 
+# Class to handle streaming or compressing of an MP3 or OGG file.
 class Player
   def songresponse(_req_hash, song_loc, downsample = false)
     # play it (stream server will be calling this method)
