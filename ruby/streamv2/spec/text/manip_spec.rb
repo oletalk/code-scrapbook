@@ -30,6 +30,15 @@ describe Manip do
     end
   end
 
+  context 'given some second durations' do
+    it 'returns the correct display' do
+      testarray = { '3' => '0:03', '300' => '5:00', '333' => '5:33', '3789' => '1:03:09' }
+      testarray.each do |input, expected|
+        expect(Manip.time_display(input)).to eq(expected)
+      end
+    end
+  end
+
   context 'given an empty list' do
     songlist = []
     it 'returns nothing' do

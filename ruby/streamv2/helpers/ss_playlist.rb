@@ -50,6 +50,7 @@ module Sinatra
         @foo = Manip.shorten_titles(JSON.parse(f.playlist(id)), MAX_ITEM_LENGTH)
         # each row has the playlist name (yeah, i know...)
         @pname = @foo[0]['name']
+        @foo.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
         @playlist_id = id
         erb :list
       end

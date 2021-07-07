@@ -27,7 +27,7 @@
       <select id="playlist" onClick="toggleMoveButtons()" name="playlist" multiple>
         <% @foo.each do |song| %>
         <option ondblclick="edittag('<%= song['hash'] %>')" id="<%= song['hash'] %>" name="<%= song['hash'] %>" >
-          <%= song['title'] %>
+          <%= song['title'] %> [ <%= (song['secs_display']) %> ]
         </option>
         <% end %>
       </select>

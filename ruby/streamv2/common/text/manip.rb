@@ -19,6 +19,15 @@ module Manip
     ret
   end
 
+  def self.time_display(secs_p)
+    secs = secs_p.to_i
+    if secs >= 3600
+      "#{secs / 3600}:#{((secs / 60) % 60).to_s.rjust(2, '0')}:#{(secs % 60).to_s.rjust(2, '0')}"
+    else
+      "#{secs / 60}:#{(secs % 60).to_s.rjust(2, '0')}"
+    end
+  end
+
   def self.collapse(str)
     str.gsub(/\s+/, ' ').strip
   end
