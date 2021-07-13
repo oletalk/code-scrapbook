@@ -31,11 +31,12 @@ describe Player do
     it 'outputs error message to be logged' do
       cmd = 'touch XXXX'
       song = '/foo'
+      denied_msgs = ["touch: /foo: Permission denied\n", "touch: /foo: Read-only file system\n" ]
       player = Player.new
       actual = player.play_song(cmd, song)
       expect(actual.songdata).to eq('')
       expect(actual.command).to eq('touch "/foo"')
-      expect(actual.warnings).to eq("touch: /foo: Permission denied\n")
+      expect(denied_msgs).to include(actual.warnings)
     end
   end
 end
