@@ -31,7 +31,9 @@ export default class Search extends React.Component<SearchState> {
   
   // new asof 18/9/21
   setTooltip = (t: TooltipBox) => {
-    this.state.tooltipBox = t
+    this.setState({
+      tooltipBox: t
+    })
   }
 
   getTooltip = () => {
