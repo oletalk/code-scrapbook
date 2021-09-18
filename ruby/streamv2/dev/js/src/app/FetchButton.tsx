@@ -57,11 +57,3 @@ export default class FetchButton extends React.Component<FetchButtonProps> {
   }
 }
 
-/* FetchButton.propTypes = {
-  axiosCall: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-} */
-
-
-// export default FetchButton;

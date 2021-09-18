@@ -3,7 +3,7 @@ import SongLink from './SongLink';
 import Search from './Search';
 import { itemAlreadyInPlaylist } from './js/playlist_ui.js'
 
-// TODO: convert playlist_util.js to ts so i can get rid of DSType!
+// TODO: convert playlist_util.js to ts so i can get rid of this Song type (which i've had to create in SongLink too)!
 type Song = {
   hash: string
   last_played: string
@@ -41,9 +41,6 @@ export default class LineItem extends React.Component<LineItemProps> {
         </li>
       )
     );
-
-
   }
 }
 
-// export default LineItem;

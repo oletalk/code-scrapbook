@@ -12,7 +12,7 @@ type TooltipBoxState = {
 
 }
 export default class TooltipBox extends React.Component<TooltipBoxProps, TooltipBoxState> {
-  constructor(props) {
+    constructor(props) {
     super(props);
     this.state = {
       content: '',

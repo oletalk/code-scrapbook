@@ -30,7 +30,6 @@ export default class SongLink extends React.Component<SongLinkProps> {
     this.tooltipMove = this.tooltipMove.bind(this);
     this.tooltipShow = this.tooltipShow.bind(this);
     //this.getTooltip  = this.getTooltip.bind(this);
-
   }
 
   getTooltip() {
