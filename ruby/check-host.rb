@@ -19,9 +19,8 @@ end
 
 if ip.nil?
   puts "Couldn't find ip in the config file" if DEBUG
-else
-  puts "Unbound config file says your (#{HOSTN}) IP is: #{ip}" if DEBUG
-
+elsif DEBUG
+  puts "Unbound config file says your (#{HOSTN}) IP is: #{ip}"
 end
 
 # we can only do a fixed # of calls per month

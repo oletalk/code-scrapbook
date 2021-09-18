@@ -166,7 +166,7 @@ class DBServer < Sinatra::Base
   end
 
   helpers do
-    def process_songdata(req_hash, req_downsample = false)
+    def process_songdata(req_hash, req_downsample=false)
       songdata = @db.find_song(req_hash)
       # NOTE! This result is an array (albeit of one)
       if songdata.nil?
@@ -186,8 +186,8 @@ class DBServer < Sinatra::Base
       end
     end
 
-    def self.set_hmac_secret(hs)
-      @@connector.set_hmac_secret(hs)
+    def self.set_hmac_secret(hmsecret)
+      @@connector.set_hmac_secret(hmsecret)
     end
   end
 
