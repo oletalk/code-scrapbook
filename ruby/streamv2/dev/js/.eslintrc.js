@@ -19,8 +19,15 @@ module.exports = {
         "sourceType": "module"
     },
     "plugins": [
-        "react"
+        "react",
+        "@typescript-eslint"
     ],
     "rules": {
+    },
+    "settings": {
+      "react": {
+          "pragma": "React",
+          "version": "detect"
+      }
     }
 };

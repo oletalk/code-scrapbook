@@ -40,11 +40,11 @@ export default class SongLink extends React.Component<SongLinkProps> {
     this.getTooltip().hide();
   }
 
-  tooltipMove(e) {
+  tooltipMove(e: React.MouseEvent) {
     this.getTooltip().move(e);
   }
 
-  tooltipShow(text) {
+  tooltipShow(text: string) {
     this.getTooltip().show(text);
   }
 
@@ -54,7 +54,7 @@ export default class SongLink extends React.Component<SongLinkProps> {
     this.props.refreshHandler();
   }
 
-  mouseOverFunc(e) {
+  mouseOverFunc(e: React.MouseEvent) {
     this.tooltipMove(e);
     let item = this.props.song;
 

@@ -3,11 +3,16 @@ import axios from 'axios';
 // import * as PropTypes from 'prop-types';
 
 // props: name, id, axiosCall, callback, noSongsFound
+type SelectedSongs = {
+  data: any[]
+}
+
 type FetchButtonProps = {
   axiosCall: string
   id: string
   name: string
-  callback: Function
+  // eslint-disable-next-line no-unused-vars
+  callback: (s: SelectedSongs) => void
   noSongsFound?: string
 }
 
@@ -17,10 +22,10 @@ export default class FetchButton extends React.Component<FetchButtonProps> {
 
     this.performAxiosCall = this.performAxiosCall.bind(this);
   }
-
+  
   performAxiosCall() {
-    var selectedSongs = [];
-    var a = this;
+    let selectedSongs = [];
+    let a = this;
 
     axios.get(this.props.axiosCall)
     .then(function(response) {

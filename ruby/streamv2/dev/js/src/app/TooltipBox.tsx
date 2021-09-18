@@ -28,7 +28,7 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
     this.props.outerSearch.setTooltip(this)
   }
 
-  move(e) {
+  move(e: React.MouseEvent) {
     this.setState({
       y: e.clientY
     });
@@ -42,7 +42,7 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
     });
   }
 
-  show(text) {
+  show(text: string) {
     //console.log(' -> received show() message');
     this.setState({
       content: text,

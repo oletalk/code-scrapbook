@@ -18,7 +18,7 @@ export default class Search extends React.Component<SearchState> {
     this.handleInputChange = this.handleInputChange.bind(this)
     this.addSongs = this.addSongs.bind(this)
   }
-  state = {
+  state: SearchState = {
     query: '',
     songs: [],
     tooltipBox: null
@@ -50,11 +50,10 @@ export default class Search extends React.Component<SearchState> {
     });
   }
 
-  handleInputChange (ev) {
+  handleInputChange (ev: React.FormEvent<HTMLInputElement>) {
 
     var a = this;
-    var str = ev.target.value;
-    console.log('ev value = ' + str)
+    var str = ev.currentTarget.value;
     a.setState({
       query: str
     })
