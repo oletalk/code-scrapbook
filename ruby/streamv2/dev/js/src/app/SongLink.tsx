@@ -1,8 +1,24 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+// import * as PropTypes from 'prop-types';
+import Search from './Search'
 import { addToList } from './js/playlist_ui.js'
 
-class SongLink extends React.Component {
+type Song = {
+  hash: string
+  last_played: string
+  plays: number
+  title: string
+  date_added: string
+}
+type SongLinkProps = {
+  outerSearch: Search
+  song: Song
+  // see https://stackoverflow.com/questions/57510552/react-prop-types-with-typescript-how-to-have-a-function-type
+  refreshHandler: Function
+  
+}
+
+export default class SongLink extends React.Component<SongLinkProps> {
   constructor(props) {
     super(props);
     if (this.props.outerSearch == null) {
@@ -18,7 +34,7 @@ class SongLink extends React.Component {
   }
 
   getTooltip() {
-    return this.props.outerSearch.tooltipBox;
+    return this.props.outerSearch.getTooltip()
   }
 
   tooltipHide() {
@@ -66,10 +82,4 @@ class SongLink extends React.Component {
   }
 }
 
-SongLink.propTypes = {
-  outerSearch: PropTypes.object,
-  song: PropTypes.object,
-  refreshHandler: PropTypes.func,
 
-};
-export default SongLink;

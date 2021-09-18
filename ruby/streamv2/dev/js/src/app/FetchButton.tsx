@@ -1,9 +1,17 @@
-import React from 'react';
+import * as React from 'react';
 import axios from 'axios';
-import PropTypes from 'prop-types';
+// import * as PropTypes from 'prop-types';
 
 // props: name, id, axiosCall, callback, noSongsFound
-class FetchButton extends React.Component {
+type FetchButtonProps = {
+  axiosCall: string
+  id: string
+  name: string
+  callback: Function
+  noSongsFound?: string
+}
+
+export default class FetchButton extends React.Component<FetchButtonProps> {
   constructor(props) {
     super(props);
 
@@ -49,11 +57,11 @@ class FetchButton extends React.Component {
   }
 }
 
-FetchButton.propTypes = {
+/* FetchButton.propTypes = {
   axiosCall: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-}
+} */
 
 
-export default FetchButton;
+// export default FetchButton;

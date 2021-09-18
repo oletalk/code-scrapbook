@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "stream server frontend",
   "private": true,
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "jest",
-    "build": "webpack",
+    "build-OLD": "webpack",
+    "build": "webpack-cli --config webpack.config.js",
     "lint": "eslint --ext .jsx **/*.jsx"
   },
   "author": "",
@@ -16,24 +17,33 @@
     "@babel/core": "^7.14.5",
     "@babel/preset-env": "^7.11.5",
     "@babel/preset-react": "^7.10.4",
+    "@types/react": "^17.0.21",
+    "@types/react-dom": "^17.0.9",
     "babel-loader": "^8.2.2",
     "css-loader": "^6.2.0",
     "eslint": "^7.29.0",
     "eslint-plugin-react": "^7.21.5",
     "file-loader": "^6.2.0",
     "jest": "^26.4.2",
+    "process": "^0.11.10",
     "prop-types": "^15.7.2",
     "style-loader": "^1.2.1",
+    "ts-loader": "^9.2.5",
     "webpack": "^5.0.0",
     "webpack-cli": "^4.0.0"
   },
   "dependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.9.2",
+    "awesome-typescript-loader": "^5.2.1",
     "axios": "^0.21.1",
     "ini": ">=1.3.6",
     "lodash": "^4.17.21",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "source-map-loader": "^3.0.0",
     "ssri": ">=6.0.2",
+    "typescript": "^4.4.3",
     "y18n": ">=4.0.1"
   }
 }

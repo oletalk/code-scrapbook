@@ -1,27 +1,45 @@
-import React from 'react';
+import * as React from 'react';
 import axios from 'axios';
-import TooltipBox from './TooltipBox.jsx';
-import LineItem from './LineItem.jsx';
-import FetchButton from './FetchButton.jsx';
+import TooltipBox from './TooltipBox';
+import LineItem from './LineItem';
+import FetchButton from './FetchButton';
 import { songFromJson } from './js/playlist_util.js'
 
 const MAX_LIST_LENGTH = 30;
 
-class Search extends React.Component {
+type SearchState = {
+  query: string
+  songs: string[]
+  tooltipBox: TooltipBox
+}
+export default class Search extends React.Component<SearchState> {
   constructor(props) {
-    super(props);
-    this.state = {
-      query: '',
-      songs: []
-    };
+    super(props)
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.addSongs = this.addSongs.bind(this)
+  }
+  state = {
+    query: '',
+    songs: [],
+    tooltipBox: null
+  }    
 
-    this.handleInputChange = this.handleInputChange.bind(this);
+  // no need for .bind(this) now??
+  // this.handleInputChange = this.handleInputChange.bind(this);
     // callbacks
-    this.addSongs = this.addSongs.bind(this);
+    // this.addSongs = this.addSongs.bind(this);
+  
+  // new asof 18/9/21
+  setTooltip = (t: TooltipBox) => {
+    this.state.tooltipBox = t
+  }
+
+  getTooltip = () => {
+    return this.state.tooltipBox
   }
 
   // callback from the buttons
-  addSongs(s) {
+  addSongs = (s) => {
     let itemList = s.data;
     itemList = itemList.slice(0,MAX_LIST_LENGTH);
     this.setState({
@@ -34,6 +52,10 @@ class Search extends React.Component {
 
     var a = this;
     var str = ev.target.value;
+    console.log('ev value = ' + str)
+    a.setState({
+      query: str
+    })
 
     if (str.length > 3) {
       axios.get('/search/' + str)
@@ -44,7 +66,6 @@ class Search extends React.Component {
           console.log('Got ' + selectedSongs.length + ' song(s).');
           selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH);
           a.setState({
-            query: '',
             songs: selectedSongs
           });
 
@@ -61,8 +82,8 @@ class Search extends React.Component {
       <div>
         <span>
           <input id='criteria' type='text' placeholder='Search for song to add...'
-          value={this.state.query.value}
-          onChange={(e) => this.handleInputChange(e) } />
+          value={this.state.query}
+          onChange={this.handleInputChange} />
           <FetchButton
             id='latestBtn' name='Latest' axiosCall='/query/latest'
             callback={this.addSongs} noSongsFound='No songs were added in the past month'
@@ -86,4 +107,4 @@ class Search extends React.Component {
   }
 }
 
-export default Search;
+// export default Search;

@@ -1,7 +1,17 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import Search from './Search';
 
-class TooltipBox extends React.Component {
+type TooltipBoxProps = {
+  outerSearch: Search
+}
+type TooltipBoxState = {
+  content: string
+  visibOuter: string
+  visibInner: string
+  y: number
+
+}
+export default class TooltipBox extends React.Component<TooltipBoxProps, TooltipBoxState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,7 +24,8 @@ class TooltipBox extends React.Component {
     this.show = this.show.bind(this);
     this.move = this.move.bind(this);
 
-    this.props.outerSearch.tooltipBox = this;
+    // this.props.outerSearch.tooltipBox = this;
+    this.props.outerSearch.setTooltip(this)
   }
 
   move(e) {
@@ -57,8 +68,3 @@ class TooltipBox extends React.Component {
   }
 }
 
-TooltipBox.propTypes = {
-  outerSearch: PropTypes.object.isRequired,
-}
-
-export default TooltipBox;
