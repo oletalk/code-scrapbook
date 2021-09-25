@@ -1,26 +1,17 @@
 import * as React from 'react';
 import SongLink from './SongLink';
 import Search from './Search';
-import { itemAlreadyInPlaylist } from './js/playlist_ui.js'
+import { itemAlreadyInPlaylist } from './js/playlist_ui_t'
+import { SongObject } from './js/playlist_util_t'
 
-// TODO: convert playlist_util.js to ts so i can get rid of this Song type (which i've had to create in SongLink too)!
-type Song = {
-  hash: string
-  last_played: string
-  plays: number
-  title: string
-  date_added: string
-  derived: string
-}
 type LineItemProps = {
-  dataSource: Song // this comes from playlist_util.js
+  dataSource: SongObject // this comes from playlist_util.js
   outerSearch: Search
 }
 
-
 export default class LineItem extends React.Component<LineItemProps> {
-  constructor(props) {
-    super(props);
+  constructor(props: any) {
+    super(props)
     this.refreshHandler = this.refreshHandler.bind(this);
   }
 

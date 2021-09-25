@@ -1,8 +1,26 @@
 const MAX_ITEM_LENGTH = 50; // TODO - different file
 
-function songFromJson (si, json) {
+type SongObject = {
+  counter: number,
+  hash: string,
+  title: string,
+  date_added: string,
+  plays: number,
+  last_played: string,
+  derived: string
+}
+type SongFromJson = {
+  counter: number,
+  hash: string,
+  title: string,
+  date_added: string,
+  plays: number,
+  last_played: string,
+  title_derived: string
+}
+function songFromJson (si: number, json: SongFromJson) {
   let songitem = json;
-  let item = {
+  let item: SongObject = {
      counter: si,
      hash: songitem['hash'],
      title: fixTitle(songitem['title']),
@@ -14,7 +32,7 @@ function songFromJson (si, json) {
    return item;
 }
 
-function fixTitle (title) {
+function fixTitle (title: string) {
   let ret = title;
    if (ret == null) {
     ret = '???';
@@ -25,9 +43,9 @@ function fixTitle (title) {
     return ret;
 }
 
-function nonnull(str) {
+function nonnull(str: any) {
     return (str !== undefined && str !== null) ? str : undefined;
 }
 
 
-export { songFromJson };
+export { songFromJson, SongObject, SongFromJson };

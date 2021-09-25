@@ -2,6 +2,7 @@
   "compilerOptions": {
       "outDir": "./dist",
       "allowJs": true,
+      "noImplicitAny": true,
       "target": "es5",
       "jsx": "react"
   },

@@ -17,14 +17,14 @@ type FetchButtonProps = {
 }
 
 export default class FetchButton extends React.Component<FetchButtonProps> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.performAxiosCall = this.performAxiosCall.bind(this);
   }
   
   performAxiosCall() {
-    let selectedSongs = [];
+    let selectedSongs: any[] = [];
     let a = this;
 
     axios.get(this.props.axiosCall)

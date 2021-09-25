@@ -1,25 +1,17 @@
 import * as React from 'react';
 // import * as PropTypes from 'prop-types';
 import Search from './Search'
-import { addToList } from './js/playlist_ui.js'
+import { addToList } from './js/playlist_ui_t'
+import { SongObject } from './js/playlist_util_t'
 
-type Song = {
-  hash: string
-  last_played: string
-  plays: number
-  title: string
-  date_added: string
-}
 type SongLinkProps = {
   outerSearch: Search
-  song: Song
-  // see https://stackoverflow.com/questions/57510552/react-prop-types-with-typescript-how-to-have-a-function-type
-  refreshHandler: Function
-  
+  song: SongObject
+  refreshHandler: () => void
 }
 
 export default class SongLink extends React.Component<SongLinkProps> {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     if (this.props.outerSearch == null) {
       console.warn('outerSearch is null! no link back to outer Search component.');

@@ -3,17 +3,20 @@ import axios from 'axios';
 import TooltipBox from './TooltipBox';
 import LineItem from './LineItem';
 import FetchButton from './FetchButton';
-import { songFromJson } from './js/playlist_util.js'
+import { songFromJson, SongFromJson } from './js/playlist_util_t'
 
 const MAX_LIST_LENGTH = 30;
 
+type RespData = {
+  data: any
+}
 type SearchState = {
   query: string
-  songs: string[]
+  songs: SongFromJson[]
   tooltipBox: TooltipBox
 }
 export default class Search extends React.Component<SearchState> {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.handleInputChange = this.handleInputChange.bind(this)
     this.addSongs = this.addSongs.bind(this)
@@ -41,7 +44,7 @@ export default class Search extends React.Component<SearchState> {
   }
 
   // callback from the buttons
-  addSongs = (s) => {
+  addSongs = (s: RespData) => {
     let itemList = s.data;
     itemList = itemList.slice(0,MAX_LIST_LENGTH);
     this.setState({
