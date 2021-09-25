@@ -25,7 +25,7 @@ export default class FetchButton extends React.Component<FetchButtonProps> {
   
   performAxiosCall() {
     let selectedSongs: any[] = []
-    let a = this
+    const a = this
 
     axios.get(this.props.axiosCall)
     .then(function(response) {

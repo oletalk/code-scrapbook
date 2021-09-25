@@ -20,7 +20,7 @@ export default class LineItem extends React.Component<LineItemProps> {
   }
 
   render() {
-    let item = this.props.dataSource
+    const item = this.props.dataSource
     return (itemAlreadyInPlaylist('s_' + item.hash) ?
       (
         <li id={'s_' + item.hash}>{item.title}</li>

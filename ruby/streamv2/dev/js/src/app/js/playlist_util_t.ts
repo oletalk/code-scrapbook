@@ -19,8 +19,8 @@ type SongFromJson = {
   title_derived: string
 }
 function songFromJson (si: number, json: SongFromJson) {
-  let songitem = json
-  let item: SongObject = {
+  const songitem = json
+  const item: SongObject = {
      counter: si,
      hash: songitem['hash'],
      title: fixTitle(songitem['title']),

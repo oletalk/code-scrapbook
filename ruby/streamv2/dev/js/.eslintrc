@@ -23,7 +23,11 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "semi": [2, "never" ]
+        "semi": [2, "never" ],
+        "prefer-const": ["error", {
+            "destructuring": "any",
+            "ignoreReadBeforeAssign": false
+        }]
     },
     "settings": {
       "react": {

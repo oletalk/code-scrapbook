@@ -13,7 +13,7 @@ type RespData = {
 type SearchState = {
   query: string
   songs: SongFromJson[]
-  tooltipBox: TooltipBox
+  tooltipBox: TooltipBox | null
 }
 export default class Search extends React.Component<SearchState> {
   constructor(props: any) {
@@ -94,7 +94,7 @@ export default class Search extends React.Component<SearchState> {
         <ul className='click'>
 
           {this.state.songs.map((row, index) => {
-            let item = songFromJson(index, row)
+            const item = songFromJson(index, row)
             return <LineItem outerSearch={this} key={item.counter} dataSource={item} />
           })}
 

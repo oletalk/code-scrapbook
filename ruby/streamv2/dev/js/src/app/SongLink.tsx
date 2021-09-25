@@ -3,6 +3,7 @@ import * as React from 'react'
 import Search from './Search'
 import { addToList } from './js/playlist_ui_t'
 import { SongObject } from './js/playlist_util_t'
+// import TooltipBox from './TooltipBox'
 
 type SongLinkProps = {
   outerSearch: Search
@@ -29,15 +30,30 @@ export default class SongLink extends React.Component<SongLinkProps> {
   }
 
   tooltipHide() {
-    this.getTooltip().hide()
+    const t = this.getTooltip()
+    if (t != null) {
+      t.hide()
+    } else {
+      console.log('Tooltip has not been set yet')
+    }
   }
 
   tooltipMove(e: React.MouseEvent) {
-    this.getTooltip().move(e)
+    const t = this.getTooltip()
+    if (t != null) {
+      t.move(e)
+    } else {
+      console.log('Tooltip has not been set yet')
+    }
   }
 
   tooltipShow(text: string) {
-    this.getTooltip().show(text)
+    const t = this.getTooltip()
+    if (t != null) {
+      t.show(text)
+    } else {
+      console.log('Tooltip has not been set yet')
+    }
   }
 
   onClickFunc() {
@@ -48,10 +64,10 @@ export default class SongLink extends React.Component<SongLinkProps> {
 
   mouseOverFunc(e: React.MouseEvent) {
     this.tooltipMove(e)
-    let item = this.props.song
+    const item = this.props.song
 
     if (typeof item !== 'undefined') {
-      let itemplays = (typeof item.plays !== 'undefined')
+      const itemplays = (typeof item.plays !== 'undefined')
           ? ("<b>Plays:</b> " + item.plays + "<br/><b>Last Played:</b>" + item.last_played)
           : "<i>Song hasn't recently been played</i>"
       this.tooltipShow(itemplays + "<br/><b>Date added:</b>" + item.date_added)
@@ -62,7 +78,7 @@ export default class SongLink extends React.Component<SongLinkProps> {
   }
 
   render() {
-    let item = this.props.song
+    const item = this.props.song
 
     return (
         <a onMouseOver={(e) => this.mouseOverFunc(e) } onMouseOut={this.tooltipHide}
