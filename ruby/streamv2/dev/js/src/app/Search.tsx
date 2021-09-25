@@ -1,14 +1,14 @@
-import * as React from 'react';
-import axios from 'axios';
-import TooltipBox from './TooltipBox';
-import LineItem from './LineItem';
-import FetchButton from './FetchButton';
+import * as React from 'react'
+import axios from 'axios'
+import TooltipBox from './TooltipBox'
+import LineItem from './LineItem'
+import FetchButton from './FetchButton'
 import { songFromJson, SongFromJson } from './js/playlist_util_t'
 
-const MAX_LIST_LENGTH = 30;
+const MAX_LIST_LENGTH = 30
 
 type RespData = {
-  data: any
+  data: SongFromJson[]
 }
 type SearchState = {
   query: string
@@ -27,12 +27,6 @@ export default class Search extends React.Component<SearchState> {
     tooltipBox: null
   }    
 
-  // no need for .bind(this) now??
-  // this.handleInputChange = this.handleInputChange.bind(this);
-    // callbacks
-    // this.addSongs = this.addSongs.bind(this);
-  
-  // new asof 18/9/21
   setTooltip = (t: TooltipBox) => {
     this.setState({
       tooltipBox: t
@@ -45,18 +39,18 @@ export default class Search extends React.Component<SearchState> {
 
   // callback from the buttons
   addSongs = (s: RespData) => {
-    let itemList = s.data;
-    itemList = itemList.slice(0,MAX_LIST_LENGTH);
+    let itemList = s.data
+    itemList = itemList.slice(0,MAX_LIST_LENGTH)
     this.setState({
       query: '',
       songs: itemList
-    });
+    })
   }
 
   handleInputChange (ev: React.FormEvent<HTMLInputElement>) {
 
-    var a = this;
-    var str = ev.currentTarget.value;
+    var a = this
+    var str = ev.currentTarget.value
     a.setState({
       query: str
     })
@@ -66,15 +60,15 @@ export default class Search extends React.Component<SearchState> {
       .then(function (response) { // process search results
         if (Array.isArray(response.data)) {
 
-          let selectedSongs = response.data;
-          console.log('Got ' + selectedSongs.length + ' song(s).');
-          selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH);
+          let selectedSongs: SongFromJson[] = response.data
+          console.log('Got ' + selectedSongs.length + ' song(s).')
+          selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH)
           a.setState({
             songs: selectedSongs
-          });
+          })
 
-        } // if ...
-      });
+        }
+      })
 
 
   }
@@ -100,14 +94,14 @@ export default class Search extends React.Component<SearchState> {
         <ul className='click'>
 
           {this.state.songs.map((row, index) => {
-            let item = songFromJson(index, row);
+            let item = songFromJson(index, row)
             return <LineItem outerSearch={this} key={item.counter} dataSource={item} />
           })}
 
         </ul>
         <TooltipBox outerSearch={this} />
       </div>
-    );
+    )
   }
 }
 

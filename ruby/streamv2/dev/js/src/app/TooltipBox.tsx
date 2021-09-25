@@ -1,5 +1,5 @@
-import * as React from 'react';
-import Search from './Search';
+import * as React from 'react'
+import Search from './Search'
 
 type TooltipBoxProps = {
   outerSearch: Search
@@ -13,16 +13,16 @@ type TooltipBoxState = {
 }
 export default class TooltipBox extends React.Component<TooltipBoxProps, TooltipBoxState> {
     constructor(props: any) {
-    super(props);
+    super(props)
     this.state = {
       content: '',
       visibOuter: 'tooltip',
       visibInner: 'tooltip',
       y: 200
-    };
-    this.hide = this.hide.bind(this);
-    this.show = this.show.bind(this);
-    this.move = this.move.bind(this);
+    }
+    this.hide = this.hide.bind(this)
+    this.show = this.show.bind(this)
+    this.move = this.move.bind(this)
 
     // this.props.outerSearch.tooltipBox = this;
     this.props.outerSearch.setTooltip(this)
@@ -31,7 +31,7 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
   move(e: React.MouseEvent) {
     this.setState({
       y: e.clientY
-    });
+    })
   }
 
   hide() {
@@ -39,7 +39,7 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
       content: '',
       visibOuter: 'tooltip',
       visibInner: 'tooltiptext'
-    });
+    })
   }
 
   show(text: string) {
@@ -48,15 +48,15 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
       content: text,
       visibOuter: 'tooltipshow',
       visibInner: 'tooltipshow'
-    });
+    })
   }
 
 
   render() {
-    var top = (this.state.y + 20) + 'px';
+    var top = (this.state.y + 20) + 'px'
     // according to https://reactjs.org/docs/dom-elements.html
     // setting innerHTML is dangerous
-    var tooltipText = {__html: this.state.content};
+    var tooltipText = {__html: this.state.content}
 
     return (
       <div id='song_tooltip_container' className={this.state.visibOuter}
@@ -64,7 +64,7 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
         <span id='song_tooltip' className={this.state.visibInner}
         dangerouslySetInnerHTML={tooltipText} />
       </div>
-    );
+    )
   }
 }
 
