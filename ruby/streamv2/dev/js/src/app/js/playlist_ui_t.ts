@@ -1,10 +1,10 @@
-function itemAlreadyInPlaylist (hash: string): boolean {
+function itemAlreadyInPlaylist(hash: string): boolean {
   var ret = false
 
-  let sel = <HTMLSelectElement>document.getElementById('playlist')
+  const sel = <HTMLSelectElement>document.getElementById('playlist')
   for (var i = 0; i < sel.options.length; i++) {
-    let opt = sel.options[i]
-    let dd_identifier = hash.split('_')
+    const opt = sel.options[i]
+    const dd_identifier = hash.split('_')
     if (opt.id == dd_identifier[1]) { // without the s_...
       ret = true
     }
@@ -12,7 +12,7 @@ function itemAlreadyInPlaylist (hash: string): boolean {
   return ret
 }
 
-function addToList (hash: string) {
+function addToList(hash: string) {
   var sel = <HTMLSelectElement>document.getElementById(hash) // should have s_ in front
   if (sel != null) {
     if (itemAlreadyInPlaylist(hash)) {
@@ -23,7 +23,7 @@ function addToList (hash: string) {
       newOption.text = sel.innerText
       //sel.innerHTML = sel.innerText; // don't touch stuff managed by React!!
       //alert(hash);
-      let dd_identifier = hash.split('_')
+      const dd_identifier = hash.split('_')
       newOption.id = dd_identifier[1] // without the s_!
       playlist.add(newOption)
       markChanges()
@@ -33,8 +33,8 @@ function addToList (hash: string) {
   }
 }
 
-function markChanges () {
-  let dt = document.title
+function markChanges() {
+  const dt = document.title
   if (dt.indexOf('[') == -1) {
     document.title = "[changes made] " + document.title
   }

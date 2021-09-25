@@ -68,8 +68,8 @@ export default class SongLink extends React.Component<SongLinkProps> {
 
     if (typeof item !== 'undefined') {
       const itemplays = (typeof item.plays !== 'undefined')
-          ? ("<b>Plays:</b> " + item.plays + "<br/><b>Last Played:</b>" + item.last_played)
-          : "<i>Song hasn't recently been played</i>"
+        ? ("<b>Plays:</b> " + item.plays + "<br/><b>Last Played:</b>" + item.last_played)
+        : "<i>Song hasn't recently been played</i>"
       this.tooltipShow(itemplays + "<br/><b>Date added:</b>" + item.date_added)
     } else {
       this.tooltipShow("No song information available.")
@@ -81,10 +81,10 @@ export default class SongLink extends React.Component<SongLinkProps> {
     const item = this.props.song
 
     return (
-        <a onMouseOver={(e) => this.mouseOverFunc(e) } onMouseOut={this.tooltipHide}
-           onClick={this.onClickFunc}>
-          {item.title}
-        </a>
+      <a onMouseOver={(e) => this.mouseOverFunc(e)} onMouseOut={this.tooltipHide}
+        onClick={this.onClickFunc}>
+        {item.title}
+      </a>
     )
   }
 }

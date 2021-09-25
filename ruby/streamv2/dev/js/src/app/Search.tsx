@@ -25,7 +25,7 @@ export default class Search extends React.Component<SearchState> {
     query: '',
     songs: [],
     tooltipBox: null
-  }    
+  }
 
   setTooltip = (t: TooltipBox) => {
     this.setState({
@@ -40,14 +40,14 @@ export default class Search extends React.Component<SearchState> {
   // callback from the buttons
   addSongs = (s: RespData) => {
     let itemList = s.data
-    itemList = itemList.slice(0,MAX_LIST_LENGTH)
+    itemList = itemList.slice(0, MAX_LIST_LENGTH)
     this.setState({
       query: '',
       songs: itemList
     })
   }
 
-  handleInputChange (ev: React.FormEvent<HTMLInputElement>) {
+  handleInputChange(ev: React.FormEvent<HTMLInputElement>) {
 
     var a = this
     var str = ev.currentTarget.value
@@ -57,22 +57,22 @@ export default class Search extends React.Component<SearchState> {
 
     if (str.length > 3) {
       axios.get('/search/' + str)
-      .then(function (response) { // process search results
-        if (Array.isArray(response.data)) {
+        .then(function (response) { // process search results
+          if (Array.isArray(response.data)) {
 
-          let selectedSongs: SongFromJson[] = response.data
-          console.log('Got ' + selectedSongs.length + ' song(s).')
-          selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH)
-          a.setState({
-            songs: selectedSongs
-          })
+            let selectedSongs: SongFromJson[] = response.data
+            console.log('Got ' + selectedSongs.length + ' song(s).')
+            selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH)
+            a.setState({
+              songs: selectedSongs
+            })
 
-        }
-      })
+          }
+        })
 
 
+    }
   }
-}
 
 
   render() {
@@ -80,8 +80,8 @@ export default class Search extends React.Component<SearchState> {
       <div>
         <span>
           <input id='criteria' type='text' placeholder='Search for song to add...'
-          value={this.state.query}
-          onChange={this.handleInputChange} />
+            value={this.state.query}
+            onChange={this.handleInputChange} />
           <FetchButton
             id='latestBtn' name='Latest' axiosCall='/query/latest'
             callback={this.addSongs} noSongsFound='No songs were added in the past month'

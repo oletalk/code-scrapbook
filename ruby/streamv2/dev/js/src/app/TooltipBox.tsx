@@ -9,10 +9,9 @@ type TooltipBoxState = {
   visibOuter: string
   visibInner: string
   y: number
-
 }
 export default class TooltipBox extends React.Component<TooltipBoxProps, TooltipBoxState> {
-    constructor(props: any) {
+  constructor(props: any) {
     super(props)
     this.state = {
       content: '',
@@ -56,13 +55,13 @@ export default class TooltipBox extends React.Component<TooltipBoxProps, Tooltip
     var top = (this.state.y + 20) + 'px'
     // according to https://reactjs.org/docs/dom-elements.html
     // setting innerHTML is dangerous
-    var tooltipText = {__html: this.state.content}
+    var tooltipText = { __html: this.state.content }
 
     return (
       <div id='song_tooltip_container' className={this.state.visibOuter}
-          style={{position:'absolute', top}}>
+        style={{ position: 'absolute', top }}>
         <span id='song_tooltip' className={this.state.visibInner}
-        dangerouslySetInnerHTML={tooltipText} />
+          dangerouslySetInnerHTML={tooltipText} />
       </div>
     )
   }

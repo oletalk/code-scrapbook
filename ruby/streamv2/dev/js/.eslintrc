@@ -1,38 +1,48 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "globals": {
+    "react": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
     },
-    "globals": {
-      "react": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended"
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "semi": [
+      2,
+      "never"
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "@typescript-eslint"
-    ],
-    "rules": {
-        "semi": [2, "never" ],
-        "prefer-const": ["error", {
-            "destructuring": "any",
-            "ignoreReadBeforeAssign": false
-        }]
-    },
-    "settings": {
-      "react": {
-          "pragma": "React",
-          "version": "detect"
+    "prefer-const": [
+      "error",
+      {
+        "destructuring": "any",
+        "ignoreReadBeforeAssign": false
       }
+    ],
+    "indent": [
+      "error",
+      2
+    ]
+  },
+  "settings": {
+    "react": {
+      "pragma": "React",
+      "version": "detect"
     }
+  }
 }
