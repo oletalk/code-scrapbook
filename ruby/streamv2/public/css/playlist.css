@@ -56,7 +56,11 @@ table.playlists {
   padding-top: 15px;
   border-spacing: 0px;
 }
-
+div.disabled-actions {
+  font-weight: bold;
+  font-style: italic;
+  color: gray;
+}
 div.actions:hover {
   background: #f9ac32;
   transition: background 0.5s ease-out;

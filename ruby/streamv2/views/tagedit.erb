@@ -35,6 +35,15 @@
           <td><label for="title">Title</label></td>
           <td><input id="title" name="title" value="<%= @taginfo['title'] %>" placeholder="MISSING - Type Song title"/></td>
         </tr>
+        <tr>
+          <td>Listen:</td>
+          <td><audio 
+                  controls 
+                  src="/play/<%= @hash %>">
+                  Your browser does not support the <code>audio</code> element.
+                  </audio>
+          </td>
+        </tr>
       </table>
       <input id="hash" type="hidden" name="hash" value="<%= @hash %>" />
       <input id="playlist_id" type="hidden" name="playlist_id" value="<%= @playlist_id %>" />

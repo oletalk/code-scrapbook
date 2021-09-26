@@ -10,14 +10,14 @@ module MP3S
       '192.168.0.0/24' => {
         allow: true,
         downsample: false,
-        playlist: true
+        playlist: true,
+        listen: true
       },
       '109.148.232.0/24' => { allow: true, downsample: true },
-      '82.118.92.0/24' => { allow: true, downsample: true },
-      '130.209.164.0/24' => { allow: true, downsample: true },
-      '130.209.6.0/24' => { allow: true, downsample: true }
+      '130.209.164.0/24' => { allow: true, downsample: true, playlist_ro: true },
+      '130.209.6.0/24' => { allow: true, downsample: true, playlist_ro: true }
     }.freeze
 
-    Default = { allow: false, playlist: false }.freeze
+    Default = { allow: false, playlist: false, playlist_ro: false, listen: false }.freeze
   end
 end

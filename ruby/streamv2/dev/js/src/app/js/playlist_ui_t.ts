@@ -13,13 +13,13 @@ function itemAlreadyInPlaylist(hash: string): boolean {
 }
 
 function addToList(hash: string) {
-  var sel = <HTMLSelectElement>document.getElementById(hash) // should have s_ in front
+  const sel = <HTMLSelectElement>document.getElementById(hash) // should have s_ in front
   if (sel != null) {
     if (itemAlreadyInPlaylist(hash)) {
       alert('Sorry, the playlist already has this item.')
     } else {
-      var playlist = <HTMLSelectElement>document.getElementById('playlist')
-      var newOption = <HTMLOptionElement>document.createElement('option')
+      const playlist = <HTMLSelectElement>document.getElementById('playlist')
+      const newOption = <HTMLOptionElement>document.createElement('option')
       newOption.text = sel.innerText
       //sel.innerHTML = sel.innerText; // don't touch stuff managed by React!!
       //alert(hash);
