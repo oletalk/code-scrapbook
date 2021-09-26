@@ -44,14 +44,15 @@ class StreamServer < Sinatra::Base
     action = @ipwl.action(remote_ip)
     Log.log.info("Action for #{remote_ip} is #{action}.")
     halt 403, { 'Content-Type' => 'text/plain' }, '403 Access Denied' unless action[:allow]
-    @playlist = action[:playlist]
-    @downsample = action[:downsample]
+    # @playlist = action[:playlist]
+    # @downsample = action[:downsample]
+    @actions = action
   end
 
   get '/play/:hash' do |req_hash|
     # PASS REQUEST ON TO DB MODULE
     f = Fetch.new
-    f.fetch(req_hash, downsample: @downsample)
+    f.fetch(req_hash, downsample: @actions[:downsample])
   end
 
   get '/m3u/:spec' do |spec|
