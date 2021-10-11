@@ -1,6 +1,5 @@
 import * as React from 'react'
 import axios from 'axios'
-// import * as PropTypes from 'prop-types';
 
 // props: name, id, axiosCall, callback, noSongsFound
 type SelectedSongs = {

@@ -7,7 +7,8 @@ type SongObject = {
   date_added: string,
   plays: number,
   last_played: string,
-  derived: string
+  derived: string,
+  secs_display?: string
 }
 type SongFromJson = {
   counter: number,
@@ -16,7 +17,8 @@ type SongFromJson = {
   date_added: string,
   plays: number,
   last_played: string,
-  title_derived: string
+  title_derived: string,
+  secs_display?: string
 }
 function songFromJson(si: number, json: SongFromJson) {
   const songitem = json
@@ -27,7 +29,8 @@ function songFromJson(si: number, json: SongFromJson) {
     date_added: nonnull(songitem['date_added']),
     plays: nonnull(songitem['plays']),
     last_played: nonnull(songitem['last_played']),
-    derived: nonnull(songitem['title_derived'])
+    derived: nonnull(songitem['title_derived']),
+    secs_display: nonnull(songitem['secs_display'])
   }
   return item
 }

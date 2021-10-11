@@ -5,6 +5,7 @@ require 'json'
 require 'cgi'
 require_relative 'common/util/config'
 require_relative 'common/comms/fetch'
+require_relative 'common/text/manip'
 require_relative 'common/comms/connector'
 require_relative 'streamserver/util/ipwl'
 require_relative 'helpers/ss_playlist'
@@ -12,6 +13,8 @@ require_relative 'helpers/ss_tageditor'
 # so, this server should be publicly accessible
 # but the other, with access to the mp3s, shouldn't
 class StreamServer < Sinatra::Base
+  MAX_ITEM_LENGTH = 80
+
   set :bind, MP3S::Config::Net::SERVER_HOST
   set :port, MP3S::Config::Net::SERVER_PORT
   enable :dump_errors
@@ -68,6 +71,15 @@ class StreamServer < Sinatra::Base
   end
 
   # json
+  get '/playlist/json/:id' do |id|
+    f = Fetch.new
+    foo = Manip.shorten_titles(JSON.parse(f.playlist(id)), MAX_ITEM_LENGTH)
+    # each row has the playlist name (yeah, i know...)
+    @pname = foo[0]['name']
+    foo.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
+    foo.to_json
+  end
+
   get '/search/:name' do |name|
     f = Fetch.new(request.env['HTTP_HOST'])
     name = CGI.escape(name)

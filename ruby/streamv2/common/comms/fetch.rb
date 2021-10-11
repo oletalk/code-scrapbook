@@ -6,6 +6,7 @@ require_relative 'base_fetcher'
 require_relative 'fetch_playlist_mixin'
 require_relative '../util/cacheable'
 
+# class to make calls to DBServer
 class Fetch < BaseFetcher
   include Cacheable
   include FetchPlaylistMixin
@@ -29,14 +30,14 @@ class Fetch < BaseFetcher
     data
   end
 
-  def playlist_m3u(spec, downsample: false)
+  def playlist_m3u(spec)
     stg = go_get("#{PLAYLIST}m3u/#{spec}").dup
     stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...
     stg.gsub!(%r{http://\d+\.\d+\.\d+\.\d+:\d+/}, "http://#{@hostheader}/")
   end
 
-  def list(spec, downsample: false)
+  def list(spec)
     stg = go_get(LIST + spec).dup
     stg = stg.force_encoding('UTF-8')
     # TODO: need to replace internal HTTP_HOST - following is v hacky...

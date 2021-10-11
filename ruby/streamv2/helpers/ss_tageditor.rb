@@ -5,7 +5,9 @@ require_relative '../common/comms/fetch'
 require_relative '../common/text/manip'
 require 'json'
 
+# Sinatra module
 module Sinatra
+  # REST methods for the tag editor screens
   module TagEditorGUI
     def self.registered(app)
       app.get '/tag/:hash/:pid' do |hash, pid|
