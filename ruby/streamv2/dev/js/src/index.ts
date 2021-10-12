@@ -2,8 +2,7 @@
 //import Icon from './icon.png';
 import * as ReactDOM from 'react-dom'
 import * as React from 'react'
-import Search from './app/Search'
-import Playlist from './app/Playlist'
+import Container from './app/Container'
 
 const e = React.createElement
 
@@ -14,11 +13,9 @@ if (typeof psCustomProps !== 'undefined') {
   const props = JSON.parse(psCustomProps)
   playlistId = props['playlistId']
 }
+const container = e(Container, { playlistId: playlistId })
+
 ReactDOM.render(
-  e(Playlist, { playlistId: playlistId }),
+  container,
   rootElem
-)
-ReactDOM.render(
-  e(Search),
-  document.getElementById('search_section')
 )

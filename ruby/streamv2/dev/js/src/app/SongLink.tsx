@@ -1,8 +1,7 @@
 import * as React from 'react'
 // import * as PropTypes from 'prop-types';
 import Search from './Search'
-import { addToList } from './js/playlist_ui_t'
-import { SongObject } from './js/playlist_util_t'
+import { SongObject, SongFromJson, SongObjectToJson } from './js/playlist_util_t'
 // import TooltipBox from './TooltipBox'
 
 type SongLinkProps = {
@@ -58,7 +57,9 @@ export default class SongLink extends React.Component<SongLinkProps> {
 
   onClickFunc() {
     this.tooltipHide()
-    addToList("s_" + this.props.song.hash)
+    const s: SongFromJson = SongObjectToJson(this.props.song)
+    this.props.outerSearch.pushItemToPlaylist(s)
+    // addToList("s_" + this.props.song.hash)
     this.props.refreshHandler()
   }
 

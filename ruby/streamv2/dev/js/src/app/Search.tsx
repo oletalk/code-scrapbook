@@ -3,6 +3,7 @@ import axios from 'axios'
 import TooltipBox from './TooltipBox'
 import LineItem from './LineItem'
 import FetchButton from './FetchButton'
+import Container from './Container'
 import { songFromJson, SongFromJson } from './js/playlist_util_t'
 
 const MAX_LIST_LENGTH = 30
@@ -10,21 +11,36 @@ const MAX_LIST_LENGTH = 30
 type RespData = {
   data: SongFromJson[]
 }
+type SearchProps = {
+  container: Container
+}
 type SearchState = {
   query: string
   songs: SongFromJson[]
   tooltipBox: TooltipBox | null
 }
-export default class Search extends React.Component<SearchState> {
+export default class Search extends React.Component<SearchProps, SearchState> {
   constructor(props: any) {
     super(props)
     this.handleInputChange = this.handleInputChange.bind(this)
     this.addSongs = this.addSongs.bind(this)
+    this.itemAlreadyInPlaylist = this.itemAlreadyInPlaylist.bind(this)
+    this.pushItemToPlaylist = this.pushItemToPlaylist.bind(this)
+
+    this.props.container.setState({ innerSearch: this })
   }
   state: SearchState = {
     query: '',
     songs: [],
     tooltipBox: null
+  }
+
+  itemAlreadyInPlaylist = (s: string): boolean => {
+    return this.props.container.playlistHasItem(s)
+  }
+
+  pushItemToPlaylist = (s: SongFromJson) => {
+    this.props.container.addToPlaylist(s)
   }
 
   setTooltip = (t: TooltipBox) => {

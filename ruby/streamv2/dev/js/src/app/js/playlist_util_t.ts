@@ -20,6 +20,22 @@ type SongFromJson = {
   title_derived: string,
   secs_display?: string
 }
+
+// yeah, i know...
+function SongObjectToJson(s: SongObject): SongFromJson {
+  const ret: SongFromJson = {
+    counter: s.counter,
+    hash: s.hash,
+    title: s.title,
+    date_added: s.date_added,
+    plays: s.plays,
+    last_played: s.last_played,
+    secs_display: s.secs_display,
+    title_derived: s.title
+  }
+
+  return ret
+}
 function songFromJson(si: number, json: SongFromJson) {
   const songitem = json
   const item: SongObject = {
@@ -51,4 +67,4 @@ function nonnull(str: any) {
 }
 
 
-export { songFromJson, SongObject, SongFromJson }
+export { songFromJson, SongObject, SongFromJson, SongObjectToJson }

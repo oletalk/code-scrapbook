@@ -1,7 +1,6 @@
 import * as React from 'react'
 import SongLink from './SongLink'
 import Search from './Search'
-import { itemAlreadyInPlaylist } from './js/playlist_ui_t'
 import { SongObject } from './js/playlist_util_t'
 
 type LineItemProps = {
@@ -21,7 +20,7 @@ export default class LineItem extends React.Component<LineItemProps> {
 
   render() {
     const item = this.props.dataSource
-    return (itemAlreadyInPlaylist('s_' + item.hash) ?
+    return (this.props.outerSearch.itemAlreadyInPlaylist(item.hash) ?
       (
         <li id={'s_' + item.hash}>{item.title}</li>
       )

@@ -1,11 +1,13 @@
 import * as React from 'react'
 import axios from 'axios'
+import Container from './Container'
 import { songFromJson, SongFromJson } from './js/playlist_util_t'
 
 // TODO - complete pre-submit checks (check name and list not empty)
-//      - interaction with search box below it
+//      - change window title to include '(*)' for unsaved changes
 type PlaylistProps = {
-  playlistId: number | undefined
+  playlistId: number | undefined,
+  container: Container
 }
 type PlaylistState = {
   pid: number | undefined
@@ -29,6 +31,10 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
     this.setPname = this.setPname.bind(this)
     this.deleteSongs = this.deleteSongs.bind(this)
     this.savePlaylist = this.savePlaylist.bind(this)
+    this.hasItem = this.hasItem.bind(this)
+    this.addItem = this.addItem.bind(this)
+
+    this.props.container.setState({ innerPlaylist: this })
   }
   state: PlaylistState = {
     pid: undefined,
@@ -39,14 +45,37 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
     btnDisabled: { up: true, down: true }
   }
 
+  addItem(s: SongFromJson) {
+    // check.
+    if (this.hasItem(s.hash)) {
+      console.log('ERROR! This playlist already has this item')
+    } else {
+      const songList = [...this.state.songs]
+      songList.push(s)
+      this.setState({
+        songs: songList,
+        changed: true
+      })
+    }
+  }
+  hasItem(s: string) {
+    let ret = false
+    for (const song of this.state.songs) {
+      if (song.hash === s) {
+        ret = true
+        break
+      }
+    }
+    return ret
+  }
   setPname(e: any) {
     const t: HTMLInputElement = e.target
     this.setState({ pname: t.value, changed: true })
   }
-  checkBeforeLeaving(): void {
+  checkBeforeLeaving(e: React.MouseEvent): void {
     if (this.state.changed) {
-      if (confirm('You have unsaved changes. Really leave this page?')) {
-        console.log('TODO')
+      if (!confirm('You have unsaved changes. Really leave this page?')) {
+        e.preventDefault()
       }
     }
   }
@@ -184,7 +213,9 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
           remainingSongs.push(i)
         }
       }
+      // TODO: update the SongLink(s) with the hash(es) of the deleted song(s)
       this.setState({ changed: true, songs: remainingSongs })
+      this.props.container.state.innerSearch.forceUpdate()
     } else {
       alert('Please select at least one song to delete.')
     }
