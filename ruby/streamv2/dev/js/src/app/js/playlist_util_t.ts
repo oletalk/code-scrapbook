@@ -31,12 +31,12 @@ function SongObjectToJson(s: SongObject): SongFromJson {
     plays: s.plays,
     last_played: s.last_played,
     secs_display: s.secs_display,
-    title_derived: s.title
+    title_derived: s.derived
   }
 
   return ret
 }
-function songFromJson(si: number, json: SongFromJson) {
+function songFromJson(si: number, json: SongFromJson): SongObject {
   const songitem = json
   const item: SongObject = {
     counter: si,

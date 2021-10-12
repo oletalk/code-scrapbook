@@ -36,11 +36,11 @@ export default class Search extends React.Component<SearchProps, SearchState> {
   }
 
   itemAlreadyInPlaylist = (s: string): boolean => {
-    return this.props.container.playlistHasItem(s)
+    return this.props.container.state.innerPlaylist.hasItem(s)
   }
 
   pushItemToPlaylist = (s: SongFromJson) => {
-    this.props.container.addToPlaylist(s)
+    this.props.container.state.innerPlaylist.addItem(s)
   }
 
   setTooltip = (t: TooltipBox) => {

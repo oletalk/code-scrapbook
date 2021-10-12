@@ -4,7 +4,8 @@ import Container from './Container'
 import { songFromJson, SongFromJson } from './js/playlist_util_t'
 
 // TODO - complete pre-submit checks (check name and list not empty)
-//      - change window title to include '(*)' for unsaved changes
+//      - check new playlist saves successfully
+//      - bug: newly added item has no secs_display value
 type PlaylistProps = {
   playlistId: number | undefined,
   container: Container
@@ -31,6 +32,7 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
     this.setPname = this.setPname.bind(this)
     this.deleteSongs = this.deleteSongs.bind(this)
     this.savePlaylist = this.savePlaylist.bind(this)
+    this.checkPlaylist = this.checkPlaylist.bind(this)
     this.hasItem = this.hasItem.bind(this)
     this.addItem = this.addItem.bind(this)
 
@@ -187,6 +189,20 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
     }
   }
 
+  checkPlaylist() {
+    const errors: string[] = []
+    if (this.state.pname == '') {
+      errors.push('Please provide a name for the playlist')
+    }
+    if (this.state.songs.length < 2) {
+      errors.push('Please add at least 2 songs to the playlist')
+    }
+    if (errors.length === 0) {
+      this.savePlaylist()
+    } else {
+      alert(errors.join("\n"))
+    }
+  }
   savePlaylist() {
     const songids = this.state.songs.map((x) => x.hash)
     const data = {
@@ -198,6 +214,8 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
     axios.post('/playlist/save', data)
       .then((response) => {
         console.log(response)
+        this.setState({ changed: false })
+        alert('Your playlist was successfully saved!')
       }
       )
       .catch((error) => {
@@ -281,7 +299,7 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
         </table>
         <span>
           <input type='button' value='Delete' onClick={this.deleteSongs} /> &nbsp;
-          <input type='button' value='Save' onClick={this.savePlaylist} />
+          <input type='button' value='Save' onClick={this.checkPlaylist} />
         </span>
       </div>
     )
