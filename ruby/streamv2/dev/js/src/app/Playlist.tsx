@@ -1,10 +1,9 @@
 import * as React from 'react'
 import axios from 'axios'
 import Container from './Container'
-import { songFromJson, SongFromJson } from './js/playlist_util_t'
+import { songFromJson, SongObject } from './js/playlist_util_t'
 
 // TODO - complete pre-submit checks (check name and list not empty)
-//      - check new playlist saves successfully
 //      - bug: newly added item has no secs_display value
 type PlaylistProps = {
   playlistId: number | undefined,
@@ -13,7 +12,7 @@ type PlaylistProps = {
 type PlaylistState = {
   pid: number | undefined
   pname: string,
-  songs: SongFromJson[],
+  songs: SongObject[],
   selectedSongs: string[],
   changed: boolean,
   btnDisabled: { up: boolean, down: boolean }
@@ -47,7 +46,7 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
     btnDisabled: { up: true, down: true }
   }
 
-  addItem(s: SongFromJson) {
+  addItem(s: SongObject) {
     // check.
     if (this.hasItem(s.hash)) {
       console.log('ERROR! This playlist already has this item')
@@ -225,7 +224,7 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
 
   deleteSongs() {
     if (this.state.selectedSongs.length > 0) {
-      const remainingSongs: SongFromJson[] = []
+      const remainingSongs: SongObject[] = []
       for (const i of this.state.songs) {
         if (this.state.selectedSongs.indexOf(i.hash) === -1) {
           remainingSongs.push(i)

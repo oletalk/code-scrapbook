@@ -26,7 +26,7 @@ export default class LineItem extends React.Component<LineItemProps> {
       )
       :
       (
-        <li id={'s_' + item.hash} className={'title_' + item.derived}>
+        <li id={'s_' + item.hash} className={'title_' + item.title_derived}>
           <SongLink outerSearch={this.props.outerSearch} song={item} refreshHandler={this.refreshHandler} />
         </li>
       )

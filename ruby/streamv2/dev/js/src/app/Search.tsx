@@ -4,19 +4,19 @@ import TooltipBox from './TooltipBox'
 import LineItem from './LineItem'
 import FetchButton from './FetchButton'
 import Container from './Container'
-import { songFromJson, SongFromJson } from './js/playlist_util_t'
+import { songFromJson, SongObject } from './js/playlist_util_t'
 
 const MAX_LIST_LENGTH = 30
 
 type RespData = {
-  data: SongFromJson[]
+  data: SongObject[]
 }
 type SearchProps = {
   container: Container
 }
 type SearchState = {
   query: string
-  songs: SongFromJson[]
+  songs: SongObject[]
   tooltipBox: TooltipBox | null
 }
 export default class Search extends React.Component<SearchProps, SearchState> {
@@ -39,7 +39,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
     return this.props.container.state.innerPlaylist.hasItem(s)
   }
 
-  pushItemToPlaylist = (s: SongFromJson) => {
+  pushItemToPlaylist = (s: SongObject) => {
     this.props.container.state.innerPlaylist.addItem(s)
   }
 
@@ -76,7 +76,7 @@ export default class Search extends React.Component<SearchProps, SearchState> {
         .then(function (response) { // process search results
           if (Array.isArray(response.data)) {
 
-            let selectedSongs: SongFromJson[] = response.data
+            let selectedSongs: SongObject[] = response.data
             console.log('Got ' + selectedSongs.length + ' song(s).')
             selectedSongs = selectedSongs.slice(0, MAX_LIST_LENGTH)
             a.setState({

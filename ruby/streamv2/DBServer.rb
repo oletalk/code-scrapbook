@@ -131,7 +131,6 @@ class DBServer < Sinatra::Base
       song_list.each do |row|
         lp = row[:last_played]
         da = row[:date_added]
-
         row[:date_added] = Manip.date_from_db(da) unless da.nil?
         row[:last_played] = Manip.timestamp_from_db(lp) unless lp.nil?
       end

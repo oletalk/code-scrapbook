@@ -84,7 +84,9 @@ class StreamServer < Sinatra::Base
     f = Fetch.new(request.env['HTTP_HOST'])
     name = CGI.escape(name)
     response.headers['Content-Type'] = 'text/plain'
-    f.search(name, nil)
+    foo = JSON.parse(f.search(name, nil))
+    foo.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
+    foo.to_json
   end
 
   get '/query/latest' do

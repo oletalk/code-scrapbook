@@ -9,6 +9,8 @@ type ContainerState = {
   innerPlaylist: Playlist,
   innerSearch: Search
 }
+// this class is just here to allow passing of instructions
+// between the Playlist and the Search's components :-]
 export default class Container extends React.Component<ContainerProps, ContainerState> {
   constructor(props: any) {
     super(props)
