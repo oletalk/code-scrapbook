@@ -29,7 +29,7 @@ class Db
       file_hash,
       secs,
       #{TITLE_TERM_SNIPPET}
-  FROM mp3s_tags
+  FROM mp3s_metadata
           ))
 
   # method defs
@@ -54,7 +54,7 @@ class Db
       where category = 'SONG'
       and item =
         (select song_filepath
-         from mp3s_tags
+         from mp3s_metadata
          where file_hash = $1)
             })
     collection_from_sql(
@@ -72,7 +72,7 @@ class Db
     sql = Manip.collapse(%(
       select artist, title,
        #{TITLE_TERM_SNIPPET}
-       from mp3s_tags where file_hash = $1
+       from mp3s_metadata where file_hash = $1
     ))
 
     collection_from_sql(
@@ -111,7 +111,7 @@ class Db
     sql = Manip.collapse(%(
       select p.name, ps.file_hash, secs,
       #{TITLE_TERM_SNIPPET}
-      from mp3s_playlist p, mp3s_playlist_song ps, mp3s_tags t
+      from mp3s_playlist p, mp3s_playlist_song ps, mp3s_metadata t
       where ps.file_hash = t.file_hash
       and p.id = ps.playlist_id
       and #{criteria} = $1
@@ -199,7 +199,7 @@ class Db
   end
 
   def find_song(given_hash)
-    sql = 'SELECT song_filepath, artist, title FROM mp3s_tags WHERE file_hash = $1'
+    sql = 'SELECT song_filepath, artist, title FROM mp3s_metadata WHERE file_hash = $1'
 
     collection_from_sql(
       sql: sql,
@@ -239,7 +239,7 @@ class Db
           file_hash,
           secs,
           #{TITLE_TERM_SNIPPET}
-      FROM mp3s_tags
+      FROM mp3s_metadata
       where date_added > current_date - interval '1 month'
       order by date_added desc, song_filepath
       ))
@@ -264,7 +264,7 @@ class Db
           file_hash,
           secs,
           #{TITLE_TERM_SNIPPET}
-      FROM mp3s_tags
+      FROM mp3s_metadata
     ORDER by display_title
             ))
 
@@ -289,7 +289,7 @@ class Db
           secs, date_added,
           #{TITLE_TERM_SNIPPET},
           #{DERIVED_TITLE_SNIPPET}
-      FROM mp3s_tags t
+      FROM mp3s_metadata t
       LEFT OUTER JOIN mp3s_stats s
       ON s.item = t.song_filepath
         WHERE (upper(song_filepath) like upper($1)
@@ -316,7 +316,7 @@ class Db
 
   def save_tag(t_artist, t_title, t_hash)
     sql = Manip.collapse(%(
-      update mp3s_tags
+      update mp3s_metadata
       set artist = $1, title = $2
       where file_hash = $3
       ))
@@ -327,7 +327,7 @@ class Db
   end
 
   def update_tag_date(file_hash, dte)
-    sql = 'update mp3s_tags set date_added = $1 where file_hash = $2'
+    sql = 'update mp3s_metadata set date_added = $1 where file_hash = $2'
     connect_for('updating date on tag') do |conn|
       conn.prepare('update_tag1', sql)
       conn.exec_prepared('update_tag1', [dte, file_hash])
@@ -340,15 +340,15 @@ class Db
     if found_songs.nil? || found_songs.empty?
       connect_for('writing tag') do |conn|
         sql = Manip.collapse(%{
-            INSERT into mp3s_tags
+            INSERT into mp3s_metadata
             (song_filepath, file_hash, artist, title,secs)
             VALUES ($1, $2, $3, $4, $5)
             })
         conn.prepare('write_tag1', sql)
         conn.exec_prepared('write_tag1', [
-                            filename, hash, tagobj[:artist],
-                            tagobj[:title], tagobj[:secs]
-                          ])
+                             filename, hash, tagobj[:artist],
+                             tagobj[:title], tagobj[:secs]
+                           ])
       end
     elsif found_songs[0]['song_filepath'] != filename
       raise 'Given tag and hash do not match!'
