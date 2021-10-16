@@ -56,7 +56,7 @@ class Db
     ))
     collection_from_sql(
       sql: sql,
-      params: [hash],
+      params: nil,
       result_map: {
         tag_id: true,
         tag_desc: true
