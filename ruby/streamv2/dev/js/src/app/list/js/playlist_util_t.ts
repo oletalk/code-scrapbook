@@ -8,7 +8,7 @@ type SongObject = {
   plays: number,
   last_played: string,
   title_derived: string, /* did we invent a title for display (1), or is the file tagged in the db (0) */
-  secs_display?: string
+  secs_display: string /* we are not using secs - raw # of seconds */
 }
 
 function songFromJson(si: number, json: SongObject): SongObject {

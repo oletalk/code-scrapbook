@@ -1,7 +1,9 @@
 var webpack = require("webpack");
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    list: './src/index.ts',
+  },
   mode: 'none', // don't think we've anything different between environments...
   module: {
     // Use `ts-loader` on any file that ends in '.ts'
@@ -17,14 +19,14 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
   },
-    plugins: [
-      // fix "process is not defined" error
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('development')
-      })
+  plugins: [
+    // fix "process is not defined" error
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('development')
+    })
   ],
-    output: {
-    filename: 'bundle.js',
+  output: {
+    filename: "[name].bundle.js",
     path: `${process.cwd()}/../../public/js/spa`,
   }
 };

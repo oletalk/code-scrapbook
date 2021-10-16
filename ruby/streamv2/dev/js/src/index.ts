@@ -2,7 +2,7 @@
 //import Icon from './icon.png';
 import * as ReactDOM from 'react-dom'
 import * as React from 'react'
-import Container from './app/Container'
+import Container from './app/list/Container'
 
 const e = React.createElement
 
