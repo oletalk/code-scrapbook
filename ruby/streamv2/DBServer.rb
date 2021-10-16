@@ -149,6 +149,11 @@ class DBServer < Sinatra::Base
     end
   end
 
+  get '/tags/:hash' do |hash|
+    song_tags = @db.tags_for_song(hash)
+    Format.json(song_tags)
+  end
+
   get '/tags/list' do
     all_tags = @db.all_tags_list
     Format.json(all_tags)

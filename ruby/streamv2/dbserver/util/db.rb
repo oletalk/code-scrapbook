@@ -65,6 +65,25 @@ class Db
     )
   end
 
+  def tags_for_song(hash)
+    sql = Manip.collapse(%(
+      select t.tag_id, t.tag_desc
+      from mp3s_tags t, mp3s_metadata_tags mt
+      where mt.tag_id = t.tag_id
+      and file_hash = $1
+      order by t.tag_desc
+    ))
+    collection_from_sql(
+      sql: sql,
+      params: [hash],
+      result_map: {
+        tag_id: true,
+        tag_desc: true
+      },
+      description: 'fetching descriptive tags for song'
+    )
+  end
+
   def get_info_json(hash)
     sql = Manip.collapse(%{
       select plays, last_played
