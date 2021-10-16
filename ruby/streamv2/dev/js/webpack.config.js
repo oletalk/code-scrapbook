@@ -3,6 +3,7 @@ var webpack = require("webpack");
 module.exports = {
   entry: {
     list: './src/index.ts',
+    tags: './src/tags.ts'
   },
   mode: 'none', // don't think we've anything different between environments...
   module: {
@@ -21,6 +22,9 @@ module.exports = {
   },
   plugins: [
     // fix "process is not defined" error
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('development')
+    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
     })

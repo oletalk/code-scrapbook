@@ -47,9 +47,12 @@
       </table>
       <input id="hash" type="hidden" name="hash" value="<%= @hash %>" />
       <input id="playlist_id" type="hidden" name="playlist_id" value="<%= @playlist_id %>" />
+    </form>
+    <div class="layout" id="tageditor_section" data-custom-props='{ "songHash": "<%= @hash %>" }'>
+    </div>
       <input type="submit" value="Save Tag"/>
       <input type="button" value="Cancel" onClick="window.history.back()"/>
-    </form>
+    <script src="/js/spa/tags.bundle.js"></script>
 
   </BODY>
 </HTML>
