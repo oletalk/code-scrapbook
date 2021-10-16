@@ -47,6 +47,24 @@ class Db
     )
   end
 
+  # fetch descriptive tags, not the metadata we used to call 'tags' :-)
+  def all_tags_list
+    sql = Manip.collapse(%(
+      select tag_id, tag_desc
+      from mp3s_tags
+      order by tag_desc
+    ))
+    collection_from_sql(
+      sql: sql,
+      params: [hash],
+      result_map: {
+        tag_id: true,
+        tag_desc: true
+      },
+      description: 'fetching descriptive tag info'
+    )
+  end
+
   def get_info_json(hash)
     sql = Manip.collapse(%{
       select plays, last_played
