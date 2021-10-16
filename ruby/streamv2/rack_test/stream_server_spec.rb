@@ -30,7 +30,9 @@ describe 'The StreamServer app' do
     @mock_fetch = double(Fetch)
     allow(@mock_fetch).to receive(:start).with(any_args) { 'OK' }
     allow(@mock_fetch).to receive(:fetch).with('abcdefg', downsample: false) { 'foo' }
-    allow(@mock_fetch).to receive(:search).with('hijkl', nil) { 'searchresult' }
+    allow(@mock_fetch).to receive(:search).with('hijkl', nil) {
+                            '[{ "secs": 63 }]'
+                          }
     Fetch.stub(:new).and_return(@mock_fetch)
 
     # set test ranges - allow/allow with downsample/reject
@@ -62,6 +64,6 @@ describe 'The StreamServer app' do
 
     get '/search/hijkl', {}, { 'REMOTE_ADDR' => '192.168.0.6' }
     expect(last_response).to be_ok
-    expect(last_response.body).to eq('searchresult')
+    expect(last_response.body).to eq('[{"secs":63,"secs_display":"1:03"}]')
   end
 end
