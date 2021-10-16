@@ -68,7 +68,7 @@ class Db
     )
   end
 
-  def get_tag_info(hash)
+  def get_metadata_info(hash)
     sql = Manip.collapse(%(
       select artist, title,
        #{TITLE_TERM_SNIPPET}
@@ -232,7 +232,7 @@ class Db
     )
   end
 
-  def fetch_latest_tags
+  def fetch_latest_metadata
     sql = Manip.collapse(%(
       SELECT
           date_added,
@@ -257,7 +257,7 @@ class Db
     )
   end
 
-  def fetch_all_tags
+  def fetch_all_metadata
     sql = Manip.collapse(%(
       SELECT
           date_added,

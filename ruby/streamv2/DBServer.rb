@@ -103,7 +103,7 @@ class DBServer < Sinatra::Base
   end
 
   get '/query/latest' do
-    song_list = @db.fetch_latest_tags
+    song_list = @db.fetch_latest_metadata
     song_list.each do |row|
       row[:date_added] = Manip.date_from_db(row[:date_added])
     end
@@ -112,7 +112,7 @@ class DBServer < Sinatra::Base
   end
 
   get '/query/random/:number' do |number|
-    song_list = @db.fetch_all_tags
+    song_list = @db.fetch_all_metadata
     num = number.to_i
     num = song_list.size if num > song_list.size
     ret = []
@@ -150,7 +150,7 @@ class DBServer < Sinatra::Base
   end
 
   get '/tag/:hash' do |hash|
-    tag_info = @db.get_tag_info(hash)
+    tag_info = @db.get_metadata_info(hash)
     Format.json(tag_info)
   end
 

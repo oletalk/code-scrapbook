@@ -40,7 +40,7 @@ describe 'The DBServer backend app' do
                          [{ hash: '9388fevh', secs: '334', title: 'Something' },
                           { hash: '599h05t9', secs: '210', title: 'A Remix' }]
                        }
-    allow(@mock_db).to receive(:fetch_all_tags) {
+    allow(@mock_db).to receive(:fetch_all_metadata) {
                          [{ hash: 'sdljkflkj', secs: '200', title: 'A Tune' }, \
                           { hash: '4908gt08g', secs: '133', title: 'Something' }, \
                           { hash: 'sfaesfafd', secs: '132', title: 'Tune three' }, \
@@ -80,7 +80,8 @@ describe 'The DBServer backend app' do
 
   it 'receives a connection request with an invalid JWT' do
     expect do
-      get '/pass/sdfdsfsd', {}, { 'HTTP_HOST' => '192.168.0.6:8080', 'REMOTE_ADDR' => '192.168.0.6' }
+      get '/pass/sdfdsfsd', {},
+          { 'HTTP_HOST' => '192.168.0.6:8080', 'REMOTE_ADDR' => '192.168.0.6' }
     end.to raise_error(JWT::DecodeError)
   end
 
