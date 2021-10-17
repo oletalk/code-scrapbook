@@ -94,7 +94,7 @@ class Db
 
   def del_descriptive_tag(hash, tag_id)
     connect_for('removing a tag from a song') do |conn|
-      sql = 'delete from mp3s_metadata_tags where tag_id = $1 and file_hash = $2)'
+      sql = 'delete from mp3s_metadata_tags where tag_id = $1 and file_hash = $2'
       conn.prepare('del_desc_tag', sql)
       conn.exec_prepared('del_desc_tag', [tag_id, hash])
     end
