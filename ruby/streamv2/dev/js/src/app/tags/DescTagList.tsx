@@ -38,6 +38,23 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
   }
   addTag(tagId: number) {
     console.log('adding tag id ' + tagId)
+    const data = {
+      hash: this.props.hash,
+      tag_id: tagId
+    }
+    console.log(data)
+    axios.post('/tags/add', data)
+      .then((response) => {
+        console.log(response)
+        alert('Your tag was successfully added!')
+      }
+      )
+      .catch((error) => {
+        console.log(error)
+      })
+      .finally(() => {
+        this.fetchTags()
+      })
     this.setState({ showTagMenu: false })
   }
   toggleAddTagMenu() {

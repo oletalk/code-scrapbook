@@ -50,6 +50,20 @@ module FetchPlaylistMixin
             })
   end
 
+  def add_desc_tag(hash, tag_id)
+    go_post("#{TAGS}/add", {
+              hash: hash,
+              tag_id: tag_id
+            })
+  end
+
+  def del_desc_tag(hash, tag_id)
+    go_post("#{TAGS}/del", {
+              hash: hash,
+              tag_id: tag_id
+            })
+  end
+
   def all_desc_tags
     go_get("#{TAGS}list")
   end
@@ -57,5 +71,4 @@ module FetchPlaylistMixin
   def song_tags(hash)
     go_get(TAGS + hash)
   end
-
 end

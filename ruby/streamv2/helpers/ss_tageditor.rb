@@ -33,6 +33,24 @@ module Sinatra
         end
       end
 
+      app.post '/tags/del' do
+        # this is coming from axios so
+        payload = JSON.parse(request.body.read)
+        t_hash = payload['hash']
+        t_tag_id = payload['tag_id']
+        f = Fetch.new
+        f.del_desc_tag(t_hash, t_tag_id)
+      end
+
+      app.post '/tags/add' do
+        # this is coming from axios so
+        payload = JSON.parse(request.body.read)
+        t_hash = payload['hash']
+        t_tag_id = payload['tag_id']
+        f = Fetch.new
+        f.add_desc_tag(t_hash, t_tag_id)
+      end
+
       app.get '/tags/list' do
         f = Fetch.new
         f.all_desc_tags
