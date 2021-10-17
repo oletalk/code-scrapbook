@@ -49,7 +49,7 @@ class BaseFetcher
     when 200
       response.body.to_s
     when 404
-      Log.log.error("*** NOT FOUND: #{url}")
+      Log.log.error('*** URI NOT FOUND')
       '404 Not Found'
     when 500...600
       puts 'DBServer had an error - check its logs'

@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 module FetchPlaylistMixin
+  TAGS = '/tags/'
   PLAYLIST = '/playlist/'
   PLAYLISTS = '/playlists'
-  TAG = '/tag/'
+  METADATA = '/tag/'
   PLAYLIST_SAVE = '/playlist/save'
-  TAG_SAVE = '/tag/save'
+  METADATA_SAVE = '/tag/save'
   QUERY = '/query/'
   SEARCH = '/search/'
 
@@ -40,12 +41,21 @@ module FetchPlaylistMixin
   end
 
   def tag(hash)
-    go_get(TAG + hash)
+    go_get(METADATA + hash)
   end
 
   def savetag(tag_artist, tag_title, tag_hash, playlist_id)
-    go_post(TAG_SAVE, {
+    go_post(METADATA_SAVE, {
               artist: tag_artist, title: tag_title, hash: tag_hash, playlist: playlist_id
             })
   end
+
+  def all_desc_tags
+    go_get("#{TAGS}list")
+  end
+
+  def song_tags(hash)
+    go_get(TAGS + hash)
+  end
+
 end

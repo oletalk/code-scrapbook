@@ -84,19 +84,25 @@ class StreamServer < Sinatra::Base
     f = Fetch.new(request.env['HTTP_HOST'])
     name = CGI.escape(name)
     response.headers['Content-Type'] = 'text/plain'
-    foo = JSON.parse(f.search(name, nil))
-    foo.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
-    foo.to_json
+    add_secs_display(f.search(name, nil))
   end
 
   get '/query/latest' do
     f = Fetch.new(request.env['HTTP_HOST'])
-    f.latestsongs
+    add_secs_display(f.latestsongs)
   end
 
   get '/query/random/:number' do |number|
     f = Fetch.new(request.env['HTTP_HOST'])
-    f.randomlist(number)
+    add_secs_display(f.randomlist(number))
+  end
+
+  helpers do
+    def add_secs_display(resp_string)
+      ret = JSON.parse(resp_string)
+      ret.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
+      ret.to_json
+    end
   end
 
   run! if app_file == $PROGRAM_NAME

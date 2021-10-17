@@ -32,6 +32,16 @@ module Sinatra
           redirect "/playlist/#{playlist_id}"
         end
       end
+
+      app.get '/tags/list' do
+        f = Fetch.new
+        f.all_desc_tags
+      end
+
+      app.get '/tags/:hash' do |hash|
+        f = Fetch.new
+        f.song_tags(hash)
+      end
     end
   end
   register TagEditorGUI
