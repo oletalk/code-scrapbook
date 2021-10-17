@@ -145,10 +145,34 @@ span.tooltipshow {
   border-radius: 3px;
 
 }
+.tagMenuItem:hover {
+  background-color:#f5dd88;
+  width: 100%;
+}
+.add-tag-link {
+  text-decoration: none;
+  font-weight:300;
+}
+.tagMenuItem {
+  color: rgb(144, 144, 197);
+}
+.taglist-item {
+  margin-right:6px;
+  background-color: #d1d3ba;
+}
+.taglist-container {
+  border: 1px solid #333333;
+}
+ul.taglist {
+  list-style-type: none;
+  margin: auto;
+  display: block;
+  width: 100%;
+  padding: 5px;
+}
 
 .tooltipshow  {
   width:400px;
-
   visibility: visible;
   transition: opacity 600ms, visibility 600ms;
 }
@@ -165,7 +189,21 @@ ul.click > li :hover {
   transition: background 0.2s ease-in;
   color: #f5dd88;
 }
-
+div.tagMenu {
+  border: 1px solid #ffffff;
+  max-height: 200px;
+  transition: max-height 0.5s;
+  background-color: #cddce5;
+}
+div.tagMenu-hidden {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.5s;
+  background-color: #cddce5;
+}
+.tag-link-small {
+  font-size: smaller;
+}
 /* when new items appear they slide in from below */
 @keyframes slide-up {
     0% {
