@@ -1,4 +1,4 @@
-var webpack = require("webpack");
+var webpack = require("webpack")
 
 module.exports = {
   entry: {
@@ -33,4 +33,4 @@ module.exports = {
     filename: "[name].bundle.js",
     path: `${process.cwd()}/../../public/js/spa`,
   }
-};
+}
