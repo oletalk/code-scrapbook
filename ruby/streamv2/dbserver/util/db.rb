@@ -84,6 +84,22 @@ class Db
     )
   end
 
+  def add_descriptive_tag(hash, tag_id)
+    connect_for('adding a tag to a song') do |conn|
+      sql = 'insert into mp3s_metadata_tags values ($1, $2)'
+      conn.prepare('add_desc_tag', sql)
+      conn.exec_prepared('add_desc_tag', [tag_id, hash])
+    end
+  end
+
+  def del_descriptive_tag(hash, tag_id)
+    connect_for('removing a tag from a song') do |conn|
+      sql = 'delete from mp3s_metadata_tags where tag_id = $1 and file_hash = $2)'
+      conn.prepare('del_desc_tag', sql)
+      conn.exec_prepared('del_desc_tag', [tag_id, hash])
+    end
+  end
+
   def get_info_json(hash)
     sql = Manip.collapse(%{
       select plays, last_played

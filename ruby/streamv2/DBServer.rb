@@ -160,6 +160,20 @@ class DBServer < Sinatra::Base
     Format.json(song_tags)
   end
 
+  post '/tags/add/:hash/:tag_id' do
+    t_hash = params['hash']
+    t_tag_id = params['tag_id']
+    @db.add_descriptive_tag(t_hash, t_tag_id)
+    '{ "result": "success" }'
+  end
+
+  post '/tags/del/:hash/:tag_id' do
+    t_hash = params['hash']
+    t_tag_id = params['tag_id']
+    @db.del_descriptive_tag(t_hash, t_tag_id)
+    '{ "result": "success" }'
+  end
+
   get '/tag/:hash' do |hash|
     tag_info = @db.get_metadata_info(hash)
     Format.json(tag_info)
