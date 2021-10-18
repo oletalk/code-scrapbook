@@ -64,6 +64,11 @@ class DBServer < Sinatra::Base
 
   get '/playlist/:id' do |id|
     x = @db.fetch_playlist(id)
+    # augment each with its tags
+    x.each do |song|
+      t = @db.tags_for_song(song[:hash])
+      song[:tags] = t
+    end
     Format.json(x)
   end
 
