@@ -29,6 +29,9 @@ describe 'The DBServer backend app' do
     @recordstats = []
 
     @mock_db = double(Db)
+    allow(@mock_db).to receive(:tags_for_song).with('9388fevh') {
+      []
+    }
     allow(@mock_db).to receive(:fetch_search).with('tune') {
       [{ hash: 'sdljkflkj', secs: '200', title: 'A Tune' }, \
        { hash: '4908gt08g', secs: '190', title: 'Tuneful' }]
@@ -150,7 +153,7 @@ describe 'The DBServer backend app' do
   it 'fetches an existing playlist' do
     mock_db
 
-    expected_playlist = '[{"name":"random","hash":"9388fevh","secs":"334","title":"Something"}]'
+    expected_playlist = '[{"name":"random","hash":"9388fevh","secs":"334","title":"Something","tags":[]}]'
     get '/playlist/2', {}, { 'HTTP_HOST' => '192.168.0.6:8080' }
     expect(last_response).to be_ok
     expect(last_response.body).to eq(expected_playlist)
