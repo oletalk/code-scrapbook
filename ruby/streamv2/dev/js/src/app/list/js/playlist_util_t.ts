@@ -6,9 +6,15 @@ type SongObject = {
   title: string,
   date_added: string,
   plays: number,
+  tags: TagObject[],
   last_played: string,
   title_derived: string, /* did we invent a title for display (1), or is the file tagged in the db (0) */
   secs_display: string /* we are not using secs - raw # of seconds */
+}
+
+type TagObject = {
+  tag_id: number,
+  tag_desc: string
 }
 
 function songFromJson(si: number, json: SongObject): SongObject {
@@ -16,6 +22,7 @@ function songFromJson(si: number, json: SongObject): SongObject {
   const item: SongObject = {
     counter: si,
     hash: songitem.hash,
+    tags: [],
     title: fixTitle(songitem.title),
     date_added: nonnull(songitem.date_added),
     plays: nonnull(songitem.plays),
@@ -42,4 +49,4 @@ function nonnull(str: any) {
 }
 
 
-export { songFromJson, SongObject }
+export { songFromJson, SongObject, TagObject }

@@ -2,21 +2,19 @@ import * as React from 'react'
 import DescTag from './DescTag'
 import LiLink from './LiLink'
 import axios from 'axios'
+import { TagObject } from '../list/js/playlist_util_t'
 
 type TagListProps = {
   hash: string
 }
 
-type DescriptiveTag = {
-  tag_id: number,
-  tag_desc: string
-}
 type TagListState = {
   changed: boolean,
   anyTagsLeft: boolean,
   showTagMenu: boolean,
-  songTags: DescriptiveTag[],
-  allTags: DescriptiveTag[]
+  songTags: TagObject[],
+  allTags: TagObject[]
+  tagMenuTitle: string
 }
 
 export default class DescTagList extends React.Component<TagListProps, TagListState> {
@@ -35,7 +33,12 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     anyTagsLeft: true,
     showTagMenu: false,
     songTags: [],
-    allTags: []
+    allTags: [],
+    tagMenuTitle: '+'
+  }
+
+  get newTagName(): string {
+    return this.state.showTagMenu ? '-' : '+'
   }
   doPostAction(action: string, tagId: number) {
     console.log('going to ' + action + ' tag id ' + tagId)
@@ -62,7 +65,10 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     this.setState({ showTagMenu: false })
   }
   toggleAddTagMenu() {
-    this.setState({ showTagMenu: !this.state.showTagMenu })
+    this.setState({
+      tagMenuTitle: this.newTagName,
+      showTagMenu: !this.state.showTagMenu
+    })
   }
   deleteTag(tagId: number) {
     this.doPostAction('del', tagId)
@@ -92,7 +98,7 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     this.fetchTags()
   }
 
-  isInSongTags(tag: DescriptiveTag): boolean {
+  isInSongTags(tag: TagObject): boolean {
     // const tagids = this.state.songTags.map((t) => { return t.tag_id })
     // console.log(tagids)
     return this.state.songTags
@@ -117,7 +123,7 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
                       callback={() => this.deleteTag(row.tag_id)} />
                   })}
                   {this.state.anyTagsLeft
-                    && <LiLink text="+" callback={this.toggleAddTagMenu} />}
+                    && <LiLink title="add tag" text={this.newTagName} callback={this.toggleAddTagMenu} />}
                 </div>
                 {this.state.anyTagsLeft
                   && <div className={'tagMenu' + (this.state.showTagMenu ? '' : '-hidden')}>
