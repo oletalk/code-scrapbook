@@ -22,7 +22,7 @@ function songFromJson(si: number, json: SongObject): SongObject {
   const item: SongObject = {
     counter: si,
     hash: songitem.hash,
-    tags: [],
+    tags: songitem.tags,
     title: fixTitle(songitem.title),
     date_added: nonnull(songitem.date_added),
     plays: nonnull(songitem.plays),

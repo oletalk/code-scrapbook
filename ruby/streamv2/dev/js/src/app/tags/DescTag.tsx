@@ -16,7 +16,7 @@ export default class DescTag extends React.Component<TagProps> {
     return (
       <span className="taglist-item" key={this.props.tag_id}>
         <a className="tag-link" href="#"
-          onClick={this.props.callback}><span className="tag-link-small">x</span></a> {this.props.tag_desc}
+          onClick={this.props.callback}> <span className="tag-link-small">x</span> </a> {this.props.tag_desc}
       </span>
     )
   }

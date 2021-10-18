@@ -14,7 +14,8 @@ type TagListState = {
   showTagMenu: boolean,
   songTags: TagObject[],
   allTags: TagObject[]
-  tagMenuTitle: string
+  tagMenuTitle: string,
+  message: string
 }
 
 export default class DescTagList extends React.Component<TagListProps, TagListState> {
@@ -34,7 +35,8 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     showTagMenu: false,
     songTags: [],
     allTags: [],
-    tagMenuTitle: '+'
+    tagMenuTitle: '+',
+    message: ''
   }
 
   get newTagName(): string {
@@ -50,7 +52,12 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     axios.post('/tags/' + action, data)
       .then((response) => {
         console.log(response)
-        alert(action + ' on tag was successful!')
+        // alert(action + ' on tag was successful!')
+        this.setState({ message: action + ' on tag was successful!' })
+        const a = this
+        setTimeout(() => {
+          a.setState({ message: '' })
+        }, 2000)
       }
       )
       .catch((error) => {
@@ -137,6 +144,9 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
             </tr>
           </tbody>
         </table>
+        {this.state.message
+          && <span className="taglist-message">{this.state.message}</span>
+        }
       </div >
     )
   }

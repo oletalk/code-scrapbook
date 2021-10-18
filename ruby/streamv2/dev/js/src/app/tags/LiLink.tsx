@@ -2,6 +2,7 @@ import * as React from 'react'
 
 type LiLinkProps = {
   text: string,
+  title: string,
   callback: () => void
 }
 
@@ -13,7 +14,7 @@ export default class LiLink extends React.Component<LiLinkProps> {
   render() {
     return (
       <span className="taglist_item">
-        <a className="tag-link" href="#"
+        <a title={this.props.title} className="tag-link" href="#"
           onClick={this.props.callback}>{this.props.text}</a>
       </span>
     )

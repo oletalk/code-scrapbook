@@ -159,16 +159,14 @@ span.tooltipshow {
 .taglist-item {
   margin-right:6px;
   background-color: #d1d3ba;
+  border-radius: 6px;
+  padding: 3px;
 }
 .taglist-container {
   border: 1px solid #333333;
 }
-ul.taglist {
-  list-style-type: none;
-  margin: auto;
-  display: block;
-  width: 100%;
-  padding: 5px;
+div.taglist {
+  padding: 3px;
 }
 
 .tooltipshow  {
@@ -203,6 +201,10 @@ div.tagMenu-hidden {
 }
 .tag-link-small {
   font-size: smaller;
+}
+span.taglist-message {
+  border: 1px solid #553344;
+  color:#715634;
 }
 /* when new items appear they slide in from below */
 @keyframes slide-up {
