@@ -1,6 +1,7 @@
 import * as React from 'react'
 import DescTag from './DescTag'
 import LiLink from './LiLink'
+import TagMenu from './TagMenu'
 import axios from 'axios'
 import { TagObject } from '../list/js/playlist_util_t'
 
@@ -27,7 +28,6 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     this.addTag = this.addTag.bind(this)
     this.doPostAction = this.doPostAction.bind(this)
     this.toggleAddTagMenu = this.toggleAddTagMenu.bind(this)
-    this.isInSongTags = this.isInSongTags.bind(this)
   }
   state: TagListState = {
     changed: false,
@@ -105,14 +105,6 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     this.fetchTags()
   }
 
-  isInSongTags(tag: TagObject): boolean {
-    // const tagids = this.state.songTags.map((t) => { return t.tag_id })
-    // console.log(tagids)
-    return this.state.songTags
-      .map((t) => { return t.tag_id })
-      .indexOf(tag.tag_id) != -1
-  }
-
   render() {
     return (
       <div>
@@ -133,13 +125,11 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
                     && <LiLink title="add tag" text={this.newTagName} callback={this.toggleAddTagMenu} />}
                 </div>
                 {this.state.anyTagsLeft
-                  && <div className={'tagMenu' + (this.state.showTagMenu ? '' : '-hidden')}>
-                    {this.state.allTags.filter((row) => { return !this.isInSongTags(row) }).map((row) => {
-                      return <div className='tagMenuItem' key={row.tag_id}>
-                        <a className="add-tag-link" href="#" onClick={() => this.addTag(row.tag_id)}>{row.tag_desc}</a>
-                      </div>
-                    })}
-                  </div>}
+                  && <TagMenu
+                    songTags={this.state.songTags}
+                    allTags={this.state.allTags}
+                    showMenu={this.state.showTagMenu}
+                    addTagCallback={this.addTag} />}
               </td>
             </tr>
           </tbody>
@@ -151,4 +141,3 @@ export default class DescTagList extends React.Component<TagListProps, TagListSt
     )
   }
 }
-

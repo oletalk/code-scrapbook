@@ -190,6 +190,7 @@ ul.click > li :hover {
 div.tagMenu {
   border: 1px solid #ffffff;
   max-height: 200px;
+  overflow: hidden;
   transition: max-height 0.5s;
   background-color: #cddce5;
 }
