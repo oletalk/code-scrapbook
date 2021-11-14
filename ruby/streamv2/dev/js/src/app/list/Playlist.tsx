@@ -52,7 +52,11 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
       console.log('ERROR! This playlist already has this item')
     } else {
       const songList = [...this.state.songs]
-      songList.push(s)
+      const newsong = s
+      if (typeof s.tags === 'undefined') {
+        newsong.tags = []
+      }
+      songList.push(newsong)
       this.setState({
         songs: songList,
         changed: true

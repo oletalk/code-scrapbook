@@ -100,7 +100,11 @@ class StreamServer < Sinatra::Base
   helpers do
     def add_secs_display(resp_string)
       ret = JSON.parse(resp_string)
-      ret.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
+      if ret.instance_of?(Hash) && ret.key?('error')
+        Log.log.error ret['error']
+      else
+        ret.each { |s| s['secs_display'] = Manip.time_display(s['secs']) }
+      end
       ret.to_json
     end
   end
