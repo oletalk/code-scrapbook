@@ -158,12 +158,15 @@ span.tooltipshow {
 }
 .taglist-item {
   margin-right:6px;
+  color:#003474;
   background-color: #d1d3ba;
   border-radius: 6px;
   padding: 3px;
+  font-size: large;
 }
 .taglist-container {
-  border: 1px solid #333333;
+  border: none;
+  background-color: grey;
 }
 div.taglist {
   padding: 3px;
@@ -202,6 +205,16 @@ div.tagMenu-hidden {
 }
 .tag-link-small {
   font-size: smaller;
+}
+a.tag-link {
+  text-decoration: none;
+  color: firebrick;
+}
+a:hover.tag-link {
+  color: #886633;
+}
+a:hover.tag-link {
+  text-decoration: underline;
 }
 span.taglist-message {
   border: 1px solid #553344;
