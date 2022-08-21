@@ -289,9 +289,9 @@ export default class Playlist extends React.Component<PlaylistProps, PlaylistSta
                     return <option
                       onDoubleClick={() => this.editTag(item.hash)}
                       key={item.hash} value={item.hash}
-                      id={item.hash} >{item.title} [ {item.secs_display} ] {item.tags.map((tag_row) => {
+                      id={item.hash} >{item.title} [ {item.secs_display} ] {typeof item.tags !== 'undefined' ? item.tags.map((tag_row) => {
                         return '<' + tag_row.tag_desc + '> '
-                      })}</option>
+                      }) : ''}</option>
                   })}
                 </select>
               </td>
