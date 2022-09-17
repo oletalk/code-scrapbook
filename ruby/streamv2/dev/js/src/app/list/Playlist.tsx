@@ -1,3 +1,5 @@
+/// <reference lib="es2020" />
+// not sure why i need the above as the compiler option for es2020 is there in tsconfig.json
 import * as React from 'react'
 import axios from 'axios'
 import Container from './Container'
