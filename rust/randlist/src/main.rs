@@ -1,7 +1,8 @@
 extern crate clap;
 extern crate rand;
 use clap::{App, ArgMatches};
-use rand::{thread_rng, Rng};
+use rand::prelude::SliceRandom;
+use rand::thread_rng;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
@@ -76,7 +77,8 @@ fn main() {
         .map(|line| (line, 1))
         .collect::<HashMap<_, _>>();
     // spit out randomised lines
-    thread_rng().shuffle(lines.as_mut_slice());
+    let mut rng = thread_rng();
+    lines.as_mut_slice().shuffle(&mut rng);
 
     let randlist = lines.into_iter().filter(|&x| !omitcheck.contains_key(x));
     let mut count = 0;
