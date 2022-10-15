@@ -15,7 +15,7 @@ module Db
   rescue StandardError => e
     puts e.message
   ensure
-    conn&.close # conn.close if conn (Style/SafeNavigation)
+    conn&.close # i.e., "conn.close if conn" (Style/SafeNavigation)
   end
 
   def new_connection

@@ -1,5 +1,8 @@
 # Copied from https://gist.github.com/jhass/a5ae80d87f18e53e7b56 on 3/5/21
 
+AllCops:
+  TargetRubyVersion: 3.0
+
 # Commonly used screens these days easily fit more than 80 characters.
 Metrics/LineLength:
   Max: 100

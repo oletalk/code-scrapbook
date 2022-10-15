@@ -1,0 +1,18 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>sign in</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+  </HEAD>
+  <BODY>
+  
+    <div class="layout">
+      <% if @error %>
+    <p class="error"><%= @error %></p>
+  <% end %>
+    <p>
+    Hello <%= @user.user_name %>
+    </p>
+    </div>
+  </BODY>
+</HTML>

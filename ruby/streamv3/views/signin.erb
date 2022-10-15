@@ -1,0 +1,28 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>sign in</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+  </HEAD>
+  <BODY>
+  
+    <div class="layout">
+      <% if @error %>
+    <p class="error"><%= @error %></p>
+  <% end %>
+
+    <form action="/sign_in" onSubmit="" method="POST">
+      <div>
+        <input name="username" value="" placeholder="username" />
+      </div>
+      <div>
+        <input name="password" type="password" value="" placeholder="password" />
+      </div>
+            <div>
+      <input type="submit" value="Save Tag"/>
+      </div>
+    </form>
+
+  </div>
+  </BODY>
+</HTML>
