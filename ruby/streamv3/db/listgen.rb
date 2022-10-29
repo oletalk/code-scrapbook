@@ -11,7 +11,7 @@ class ListGen
   end
 
   # fetch the playlist i use 90+% of the time...
-  def fetch_all
+  def fetch_all_tunes
     ret = "#EXTM3U\n".dup # don't freeze the initial string plz
     connect_for('full playlist') do |conn|
       sql = File.read('./sql/all_tunes.sql')

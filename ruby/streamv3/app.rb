@@ -29,7 +29,11 @@ class StreamServer < Sinatra::Base
     content_type 'text/plain'
   end
 
-  # PLAYLISTS
+  # PLAYLISTS (JSON)
+  get '/playlists' do
+  end
+
+  # PLAYLISTS (M3U)
   get '/m3u/all' do
     lg = ListGen.new(hostheader: request.env['HTTP_HOST'])
     lg.fetch_all
