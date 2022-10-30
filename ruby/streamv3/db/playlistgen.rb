@@ -30,7 +30,7 @@ class PlaylistGen
         end
       end
     end
-    ret
+    ret.to_json
   end
 
   def fetch_tunes(name:)
@@ -49,6 +49,6 @@ class PlaylistGen
         end
       end
     end
-    ret
+    ret.to_json
   end
 end

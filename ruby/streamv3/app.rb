@@ -31,6 +31,13 @@ class StreamServer < Sinatra::Base
 
   # PLAYLISTS (JSON)
   get '/playlists' do
+    plg = PlaylistGen.new(hostheader: request.env['HTTP_HOST'])
+    plg.fetch_all_playlists
+  end
+
+  get '/playlist/:name' do |name|
+    plg = PlaylistGen.new(hostheader: request.env['HTTP_HOST'])
+    plg.fetch_tunes(name: name)
   end
 
   # PLAYLISTS (M3U)
