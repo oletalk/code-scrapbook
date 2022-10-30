@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'db/listgen'
+require_relative 'db/playlistgen'
 require_relative 'util/crypt'
 require 'sinatra/base'
 

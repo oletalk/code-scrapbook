@@ -20,6 +20,6 @@ module Db
 
   def new_connection
     PG.connect(host: MP3S::Config::Db::SERVER_HOST, dbname: MP3S::Config::Db::NAME,
-               user: MP3S::Config::Db::USER)
+               user: MP3S::Config::Db::USER, password: MP3S::Config::Db::PASSWORD)
   end
 end
