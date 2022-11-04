@@ -27,6 +27,9 @@ class StreamServer < Sinatra::Base
   # end
 
   before do
+    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Headers'] = 'Accept, Authorization, Origin'
     content_type 'text/plain'
   end
 
