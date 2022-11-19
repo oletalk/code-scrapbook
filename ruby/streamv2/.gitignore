@@ -3,3 +3,4 @@ npm-debug.log
 dev/js/dist
 public/js/spa
 .hmac
+pw.txt

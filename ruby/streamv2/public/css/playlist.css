@@ -3,13 +3,14 @@ body {
   font-family: sans-serif, Arial;
 }
 
-table tr > td:first-child {
-    min-width: 100px;
+table tr>td:first-child {
+  min-width: 100px;
 }
 
-table.playlists > tr {
+table.playlists>tr {
   border: 1px solid #000000;
 }
+
 .playlist_name {
   font-style: normal;
   font-weight: bold;
@@ -28,7 +29,7 @@ div.info {
 }
 
 span.control {
-    width: 80%;
+  width: 80%;
 }
 
 table.layout {
@@ -38,6 +39,7 @@ table.layout {
 img.disabled {
   opacity: 25%;
 }
+
 img.up {
   height: 30px;
   width: 50px;
@@ -56,38 +58,46 @@ table.playlists {
   padding-top: 15px;
   border-spacing: 0px;
 }
+
 div.disabled-actions {
   font-weight: bold;
   font-style: italic;
   color: gray;
 }
+
 div.actions:hover {
   background: #f9ac32;
   transition: background 0.5s ease-out;
 }
+
 table.playlist_entry {
   border: 1px solid black;
   background-color: #FBAB7E;
   background-image: linear-gradient(79deg, #FBAB7E 0%, #F7CE68 53%);
 }
-table.playlists tr > td {
+
+table.playlists tr>td {
   padding: 3px;
 }
+
 div.layout {
   width: 80%;
   padding: 5px;
 }
+
 div#search_section {
   width: 340px;
 }
+
 select#playlist {
   min-width: 250px;
   width: 95%;
   resize: vertical;
-  font-family: Arial,sans-serif;
-  font-size:small;
+  font-family: Arial, sans-serif;
+  font-size: small;
   background: peachpuff;
 }
+
 ul.click {
   list-style-type: none;
   padding: 0;
@@ -95,7 +105,8 @@ ul.click {
   background-color: #f5dd88;
   cursor: pointer;
 }
-ul.click > li {
+
+ul.click>li {
   color: #715634;
   padding: 2px 4px;
   border-bottom: 1px solid #555;
@@ -103,15 +114,16 @@ ul.click > li {
   animation: slide-up 0.4s ease;
 }
 
-ul.click > li.inlist {
+ul.click>li.inlist {
   list-style-type: disc;
 }
 
 input#latestBtn {
-    margin-left: 20px;
+  margin-left: 20px;
 }
+
 input#randomBtn {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 
 li.title_1 {
@@ -134,6 +146,11 @@ div.tooltipshow {
   background-color: #555;
   visibility: visible;
 }
+
+.error {
+  color: red;
+}
+
 span.tooltipshow {
   visibility: visible;
 
@@ -141,39 +158,45 @@ span.tooltipshow {
   /* background-color: #555; */
   color: white;
   text-align: left;
-  font-size:14px;
+  font-size: 14px;
   border-radius: 3px;
 
 }
+
 .tagMenuItem:hover {
-  background-color:#f5dd88;
+  background-color: #f5dd88;
   width: 100%;
 }
+
 .add-tag-link {
   text-decoration: none;
-  font-weight:300;
+  font-weight: 300;
 }
+
 .tagMenuItem {
   color: rgb(144, 144, 197);
 }
+
 .taglist-item {
-  margin-right:6px;
-  color:#003474;
+  margin-right: 6px;
+  color: #003474;
   background-color: #d1d3ba;
   border-radius: 6px;
   padding: 3px;
   font-size: large;
 }
+
 .taglist-container {
   border: none;
   background-color: grey;
 }
+
 div.taglist {
   padding: 3px;
 }
 
-.tooltipshow  {
-  width:400px;
+.tooltipshow {
+  width: 400px;
   visibility: visible;
   transition: opacity 600ms, visibility 600ms;
 }
@@ -182,14 +205,15 @@ a {
   font-weight: bold;
 }
 
-ul.click > li :hover {
+ul.click>li :hover {
   background-color: #553344;
-  -o-transition:background 0.2s ease-in;
-  -moz-transition:background 0.2s ease-in;
-  -webkit-transition:background 0.2s ease-in;
+  -o-transition: background 0.2s ease-in;
+  -moz-transition: background 0.2s ease-in;
+  -webkit-transition: background 0.2s ease-in;
   transition: background 0.2s ease-in;
   color: #f5dd88;
 }
+
 div.tagMenu {
   border: 1px solid #ffffff;
   max-height: 200px;
@@ -197,37 +221,45 @@ div.tagMenu {
   transition: max-height 0.5s;
   background-color: #cddce5;
 }
+
 div.tagMenu-hidden {
   max-height: 0px;
   overflow: hidden;
   transition: max-height 0.5s;
   background-color: #cddce5;
 }
+
 .tag-link-small {
   font-size: smaller;
 }
+
 a.tag-link {
   text-decoration: none;
   color: firebrick;
 }
+
 a:hover.tag-link {
   color: #886633;
 }
+
 a:hover.tag-link {
   text-decoration: underline;
 }
+
 span.taglist-message {
   border: 1px solid #553344;
-  color:#715634;
+  color: #715634;
 }
+
 /* when new items appear they slide in from below */
 @keyframes slide-up {
-    0% {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

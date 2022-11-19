@@ -15,7 +15,8 @@ module MP3S
       },
       '109.148.232.0/24' => { allow: true, downsample: true },
       '130.209.164.0/24' => { allow: true, downsample: true, playlist_ro: true },
-      '130.209.6.0/24' => { allow: true, downsample: true, playlist_ro: true }
+      '130.209.6.0/24' => { allow: true, downsample: true, playlist_ro: true },
+      '81.98.226.0/24' => { allow: true, downsample: true, playlist_ro: true }
     }.freeze
 
     Default = { allow: false, playlist: false, playlist_ro: false, listen: false }.freeze
