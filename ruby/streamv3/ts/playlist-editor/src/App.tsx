@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import Playlist from './components/Playlist'
+import SearchBox from './SearchBox'
 
 function App() {
   return (
     <div className="App">
       hello world!!
-      <Playlist id={0} />
+      <SearchBox name="foo" />
     </div>
   );
 }

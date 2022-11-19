@@ -13,6 +13,34 @@
   }
 }
 
+.playlist-header {
+  text-align: center;
+  margin: 1px;
+  border: 1px solid black;
+}
+
+.playlist-item-hidden {
+  opacity: 0;
+  overflow: hidden;
+  height: 0px;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  border: 1px solid white;
+  transition: all 0.2s linear 0.2s;
+}
+
+.playlist-item {
+  opacity: 1;
+  height: 20px;
+  background-color: blanchedalmond;
+  text-align: left;
+  margin: 1px;
+  border: 1px solid midnightblue;
+  padding: 3px 10px 3px 10px;
+  transition: all 0.2s linear 0.2s;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -32,6 +60,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
