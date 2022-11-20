@@ -8,8 +8,8 @@ interface PlaylistListProps {
 interface PlaylistDesc {
     name: string,
     owner: string,
-    date_created: string,
-    date_modified: string
+    date_created: Date,
+    date_modified: Date
 }
 
 const PlaylistList: FC<PlaylistListProps> = (props: PlaylistListProps) => {
@@ -29,13 +29,12 @@ const PlaylistList: FC<PlaylistListProps> = (props: PlaylistListProps) => {
     return(
         <>
         {plList.map(pl => (
-        <li>
           <Playlist
+             key={pl.name}
              name={pl.name}
              owner={pl.owner}
              date_created={pl.date_created}
              date_modified={pl.date_modified} />
-        </li>
       ))}
         </>
     )
