@@ -1,22 +1,29 @@
 import axios from 'axios'
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 
 interface PlaylistProps {
-  id: number
+  name: string,
+  owner: string,
+  date_created: string,
+  date_modified: string
 }
+interface SongDesc {
+  title: string,
+  url: string,
+  secs: string
+}
+const Playlist: FC<PlaylistProps> = (props: PlaylistProps) => {
+  const [playlist, setPlaylist] = useState<Array<SongDesc>>([])
 
-const Playlist: FC<PlaylistProps> = ({ id }) => {
-  const [playlist, setPlaylist] = useState({})
-
-
-  const url = '' // use REACT_APP_OLD_BACKEND to check what old backend did
-  axios.get(url + '/playlists' + id)
-    .then(response => setPlaylist(response.data))
-
-
+  useEffect(() => {
+    const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
+    axios.get(url + '/playlist/' + props.name)
+      .then(response => setPlaylist(response.data))
+  
+}, [props.name])
   return (
     <>
-      <div className="playlist">Playlist id {id}</div>
+      <div className="playlist">Playlist "{props.name}" (owner {props.owner})</div>
     </>
   )
 

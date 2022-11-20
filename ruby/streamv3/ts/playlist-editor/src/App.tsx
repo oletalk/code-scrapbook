@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import Playlist from './components/Playlist'
+import PlaylistList from './components/PlaylistList'
 
 function App() {
   return (
     <div className="App">
       hello world!!
-      <Playlist id={0} />
+      <PlaylistList owner='me' />
     </div>
   );
 }
