@@ -1,56 +1,56 @@
 import * as React from 'react'
 import axios from 'axios'
+import { FC, useState, useEffect } from 'react'
 
-type PlaylistProps = {
+interface PlaylistProps {
   name: string,
+  owner: string,
+  date_created: Date,
+  date_modified: Date
 }
-type PlaylistState = {
-  songs: Song[],
+interface SongDesc {
+  title: string,
+  url: string,
+  secs: string
+}
+interface PlaylistState {
+  songs: Array<SongDesc>,
   expanded: boolean
 }
-type Song = { /* TODO: put into library file */
-  secs: number,
-  title: string,
-  url: string
-}
-
-export default class Playlist extends React.Component<PlaylistProps, PlaylistState> {
-  constructor(props: any) {
-    super(props)
-    this.loadPlaylist = this.loadPlaylist.bind(this)
-    this.toggleList = this.toggleList.bind(this)
-  }
-  state: PlaylistState = {
+const Playlist: FC<PlaylistProps> = (props: PlaylistProps) => {
+  const [playlist, setPlaylist] = useState<PlaylistState>({
     songs: [],
     expanded: false
-  }
-  loadPlaylist = () => {
-    let a = this
-    const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
-    axios.get(url + '/playlist/' + this.props.name)
-      .then(response => a.setState({
-        songs: response.data
-      }))
+  })
 
-  }
-  toggleList = () => {
-    this.setState({
-      expanded: !(this.state.expanded)
+  useEffect(() => {
+    const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
+    axios.get(url + '/playlist/' + props.name)
+      .then(response => {
+        const plsongs: Array<SongDesc> = response.data
+        setPlaylist({
+          songs: plsongs,
+          expanded: false
+      })
     })
-  }
-  componentDidMount(): void {
-    this.loadPlaylist()
-  }
-  render() {
-    return (
-      <div>
-        <div onClick={this.toggleList} className='playlist-header'>Playlist: {this.props.name}</div>
-        {this.state.songs.map((row: Song, index: number) => {
-          return <div
-            className={this.state.expanded ? 'playlist-item' : 'playlist-item-hidden'}
-            key={index}>{row.title}</div>
-        })}
+  
+}, [props.name])
+  return (
+    <>
+      <div className="playlist">
+      Playlist "{props.name}" (owner {props.owner})
+        <ul className={playlist.expanded ? 'list-expanded' : 'list-collapsed'}>
+          {playlist.songs.map(song => (
+          <li>{song.title}</li>
+        ))}
+        </ul>
       </div>
-    )
-  }
+    </>
+  )
+
+
 }
+
+
+
+export default Playlist
