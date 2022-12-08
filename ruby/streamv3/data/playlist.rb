@@ -2,7 +2,7 @@
 
 require 'json'
 
-# holds information about a user of the management gui
+# holds information about a playlist (not its contents)
 class NamedPlaylist
   attr_reader :name,
               :owner,
