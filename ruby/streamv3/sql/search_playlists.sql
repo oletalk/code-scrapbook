@@ -1,9 +1,14 @@
 select name,
-  file_hash,
-  secs,
+  owner,
+  date_created,
+  date_modified,
   display_title
 from (
-    select p.name,
+    select p.id,
+      p.name,
+      p.owner,
+      p.date_created,
+      p.date_modified,
       m.file_hash,
       secs,
       case
