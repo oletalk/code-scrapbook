@@ -46,7 +46,7 @@ class StreamServer < Sinatra::Base
 
   get '/search/:spec' do |spec|
     plg = PlaylistGen.new(hostheader: request.env['HTTP_HOST'])
-    plg.search_playlists(spec: spec)
+    plg.search_playlists(spec: spec.downcase)
   end
 
   # PLAYLISTS (M3U)
