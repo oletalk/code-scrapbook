@@ -37,18 +37,25 @@ class PlaylistGen
     ret = [] # don't freeze the initial string plz
 
     playlist_sql = File.read('./sql/search_playlists.sql')
+    old_pls = ''.dup
     connect_for('playlists with tune') do |conn|
       conn.prepare('pls_sql', playlist_sql)
       conn.exec_prepared('pls_sql', ["\%#{spec}\%"]) do |result|
         result.each do |result_row|
+          next unless old_pls != result_row['name']
+
           # hash = result_row['file_hash']
           # url = "http://#{@hh}/play/#{hash}"
+          # TODO: the results include a row for each occurrence
+          #       of a tune matching the search
+          #       we'll skip these for now
           ret.push(
             NamedPlaylist.new(
               result_row['name'], result_row['owner'],
               result_row['date_created'], result_row['modified']
             )
           )
+          old_pls = result_row['name']
         end
       end
     end
