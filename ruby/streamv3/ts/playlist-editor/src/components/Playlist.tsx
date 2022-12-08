@@ -23,6 +23,16 @@ const Playlist: FC<PlaylistProps> = (props: PlaylistProps) => {
     expanded: false
   })
 
+  function toggleExpanded() {
+    const ex = playlist.expanded
+    setPlaylist(prevPlaylist => {
+      return {
+        ...prevPlaylist, /* js spread syntax. this includes everything else already in prevPlaylist */
+        expanded: !ex
+      }
+    })
+  }
+
   useEffect(() => {
     const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
     axios.get(url + '/playlist/' + props.name)
@@ -31,18 +41,19 @@ const Playlist: FC<PlaylistProps> = (props: PlaylistProps) => {
         setPlaylist({
           songs: plsongs,
           expanded: false
+        })
       })
-    })
-  
-}, [props.name])
+
+  }, [props.name])
   return (
     <>
       <div className="playlist">
-      Playlist "{props.name}" (owner {props.owner})
-        <ul className={playlist.expanded ? 'list-expanded' : 'list-collapsed'}>
-          {playlist.songs.map(song => (
-          <li>{song.title}</li>
-        ))}
+        <span className={playlist.expanded ? 'list-expanded' : 'list-collapsed'}
+          onClick={toggleExpanded}>Playlist "{props.name}" (owner {props.owner}) {playlist.expanded ? '^' : 'V'}</span>
+        <ul className={playlist.expanded ? 'ul-expanded' : 'ul-collapsed'}>
+          {playlist.songs.map((song, index) => (
+            <li className={playlist.expanded ? 'playlist-item' : 'playlist-item-hidden'} key={index}>{song.title}</li>
+          ))}
         </ul>
       </div>
     </>

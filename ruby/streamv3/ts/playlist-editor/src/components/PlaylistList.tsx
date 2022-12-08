@@ -3,7 +3,8 @@ import Playlist from './Playlist'
 import { FC, useState, useEffect } from 'react'
 
 interface PlaylistListProps {
-    owner: string
+    owner: string,
+    highlights: Array<string>
 }
 interface PlaylistDesc {
     name: string,
@@ -13,7 +14,7 @@ interface PlaylistDesc {
 }
 
 const PlaylistList: FC<PlaylistListProps> = (props: PlaylistListProps) => {
-    
+
     const [plList, setPLList] = useState<Array<PlaylistDesc>>([])
 
     /* 'componentDidMount' */
@@ -23,19 +24,19 @@ const PlaylistList: FC<PlaylistListProps> = (props: PlaylistListProps) => {
 
         console.log('we want playlists for ' + props.owner)
         axios.get(url + '/playlists')
-        .then(response => setPLList(response.data))    
+            .then(response => setPLList(response.data))
     }, [props.owner])
 
-    return(
+    return (
         <>
-        {plList.map(pl => (
-          <Playlist
-             key={pl.name}
-             name={pl.name}
-             owner={pl.owner}
-             date_created={pl.date_created}
-             date_modified={pl.date_modified} />
-      ))}
+            {plList.map(pl => (
+                <Playlist
+                    key={pl.name}
+                    name={pl.name}
+                    owner={pl.owner}
+                    date_created={pl.date_created}
+                    date_modified={pl.date_modified} />
+            ))}
         </>
     )
 
