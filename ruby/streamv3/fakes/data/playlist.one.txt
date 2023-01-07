@@ -1,0 +1,7 @@
+[
+{'title':'song a','url':'http://127.0.0.1:345/play/6f7d6a8d7f6d','secs':'202'}
+{'title':'song b','url':'http://127.0.0.1:345/play/d8g79s8d7d7f','secs':'138'}
+{'title':'song c','url':'http://127.0.0.1:345/play/f8g9s6g5a0s7','secs':'184'}
+{'title':'song d','url':'http://127.0.0.1:345/play/j4k6h4j3d3j6','secs':'124'}
+{'title':'song e','url':'http://127.0.0.1:345/play/c8vj3nv6fn21','secs':'138'}
+]
