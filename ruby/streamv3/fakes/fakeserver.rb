@@ -21,7 +21,7 @@ class FakeStreamServer < Sinatra::Base
     # validate it - just want alphanumeric chars, no funny stuff
     if name =~ /^\w+$/
       filename = "data/playlist.#{name}.txt"
-      if File.exists(filename)
+      if File.exist?(filename)
         File.read(filename).chomp
       else
         "[{'error': 'playlist does not exist'}]"
