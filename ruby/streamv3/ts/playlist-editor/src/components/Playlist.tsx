@@ -51,7 +51,7 @@ const Playlist: FC<PlaylistProps> = (props: PlaylistProps) => {
   }
 
   useEffect(() => {
-    const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
+    const url = process.env.REACT_APP_BACKEND
     axios.get(url + '/playlist/' + props.name)
       .then(response => {
         const plsongs: Array<SongDesc> = response.data

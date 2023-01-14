@@ -20,7 +20,7 @@ const PlaylistList: FC<PlaylistListProps> = (props: PlaylistListProps) => {
     /* 'componentDidMount' */
     useEffect(() => {
         console.log('loading....')
-        const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
+        const url = process.env.REACT_APP_BACKEND
 
         console.log('we want playlists for ' + props.owner)
         axios.get(url + '/playlists')

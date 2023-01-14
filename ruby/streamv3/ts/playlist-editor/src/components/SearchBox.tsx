@@ -38,7 +38,7 @@ const SearchBox: FC<SearchBoxProps> = (props: SearchBoxProps) => {
   function searchForPlaylists() {
     if (searchbox.search.length >= 3) {
       console.log('searching for playlists with search string ' + searchbox.search)
-      const url = 'http://192.168.0.2:1234' // use REACT_APP_OLD_BACKEND to check what old backend did
+      const url = process.env.REACT_APP_BACKEND
       axios.get(url + '/search/' + searchbox.search)
         .then(response => {
           const plsongs: Array<PlaylistProps> = response.data
