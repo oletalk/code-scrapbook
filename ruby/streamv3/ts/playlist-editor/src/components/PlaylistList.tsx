@@ -31,6 +31,8 @@ const PlaylistList: FC<PlaylistListProps> = (props: PlaylistListProps) => {
         <>
             {plList.map(pl => (
                 <Playlist
+                    allowEdit={true}
+                    highlighted={props.highlights.indexOf(pl.name) !== -1}
                     key={pl.name}
                     name={pl.name}
                     owner={pl.owner}
