@@ -9,7 +9,8 @@ class HashSong
   attr_reader :file_hash,
               :secs,
               :song_filepath,
-              :display_title
+              :display_title,
+              :found
 
   def initialize(hash:)
     connect_for('fetching song data from hash') do |conn|
@@ -25,7 +26,7 @@ class HashSong
           found_song = true
         end
       end
-      puts "no song found for hash #{hash}" unless found_song
+      @found = found_song
     end
   end
 end
