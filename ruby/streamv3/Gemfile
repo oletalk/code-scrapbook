@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-gem 'pg', '~> 1.4.3'
 gem 'iostreams', '~> 1.10.3'
+gem 'pg', '~> 1.4.3'
 gem 'sinatra', '~> 3.0.2'
