@@ -3,6 +3,8 @@
 require_relative 'db/listgen'
 require_relative 'db/playlistgen'
 require_relative 'util/crypt'
+require_relative 'db/hashsong'
+require_relative 'stream/stream'
 require 'sinatra/base'
 
 # lg = ListGen.new
@@ -31,6 +33,23 @@ class StreamServer < Sinatra::Base
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Accept, Authorization, Origin'
     content_type 'text/plain'
+  end
+
+  # PLAY STREAM (main)
+  get '/play/:hash' do |hash|
+    # find file containing that hash
+    song = HashSong.new(hash)
+
+    # if it exists, stream it back
+    if song.found
+      stream do |out|
+        st = Stream.new(song.file_songpath)
+        out.puts st.readall
+        out.flush
+      end
+    else
+      puts 'Invalid hash!'
+    end
   end
 
   # PLAYLISTS (JSON)
