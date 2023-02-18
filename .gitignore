@@ -4,6 +4,7 @@
 *DS_Store*
 .log
 .class
+node_modules
 
 # Example code in package build process
 *-Ex.R
