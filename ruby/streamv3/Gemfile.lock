@@ -2,29 +2,38 @@ GEM
   remote: https://rubygems.org/
   specs:
     iostreams (1.10.3)
+    multi_json (1.15.0)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     pg (1.4.4)
-    rack (2.2.4)
-    rack-protection (3.0.2)
+    rack (2.2.6.3)
+    rack-protection (3.0.4)
       rack
     ruby2_keywords (0.0.5)
-    sinatra (3.0.2)
+    sinatra (3.0.4)
       mustermann (~> 3.0)
       rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.0.2)
+      rack-protection (= 3.0.4)
       tilt (~> 2.0)
-    tilt (2.0.11)
+    sinatra-contrib (3.0.4)
+      multi_json
+      mustermann (~> 3.0)
+      rack-protection (= 3.0.4)
+      sinatra (= 3.0.4)
+      tilt (~> 2.0)
+    tilt (2.1.0)
 
 PLATFORMS
   universal-darwin-22
   x86_64-darwin-20
   x86_64-freebsd-12
+  x86_64-linux
 
 DEPENDENCIES
   iostreams (~> 1.10.3)
   pg (~> 1.4.3)
-  sinatra (~> 3.0.2)
+  sinatra (~> 3.0.4)
+  sinatra-contrib (~> 3.0.2)
 
 BUNDLED WITH
    2.2.22
