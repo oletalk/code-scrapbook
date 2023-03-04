@@ -6,12 +6,14 @@ require_relative 'util/crypt'
 require_relative 'db/hashsong'
 require_relative 'stream/stream'
 require 'sinatra/base'
+require 'sinatra/streaming' # so we can use 'stream do'
 
 # lg = ListGen.new
 # puts lg.fetch_playlist('programming')
 
 # main app to take requests for playlists and songs from clients
 class StreamServer < Sinatra::Base
+  helpers Sinatra::Streaming
   enable :dump_errors
   enable :sessions
   # TODO: -
@@ -36,20 +38,21 @@ class StreamServer < Sinatra::Base
   end
 
   # PLAY STREAM (main)
-  get '/play/:hash' do |hash|
+  get '/play/:hsh' do |hsh|
+   stream do |out|
     # find file containing that hash
-    song = HashSong.new(hash)
+    song = HashSong.new(hash:hsh.to_s)
 
     # if it exists, stream it back
     if song.found
-      stream do |out|
-        st = Stream.new(song.file_songpath)
-        out.puts st.readall
-        out.flush
-      end
+      puts "Streaming #{song.song_filepath}"
+      st = SongStream.new(song.song_filepath.to_s)
+      out.puts st.readall
+      out.flush
     else
       puts 'Invalid hash!'
     end
+   end
   end
 
   # PLAYLISTS (JSON)
