@@ -3,5 +3,5 @@
 source 'https://rubygems.org'
 gem 'iostreams', '~> 1.10.3'
 gem 'pg', '~> 1.4.3'
-gem 'sinatra', '~> 3.0.2'
+gem 'sinatra', '~> 3.0.4'
 gem 'sinatra-contrib', '~> 3.0.2'
