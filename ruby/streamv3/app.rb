@@ -39,20 +39,20 @@ class StreamServer < Sinatra::Base
 
   # PLAY STREAM (main)
   get '/play/:hsh' do |hsh|
-   stream do |out|
-    # find file containing that hash
-    song = HashSong.new(hash:hsh.to_s)
+    stream do |out|
+      # find file containing that hash
+      song = HashSong.new(hash: hsh.to_s)
 
-    # if it exists, stream it back
-    if song.found
-      puts "Streaming #{song.song_filepath}"
-      st = SongStream.new(song.song_filepath.to_s)
-      out.puts st.readall
-      out.flush
-    else
-      puts 'Invalid hash!'
+      # if it exists, stream it back
+      if song.found
+        puts "Streaming #{song.song_filepath}"
+        st = SongStream.new(song.song_filepath.to_s)
+        out.puts st.readall
+        out.flush
+      else
+        puts 'Invalid hash!'
+      end
     end
-   end
   end
 
   # PLAYLISTS (JSON)
@@ -74,7 +74,7 @@ class StreamServer < Sinatra::Base
   # PLAYLISTS (M3U)
   get '/m3u/all' do
     lg = ListGen.new(hostheader: request.env['HTTP_HOST'])
-    lg.fetch_all
+    lg.fetch_all_tunes
   end
 
   get '/m3u/:name' do |name|
