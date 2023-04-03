@@ -72,12 +72,11 @@ class SenderHandler
   def update_sender(sender)
     raise TypeError, 'update_sender expects a Sender' unless sender.is_a?(Sender)
 
-    sql = 'update bills.sender set name = $1, username = $2, password_hint = $3, '\
-          'comments = $4) where id = $5'
+    sql = 'update bills.sender set username = $1, password_hint = $2, '\
+          'comments = $3 where id = $4'
     connect_for('updating a sender') do |conn|
       conn.prepare('upd_sender', sql)
       conn.exec_prepared('upd_sender', [
-                           sender.name,
                            sender.username,
                            sender.password_hint,
                            sender.comments,

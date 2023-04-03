@@ -4,7 +4,7 @@ require_relative 'senderaccount'
 
 # holds information about the sender of a document (account you have with them)
 class Sender
-  attr_reader :id, :created_at
+  attr_reader :id, :created_at, :sender_accounts
   attr_accessor :name, :username, :password_hint, :comments
 
   def initialize(id_, created_at_)

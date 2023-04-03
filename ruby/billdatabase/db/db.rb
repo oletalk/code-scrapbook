@@ -14,7 +14,7 @@ module Db
     end
   rescue StandardError => e
     puts "problem connecting for #{description}"
-    puts e.message
+    raise e
   ensure
     conn&.close # i.e., "conn.close if conn" (Style/SafeNavigation)
   end

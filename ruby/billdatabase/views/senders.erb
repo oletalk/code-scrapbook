@@ -1,0 +1,27 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>view/edit senders</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+  </HEAD>
+  <BODY>
+
+    <h2>Sender list</h2>
+    <div class="layout" id="doctype_section">
+      <table class="senderlist">
+      <% @senders.each_with_index do |sender, index| %>
+      <tr>
+        <td colspan='4'><b><a href="/sender/<%= sender.id %>"><%= sender.name %></a></b></td>
+      </tr>
+      <tr>
+        <td><label>Username</label><span class='optional'> (optional)</span></td><td><%= sender.username %></b></td>
+        <td><label>Password hint</label><span class='optional'> (optional)</span></td><td><%= sender.password_hint %></b></td>
+      </tr>
+      <tr>
+        <td><label>Comments</label></td><td colspan='3'><%= sender.comments %></td>
+      </tr>
+      <% end %>
+      </table>
+    </div>
+  </BODY>
+</HTML>

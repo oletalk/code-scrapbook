@@ -1,0 +1,16 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>edit document types</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+  </HEAD>
+  <BODY>
+
+    <h2>Document Types</h2>
+    <div class="layout" id="doctype_section">
+      <% @doctypes.each_with_index do |type, index| %>
+      <div><%= type.name %></div>
+      <% end %>
+    </div>
+  </BODY>
+</HTML>
