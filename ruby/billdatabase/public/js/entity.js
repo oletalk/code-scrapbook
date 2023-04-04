@@ -1,7 +1,23 @@
-function foo() {
-  alert('hello')
+function go(url) {
+  window.location.replace(url)
 }
 
+function addSender() {
+  const data = collectElementsOfFrom('sender_field', document)
+  axios.post('/sender_new', data)
+    .then((response) => {
+      const new_id = response.data.id
+      if (typeof new_id !== 'undefined') {
+        console.log(response.data)
+        window.location.replace('/sender/' + new_id)
+      } else {
+        console.error('no new id returned - save did not work')
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
 
 function updateSender(sid) {
   const data = collectElementsOfFrom('sender_field', document)

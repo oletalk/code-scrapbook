@@ -10,3 +10,13 @@ body {
   width: 90%;
   display: table;
 }
+
+.optional {
+  font-size: smaller;
+  font-style: italic;
+}
+
+label {
+  font-weight: 700;
+  color: darkblue;
+}

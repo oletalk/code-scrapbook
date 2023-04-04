@@ -14,13 +14,18 @@
         <td colspan='4'><b><a href="/sender/<%= sender.id %>"><%= sender.name %></a></b></td>
       </tr>
       <tr>
-        <td><label>Username</label><span class='optional'> (optional)</span></td><td><%= sender.username %></b></td>
-        <td><label>Password hint</label><span class='optional'> (optional)</span></td><td><%= sender.password_hint %></b></td>
+        <td><label>Username</label><span class='optional'> (optional): </span></td><td><%= sender.username %></b></td>
+        <td><label>Password hint</label><span class='optional'> (optional): </span></td><td><%= sender.password_hint %></b></td>
       </tr>
       <tr>
         <td><label>Comments</label></td><td colspan='3'><%= sender.comments %></td>
       </tr>
       <% end %>
+      <tr>
+        <td colspan='4'>
+          <button onClick="go('/sender_new')">create new sender</button>
+        </td>
+      </tr>
       </table>
     </div>
   </BODY>

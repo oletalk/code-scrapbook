@@ -12,10 +12,11 @@ class SenderHandler
   include Db
 
   def add_sender(sender)
+    ret = nil
     raise TypeError, 'add_sender expects a Sender' unless sender.is_a?(Sender)
 
     sql = 'insert into bills.sender (name, username, password_hint, '\
-          'comments) values ($1, $2, $3, $4)'
+          'comments) values ($1, $2, $3, $4) returning id'
     connect_for('adding a new sender') do |conn|
       conn.prepare('add_sender', sql)
       conn.exec_prepared('add_sender', [
@@ -23,8 +24,14 @@ class SenderHandler
                            sender.username,
                            sender.password_hint,
                            sender.comments
-                         ])
+                         ]) do |result|
+                           result.each do |result_row|
+                             ret = result_row['id']
+                           end
+                         end
     end
+    puts "new id returned: #{ret}"
+    ret
   end
 
   def add_sender_account(account)

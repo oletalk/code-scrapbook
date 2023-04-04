@@ -1,0 +1,42 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>add new sender</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/js/entity.js" type="text/javascript" ></script>
+  </HEAD>
+  <BODY>
+
+    <h2>Add New Sender</h2>
+    <div class="layout" id="doctype_section">
+      <table class="senderdetail">
+      <tr>
+        <td>Name:</td><td colspan='3'><b><input class='sender_field' name="name"></b></td>
+      </tr>
+      <tr>
+        <td><label>Username</label><span class='optional'> (optional)</span></td><td colspan='2'><input name="username" class='sender_field' /></td><td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><label>Password hint</label><span class='optional'> (optional)</span></td><td colspan='2'><input name="password_hint" class='sender_field' /></td><td>&nbsp;</td>
+      </tr>
+          <tr>
+            <td colspan='4'>
+              <div class='sender_account' >
+                <div>
+                (Save sender first before adding accounts)
+                </div>
+              </div>
+            </td>
+          </tr>
+      <tr>
+        <td><label>Comments</label></td><td colspan='3'><textarea class='sender_field' name='comments'></textarea></td>
+      </tr>
+      <tr>
+        <td colspan='4'>
+          <button onClick="addSender()">add sender</button>
+        </td>
+      </table>
+    </div>
+  </BODY>
+</HTML>

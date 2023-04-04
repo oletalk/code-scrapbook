@@ -15,10 +15,10 @@
         <td colspan='4'><b><%= @sender.name %></b></td>
       </tr>
       <tr>
-        <td><label>Username</label><span class='optional'> (optional)</span></td><td colspan='2'><input name="username" class='sender_field' value='<%= @sender.username %>'/></td><td>&nbsp;</td>
+        <td><label>Username</label><span class='optional'> (optional)</span>: </td><td colspan='2'><input name="username" class='sender_field' value='<%= @sender.username %>'/></td><td>&nbsp;</td>
       </tr>
       <tr>
-        <td><label>Password hint</label><span class='optional'> (optional)</span></td><td colspan='2'><input name="password_hint" class='sender_field' value='<%= @sender.password_hint %>'/></td><td>&nbsp;</td>
+        <td><label>Password hint</label><span class='optional'> (optional): </span></td><td colspan='2'><input name="password_hint" class='sender_field' value='<%= @sender.password_hint %>'/></td><td>&nbsp;</td>
       </tr>
       <% if @sender.sender_accounts.size > 0 %>
         <% @sender.sender_accounts.each_with_index do |account, index| %>
@@ -49,6 +49,7 @@
       <tr>
         <td colspan='4'>
           <button onClick="updateSender(<%= @sender.id %>)">update sender</button>
+          <button onClick="go('/senders')">back to list</button>
         </td>
       </table>
     </div>
