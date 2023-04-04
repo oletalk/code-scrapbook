@@ -6,6 +6,10 @@ body {
   border: 1px solid #343434;
 }
 
+#newaccount.hidden {
+  display: none;
+}
+
 .senderdetail {
   width: 90%;
   display: table;

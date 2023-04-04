@@ -5,10 +5,15 @@ require 'sinatra/base'
 require_relative 'db/dochandler'
 require_relative 'db/senderhandler'
 require_relative 'data/sender'
+require_relative 'data/senderaccount'
 
 # main app
 class BillDatabase < Sinatra::Base
-  # TODO: -
+  # writing functionality
+  # 1. write or add method to write to db in a handler
+  # 2. add method that accesses handler here VV
+  # 3. add method in entity.js (or wherever) that does axios call to this
+  # 4. add element in erb that calls that method in js
 
   before do
     headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
@@ -66,6 +71,26 @@ class BillDatabase < Sinatra::Base
     sender.password_hint = params['password_hint']
     sender.comments = params['comments']
     s.update_sender(sender)
+  end
+
+  post '/sender/:id/account_new' do |id|
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    sa = SenderAccount.new(nil, id)
+    sa.account_number = params['account_number']
+    sa.account_details = params['account_details']
+    sa.comments = params['comments']
+    s.add_sender_account(sa)
+  end
+
+  post '/senderaccount/:acc_id' do |acc_id|
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    sa = SenderAccount.new(acc_id, nil) # don't need sender_id for update
+    sa.account_number = params['account_number']
+    sa.account_details = params['account_details']
+    sa.comments = params['comments']
+    s.upd_sender_account(sa)
   end
 
   run! if app_file == $PROGRAM_NAME
