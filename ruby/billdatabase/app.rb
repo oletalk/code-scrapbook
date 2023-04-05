@@ -83,6 +83,11 @@ class BillDatabase < Sinatra::Base
     s.add_sender_account(sa)
   end
 
+  delete '/senderaccount/:acc_id' do |acc_id|
+    s = SenderHandler.new
+    s.del_sender_account(acc_id)
+  end
+
   post '/senderaccount/:acc_id' do |acc_id|
     params = JSON.parse(request.body.read)
     s = SenderHandler.new

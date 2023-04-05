@@ -37,7 +37,10 @@
                 </div>
               </div>
             </td>
-            <td><button onClick="updateAccount('account_<%= account.id %>')">update account</button></td>
+            <td><button class="update_btn" onClick="updateAccount('account_<%= account.id %>')">update account</button>
+            <br/>
+            <button class="delete_btn" onClick="deleteAccount('<%= account.id %>')">DELETE account</button>
+            </td>
           </tr>
         <% end %>
       <% end %>

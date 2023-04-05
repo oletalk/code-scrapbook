@@ -109,7 +109,7 @@ class SenderHandler
 
         accounts = []
         sql = "select #{ACCOUNT_FIELDS} from bills.sender_account " \
-              'where sender_id = $1 order by account_number'
+              'where sender_id = $1 and deleted is null order by account_number'
         conn.prepare('fetch_sa', sql)
         conn.exec_prepared('fetch_sa', [sender_id]) do |result|
           result.each do |result_row|
@@ -135,6 +135,32 @@ class SenderHandler
           sender = Sender.new(result_row['id'], result_row['created_at'])
           sender.fill_out_from(result_row)
           ret.push(sender)
+        end
+      end
+    end
+    ret
+  end
+
+  def del_sender_account(sa_id)
+    raise 'Cannot delete account while it still has associated documents' \
+    unless check_senderaccount_nodocuments(sa_id)
+
+    sql = 'update bills.sender_account '\
+          "set deleted = 'Y' where id = $1"
+    connect_for('marking a sender account as deleted') do |conn|
+      conn.prepare('upd_sa', sql)
+      conn.exec_prepared('upd_sa', [sa_id])
+    end
+  end
+
+  def check_senderaccount_nodocuments(sa_id)
+    ret = true
+    connect_for('checking sender account for any associated documents') do |conn|
+      sql = 'select 1 from bills.document where sender_account_id = $1'
+      conn.prepare('check_sa_nd', sql)
+      conn.exec_prepared('check_sa_nd', [sa_id]) do |result|
+        result.each do |_result_row|
+          ret = false
         end
       end
     end
