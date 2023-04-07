@@ -58,6 +58,10 @@ function addAccount(sender_id) {
   }
 }
 
+function fetchSenderAccounts(sender_id) {
+  axios.get('/')
+}
+
 function markChanged(target) {
   if (!target.classList.contains('field_changed')) {
     target.classList.add('field_changed')
