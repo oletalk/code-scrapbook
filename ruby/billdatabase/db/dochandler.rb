@@ -2,11 +2,61 @@
 
 require_relative 'db'
 require_relative '../data/doctype'
+require_relative '../data/document'
 
 # fetches document information from the db
 class DocHandler
   include Db
 
+  def fetch_documents
+    ret = []
+    connect_for('fetching all documents') do |conn|
+      sql = 'select id, received_date, doc_type_id, sender_id, due_date, paid_date, '\
+      'file_location, comments, sender_account_id from bills.document'
+      conn.exec(sql) do |result|
+        result.each do |result_row|
+          # TODO
+        end
+      end
+    end
+    ret
+  end
+
+  def add_document(doc)
+    ret = nil
+    raise TypeError, 'add_document expects a Document' unless doc.is_a?(Document)
+    raise ArgumentError, 'supplied Document does not have a DocType' if doc.doc_type.nil?
+    raise ArgumentError, 'supplied Document does not have a Sender' if doc.sender.nil?
+
+    sql = 'INSERT into bills.document (received_date, doc_type_id, sender_id, due_date,'\
+    'paid_date, file_location, comments, sender_account_id) values ($1, $2, $3, $4, $5,'\
+    '$6, $7, $8) returning id'
+    connect_for('adding a document') do |conn|
+      conn.prepare('add_document', sql)
+      conn.exec_prepared('add_document', [
+                           doc.received_date,
+                           doc.doc_type.id, # check?
+                           doc.sender.id, # check?
+                           doc.due_date,
+                           doc.paid_date,
+                           doc.file_location,
+                           doc.comments,
+                           doc.sender_account.id
+
+                         ]) do |result|
+        result.each do |result_row|
+          ret = result_row['id']
+        end
+      end
+    rescue StandardError => e
+      ret = { result: e.to_s }
+    end
+
+    puts "new id returned: #{ret}"
+    ret
+  end
+
+  # doctypes
   def update_doctype(id)
     ret = { result: 'success' }
     sql = 'UPDATE bills.doc_type SET name = $1 WHERE id = $1'

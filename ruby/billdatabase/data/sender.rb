@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require_relative 'senderaccount'
 
 # holds information about the sender of a document (account you have with them)
@@ -27,5 +28,18 @@ class Sender
 
       @sender_accounts.push(account)
     end
+  end
+
+  def to_json(*args)
+    {
+      JSON.create_id => self.class.name,
+      'id' => @id,
+      'name' => @name,
+      'created_at' => @created_at,
+      'username' => @username,
+      'password_hint' => @password_hint,
+      'comments' => @comments,
+      'sender_accounts' => @sender_accounts
+    }.to_json(*args)
   end
 end

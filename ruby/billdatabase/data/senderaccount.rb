@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 # holds information about each account you have with an entity (e.g. bank account with barclays)
 class SenderAccount
   attr_reader :id, :sender_id
@@ -14,5 +16,16 @@ class SenderAccount
     @account_number = result_row['account_number']
     @account_details = result_row['account_details']
     @comments = result_row['comments']
+  end
+
+  def to_json(*args)
+    {
+      JSON.create_id => self.class.name,
+      'id' => @id,
+      'sender_id' => @sender_id,
+      'account_number' => @account_number,
+      'account_details' => @account_details,
+      'comments' => @comments
+    }.to_json(*args)
   end
 end
