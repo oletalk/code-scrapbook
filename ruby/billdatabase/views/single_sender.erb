@@ -12,7 +12,7 @@
     <div class="layout" id="doctype_section">
       <table class="senderdetail">
       <tr>
-        <td colspan='4'><b><%= @sender.name %></b></td>
+        <td colspan='4'><span class='sendername'><%= @sender.name %></span></td>
       </tr>
       <tr>
         <td><label>Username</label><span class='optional'> (optional)</span>: </td><td colspan='2'><input name="username" class='sender_field' value='<%= @sender.username %>'/></td><td>&nbsp;</td>
@@ -33,7 +33,7 @@
                   <%= index+1 %> - Account details: <input name="account_details" class='fieldval' value="<%= account.account_details %>" />
                 </div>
                 <div>
-                  <%= index+1 %> - Comments: <textarea name='account_comments' class='fieldval' ><%= account.comments %></textarea>
+                  <%= index+1 %> - Comments: <textarea name='comments' class='fieldval' ><%= account.comments %></textarea>
                 </div>
               </div>
             </td>
@@ -57,14 +57,14 @@
                 + - Account details: <input name="account_details" class='fieldval' value="" />
               </div>
               <div>
-                + - Comments: <textarea name='account_comments' class='fieldval' ></textarea>
+                + - Comments: <textarea name='comments' class='fieldval' ></textarea>
               </div>
             </div>
           </td>
           <td><button onClick="addAccount(<%= @sender.id %>)">add account</button></td>
       </tr>
       <tr>
-        <td><label>Comments</label></td><td colspan='3'><textarea class='sender_field' name='comments'><%= @sender.comments %></textarea></td>
+        <td><label>Comments</label></td><td colspan='3'><textarea rows='5' class='sender_field' name='comments'><%= @sender.comments %></textarea></td>
       </tr>
       <tr>
         <td colspan='4'>
@@ -73,5 +73,9 @@
         </td>
       </table>
     </div>
+    <script type='text/javascript'>
+    addChangeIndicators('sender_field')
+    addChangeIndicators('fieldval')
+    </script>
   </BODY>
 </HTML>

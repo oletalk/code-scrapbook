@@ -10,13 +10,12 @@ function toggleShowAccount() {
 function addSender() {
   const data = collectElementsOfFrom('sender_field', document)
   if (typeof data !== 'undefined') {
-    console.log('type of data = ' + (typeof data))
     axios.post('/sender_new', data)
       .then((response) => {
         const new_id = response.data.id
         if (typeof new_id !== 'undefined') {
           console.log(response.data)
-          // window.location.replace('/sender/' + new_id)
+          window.location.replace('/sender/' + new_id)
         } else {
           console.error('no new id returned - save did not work')
         }
@@ -59,6 +58,11 @@ function addAccount(sender_id) {
   }
 }
 
+function markChanged(target) {
+  if (!target.classList.contains('field_changed')) {
+    target.classList.add('field_changed')
+  }
+}
 function deleteAccount(sa_id) {
   if (confirm('Are you sure??')) {
     axios.delete('/senderaccount/' + sa_id)
@@ -111,4 +115,19 @@ function collectElementsOfFrom(className, containerElement) {
 
   return data
 }
-// 'mounted' follows
+
+// we have to do this AFTER the document loaded
+function addChangeIndicators(className) {
+  for (let field of document.getElementsByClassName(className)) {
+    // check it is an input or textarea
+    if (field.nodeName == 'INPUT' || field.nodeName == 'TEXTAREA') {
+      console.log(field.name)
+      field.addEventListener(
+        'change',
+        function () { markChanged(this) },
+        false
+      )
+    }
+  }
+
+}

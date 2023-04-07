@@ -2,12 +2,71 @@ body {
   font-family: Arial, Helvetica, sans-serif
 }
 
+input.sender_field {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 100%;
+}
+
+textarea.sender_field {
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 90%;
+}
+
+textarea.fieldval {
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 90%;
+}
+
+
+input.fieldval {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  background-color: #f0f0ff;
+  margin: 2px;
+}
+
+input.field_changed {
+  border-top: 2px solid red;
+  border-top-style: dashed;
+}
+
+textarea.field_changed {
+  border-top: 2px solid red;
+  border-top-style: dashed;
+}
+
+
 .sender_account {
   border: 1px solid #343434;
 }
 
 #newaccount.hidden {
   display: none;
+}
+
+table {
+  border: 1px solid grey;
+
+  padding: 5px;
+}
+
+td {
+  color: sienna;
+}
+
+.sendername {
+  font-size: large;
+  font-weight: 700;
+  margin-left: -6px;
 }
 
 .senderdetail {
@@ -21,6 +80,6 @@ body {
 }
 
 label {
-  font-weight: 700;
+  font-weight: 500;
   color: darkblue;
 }
