@@ -26,6 +26,14 @@ class BillDatabase < Sinatra::Base
     '<h1>hello world</h1>'
   end
 
+  get '/document_new' do
+    dh = DocHandler.new
+    sh = SenderHandler.new
+    @doctypes = dh.fetch_doctypes
+    @senders = sh.fetch_senders
+    erb :document_new
+  end
+
   get '/doctypes' do
     d = DocHandler.new
     @doctypes = d.fetch_doctypes
@@ -96,6 +104,18 @@ class BillDatabase < Sinatra::Base
     sa.account_details = params['account_details']
     sa.comments = params['comments']
     s.upd_sender_account(sa)
+  end
+
+  # non-erb (axios-only) calls here
+  get '/json/sender/:id/accounts' do |id|
+    content_type 'application/json'
+    s = SenderHandler.new
+    sender = s.fetch_sender(id)
+    if sender.nil?
+      []
+    else
+      sender.sender_accounts.to_json
+    end
   end
 
   run! if app_file == $PROGRAM_NAME

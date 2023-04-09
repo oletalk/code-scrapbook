@@ -1,0 +1,73 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>add new document</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+    <script src="/js/ext/axios.min.js"></script>
+    <script src="/js/entity.js" type="text/javascript" ></script>
+  </HEAD>
+  <BODY>
+
+    <h2>Add New Document</h2>
+    <div class="layout">
+      <table class="documentdetail">
+      <tr>
+      <td colspan='2'>Warning: account numbers are shown in this screen so be careful if you are accessing this site in a public place.</td>
+      </tr>
+      <tr>
+        <td>
+
+
+          <div>Document Type:</div>
+          <div>
+            <select class='sender_field' id="doctypes" name="doc_type_id">
+            <option value='none'> - Please select - </option>
+            <% @doctypes.each do |doctype| %>
+            <option value="<%= doctype.id %>"><%= doctype.name %></option>
+            <% end %>
+            </select>
+          </div>
+
+          <div>Sender:</div>
+          <div>
+            <select class='sender_field' id="senders" onChange="fetchSenderAccounts(this.value)" name="sender_id">
+            <option value='none'> - Please select - </option>
+            <% @senders.each do |sender| %>
+            <option value="<%= sender.id %>"><%= sender.name %></option>
+            <% end %>
+            </select>
+          </div>
+          <div>Sender account:</div>
+          <div>
+            <select id="senderaccounts" onChange="fetchSenderAccounts(this.value)" name="sender_id">
+            <option value="none">- none -</option>
+            </select>
+          </div>
+
+        </td>
+        <td>
+          <table class='dates'>
+            <tr>
+              <td><label>Received</label> *</td><td><input type="date" id='date_received' name="date_received" /></td>
+            </tr>
+            <tr>
+              <td><label>Date Due</label></td><td><input type="date" name="date_received"/></td>
+            </tr>
+            <tr>
+              <td><label>Date Paid</label></td><td><input type="date" name="date_received"/></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button onClick="addDocument()">add document</button>
+        </td>
+      </table>
+    </div>
+    <script type='text/javascript'>
+    const rd = document.getElementById('date_received')
+    rd.value = getToday()
+    </script>
+  </BODY>
+</HTML>

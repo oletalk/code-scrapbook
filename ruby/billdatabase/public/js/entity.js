@@ -59,7 +59,24 @@ function addAccount(sender_id) {
 }
 
 function fetchSenderAccounts(sender_id) {
-  axios.get('/')
+  axios.get('/json/sender/' + sender_id + '/accounts')
+    .then((response) => {
+      const data = response.data
+      const accBox = document.getElementById('senderaccounts')
+      removeAllOptions(accBox)
+      accBox.appendChild(createOption('none', '- none -'))
+      for (let acc of data) {
+        // console.log(acc.id + ': ' + acc.account_number)
+        const opt = createOption(acc.id, acc.account_number)
+        accBox.appendChild(opt)
+
+
+      }
+      // need to regenerate select options based on the elements
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 }
 
 function markChanged(target) {
@@ -120,6 +137,20 @@ function collectElementsOfFrom(className, containerElement) {
   return data
 }
 
+function removeAllOptions(selectBox) {
+  while (selectBox.options.length > 0) {
+    selectBox.remove(0)
+  }
+}
+// helper function to create a new option
+function createOption(val, txt) {
+  const newOption = document.createElement('option')
+  const optionText = document.createTextNode(txt)
+  newOption.appendChild(optionText)
+  newOption.setAttribute('value', val)
+  return newOption
+}
+
 // we have to do this AFTER the document loaded
 function addChangeIndicators(className) {
   for (let field of document.getElementsByClassName(className)) {
@@ -133,5 +164,10 @@ function addChangeIndicators(className) {
       )
     }
   }
-
 }
+
+function getToday() {
+  const d = new Date()
+  return d.toISOString().split('T')[0]
+}
+
