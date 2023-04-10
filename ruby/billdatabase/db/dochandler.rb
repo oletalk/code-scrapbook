@@ -8,6 +8,25 @@ require_relative '../data/document'
 class DocHandler
   include Db
 
+  def fetch_document(id)
+    ret = {}
+    connect_for('fetching a document') do |conn|
+      sql = File.read('./sql/fetch_document.sql')
+      conn.prepare('fetch_document', sql)
+      conn.exec_prepared('fetch_document', [id]) do |result|
+        result.each do |result_row|
+          dt = DocType.new(result_row['doc_type_id'], result_row['doc_type_name'])
+          s = Sender.new(result_row['sender_id'], result_row['sender_name'])
+          ret = Document.new(
+            result_row['id'], nil,
+            result_row['received_date'], dt, s
+          )
+        end
+      end
+    end
+    ret
+  end
+
   def fetch_documents
     ret = []
     connect_for('fetching all documents') do |conn|
@@ -37,11 +56,11 @@ class DocHandler
                            doc.received_date,
                            doc.doc_type.id, # check?
                            doc.sender.id, # check?
-                           doc.due_date,
-                           doc.paid_date,
+                           nil_if_empty(doc.due_date),
+                           nil_if_empty(doc.paid_date),
                            doc.file_location,
                            doc.comments,
-                           doc.sender_account.id
+                           doc.sender_account.nil? ? nil : doc.sender_account.id
 
                          ]) do |result|
         result.each do |result_row|
@@ -54,6 +73,10 @@ class DocHandler
 
     puts "new id returned: #{ret}"
     ret
+  end
+
+  def nil_if_empty(str)
+    str.empty? ? nil : str
   end
 
   # doctypes

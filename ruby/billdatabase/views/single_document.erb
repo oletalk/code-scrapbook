@@ -1,14 +1,14 @@
 <!doctype html>
 <HTML>
   <HEAD>
-    <TITLE>add new document</TITLE>
+    <TITLE>edit document</TITLE>
     <link rel="stylesheet" href="/css/default.css">
     <script src="/js/ext/axios.min.js"></script>
     <script src="/js/entity.js" type="text/javascript" ></script>
   </HEAD>
   <BODY>
 
-    <h2>Add New Document</h2>
+    <h2>Edit Document</h2>
     <div class="layout">
       <table class="documentdetail">
       <tr>
@@ -19,23 +19,12 @@
 
 
           <div>Document Type:</div>
-          <div>
-            <select class='sender_field mandatory' id="doctypes" name="doc_type_id">
-            <option value=''> - Please select - </option>
-            <% @doctypes.each do |doctype| %>
-            <option value="<%= doctype.id %>"><%= doctype.name %></option>
-            <% end %>
-            </select>
+          <div><%= @doc.doc_type.name %>
           </div>
 
           <div>Sender:</div>
           <div>
-            <select class='sender_field mandatory' id="senders" onChange="fetchSenderAccounts(this.value)" name="sender_id">
-            <option value=''> - Please select - </option>
-            <% @senders.each do |sender| %>
-            <option value="<%= sender.id %>"><%= sender.name %></option>
-            <% end %>
-            </select>
+            <%= @doc.sender.name %>
           </div>
           <div>Sender account:</div>
           <div>
@@ -48,7 +37,7 @@
         <td>
           <table class='dates'>
             <tr>
-              <td><label>Received</label> *</td><td><input class='sender_field mandatory' type="date" id='date_received' name="received_date" /></td>
+              <td><label>Received</label> *</td><td><input class='sender_field mandatory' type="date" id='date_received' name="received_date" value="<%= @doc.received_date %>" /></td>
             </tr>
             <tr>
               <td><label>Date Due</label></td><td><input class='sender_field' type="date" name="due_date"/></td>
@@ -73,9 +62,5 @@
         </td>
       </table>
     </div>
-    <script type='text/javascript'>
-    const rd = document.getElementById('date_received')
-    rd.value = getToday()
-    </script>
   </BODY>
 </HTML>

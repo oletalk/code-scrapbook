@@ -12,6 +12,26 @@ input.sender_field {
   width: 100%;
 }
 
+button {
+  color: #ffffaa;
+  background-color: #5a55a0;
+  border-radius: 6px;
+  border: 0px;
+  padding: 7px;
+  font-weight: 600;
+}
+
+select.sender_field {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 100%;
+}
+
+
 textarea.sender_field {
   background-color: #f0f0ff;
   margin: 2px;
@@ -24,6 +44,10 @@ textarea.fieldval {
   width: 90%;
 }
 
+table.dates {
+  width: 100%;
+  margin: 8px;
+}
 
 input.fieldval {
   border-top-style: hidden;
@@ -72,6 +96,12 @@ td {
 .senderdetail {
   width: 90%;
   display: table;
+}
+
+.advice {
+  font-size: smaller;
+  font-style: italic;
+  border: 1px solid #000;
 }
 
 .optional {

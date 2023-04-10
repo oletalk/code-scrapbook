@@ -34,6 +34,39 @@ class BillDatabase < Sinatra::Base
     erb :document_new
   end
 
+  post '/document_new' do
+    # the photo/pdf should probably be handled separately
+    params = JSON.parse(request.body.read)
+    dt = DocType.new(params['doc_type_id'], nil)
+    s = Sender.new(params['sender_id'], nil)
+    sa_p = params['sender_account_id']
+    sa = sa_p.nil? || sa_p.empty? ? nil : SenderAccount.new(sa_p, nil)
+    d = Document.new(nil, nil, params['received_date'], dt, s)
+    d.due_date = params['due_date']
+    d.paid_date = params['paid_date']
+    d.comments = params['comments']
+    d.sender_account = sa unless sa.nil?
+    dh = DocHandler.new
+    new_id = dh.add_document(d)
+    if new_id.instance_of?(Hash)
+      # uh - oh
+      puts new_id
+      ret = new_id
+    else
+      ret = { 'id': new_id }
+    end
+
+    ret.to_json
+  end
+
+  get '/document/:id' do |id|
+    content_type 'text/html'
+
+    d = DocHandler.new
+    @doc = d.fetch_document(id)
+    erb :single_document
+  end
+
   get '/doctypes' do
     d = DocHandler.new
     @doctypes = d.fetch_doctypes

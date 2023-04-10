@@ -62,16 +62,18 @@ function fetchSenderAccounts(sender_id) {
   axios.get('/json/sender/' + sender_id + '/accounts')
     .then((response) => {
       const data = response.data
-      const accBox = document.getElementById('senderaccounts')
+      let accBox = document.getElementById('senderaccounts')
       removeAllOptions(accBox)
-      accBox.appendChild(createOption('none', '- none -'))
+      accBox.appendChild(createOption('', '- none -'))
+      let noOptions = true
       for (let acc of data) {
         // console.log(acc.id + ': ' + acc.account_number)
         const opt = createOption(acc.id, acc.account_number)
         accBox.appendChild(opt)
-
-
+        noOptions = false
       }
+      accBox.disabled = noOptions
+
       // need to regenerate select options based on the elements
     })
     .catch((error) => {
@@ -115,6 +117,30 @@ function updateAccount(topEl) {
 
   }
 
+}
+
+function addDocument() {
+  const docInfo = collectElementsOfFrom('sender_field', document)
+  console.log(docInfo)
+  if (typeof docInfo !== 'undefined') {
+    axios.post('/document_new', docInfo)
+      .then((response) => {
+        const new_id = response.data.id
+        if (typeof new_id !== 'undefined') {
+          console.log(response.data)
+          window.location.replace('/document/' + new_id)
+        } else {
+          if (typeof response.data.result !== 'undefined') {
+            console.error('Problem saving document: ' + response.data.result)
+          } else {
+            console.error('no new id returned - save did not work')
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
 }
 
 // utility methods
