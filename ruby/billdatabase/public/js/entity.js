@@ -143,6 +143,11 @@ function addDocument() {
   }
 }
 
+function updateDocument() {
+  const docInfo = collectElementsOfFrom('sender_field', document)
+  console.log(docInfo)
+}
+
 // utility methods
 function collectElementsOfFrom(className, containerElement) {
   let data = {}

@@ -16,20 +16,25 @@
       </tr>
       <tr>
         <td>
-
+          <input class="sender_field" type='hidden' name='id' value="<%= @doc.id %>"/>
 
           <div>Document Type:</div>
-          <div><%= @doc.doc_type.name %>
+          <input class="sender_field" type='hidden' name='doc_type_id' value="<%= @doc.doc_type.id %>"/>
+          <div class="field_value"><%= @doc.doc_type.name %>
           </div>
 
           <div>Sender:</div>
-          <div>
+          <input class="sender_field" type='hidden' name='sender_id' value="<%= @doc.sender.id %>"/>
+          <div class="field_value">
             <%= @doc.sender.name %>
           </div>
           <div>Sender account:</div>
           <div>
             <select class='sender_field ' id="senderaccounts" name="sender_account_id">
             <option value="">- none -</option>
+            <% @sender.sender_accounts.each do |account| %>
+            <option value="<%= account.id %>" <%= !@doc.sender_account.nil? && @doc.sender_accountaccount.id == @doc.sender_account.id ? ' selected' : ''%>><%= account.account_number%>
+            <% end %>
             </select>
           </div>
 
@@ -58,7 +63,7 @@
       </tr>
       <tr>
         <td>
-          <button onClick="addDocument()">add document</button>
+          <button onClick="updateDocument()">update document</button>
         </td>
       </table>
     </div>

@@ -16,7 +16,8 @@ class DocHandler
       conn.exec_prepared('fetch_document', [id]) do |result|
         result.each do |result_row|
           dt = DocType.new(result_row['doc_type_id'], result_row['doc_type_name'])
-          s = Sender.new(result_row['sender_id'], result_row['sender_name'])
+          s = Sender.new(result_row['sender_id'], nil)
+          s.name = result_row['sender_name']
           ret = Document.new(
             result_row['id'], nil,
             result_row['received_date'], dt, s

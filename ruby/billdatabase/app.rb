@@ -23,7 +23,7 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/main' do
-    '<h1>hello world</h1>'
+    erb :main
   end
 
   get '/document_new' do
@@ -64,6 +64,9 @@ class BillDatabase < Sinatra::Base
 
     d = DocHandler.new
     @doc = d.fetch_document(id)
+    s = SenderHandler.new
+    @sender = s.fetch_sender(@doc.sender.id)
+
     erb :single_document
   end
 
