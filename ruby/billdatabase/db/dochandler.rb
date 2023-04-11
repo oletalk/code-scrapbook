@@ -48,15 +48,13 @@ class DocHandler
     raise ArgumentError, 'supplied Document does not have a DocType' if doc.doc_type.nil?
     raise ArgumentError, 'supplied Document does not have a Sender' if doc.sender.nil?
 
-    sql = 'INSERT into bills.document (received_date, doc_type_id, sender_id, due_date,'\
-    'paid_date, file_location, comments, sender_account_id) values ($1, $2, $3, $4, $5,'\
-    '$6, $7, $8) returning id'
+    sql = ''
     connect_for('adding a document') do |conn|
       conn.prepare('add_document', sql)
       conn.exec_prepared('add_document', [
                            doc.received_date,
-                           doc.doc_type.id, # check?
-                           doc.sender.id, # check?
+                           doc.doc_type.id,
+                           doc.sender.id,
                            nil_if_empty(doc.due_date),
                            nil_if_empty(doc.paid_date),
                            doc.file_location,
@@ -78,6 +76,30 @@ class DocHandler
 
   def nil_if_empty(str)
     str.empty? ? nil : str
+  end
+
+  def update_document(doc)
+    ret = { result: 'success' }
+    raise TypeError, 'add_document expects a Document' unless doc.is_a?(Document)
+    raise ArgumentError, 'supplied Document does not have a DocType' if doc.doc_type.nil?
+    raise ArgumentError, 'supplied Document does not have a Sender' if doc.sender.nil?
+
+    sql = File.read('./sql/update_document.sql')
+    connect_for('updating a document') do |conn|
+      conn.prepare('upd_document', sql)
+      conn.exec_prepared('upd_document',
+                         [
+                           doc.received_date,
+                           doc.due_date,
+                           doc.paid_date,
+                           doc.comments,
+                           doc.sender_account.nil? ? nil : doc.sender_account.id,
+                           doc.id
+                         ])
+    rescue StandardError => e
+      ret = { result: e.to_s }
+    end
+    ret
   end
 
   # doctypes

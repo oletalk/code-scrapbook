@@ -59,6 +59,21 @@ class BillDatabase < Sinatra::Base
     ret.to_json
   end
 
+  post '/document/:id' do |id|
+    params = JSON.parse(request.body.read)
+    dt = DocType.new(params['doc_type_id'], nil)
+    s = Sender.new(params['sender_id'], nil)
+    sa_p = params['sender_account_id']
+    sa = sa_p.nil? || sa_p.empty? ? nil : SenderAccount.new(sa_p, nil)
+    d = Document.new(id, nil, params['received_date'], dt, s)
+    d.due_date = params['due_date']
+    d.paid_date = params['paid_date']
+    d.comments = params['comments']
+    d.sender_account = sa unless sa.nil?
+    dh = DocHandler.new
+    puts dh.update_document(d)
+  end
+
   get '/document/:id' do |id|
     content_type 'text/html'
 

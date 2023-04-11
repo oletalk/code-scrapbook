@@ -143,9 +143,20 @@ function addDocument() {
   }
 }
 
-function updateDocument() {
+function updateDocument(id) {
   const docInfo = collectElementsOfFrom('sender_field', document)
   console.log(docInfo)
+  if (typeof docInfo !== 'undefined') {
+    axios.post('/document/' + id, docInfo)
+      .then((response) => {
+        location.reload()
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+
+  }
 }
 
 // utility methods
