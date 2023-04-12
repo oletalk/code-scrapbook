@@ -31,11 +31,17 @@ class DocHandler
   def fetch_documents
     ret = []
     connect_for('fetching all documents') do |conn|
-      sql = 'select id, received_date, doc_type_id, sender_id, due_date, paid_date, '\
-      'file_location, comments, sender_account_id from bills.document'
+      sql = File.read('./sql/fetch_all_documents.sql')
       conn.exec(sql) do |result|
         result.each do |result_row|
-          # TODO
+          dt = DocType.new(result_row['doc_type_id'], result_row['doc_type_name'])
+          s = Sender.new(result_row['sender_id'], nil)
+          s.name = result_row['sender_name']
+          doc = Document.new(
+            result_row['id'], nil,
+            result_row['received_date'], dt, s
+          )
+          ret.push(doc)
         end
       end
     end

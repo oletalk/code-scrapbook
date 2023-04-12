@@ -26,6 +26,12 @@ class BillDatabase < Sinatra::Base
     erb :main
   end
 
+  get '/documents' do
+    dh = DocHandler.new
+    @documents = dh.fetch_documents
+    erb :documents
+  end
+
   get '/document_new' do
     dh = DocHandler.new
     sh = SenderHandler.new
