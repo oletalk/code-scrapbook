@@ -104,10 +104,11 @@ class DocHandler
       conn.exec_prepared('upd_document',
                          [
                            doc.received_date,
-                           doc.due_date,
-                           doc.paid_date,
+                           nil_if_empty(doc.due_date),
+                           nil_if_empty(doc.paid_date),
                            doc.comments,
                            doc.sender_account.nil? ? nil : doc.sender_account.id,
+                           doc.summary,
                            doc.id
                          ])
     rescue StandardError => e

@@ -17,6 +17,7 @@
           <th><label>Due</label></th>
           <th><label>Paid</label></th>
           <th><label>Account (if applicable)</label></th>
+          <th><label>Summary</label></th>
         </tr>
         <% @documents.each_with_index do |document, index| %>
         <tr>
@@ -26,6 +27,7 @@
           <td><%= document.due_date ? document.due_date : '-' %></td>
           <td><%= document.paid_date ? document.paid_date : '-' %></td>
           <td><%= document.sender_account.nil? ? '&nbsp;' : document.sender_account.account_name %></td>
+          <td><%= document.summary %></td>
         </tr>
         <% end %>
       </table>

@@ -30,12 +30,16 @@
           </div>
           <div>Sender account:</div>
           <div>
-            <select class='sender_field ' id="senderaccounts" name="sender_account_id">
+            <select class='sender_field' id="senderaccounts" name="sender_account_id">
             <option value="">- none -</option>
             <% @sender.sender_accounts.each do |account| %>
             <option value="<%= account.id %>" <%= !@doc.sender_account.nil? && @doc.sender_account.id == @doc.sender_account.id ? ' selected' : ''%>><%= account.account_number%>
             <% end %>
             </select>
+          </div>
+
+          <div>Summary:</div>
+          <input name="summary" class='sender_field' value="<%= @doc.summary %>" />
           </div>
 
         </td>
@@ -64,7 +68,7 @@
       <tr>
         <td>
           <button onClick="updateDocument(<%= @doc.id %>)">update document</button>
-          <button onClick="history.back()">back to list</button>
+          <button onClick="go('/documents')">back to list</button>
         </td>
       </table>
     </div>

@@ -48,6 +48,7 @@ class BillDatabase < Sinatra::Base
     sa_p = params['sender_account_id']
     sa = sa_p.nil? || sa_p.empty? ? nil : SenderAccount.new(sa_p, nil)
     d = Document.new(nil, nil, params['received_date'], dt, s)
+    d.summary = params['summary']
     d.due_date = params['due_date']
     d.paid_date = params['paid_date']
     d.comments = params['comments']
@@ -72,12 +73,14 @@ class BillDatabase < Sinatra::Base
     sa_p = params['sender_account_id']
     sa = sa_p.nil? || sa_p.empty? ? nil : SenderAccount.new(sa_p, nil)
     d = Document.new(id, nil, params['received_date'], dt, s)
-    d.due_date = params['due_date']
-    d.paid_date = params['paid_date']
+    d.summary = params['summary']
+    d.due_date = params['due_date'] if params['due_date']
+    d.paid_date = params['paid_date'] if params['paid_date']
     d.comments = params['comments']
     d.sender_account = sa unless sa.nil?
     dh = DocHandler.new
-    puts dh.update_document(d)
+    ret = dh.update_document(d)
+    ret.to_json
   end
 
   get '/document/:id' do |id|

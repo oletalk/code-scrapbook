@@ -31,10 +31,7 @@ function updateSender(sid) {
   if (typeof data !== 'undefined') {
     console.log(JSON.stringify(data))
     axios.post('/sender/' + sid, data)
-      .then((response) => {
-        console.log(response.data)
-        location.reload()
-      })
+      .then((response) => reloadOrPrintError(response, 'updating sender'))
       .catch((error) => {
         console.error(error)
       })
@@ -48,10 +45,7 @@ function addAccount(sender_id) {
     data['sender_id'] = sender_id
     console.log(JSON.stringify(data))
     axios.post('/sender/' + sender_id + '/account_new', data)
-      .then((response) => {
-        console.log(response.data)
-        location.reload()
-      })
+      .then((response) => reloadOrPrintError(response, 'adding account'))
       .catch((error) => {
         console.error(error)
       })
@@ -89,10 +83,7 @@ function markChanged(target) {
 function deleteAccount(sa_id) {
   if (confirm('Are you sure??')) {
     axios.delete('/senderaccount/' + sa_id)
-      .then((response) => {
-        location.reload()
-        console.log(response.data)
-      })
+      .then((response) => reloadOrPrintError(response, 'deleting account'))
       .catch((error) => {
         console.error(error)
       })
@@ -107,10 +98,7 @@ function updateAccount(topEl) {
   if (typeof data !== 'undefined') {
     console.log(JSON.stringify(data))
     axios.post('/senderaccount/' + data.id, data)
-      .then((response) => {
-        location.reload()
-        console.log(response.data)
-      })
+      .then((response) => reloadOrPrintError(response, 'updating account'))
       .catch((error) => {
         console.error(error)
       })
@@ -146,12 +134,10 @@ function addDocument() {
 function updateDocument(id) {
   const docInfo = collectElementsOfFrom('sender_field', document)
   console.log(docInfo)
+  // docInfo = undefined //test
   if (typeof docInfo !== 'undefined') {
     axios.post('/document/' + id, docInfo)
-      .then((response) => {
-        location.reload()
-        console.log(response.data)
-      })
+      .then((response) => reloadOrPrintError(response, 'updating document'))
       .catch((error) => {
         console.error(error)
       })
@@ -160,6 +146,16 @@ function updateDocument(id) {
 }
 
 // utility methods
+function reloadOrPrintError(response, operation) {
+  if (typeof response.data.result !== 'undefined' && response.data.result !== 'success') {
+    console.error('Problem ' + operation + ': ' + response.data.result)
+  } else {
+    location.reload()
+    console.log(response.data)
+  }
+
+}
+
 function collectElementsOfFrom(className, containerElement) {
   let data = {}
   for (field of containerElement.getElementsByClassName(className)) {
