@@ -22,6 +22,13 @@ class DocHandler
             result_row['id'], nil,
             result_row['received_date'], dt, s
           )
+          ret.fill_out_from(result_row)
+          next unless result_row['sender_account_id']
+
+          sa_id = result_row['sender_account_id']
+          sa_an = result_row['acdcount_number']
+          sa = SenderAccount.new(sa_id, sa_an)
+          ret.sender_account = sa
         end
       end
     end
@@ -41,6 +48,7 @@ class DocHandler
             result_row['id'], nil,
             result_row['received_date'], dt, s
           )
+          doc.fill_out_from(result_row)
           ret.push(doc)
         end
       end
@@ -54,7 +62,7 @@ class DocHandler
     raise ArgumentError, 'supplied Document does not have a DocType' if doc.doc_type.nil?
     raise ArgumentError, 'supplied Document does not have a Sender' if doc.sender.nil?
 
-    sql = ''
+    sql = File.read('./sql/insert_document.sql')
     connect_for('adding a document') do |conn|
       conn.prepare('add_document', sql)
       conn.exec_prepared('add_document', [

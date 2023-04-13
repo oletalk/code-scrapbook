@@ -19,4 +19,11 @@ class Document
     @doc_type = doc_type_
     @sender = sender_
   end
+
+  def fill_out_from(result_row)
+    @due_date = result_row['due_date']
+    @paid_date = result_row['paid_date']
+    @file_location = result_row['file_location']
+    @comments = result_row['comments']
+  end
 end

@@ -33,7 +33,7 @@
             <select class='sender_field ' id="senderaccounts" name="sender_account_id">
             <option value="">- none -</option>
             <% @sender.sender_accounts.each do |account| %>
-            <option value="<%= account.id %>" <%= !@doc.sender_account.nil? && @doc.sender_accountaccount.id == @doc.sender_account.id ? ' selected' : ''%>><%= account.account_number%>
+            <option value="<%= account.id %>" <%= !@doc.sender_account.nil? && @doc.sender_account.id == @doc.sender_account.id ? ' selected' : ''%>><%= account.account_number%>
             <% end %>
             </select>
           </div>
@@ -45,10 +45,10 @@
               <td><label>Received</label> *</td><td><input class='sender_field mandatory' type="date" id='date_received' name="received_date" value="<%= @doc.received_date %>" /></td>
             </tr>
             <tr>
-              <td><label>Date Due</label></td><td><input class='sender_field' type="date" name="due_date"/></td>
+              <td><label>Date Due</label></td><td><input class='sender_field' type="date" name="due_date" value="<%= @doc.due_date %>"/></td>
             </tr>
             <tr>
-              <td><label>Date Paid</label></td><td><input class='sender_field' type="date" name="paid_date"/></td>
+              <td><label>Date Paid</label></td><td><input class='sender_field' type="date" name="paid_date" value="<%= @doc.paid_date %>"/></td>
             </tr>
           </table>
         </td>
@@ -58,7 +58,7 @@
         <div><label>Receipt photo/PDF:</label></div>
         <div><input name='file_location' class='sender_field' type='file'></textarea></div>
         <div><label>Comments:</label></div>
-        <div><textarea name='comments' class='sender_field' rows='5'></textarea></div>
+        <div><textarea name='comments' class='sender_field' rows='5'><%= @doc.comments %></textarea></div>
         </td>
       </tr>
       <tr>

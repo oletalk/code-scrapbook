@@ -8,6 +8,7 @@ select d.id,
   paid_date,
   file_location,
   d.comments,
+  sa.id as sender_account_id,
   sa.account_number
 from bills.document d
   join bills.doc_type dt on d.doc_type_id = dt.id
