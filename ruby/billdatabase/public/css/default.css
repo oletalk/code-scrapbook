@@ -67,6 +67,15 @@ table.documenttable tr:nth-child(even) {
   background-color: #dee3e7;
 }
 
+table.documenttable tr:nth-child(odd):hover {
+  background-color: #cbdcf3;
+}
+
+table.documenttable tr:nth-child(even):hover {
+  background-color: #c9d9e7;
+}
+
+
 table.documenttable tr td {
   padding: 5px 15px 5px 15px;
 }

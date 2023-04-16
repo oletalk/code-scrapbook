@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require 'securerandom'
 require_relative 'db'
 require_relative '../data/doctype'
 require_relative '../data/document'
+require_relative '../constants'
 
 # fetches document information from the db
 class DocHandler
@@ -69,6 +71,7 @@ class DocHandler
                            doc.received_date,
                            doc.doc_type.id,
                            doc.sender.id,
+                           doc.summary,
                            nil_if_empty(doc.due_date),
                            nil_if_empty(doc.paid_date),
                            doc.file_location,
@@ -85,6 +88,62 @@ class DocHandler
     end
 
     puts "new id returned: #{ret}"
+    ret
+  end
+
+  def download_file(doc_id)
+    floc = nil
+    ret = nil
+    # so far can't think of why you'd want > 1 file per document
+    connect_for('fetching file location for the document') do |conn|
+      sql = 'select file_location from bills.document where id = $1'
+      conn.prepare('fetch_file_location', sql)
+      conn.exec_prepared('fetch_file_location', [doc_id]) do |result|
+        result.each do |result_row|
+          floc = result_row['file_location']
+        end
+      end
+    end
+
+    if floc.nil?
+      puts "no file location for document id #{doc_id} found"
+    else
+      docroot = Bills::Config::File::DOC_ROOT
+      ret = "#{docroot}/#{floc}"
+    end
+    ret
+  end
+
+  def upload_file(doc_id, file_name, file_contents)
+    ret = { result: 'success' }
+
+    docroot = Bills::Config::File::DOC_ROOT
+    newbasename1 = SecureRandom.urlsafe_base64(4)
+    newbasename2 = File.extname(file_name)
+    filelocation = "#{doc_id}/#{newbasename1}#{newbasename2}"
+    filename = "#{docroot}/#{filelocation}"
+    puts "new file to be saved in #{filename}"
+    sql = 'update bills.document set file_location = $1 where id = $2'
+
+    # create the subfolder in the doc root and then
+    # write the file to the document root
+    begin
+      Dir.mkdir("#{docroot}/#{doc_id}/") unless File.exist?("#{docroot}/#{doc_id}/")
+      File.binwrite(filename, file_contents)
+    rescue StandardError => e
+      ret = { result: e.to_s }
+    end
+
+    # record this file location in the database
+    if ret[:result] == 'success'
+      connect_for('updating a document with the filename') do |conn|
+        conn.prepare('updfile_document', sql)
+        conn.exec_prepared('updfile_document', [filelocation, doc_id])
+      rescue StandardError => e
+        ret = { result: e.to_s }
+      end
+    end
+
     ret
   end
 

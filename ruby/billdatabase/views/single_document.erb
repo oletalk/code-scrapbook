@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/css/default.css">
     <script src="/js/ext/axios.min.js"></script>
     <script src="/js/entity.js" type="text/javascript" ></script>
+    <script src="/js/fileupload.js" type="text/javascript" ></script>
   </HEAD>
   <BODY>
 
@@ -60,7 +61,12 @@
       <tr>
         <td>
         <div><label>Receipt photo/PDF:</label></div>
-        <div><input name='file_location' class='sender_field' type='file'></textarea></div>
+        <% if @doc.file_location.nil? %>
+        <div><input id='file_location' name='file_location' type='file' />
+        <button onClick="uploadFile('file_location', <%= @doc.id %>)">Upload</button></div>
+        <% else %>
+        <div><button onClick="downloadFile(<%= @doc.id %>)">Download receipt</button> <button onClick="deleteFile(<%= @doc.id %>)">Delete</button></div>
+        <% end %>
         <div><label>Comments:</label></div>
         <div><textarea name='comments' class='sender_field' rows='5'><%= @doc.comments %></textarea></div>
         </td>

@@ -6,6 +6,7 @@ require_relative 'db/dochandler'
 require_relative 'db/senderhandler'
 require_relative 'data/sender'
 require_relative 'data/senderaccount'
+require_relative 'constants'
 
 # main app
 class BillDatabase < Sinatra::Base
@@ -92,6 +93,21 @@ class BillDatabase < Sinatra::Base
     @sender = s.fetch_sender(@doc.sender.id)
 
     erb :single_document
+  end
+
+  get '/document/:id/file' do |id|
+    d = DocHandler.new
+    doc = d.download_file(id)
+    send_file doc, type: 'Application/octet-stream'
+  end
+
+  post '/document/:id/file' do |id|
+    params = JSON.parse(request.body.read)
+    puts "received file #{params['name']} for document #{id}"
+
+    d = DocHandler.new
+    ret = d.upload_file(id, params['name'], params['data'])
+    ret.to_json
   end
 
   get '/doctypes' do

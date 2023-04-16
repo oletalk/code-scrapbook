@@ -8,5 +8,9 @@ module Bills
       USER = 'web'
       PASSWORD = File.read('config/db_pw.txt').chomp
     end
+
+    module File
+      DOC_ROOT = '/tmp'
+    end
   end
 end
