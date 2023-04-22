@@ -60,12 +60,16 @@
       </tr>
       <tr>
         <td>
-        <div><label>Receipt photo/PDF:</label></div>
+        <div><label>Receipt photo/PDF:</label> 
+          <% if @doc.file_location %>
+          <span class="doc_filename"><%= File.basename(@doc.file_location) %></span>
+          <% end %>
+        </div>
         <% if @doc.file_location.nil? %>
         <div><input id='file_location' name='file_location' type='file' />
         <button onClick="uploadFile('file_location', <%= @doc.id %>)">Upload</button></div>
         <% else %>
-        <div><button onClick="downloadFile(<%= @doc.id %>)">Download receipt</button> <button onClick="deleteFile(<%= @doc.id %>)">Delete</button></div>
+        <div><button onClick="openwindow('/document/<%= @doc.id %>/file')">Download receipt</button> <button onClick="deleteFile(<%= @doc.id %>)">Delete</button></div>
         <% end %>
         <div><label>Comments:</label></div>
         <div><textarea name='comments' class='sender_field' rows='5'><%= @doc.comments %></textarea></div>

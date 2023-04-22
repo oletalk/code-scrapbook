@@ -98,15 +98,40 @@ class BillDatabase < Sinatra::Base
   get '/document/:id/file' do |id|
     d = DocHandler.new
     doc = d.download_file(id)
-    send_file doc, type: 'Application/octet-stream'
+    #       send_file(filename, :filename => "t.cer", :type => "application/octet-stream")
+    fname = File.basename(doc)
+    opts = {
+      filename: fname,
+      type: 'application/octet-stream'
+    }
+    if File.exist?(doc)
+      content_type 'application/octet-stream'
+      attachment fname
+
+      send_file doc, opts: opts
+    else
+      'sorry, file link is broken'
+    end
   end
 
   post '/document/:id/file' do |id|
-    params = JSON.parse(request.body.read)
+    # this is no longer a JSON request as of 22/04/2023
+    puts "received file upload for document id #{id}"
+    fileupload = params['file']
+    # puts fileupload['filename']
+    # the FormData object in js seems to reassemble the file in a temp dir
+    # inside of fileupload['tempfile'] so just copy it
+
+    d = DocHandler.new
+    ret = d.upload_file(id, fileupload['filename'], fileupload['tempfile'], 'copy')
+    ret.to_json # TODO: check but i think this gets ignored
+  end
+
+  delete '/document/:id/file' do |id|
     puts "received file #{params['name']} for document #{id}"
 
     d = DocHandler.new
-    ret = d.upload_file(id, params['name'], params['data'])
+    ret = d.delete_file(id)
     ret.to_json
   end
 

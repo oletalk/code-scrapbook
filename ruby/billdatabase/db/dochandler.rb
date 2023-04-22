@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'securerandom'
+# require 'base64'
 require_relative 'db'
 require_relative '../data/doctype'
 require_relative '../data/document'
@@ -91,6 +92,41 @@ class DocHandler
     ret
   end
 
+  def delete_file(doc_id)
+    ret = { result: 'success' }
+    floc = nil
+    connect_for('fetching file location for the document') do |conn|
+      sql = 'select file_location from bills.document where id = $1'
+      conn.prepare('fetch_file_location', sql)
+      conn.exec_prepared('fetch_file_location', [doc_id]) do |result|
+        result.each do |result_row|
+          floc = result_row['file_location']
+        end
+      end
+    end
+    if floc.nil?
+      ret = { result: 'file not found' }
+    else
+      # remove file
+      docroot = Bills::Config::File::DOC_ROOT
+      file_loc = "#{docroot}/#{floc}"
+
+      begin
+        File.delete(file_loc)
+      rescue StandardError => e
+        ret = { result: e.to_s }
+      end
+
+      # remove database entry
+      connect_for('updating file location for deleted document') do |conn|
+        sql = 'update bills.document set file_location = null where id = $1'
+        conn.prepare('upd_file_location', sql)
+        conn.exec_prepared('upd_file_location', [doc_id])
+      end
+    end
+    ret
+  end
+
   def download_file(doc_id)
     floc = nil
     ret = nil
@@ -103,6 +139,11 @@ class DocHandler
           floc = result_row['file_location']
         end
       end
+      if floc.nil?
+        puts 'file not found!'
+      else
+        ret = floc
+      end
     end
 
     if floc.nil?
@@ -110,11 +151,15 @@ class DocHandler
     else
       docroot = Bills::Config::File::DOC_ROOT
       ret = "#{docroot}/#{floc}"
+      puts "file location is #{ret}"
     end
     ret
   end
 
-  def upload_file(doc_id, file_name, file_contents)
+  def upload_file(doc_id, file_name, file_contents, mode)
+    # mode is 'stream' (file contents) or 'copy' (from temp file)
+    # (id, fileupload['filename'], fileupload['tempfile'])
+
     ret = { result: 'success' }
 
     docroot = Bills::Config::File::DOC_ROOT
@@ -129,7 +174,17 @@ class DocHandler
     # write the file to the document root
     begin
       Dir.mkdir("#{docroot}/#{doc_id}/") unless File.exist?("#{docroot}/#{doc_id}/")
-      File.binwrite(filename, file_contents)
+      # File.binwrite(filename, file_contents)
+      case mode
+      when 'stream'
+        File.open(filename, 'wb') do |f|
+          f.write(file_contents)
+        end
+      when 'copy'
+        FileUtils.cp(file_contents, filename)
+      else
+        raise "unknown mode #{mode} - should be stream or raise"
+      end
     rescue StandardError => e
       ret = { result: e.to_s }
     end

@@ -18,9 +18,10 @@ function deleteFile(docId) {
     axios.delete('/document/' + docId + '/file')
       .then((response) => {
         if (typeof response.data.result !== 'undefined' && response.data.result !== 'success') {
-          console.error('Problem ' + operation + ': ' + response.data.result)
+          console.error('Problem deleting file: ' + response.data.result)
         } else {
           alert('document deleted!')
+          location.reload()
         }
       })
       .catch((error) => {
@@ -30,27 +31,27 @@ function deleteFile(docId) {
 }
 
 function uploadFile(elementId, docId) {
-  const fileInput = document.getElementById(elementId)
+  const file = document.getElementById(elementId).files[0]
   console.log('uploadFile called for doc ' + docId)
-  var reader = new FileReader()
-  reader.onload = function (e) {
-    // format reader.result for upload
-    const data = {
-      name: fileInput.files[0].name,
-      data: reader.result
-    }
-    axios.post('/document/' + docId + '/file', data)
-      .then((response) => {
-        if (typeof response.data.result !== 'undefined' && response.data.result !== 'success') {
-          console.error('Problem ' + operation + ': ' + response.data.result)
-        } else {
-          alert('document uploaded.')
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+  let formData = new FormData()
 
-  }
-  reader.readAsText(fileInput.files[0])
+  formData.append('file', file)
+
+  // POST to /document/<docId>/file
+  // i give up on axios/json for uploads, using fetch instead
+  fetch('/document/' + docId + '/file', {
+    method: "POST",
+    body: formData
+  })
+    .then((response) => {
+      if (response.ok) {
+        location.reload()
+      } else {
+        console.error('Problem uploading file: ')
+        console.log('HTTP status: ' + response.status + ' ' + response.statusText)
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 }

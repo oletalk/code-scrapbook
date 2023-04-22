@@ -59,6 +59,10 @@ table.documenttable {
   font-size: small;
 }
 
+.doc_filename {
+  color: rgb(51, 131, 51);
+}
+
 table.documenttable tr:nth-child(odd) {
   background-color: #e8edf4;
 }

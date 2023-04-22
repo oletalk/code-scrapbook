@@ -1,6 +1,9 @@
 function go(url) {
   window.location.replace(url)
 }
+function openwindow(url) {
+  window.open(url)
+}
 
 function toggleShowAccount() {
   let sa = document.getElementById('newaccount')
