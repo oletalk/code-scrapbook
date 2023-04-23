@@ -60,17 +60,21 @@
       </tr>
       <tr>
         <td>
-        <div><label>Receipt photo/PDF:</label> 
+        <div class='filesection'><label>Receipt photo/PDF:</label> 
           <% if @doc.file_location %>
           <span class="doc_filename"><%= File.basename(@doc.file_location) %></span>
           <% end %>
-        </div>
-        <% if @doc.file_location.nil? %>
-        <div><input id='file_location' name='file_location' type='file' />
-        <button onClick="uploadFile('file_location', <%= @doc.id %>)">Upload</button></div>
-        <% else %>
-        <div><button onClick="openwindow('/document/<%= @doc.id %>/file')">Download receipt</button> <button onClick="deleteFile(<%= @doc.id %>)">Delete</button></div>
+          <% if @doc.file_location.nil? %>
+          <div class="fileops"><input id='file_location' name='file_location' type='file' />
+          <button onClick="uploadFile('file_location', <%= @doc.id %>)">Upload</button></div>
+          <% else %>
+          <div class="fileops">
+            <button class='icon icon-download' onClick="openwindow('/document/<%= @doc.id %>/file')"><img src='/img/download.svg'/></button>
+            <button class='icon icon-trash' onClick="deleteFile(<%= @doc.id %>)"><img src='/img/trash.svg'/></button>
+          </div>
         <% end %>
+
+        </div>
         <div><label>Comments:</label></div>
         <div><textarea name='comments' class='sender_field' rows='5'><%= @doc.comments %></textarea></div>
         </td>

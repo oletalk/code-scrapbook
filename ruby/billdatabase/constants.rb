@@ -10,7 +10,7 @@ module Bills
     end
 
     module File
-      DOC_ROOT = '/tmp'
+      DOC_ROOT = '/Users/colin/docs'
     end
   end
 end

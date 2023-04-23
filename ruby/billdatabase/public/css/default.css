@@ -103,6 +103,12 @@ textarea.field_changed {
   border-top-style: dashed;
 }
 
+.searchbar {
+  border: 1px solid grey;
+  padding: 2px;
+  margin-bottom: 5px;
+  background: rgb(246, 240, 148);
+}
 
 .sender_account {
   border: 1px solid #343434;
@@ -149,7 +155,33 @@ td {
   font-style: italic;
 }
 
+div.filesection {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+button.icon {
+  padding: 0px;
+  border: 0;
+  background-color: transparent;
+}
+
+.fileops {
+  display: inline-flex;
+  padding: 3px;
+}
+
+button.icon img {
+  width: 30px;
+  padding: 0px;
+}
+
 label {
   font-weight: 500;
   color: darkblue;
+}
+
+.add_document {
+  margin: 10px;
 }
