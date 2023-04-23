@@ -177,6 +177,7 @@ button.icon img {
   padding: 0px;
 }
 
+
 label {
   font-weight: 500;
   color: darkblue;
@@ -184,4 +185,9 @@ label {
 
 .add_document {
   margin: 10px;
+}
+
+.top_navigation {
+  margin-bottom: 10px;
+  width: fit-content;
 }

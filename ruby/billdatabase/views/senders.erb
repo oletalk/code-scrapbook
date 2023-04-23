@@ -10,6 +10,7 @@
   <BODY>
 
     <h2>Sender list</h2>
+    <%= erb :nav, { :locals => { :page => 'senders'} } %>
     <div class="layout" id="doctype_section">
       <table class="senderlist">
       <% @senders.each_with_index do |sender, index| %>

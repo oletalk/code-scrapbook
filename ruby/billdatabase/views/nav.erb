@@ -1,0 +1,19 @@
+<div class='top_navigation'>
+  <div class='link'>
+    <% if page == 'documents' %>
+    <a href="/main">Home</a> &gt; Documents
+    <% elsif page == 'new document' %>
+    <a href="/main">Home</a> &gt; <a href="/documents">Documents</a> &gt; New Document
+    <% elsif page == 'edit document' %>
+    <a href="/main">Home</a> &gt; <a href="/documents">Documents</a> &gt; Edit Document
+    <% elsif page == 'senders' %>
+    <a href="/main">Home</a> &gt; Senders 
+    <% elsif page == 'new sender' %>
+    <a href="/main">Home</a> &gt; <a href="/senders">Senders</a> &gt; New Sender
+    <% elsif page == 'edit sender' %>
+    <a href="/main">Home</a> &gt; <a href="/senders">Senders</a> &gt; Edit Sender
+    <% elsif page == 'document types' %>
+    <a href="/main">Home</a> &gt; Document Types 
+    <% end %>
+  </div>
+</div>

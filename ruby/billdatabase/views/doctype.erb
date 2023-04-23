@@ -7,6 +7,7 @@
   <BODY>
 
     <h2>Document Types</h2>
+    <%= erb :nav, { :locals => { :page => 'document types'} } %>
     <div class="layout" id="doctype_section">
       <% @doctypes.each_with_index do |type, index| %>
       <div><%= type.name %></div>
