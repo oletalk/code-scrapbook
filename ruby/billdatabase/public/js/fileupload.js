@@ -32,26 +32,31 @@ function deleteFile(docId) {
 
 function uploadFile(elementId, docId) {
   const file = document.getElementById(elementId).files[0]
-  console.log('uploadFile called for doc ' + docId)
-  let formData = new FormData()
+  if (typeof file === 'undefined') {
+    alert('Please select a file to upload first!')
+  } else {
+    console.log('uploadFile called for doc ' + docId)
+    let formData = new FormData()
 
-  formData.append('file', file)
+    formData.append('file', file)
 
-  // POST to /document/<docId>/file
-  // i give up on axios/json for uploads, using fetch instead
-  fetch('/document/' + docId + '/file', {
-    method: "POST",
-    body: formData
-  })
-    .then((response) => {
-      if (response.ok) {
-        location.reload()
-      } else {
-        console.error('Problem uploading file: ')
-        console.log('HTTP status: ' + response.status + ' ' + response.statusText)
-      }
+    // POST to /document/<docId>/file
+    // i give up on axios/json for uploads, using fetch instead
+    fetch('/document/' + docId + '/file', {
+      method: "POST",
+      body: formData
     })
-    .catch((error) => {
-      console.error(error)
-    })
+      .then((response) => {
+        if (response.ok) {
+          location.reload()
+        } else {
+          console.error('Problem uploading file: ')
+          console.log('HTTP status: ' + response.status + ' ' + response.statusText)
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+
+  }
 }
