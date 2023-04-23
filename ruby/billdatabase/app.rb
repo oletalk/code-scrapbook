@@ -192,6 +192,16 @@ class BillDatabase < Sinatra::Base
     s.add_sender_account(sa)
   end
 
+  post '/sender/:id/contact_new' do |id|
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    sc = SenderContact.new(nil, id)
+    sc.name = params['name']
+    sc.contact = params['contact']
+    sc.comments = params['comments']
+    s.add_sender_contact(sc)
+  end
+
   delete '/senderaccount/:acc_id' do |acc_id|
     s = SenderHandler.new
     s.del_sender_account(acc_id)
@@ -205,6 +215,21 @@ class BillDatabase < Sinatra::Base
     sa.account_details = params['account_details']
     sa.comments = params['comments']
     s.upd_sender_account(sa)
+  end
+
+  delete '/sendercontact/:ctc_id' do |ctc_id|
+    s = SenderHandler.new
+    s.del_sender_contact(ctc_id)
+  end
+
+  post '/sendercontact/:ctc_id' do |ctc_id|
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    sc = SenderContact.new(ctc_id, nil) # don't need sender_id for update
+    sc.name = params['name']
+    sc.contact = params['contact']
+    sc.comments = params['comments']
+    s.upd_sender_contact(sc)
   end
 
   # non-erb (axios-only) calls here

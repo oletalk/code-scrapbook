@@ -112,9 +112,24 @@ textarea.field_changed {
 
 .sender_account {
   border: 1px solid #343434;
+  background-color: #ebe6f2;
 }
 
+.sender_contact {
+  border: 1px solid #343434;
+  background-color: #d2eee2;
+}
+
+
 #newaccount.hidden {
+  display: none;
+}
+
+#newcontact.hidden {
+  display: none;
+}
+
+table.senderlist tr.hidden {
   display: none;
 }
 
@@ -136,6 +151,7 @@ td {
   font-size: large;
   font-weight: 700;
   margin-left: -6px;
+  color: #b66ddd;
 }
 
 .senderdetail {

@@ -28,7 +28,9 @@
           <div>Sender:</div>
           <input class="sender_field" type='hidden' name='sender_id' value="<%= @doc.sender.id %>"/>
           <div class="field_value">
+            <a href="/sender/<%= @doc.sender.id %>">
             <%= @doc.sender.name %>
+            </a>
           </div>
           <div>Sender account:</div>
           <div>

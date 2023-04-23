@@ -4,11 +4,12 @@ require 'json'
 
 # holds information about each account you have with an entity (e.g. bank account with barclays)
 class SenderContact
-  attr_reader :id
+  attr_reader :id, :sender_id
   attr_accessor :name, :contact, :comments
 
-  def initialize(id_)
+  def initialize(id_, sender_id_)
     @id = id_
+    @sender_id = sender_id_
   end
 
   def fill_out_from(result_row)
@@ -21,6 +22,7 @@ class SenderContact
     {
       JSON.create_id => self.class.name,
       'id' => @id,
+      'sender_id' => @sender_id,
       'name' => @name,
       'contact' => @contact,
       'comments' => @comments

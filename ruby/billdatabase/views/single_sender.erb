@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/css/default.css">
     <script src="/js/ext/axios.min.js"></script>
     <script src="/js/entity.js" type="text/javascript" ></script>
+    <script src="/js/sender.js" type="text/javascript" ></script>
   </HEAD>
   <BODY>
 
@@ -21,6 +22,7 @@
       <tr>
         <td><label>Password hint</label><span class='optional'> (optional): </span></td><td colspan='2'><input name="password_hint" class='sender_field' value='<%= @sender.password_hint %>'/></td><td>&nbsp;</td>
       </tr>
+      <!-- ACCOUNTS WE HAVE WITH THIS SENDER -->
       <% if @sender.sender_accounts.size > 0 %>
         <% @sender.sender_accounts.each_with_index do |account, index| %>
           <tr>
@@ -64,6 +66,52 @@
           </td>
           <td><button onClick="addAccount(<%= @sender.id %>)">add account</button></td>
       </tr>
+
+      <!-- CONTACT DETAILS WE HAVE FOR THIS SENDER -->
+      <% if @sender.sender_contacts.size > 0 %>
+        <% @sender.sender_contacts.each_with_index do |contact, index| %>
+          <tr>
+            <td colspan='3'>
+              <div class='sender_contact' id='contact_<%= contact.id %>'>
+                <div>
+                  <input type="hidden" name="id" class='fieldval' value="<%= contact.id %>" />
+                  <%= index+1 %> - Contact name: <input name="name" class='fieldval' value="<%= contact.name %>" />
+                </div>
+                <div>
+                  <%= index+1 %> - Contact info (phone, etc): <input name="contact" class='fieldval' value="<%= contact.contact %>" />
+                </div>
+                <div>
+                  <%= index+1 %> - Comments: <textarea name='comments' class='fieldval' ><%= contact.comments %></textarea>
+                </div>
+              </div>
+            </td>
+            <td><button class="update_btn" onClick="updateContact('contact_<%= contact.id %>')">update contact</button>
+            <br/>
+            <button class="delete_btn" onClick="deleteContact('<%= contact.id %>')">DELETE contact</button>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+      <tr>
+        <td colspan='4'><button onClick="toggleShowContact()">Add (more) contact info</button></td>
+      </tr>
+      <tr id="newcontact" class="hidden">
+          <td colspan='3'>
+            <div class='sender_contact' id='contact_new'>
+              <div>
+                + - Contact name: <input name="name" class='fieldval' value="" />
+              </div>
+              <div>
+                + - Contact info (phone, etc): <input name="contact" class='fieldval' value="" />
+              </div>
+              <div>
+                + - Comments: <textarea name='comments' class='fieldval' ></textarea>
+              </div>
+            </div>
+          </td>
+          <td><button onClick="addContact(<%= @sender.id %>)">add contact</button></td>
+      </tr>
+
       <tr>
         <td><label>Comments</label></td><td colspan='3'><textarea rows='5' class='sender_field' name='comments'><%= @sender.comments %></textarea></td>
       </tr>

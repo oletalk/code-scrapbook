@@ -11,13 +11,16 @@
 
     <h2>Sender list</h2>
     <%= erb :nav, { :locals => { :page => 'senders'} } %>
+    <!-- TODO make search box here too -->
     <div class="layout" id="doctype_section">
       <table class="senderlist">
       <% @senders.each_with_index do |sender, index| %>
       <tr>
-        <td colspan='3'><span class='sendername'><a href="/sender/<%= sender.id %>"><%= sender.name %></a></span></td>
+        <td colspan='3'>
+          <button onClick="toggleShowSender('tr_<%= index %>')"">+</button>
+          &nbsp;&nbsp;<span class='sendername'><a href="/sender/<%= sender.id %>"><%= sender.name %></a></span></td>
       </tr>
-      <tr>
+      <tr id="tr_<%= index %>_0" class='hidden'>
         <td>
           <label>Username</label><span class='optional'> (optional): </span>
           <% unless (sender.username.empty?) %>
@@ -36,7 +39,7 @@
           <% end %>
         </td>
       </tr>
-      <tr>
+      <tr id="tr_<%= index %>_1" class='hidden'>
         <td><label>Comments</label></td><td colspan='3'><%= sender.comments %></td>
       </tr>
       <% end %>

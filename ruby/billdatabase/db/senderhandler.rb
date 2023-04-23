@@ -6,6 +6,7 @@ require_relative '../data/sender'
 SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
 ACCOUNT_FIELDS = 'id, sender_id, account_number, account_details, comments'
+CONTACT_FIELDS = 'id, sender_id, name, contact, comments'
 
 # fetches sender information from the db
 class SenderHandler
@@ -76,6 +77,48 @@ class SenderHandler
     end
   end
 
+  def add_sender_contact(contact)
+    unless contact.is_a?(SenderContact)
+      raise TypeError,
+            'add_sender_contact expects a SenderContact'
+    end
+    raise ArgumentError, 'provided contact is not linked to a sender' if contact.sender_id.nil?
+
+    sql = 'insert into bills.sender_contact '\
+          '(sender_id, name, contact, comments) '\
+          'VALUES ($1, $2, $3, $4)'
+    connect_for('adding a contact to a sender') do |conn|
+      conn.prepare('add_sc', sql)
+      conn.exec_prepared('add_sc', [
+                           account.sender_id,
+                           account.name,
+                           account.contact,
+                           account.comments
+                         ])
+    end
+  end
+
+  def upd_sender_contact(contact)
+    unless contact.is_a?(SenderContact)
+      raise TypeError,
+            'add_sender_contact expects a SenderContact'
+    end
+    raise ArgumentError, 'provided contact has no id' if contact.id.nil?
+
+    sql = 'update bills.sender_contact '\
+          'set name = $1, contact = $2, comments = $3 '\
+          ' where id = $4'
+    connect_for('updating contact information for a sender') do |conn|
+      conn.prepare('upd_sc', sql)
+      conn.exec_prepared('upd_sc', [
+                           contact.name,
+                           contact.contact,
+                           contact.comments,
+                           contact.id
+                         ])
+    end
+  end
+
   def update_sender(sender)
     raise TypeError, 'update_sender expects a Sender' unless sender.is_a?(Sender)
 
@@ -106,7 +149,7 @@ class SenderHandler
       end
 
       unless ret.nil?
-
+        # load accounts you have with the sender if any
         accounts = []
         sql = "select #{ACCOUNT_FIELDS} from bills.sender_account " \
               'where sender_id = $1 and deleted is null order by account_number'
@@ -119,6 +162,21 @@ class SenderHandler
           end
         end
         ret.add_accounts(accounts)
+
+        # load contact details you have with the sender if any
+        contacts = []
+
+        sql = "select #{CONTACT_FIELDS} from bills.sender_contact " \
+              'where sender_id = $1 and deleted is null order by name'
+        conn.prepare('fetch_sc', sql)
+        conn.exec_prepared('fetch_sc', [sender_id]) do |result|
+          result.each do |result_row|
+            ctc = SenderContact.new(result_row['id'], result_row['sender_id'])
+            ctc.fill_out_from(result_row)
+            contacts.push(ctc)
+          end
+        end
+        ret.add_contacts(contacts)
       end
       ret
     end
@@ -150,6 +208,15 @@ class SenderHandler
     connect_for('marking a sender account as deleted') do |conn|
       conn.prepare('upd_sa', sql)
       conn.exec_prepared('upd_sa', [sa_id])
+    end
+  end
+
+  def del_sender_contact(sc_id)
+    sql = 'update bills.sender_contact '\
+          "set deleted = 'Y' where id = $1"
+    connect_for('marking a sender contact as deleted') do |conn|
+      conn.prepare('upd_sc', sql)
+      conn.exec_prepared('upd_sc', [sc_id])
     end
   end
 
