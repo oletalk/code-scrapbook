@@ -5,11 +5,16 @@
     <link rel="stylesheet" href="/css/default.css">
     <script src="/js/ext/axios.min.js"></script>
     <script src="/js/entity.js" type="text/javascript" ></script>
+    <script src="/js/searchfilter.js" type="text/javascript" ></script>
   </HEAD>
   <BODY>
     <h2>View Documents</h2>
     <div class="layout">
-      <table class="documenttable">
+    <div class="searchbar">
+      <span class='searchtitle'>Search type/sender/summary: </span>
+      <span class='searchfilter'><input name='searchfilter' oninput='quickFilter(this.value)' />
+    </div>
+      <table class="documenttable" id='alldocuments'>
         <tr>
           <th class="recvd"><label>Received</label></th>
           <th><label>Type</label></th>
@@ -21,7 +26,11 @@
         </tr>
         <% @documents.each_with_index do |document, index| %>
         <tr>
-          <td><a href="/document/<%= document.id %>"><%= document.received_date %></a></td>
+          <td>
+            <a href="/document/<%= document.id %>">
+            <%= document.received_date %></a>
+            <% if document.file_location %> * <% end %>
+          </td>
           <td><%= document.doc_type.name %></td>
           <td><%= document.sender.name %></td>
           <td><%= document.due_date ? document.due_date : '-' %></td>
@@ -31,5 +40,7 @@
         </tr>
         <% end %>
       </table>
+      <span class='advice'>* receipt/document uploaded</span>
     </div>
+    <div class='add_document'><button onClick="go('/document_new')">Add New Document</button></div>
   </BODY>
