@@ -19,7 +19,12 @@
       </tr>
       <tr>
         <td>
-          <label>Username</label><span class='optional'> (optional): </span></td><td><%= sender.username %></b>
+          <label>Username</label><span class='optional'> (optional): </span>
+          <% unless (sender.username.empty?) %>
+          <b><%= sender.username %></b>
+          <% else %>
+          <span class='not_provided'>(none)</span>
+          <% end %>
         </td>
         <td>
           <% unless (sender.password_hint.empty? ) %>
