@@ -84,6 +84,14 @@ table.documenttable tr td {
   padding: 5px 15px 5px 15px;
 }
 
+.accountnumber {
+  opacity: 0;
+}
+
+.accountnumber:hover {
+  opacity: 1;
+}
+
 input.fieldval {
   border-top-style: hidden;
   border-right-style: hidden;

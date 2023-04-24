@@ -2,6 +2,9 @@
 
 require_relative 'db'
 require_relative '../data/sender'
+require_relative '../data/mappers/sendermapper'
+require_relative '../data/mappers/senderaccountmapper'
+require_relative '../data/mappers/sendercontactmapper'
 
 SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
@@ -142,10 +145,7 @@ class SenderHandler
       sql = "select #{SENDER_FIELDS} from bills.sender where id = $1"
       conn.prepare('fetch_sender', sql)
       conn.exec_prepared('fetch_sender', [sender_id]) do |result|
-        result.each do |result_row|
-          ret = Sender.new(result_row['id'], result_row['created_at'])
-          ret.fill_out_from(result_row)
-        end
+        ret = SenderMapper.new.create_from_result(result)[0]
       end
 
       unless ret.nil?
@@ -155,11 +155,7 @@ class SenderHandler
               'where sender_id = $1 and deleted is null order by account_number'
         conn.prepare('fetch_sa', sql)
         conn.exec_prepared('fetch_sa', [sender_id]) do |result|
-          result.each do |result_row|
-            acc = SenderAccount.new(result_row['id'], result_row['sender_id'])
-            acc.fill_out_from(result_row)
-            accounts.push(acc)
-          end
+          accounts = SenderAccountMapper.new.create_from_result(result)
         end
         ret.add_accounts(accounts)
 
@@ -170,12 +166,9 @@ class SenderHandler
               'where sender_id = $1 and deleted is null order by name'
         conn.prepare('fetch_sc', sql)
         conn.exec_prepared('fetch_sc', [sender_id]) do |result|
-          result.each do |result_row|
-            ctc = SenderContact.new(result_row['id'], result_row['sender_id'])
-            ctc.fill_out_from(result_row)
-            contacts.push(ctc)
-          end
+          contacts = SenderContactMapper.new.create_from_result(result)
         end
+
         ret.add_contacts(contacts)
       end
       ret
@@ -189,11 +182,7 @@ class SenderHandler
     connect_for('fetching all senders') do |conn|
       sql = "select #{SENDER_FIELDS} from bills.sender order by name"
       conn.exec(sql) do |result|
-        result.each do |result_row|
-          sender = Sender.new(result_row['id'], result_row['created_at'])
-          sender.fill_out_from(result_row)
-          ret.push(sender)
-        end
+        ret = SenderMapper.new.create_from_result(result)
       end
     end
     ret
@@ -226,7 +215,7 @@ class SenderHandler
       sql = 'select 1 from bills.document where sender_account_id = $1'
       conn.prepare('check_sa_nd', sql)
       conn.exec_prepared('check_sa_nd', [sa_id]) do |result|
-        result.each do |_result_row|
+        result.each do
           ret = false
         end
       end

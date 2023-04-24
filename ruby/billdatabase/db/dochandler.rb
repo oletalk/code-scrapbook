@@ -6,6 +6,7 @@ require_relative 'db'
 require_relative '../data/doctype'
 require_relative '../data/document'
 require_relative '../constants'
+require_relative '../data/mappers/documentmapper'
 
 # fetches document information from the db
 class DocHandler
@@ -17,22 +18,7 @@ class DocHandler
       sql = File.read('./sql/fetch_document.sql')
       conn.prepare('fetch_document', sql)
       conn.exec_prepared('fetch_document', [id]) do |result|
-        result.each do |result_row|
-          dt = DocType.new(result_row['doc_type_id'], result_row['doc_type_name'])
-          s = Sender.new(result_row['sender_id'], nil)
-          s.name = result_row['sender_name']
-          ret = Document.new(
-            result_row['id'], nil,
-            result_row['received_date'], dt, s
-          )
-          ret.fill_out_from(result_row)
-          next unless result_row['sender_account_id']
-
-          sa_id = result_row['sender_account_id']
-          sa_an = result_row['acdcount_number']
-          sa = SenderAccount.new(sa_id, sa_an)
-          ret.sender_account = sa
-        end
+        ret = DocumentMapper.new.create_from_result(result)[0]
       end
     end
     ret
@@ -43,17 +29,7 @@ class DocHandler
     connect_for('fetching all documents') do |conn|
       sql = File.read('./sql/fetch_all_documents.sql')
       conn.exec(sql) do |result|
-        result.each do |result_row|
-          dt = DocType.new(result_row['doc_type_id'], result_row['doc_type_name'])
-          s = Sender.new(result_row['sender_id'], nil)
-          s.name = result_row['sender_name']
-          doc = Document.new(
-            result_row['id'], nil,
-            result_row['received_date'], dt, s
-          )
-          doc.fill_out_from(result_row)
-          ret.push(doc)
-        end
+        ret = DocumentMapper.new.create_from_result(result)
       end
     end
     ret
@@ -181,7 +157,7 @@ class DocHandler
           f.write(file_contents)
         end
       when 'copy'
-        FileUtils.cp(file_contents, filename)
+        FileUtils.cp(file_contents, dest_folder)
       else
         raise "unknown mode #{mode} - should be stream or raise"
       end
