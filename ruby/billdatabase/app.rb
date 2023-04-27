@@ -202,6 +202,12 @@ class BillDatabase < Sinatra::Base
     s.add_sender_contact(sc)
   end
 
+  get '/sendercontacts' do
+    s = SenderHandler.new
+    @senders = s.fetch_all_contacts # contacts grouped by sender
+    erb :contacts
+  end
+
   delete '/senderaccount/:acc_id' do |acc_id|
     s = SenderHandler.new
     s.del_sender_account(acc_id)

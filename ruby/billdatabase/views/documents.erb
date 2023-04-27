@@ -37,7 +37,7 @@
           <td><%= document.sender.name %></td>
           <td><%= document.due_date ? document.due_date : '-' %></td>
           <td><%= document.paid_date ? document.paid_date : '-' %></td>
-          <td class='accountnumber'><%= document.sender_account.nil? ? 'N/A' : document.sender_account.account_number %></td>
+          <td class='accountnumber'><%= document.sender_account.nil? ? '&nbsp;' : document.sender_account.account_number %></td>
           <td><%= document.summary %></td>
         </tr>
         <% end %>

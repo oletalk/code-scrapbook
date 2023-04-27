@@ -93,10 +93,10 @@ class SenderHandler
     connect_for('adding a contact to a sender') do |conn|
       conn.prepare('add_sc', sql)
       conn.exec_prepared('add_sc', [
-                           account.sender_id,
-                           account.name,
-                           account.contact,
-                           account.comments
+                           contact.sender_id,
+                           contact.name,
+                           contact.contact,
+                           contact.comments
                          ])
     end
   end
@@ -221,5 +221,36 @@ class SenderHandler
       end
     end
     ret
+  end
+
+  def fetch_all_contacts
+    ret = []
+    connect_for('fetching all sender contacts') do |conn|
+      sql = File.read('./sql/fetch_all_contact_info.sql')
+      prev_sender_id = 0
+      curr_sender = nil
+      curr_sender_contacts = []
+      conn.exec(sql) do |result|
+        result.each do |result_row|
+          # we will save them by sender
+          if result_row['sender_id'] != prev_sender_id
+            prev_sender_id = result_row['sender_id']
+            push_sender_account_record(curr_sender_contacts, curr_sender, ret)
+            curr_sender_contacts = [] unless curr_sender_contacts.empty?
+            curr_sender = Sender.new(result_row['sender_id'], nil)
+            curr_sender.name = result_row['sender_name']
+          end
+
+          curr_sender_contacts.push(SenderContactMapper.new.create_from_row(result_row))
+        end
+      end
+      push_sender_account_record(curr_sender_contacts, curr_sender, ret)
+    end
+    ret
+  end
+
+  def push_sender_account_record(contact_array, sender, sender_array)
+    sender.add_contacts(contact_array) unless contact_array.empty?
+    sender_array.push(sender) unless sender.nil?
   end
 end

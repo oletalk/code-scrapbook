@@ -1,0 +1,28 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>sender contacts</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+  </HEAD>
+  <BODY>
+
+    <h2>Contact Sender</h2>
+    <%= erb :nav, { :locals => { :page => 'sender contacts'} } %>
+    <div class="layout">
+      <ul>
+      <% @senders.each do |sender| %>
+      <li>
+        <%= sender.name%>
+        <ul>
+        <% sender.sender_contacts.each_with_index do |contact, index| %>
+        <li>
+          <%= contact.name %>
+        </li>
+        <% end %>
+        </ul>
+      </li>
+      <% end %>
+      </ul>
+    </ul>
+  </BODY>
+</HTML>

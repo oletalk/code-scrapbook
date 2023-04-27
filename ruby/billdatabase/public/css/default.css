@@ -85,11 +85,15 @@ table.documenttable tr td {
 }
 
 .accountnumber {
-  opacity: 0;
+  opacity: 1;
+  color: transparent;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
 .accountnumber:hover {
   opacity: 1;
+  color: black;
+  text-shadow: 0;
 }
 
 input.fieldval {
