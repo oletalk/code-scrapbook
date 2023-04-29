@@ -18,9 +18,9 @@ function filterSearchTrs(searchStr, tblid) {
     const senderMatch = columnContains(trs[i], 2, searchStr)
     const summaryMatch = columnContains(trs[i], 6, searchStr)
     if (docTypeMatch || senderMatch || summaryMatch) {
-      trs[i].style.display = ''
+      trs[i].classList.remove('hidden')
     } else {
-      trs[i].style.display = 'none'
+      trs[i].classList.add('hidden')
     }
   }
 }

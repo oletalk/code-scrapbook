@@ -28,17 +28,17 @@
         </tr>
         <% @documents.each_with_index do |document, index| %>
         <tr>
-          <td>
+          <td><div>
             <a href="/document/<%= document.id %>">
             <%= document.received_date %></a>
             <% if document.file_location %> * <% end %>
-          </td>
-          <td><%= document.doc_type.name %></td>
-          <td><%= document.sender.name %></td>
-          <td><%= document.due_date ? document.due_date : '-' %></td>
-          <td><%= document.paid_date ? document.paid_date : '-' %></td>
-          <td class='accountnumber'><%= document.sender_account.nil? ? '&nbsp;' : document.sender_account.account_number %></td>
-          <td><%= document.summary %></td>
+          </div></td>
+          <td><div><%= document.doc_type.name %></div></td>
+          <td><div><%= document.sender.name %></div></td>
+          <td><div><%= document.due_date ? document.due_date : '-' %></div></td>
+          <td><div><%= document.paid_date ? document.paid_date : '-' %></div></td>
+          <td class='accountnumber'><div><%= document.sender_account.nil? ? '&nbsp;' : document.sender_account.account_number %></div></td>
+          <td><div><%= document.summary %></div></td>
         </tr>
         <% end %>
       </table>

@@ -79,6 +79,27 @@ table.documenttable tr:nth-child(even):hover {
   background-color: #c9d9e7;
 }
 
+table.documenttable tr {
+  visibility: visible;
+  opacity: 1;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr.hidden td div {
+  max-height: 0;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr td div {
+  max-height: 50px;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr.hidden {
+  visibility: collapse;
+  opacity: 0;
+  transition: all 0.25s ease-in;
+}
 
 table.documenttable tr td {
   padding: 5px 15px 5px 15px;
@@ -142,7 +163,20 @@ textarea.field_changed {
 }
 
 table.senderlist tr.hidden {
-  display: none;
+  opacity: 0;
+  max-height: 0;
+  height: 0;
+  visibility: collapse;
+  transition: all 0.25s ease-in;
+}
+
+table.senderlist tr {
+  opacity: 1;
+  max-height: 50px;
+  height: auto;
+  visibility: visible;
+  transition: all 0.25s ease-in;
+
 }
 
 table {
