@@ -2,9 +2,9 @@
 
 require_relative 'db'
 require_relative '../data/sender'
+require_relative '../data/mappers/genericmapper'
 require_relative '../data/mappers/sendermapper'
-require_relative '../data/mappers/senderaccountmapper'
-require_relative '../data/mappers/sendercontactmapper'
+require_relative '../data/mappers/sendertagmapper'
 
 SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
@@ -150,32 +150,55 @@ class SenderHandler
 
       unless ret.nil?
         # load accounts you have with the sender if any
-        accounts = []
-        sql = "select #{ACCOUNT_FIELDS} from bills.sender_account " \
-              'where sender_id = $1 and deleted is null order by account_number'
-        conn.prepare('fetch_sa', sql)
-        conn.exec_prepared('fetch_sa', [sender_id]) do |result|
-          accounts = SenderAccountMapper.new.create_from_result(result)
-        end
-        ret.add_accounts(accounts)
+        ret.add_accounts(fetchlist_accounts(conn, sender_id))
 
         # load contact details you have with the sender if any
-        contacts = []
+        ret.add_contacts(fetchlist_contacts(conn, sender_id))
 
-        sql = "select #{CONTACT_FIELDS} from bills.sender_contact " \
-              'where sender_id = $1 and deleted is null order by name'
-        conn.prepare('fetch_sc', sql)
-        conn.exec_prepared('fetch_sc', [sender_id]) do |result|
-          contacts = SenderContactMapper.new.create_from_result(result)
-        end
-
-        ret.add_contacts(contacts)
+        # load contact details you have with the sender if any
+        ret.add_tags(fetchlist_tags(conn, sender_id))
       end
       ret
     end
 
     ret
   end
+
+  ## sub methods for above
+  def fetchlist_accounts(conn, sender_id)
+    ret = []
+    sql = "select #{ACCOUNT_FIELDS} from bills.sender_account " \
+              'where sender_id = $1 and deleted is null order by account_number'
+    conn.prepare('fetch_sa', sql)
+    conn.exec_prepared('fetch_sa', [sender_id]) do |result|
+      ret = GenericMapper.new.create_from_result(result, SenderAccount)
+    end
+    ret
+  end
+
+  def fetchlist_contacts(conn, sender_id)
+    ret = []
+    sql = "select #{CONTACT_FIELDS} from bills.sender_contact " \
+      'where sender_id = $1 and deleted is null order by name'
+    conn.prepare('fetch_sc', sql)
+    conn.exec_prepared('fetch_sc', [sender_id]) do |result|
+      ret = GenericMapper.new.create_from_result(result, SenderContact)
+    end
+    ret
+  end
+
+  def fetchlist_tags(conn, sender_id)
+    ret = []
+    sql = 'select tag_id, tag_name from bills.tag_type t, bills.sender_tag st ' \
+      'where t.id = st.tag_id and st.sender_id = $1 order by tag_name'
+    conn.prepare('fetch_st', sql)
+    conn.exec_prepared('fetch_st', [sender_id]) do |result|
+      ret = SenderTagMapper.new.create_from_result(result)
+    end
+    ret
+  end
+
+  ## end sub methods...
 
   def fetch_senders
     ret = []
@@ -241,7 +264,7 @@ class SenderHandler
             curr_sender.name = result_row['sender_name']
           end
 
-          curr_sender_contacts.push(SenderContactMapper.new.create_from_row(result_row))
+          curr_sender_contacts.push(GenericMapper.new.create_from_row(result_row, SenderContact))
         end
       end
       push_sender_account_record(curr_sender_contacts, curr_sender, ret)
