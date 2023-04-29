@@ -12,11 +12,12 @@
       <ul>
       <% @senders.each do |sender| %>
       <li>
-        <%= sender.name%>
+        <a href="/sender/<%= sender.id %>"><%= sender.name%></a>
         <ul>
         <% sender.sender_contacts.each_with_index do |contact, index| %>
         <li>
-          <%= contact.name %>
+          <%= contact.name %> - <%= contact.contact%>
+          <% unless contact.comments.empty? %> (<%= contact.comments %>)<% end %>
         </li>
         <% end %>
         </ul>
