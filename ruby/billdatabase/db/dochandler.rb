@@ -157,12 +157,14 @@ class DocHandler
           f.write(file_contents)
         end
       when 'copy'
+        puts "Source: #{file_contents} -> Target: #{dest_folder}"
         FileUtils.cp(file_contents, dest_folder)
       else
         raise "unknown mode #{mode} - should be stream or raise"
       end
     rescue StandardError => e
-      ret = { result: e.to_s }
+      puts "Error: #{e}"
+      raise e
     end
 
     # record this file location in the database
