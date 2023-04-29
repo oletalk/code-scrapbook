@@ -202,6 +202,16 @@ class BillDatabase < Sinatra::Base
     s.add_sender_contact(sc)
   end
 
+  post '/sendertag/:id/:tagid' do |id, tag_id|
+    s = SenderHandler.new
+    s.add_sender_tag(id, tag_id)
+  end
+
+  delete '/sendertag/:id/:tagid' do |id, tag_id|
+    s = SenderHandler.new
+    s.del_sender_tag(id, tag_id)
+  end
+
   get '/sendercontacts' do
     s = SenderHandler.new
     @senders = s.fetch_all_contacts # contacts grouped by sender
@@ -248,6 +258,13 @@ class BillDatabase < Sinatra::Base
     else
       sender.sender_accounts.to_json
     end
+  end
+
+  get '/sendertags' do
+    content_type 'application/json'
+    s = SenderHandler.new
+    tags = s.fetch_sender_tags(id)
+    tags.to_json
   end
 
   run! if app_file == $PROGRAM_NAME
