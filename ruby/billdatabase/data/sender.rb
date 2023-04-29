@@ -3,10 +3,11 @@
 require 'json'
 require_relative 'senderaccount'
 require_relative 'sendercontact'
+require_relative 'sendertag'
 
 # holds information about the sender of a document (account you have with them)
 class Sender
-  attr_reader :id, :created_at, :sender_accounts, :sender_contacts
+  attr_reader :id, :created_at, :sender_accounts, :sender_contacts, :sender_tags
   attr_accessor :name, :username, :password_hint, :comments
 
   def initialize(id_, created_at_)
@@ -14,6 +15,7 @@ class Sender
     @created_at = created_at_
     @sender_accounts = []
     @sender_contacts = []
+    @sender_tags = []
   end
 
   def fill_out_from(result_row)
@@ -21,6 +23,15 @@ class Sender
     @username = result_row['username']
     @password_hint = result_row['password_hint']
     @comments = result_row['comments']
+  end
+
+  def add_tags(tags)
+    tags.each do |tag|
+      raise "Array doesn't completely consist of SenderTags" \
+      unless tag.is_a?(SenderTag)
+
+      @sender_tags.push(tag)
+    end
   end
 
   def add_accounts(accounts)
@@ -51,7 +62,8 @@ class Sender
       'password_hint' => @password_hint,
       'comments' => @comments,
       'sender_accounts' => @sender_accounts,
-      'sender_contacts' => @sender_contacts
+      'sender_contacts' => @sender_contacts,
+      'sender_tags' => @sender_tags
     }.to_json(*args)
   end
 end

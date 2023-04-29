@@ -211,6 +211,30 @@ class SenderHandler
     ret
   end
 
+  def fetch_sender_tags(sender_id)
+    ret = []
+    connect_for('fetching sender tags') do |conn|
+      ret = fetchlist_tags(conn, sender_id)
+    end
+    ret
+  end
+
+  def del_sender_tag(sender_id, tag_id)
+    sql = 'delete from bills.sender_tag where sender_id = $1 and tag_id = $2'
+    connect_for('deleting a tag from a sender') do |conn|
+      conn.prepare('del_st', sql)
+      conn.exec_prepared('del_st', [sender_id, tag_id])
+    end
+  end
+
+  def add_sender_tag(sender_id, tag_id)
+    sql = 'insert into bills.sender_tag (sender_id, tag_id) values ($1, $2)'
+    connect_for('adding a tag to a sender') do |conn|
+      conn.prepare('add_st', sql)
+      conn.exec_prepared('add_st', [sender_id, tag_id])
+    end
+  end
+
   def del_sender_account(sa_id)
     raise 'Cannot delete account while it still has associated documents' \
     unless check_senderaccount_nodocuments(sa_id)
