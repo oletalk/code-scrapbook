@@ -124,7 +124,7 @@ class BillDatabase < Sinatra::Base
 
     d = DocHandler.new
     ret = d.upload_file(id, fileupload['filename'], fileupload['tempfile'], 'copy')
-    ret.to_json # TODO: check but i think this gets ignored
+    ret.to_json
   end
 
   delete '/document/:id/file' do |id|

@@ -157,8 +157,9 @@ class DocHandler
           f.write(file_contents)
         end
       when 'copy'
-        puts "Source: #{file_contents} -> Target: #{dest_folder}"
-        FileUtils.cp(file_contents, dest_folder)
+        puts "Source tempfile path: #{file_contents.path}"
+        puts "Source: #{file_contents.path} -> Target: #{filename}"
+        FileUtils.cp(file_contents.path, filename)
       else
         raise "unknown mode #{mode} - should be stream or raise"
       end
