@@ -15,6 +15,16 @@
     <div class="searchbar">
       <span class='searchtitle'>Search type/sender/summary: </span>
       <span class='searchfilter'><input name='searchfilter' oninput='quickFilter(this.value)' />
+      <% if @dates %>
+      <span> From: <input id='dateFrom' type='date' value='<%= @dates[:from] %>' /> 
+             To: <input id='dateTo' type='date' value='<%= @dates[:to] %>' /> 
+             <button onClick="updateDocumentsDates('dateFrom', 'dateTo')">Update</button></span>
+             <button onClick="go('/documents')">Clear date filter</button></span>
+      <% else %>
+            <span> From: <input id='dateFrom' type='date' /> 
+             To: <input id='dateTo' type='date' /> 
+             <button onClick="updateDocumentsDates('dateFrom', 'dateTo')">Update</button></span>
+      <% end %>
     </div>
       <table class="documenttable" id='alldocuments'>
         <tr>

@@ -24,11 +24,16 @@ class DocHandler
     ret
   end
 
-  def fetch_documents
+  def fetch_documents(d_from, d_to)
     ret = []
+    today = Time.now.strftime('%Y-%m-%d')
+    date_from = d_from.nil? ? '1970-01-01' : d_from
+    date_to = d_to.nil? ? today : d_to
+    puts "fetching documents from #{date_from} to #{date_to}"
     connect_for('fetching all documents') do |conn|
       sql = File.read('./sql/fetch_all_documents.sql')
-      conn.exec(sql) do |result|
+      conn.prepare('fetch_docs', sql)
+      conn.exec_prepared('fetch_docs', [date_from, date_to]) do |result|
         ret = DocumentMapper.new.create_from_result(result)
       end
     end

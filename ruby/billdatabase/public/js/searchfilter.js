@@ -37,3 +37,17 @@ function columnContains(row, colno, searchStr) {
   }
   return ret
 }
+
+function updateDocumentsDates(dateFromEl, dateToEl) {
+  const dfe = document.getElementById(dateFromEl).value
+  const dte = document.getElementById(dateToEl).value
+
+  console.log('from: ' + dfe + ', to: ' + dte)
+  if (dfe == '' || dte == '') {
+    alert('Please select both dates first')
+  } else if (dfe > dte) {
+    alert('End date should be after start date')
+  } else {
+    location.href = '/documents/' + dfe + '/' + dte
+  }
+}

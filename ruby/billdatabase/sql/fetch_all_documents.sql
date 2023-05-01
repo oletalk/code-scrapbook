@@ -15,4 +15,6 @@ from bills.document d
   join bills.doc_type dt on d.doc_type_id = dt.id
   join bills.sender s on d.sender_id = s.id
   left join bills.sender_account sa on d.sender_account_id = sa.id
+where received_date >= $1
+  and received_date <= $2
 order by received_date desc;
