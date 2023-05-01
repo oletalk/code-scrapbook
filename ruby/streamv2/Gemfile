@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-gem 'httparty', '~> 0.20.0'
+gem 'httparty', '~> 0.21.0'
 gem 'jwt', '~> 2.5.0'
 gem 'logger', '~> 1.4.2'
 gem 'pg', '~> 1.4.3'
