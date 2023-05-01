@@ -15,7 +15,7 @@
       <table class='tags'>
       <% @tags.each do |tag| %>
       <tr>
-        <td><input id="<%= tag.id %>_color" type='color' value="<%= tag.color.nil? ? '#000000' : tag.color %>"/> <%= tag.description %></td>
+        <td><input class='fieldval' id="<%= tag.id %>_color" type='color' value="<%= tag.color.nil? ? '#000000' : tag.color %>"/> <%= tag.description %></td>
         <td><button onClick='updateColor(<%= tag.id %>, "<%= tag.id %>_color")'>update</button></td>
       </tr>
       <% end %>
@@ -24,11 +24,15 @@
       </tr>
       <tr>
         <td>
-          <input id="new_color" type='color' /> <input name="new_tag" />
+          <input id="new_color" type='color' /> <input id="new_tag" />
         </td>
         <td><button onClick='addTag()'>save</button></td>
       </tr>
       </table>
     </div>
+    <script type='text/javascript'>
+    addChangeIndicators('fieldval')
+    </script>
+
   </BODY>
 </HTML>
