@@ -273,7 +273,7 @@ class BillDatabase < Sinatra::Base
   post '/tagtype_new' do
     params = JSON.parse(request.body.read)
     s = SenderHandler.new
-    st = SenderTag.new(params['id'], params['tag_type'], params['color'])
+    st = SenderTag.new(nil, params['tag_type'], params['color'])
     res = s.add_tagtype(st)
     res.to_json
   end
@@ -287,6 +287,13 @@ class BillDatabase < Sinatra::Base
   end
 
   # non-erb (axios-only) GET calls here
+  get '/json/sendertags' do
+    content_type 'application/json'
+    s = SenderHandler.new
+    ret = s.fetch_senders_and_tags
+    ret.to_json
+  end
+
   get '/json/sender/:id/accounts' do |id|
     content_type 'application/json'
     s = SenderHandler.new

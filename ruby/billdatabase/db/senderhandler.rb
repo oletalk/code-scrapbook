@@ -199,6 +199,21 @@ class SenderHandler
   end
 
   ## end sub methods...
+  def fetch_senders_and_tags
+    ret = []
+    connect_for('fetching senders and tags') do |conn|
+      sql = File.read('./sql/fetch_sender_tags.sql')
+      conn.exec(sql) do |result|
+        result.each do |result_row|
+          ret.push({
+                     sender_id: result_row['id'],
+                     tag_name: result_row['tag_name']
+                   })
+        end
+      end
+    end
+    ret
+  end
 
   def fetch_senders
     ret = []
@@ -237,7 +252,7 @@ class SenderHandler
     sql = 'insert into bills.tag_type (tag_name, color) values ($1, $2)'
     connect_for('inserting new tag type') do |conn|
       conn.prepare('add_tagtype', sql)
-      conn.exec_prepared('add_tagtype', [tag.id, tag.tag_name, tag.color])
+      conn.exec_prepared('add_tagtype', [tag.tag_name, tag.color])
     rescue StandardError => e
       ret = { result: e.to_s }
     end
