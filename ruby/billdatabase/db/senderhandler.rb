@@ -211,6 +211,17 @@ class SenderHandler
     ret
   end
 
+  def fetch_all_tags
+    ret = []
+    connect_for('fetching all tags') do |conn|
+      sql = 'select id as tag_id, tag_name from bills.tag_type order by tag_name'
+      conn.exec(sql) do |result|
+        ret = SenderTagMapper.new.create_from_result(result)
+      end
+    end
+    ret
+  end
+
   def fetch_sender_tags(sender_id)
     ret = []
     connect_for('fetching sender tags') do |conn|

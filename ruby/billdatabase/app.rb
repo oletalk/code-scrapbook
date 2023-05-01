@@ -2,6 +2,7 @@
 
 require 'json'
 require 'sinatra/base'
+require_relative 'util/date_util'
 require_relative 'db/dochandler'
 require_relative 'db/senderhandler'
 require_relative 'data/sender'
@@ -10,6 +11,7 @@ require_relative 'constants'
 
 # main app
 class BillDatabase < Sinatra::Base
+  include DateUtil
   # writing functionality
   # 1. write or add method to write to db in a handler
   # 2. add method that accesses handler here VV
@@ -29,8 +31,22 @@ class BillDatabase < Sinatra::Base
 
   get '/documents' do
     dh = DocHandler.new
-    @documents = dh.fetch_documents
+    @documents = dh.fetch_documents(nil, nil)
     erb :documents
+  end
+
+  get '/documents/:fromdate/:todate' do |fromdate, todate|
+    if check_ymd(fromdate) && check_ymd(todate)
+      dh = DocHandler.new
+      @documents = dh.fetch_documents(fromdate, todate)
+      @dates = {
+        from: fromdate,
+        to: todate
+      }
+      erb :documents
+    else
+      erb 'Sorry, the dates are not formatted correctly'
+    end
   end
 
   get '/document_new' do
@@ -264,6 +280,13 @@ class BillDatabase < Sinatra::Base
     content_type 'application/json'
     s = SenderHandler.new
     tags = s.fetch_sender_tags(id)
+    tags.to_json
+  end
+
+  get '/tags' do
+    content_type 'application/json'
+    s = SenderHandler.new
+    tags = s.fetch_all_tags
     tags.to_json
   end
 

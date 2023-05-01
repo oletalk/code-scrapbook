@@ -137,3 +137,67 @@ function toggleShowContact() {
   let sc = document.getElementById('newcontact')
   sc.classList.toggle('hidden')
 }
+
+function toggleTagMenu(sender_id) {
+  let taglist = document.getElementById('taglist')
+  const allTagNames = senderTags()
+  if (taglist.classList.contains('hidden')) {
+    axios.get('/tags')
+      .then((response) => {
+        const tags = response.data
+        for (let tag of tags) { // id, description
+          if (allTagNames.indexOf(tag.description) == -1) {
+            let newtag = document.createElement('li')
+            newtag.innerHTML = tag.description
+            newtag.onclick = function () { addTag(sender_id, tag.id) }
+            taglist.appendChild(newtag)
+          }
+        }
+        document.getElementById('taglist').classList.remove('hidden')
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  } else {
+    hideTagMenu()
+  }
+
+}
+
+function senderTags() {
+  let ret = []
+  const taglist = document.getElementById('sendertags')
+  for (t of taglist.children) {
+    if (t.nodeName == 'BUTTON') {
+      if (t.innerText != 'Add') {
+        ret.push(t.innerText)
+      }
+    }
+  }
+  return ret
+}
+function hideTagMenu() {
+  document.getElementById('taglist').classList.add('hidden')
+  document.getElementById('taglist').innerHTML = ''
+}
+
+function addTag(sender_id, tag_id) {
+  console.log('adding tag for sender ' + sender_id + ', tag ' + tag_id)
+  axios.post('/sendertag/' + sender_id + '/' + tag_id)
+    .then((response) => reloadOrPrintError(response, 'adding tag to sender'))
+    .catch((error) => {
+      console.error(error)
+    })
+
+  hideTagMenu()
+}
+function delTag(sender_id, tag_id) {
+  if (confirm('Are you sure you want to remove this tag?')) {
+    axios.delete('/sendertag/' + sender_id + '/' + tag_id)
+      .then((response) => reloadOrPrintError(response, 'adding tag to sender'))
+      .catch((error) => {
+        console.error(error)
+      })
+
+  }
+}
