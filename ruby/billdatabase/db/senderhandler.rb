@@ -189,7 +189,7 @@ class SenderHandler
 
   def fetchlist_tags(conn, sender_id)
     ret = []
-    sql = 'select tag_id, tag_name from bills.tag_type t, bills.sender_tag st ' \
+    sql = 'select tag_id, tag_name, color from bills.tag_type t, bills.sender_tag st ' \
       'where t.id = st.tag_id and st.sender_id = $1 order by tag_name'
     conn.prepare('fetch_st', sql)
     conn.exec_prepared('fetch_st', [sender_id]) do |result|
@@ -214,7 +214,7 @@ class SenderHandler
   def fetch_all_tags
     ret = []
     connect_for('fetching all tags') do |conn|
-      sql = 'select id as tag_id, tag_name from bills.tag_type order by tag_name'
+      sql = 'select id as tag_id, tag_name, color from bills.tag_type order by tag_name'
       conn.exec(sql) do |result|
         ret = SenderTagMapper.new.create_from_result(result)
       end
@@ -226,6 +226,34 @@ class SenderHandler
     ret = []
     connect_for('fetching sender tags') do |conn|
       ret = fetchlist_tags(conn, sender_id)
+    end
+    ret
+  end
+
+  def add_tagtype(tag)
+    raise TypeError, 'upd_tagtype expects a SenderTag' unless tag.is_a?(SenderTag)
+
+    ret = { result: success }
+    sql = 'insert into bills.tag_type (tag_name, color) values ($1, $2)'
+    connect_for('inserting new tag type') do |conn|
+      conn.prepare('add_tagtype', sql)
+      conn.exec_prepared('add_tagtype', [tag.id, tag.tag_name, tag.color])
+    rescue StandardError => e
+      ret = { result: e.to_s }
+    end
+    ret
+  end
+
+  def upd_tagtype(tag)
+    raise TypeError, 'upd_tagtype expects a SenderTag' unless tag.is_a?(SenderTag)
+
+    ret = { result: 'success' }
+    sql = 'update bills.tag_type set color = $1 where id = $2'
+    connect_for('updating tag color') do |conn|
+      conn.prepare('upd_tagtype', sql)
+      conn.exec_prepared('upd_tagtype', [tag.color, tag.id])
+    rescue StandardError => e
+      ret = { result: e.to_s }
     end
     ret
   end

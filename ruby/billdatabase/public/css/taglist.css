@@ -47,3 +47,7 @@
 #taglist li:hover {
   background-color: bisque;
 }
+
+#sendertags {
+  width: fit-content;
+}

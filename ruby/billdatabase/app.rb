@@ -264,7 +264,29 @@ class BillDatabase < Sinatra::Base
     s.upd_sender_contact(sc)
   end
 
-  # non-erb (axios-only) calls here
+  get '/taglist' do
+    s = SenderHandler.new
+    @tags = s.fetch_all_tags
+    erb :tagtype
+  end
+
+  post '/tagtype_new' do
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    st = SenderTag.new(params['id'], params['tag_type'], params['color'])
+    res = s.add_tagtype(st)
+    res.to_json
+  end
+
+  post '/tagtype/:id' do |id|
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    st = SenderTag.new(id, nil, params['color'])
+    res = s.upd_tagtype(st)
+    res.to_json
+  end
+
+  # non-erb (axios-only) GET calls here
   get '/json/sender/:id/accounts' do |id|
     content_type 'application/json'
     s = SenderHandler.new

@@ -1,0 +1,34 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>edit tags</TITLE>
+    <link rel="stylesheet" href="/css/default.css">
+    <script src="/js/ext/axios.min.js"></script>
+    <script src="/js/tagtype.js" type="text/javascript" ></script>
+    <script src="/js/entity.js" type="text/javascript" ></script>
+  </HEAD>
+  <BODY>
+
+    <h2>Tag Types</h2>
+    <%= erb :nav, { :locals => { :page => 'tag types'} } %>
+    <div class="layout" id="tag_section">
+      <table class='tags'>
+      <% @tags.each do |tag| %>
+      <tr>
+        <td><input id="<%= tag.id %>_color" type='color' value="<%= tag.color.nil? ? '#000000' : tag.color %>"/> <%= tag.description %></td>
+        <td><button onClick='updateColor(<%= tag.id %>, "<%= tag.id %>_color")'>update</button></td>
+      </tr>
+      <% end %>
+      <tr>
+        <td colspan='2'>Add new tag:</td>
+      </tr>
+      <tr>
+        <td>
+          <input id="new_color" type='color' /> <input name="new_tag" />
+        </td>
+        <td><button onClick='addTag()'>save</button></td>
+      </tr>
+      </table>
+    </div>
+  </BODY>
+</HTML>
