@@ -207,7 +207,8 @@ class SenderHandler
         result.each do |result_row|
           ret.push({
                      sender_id: result_row['id'],
-                     tag_name: result_row['tag_name']
+                     tag_name: result_row['tag_name'],
+                     color: result_row['color']
                    })
         end
       end

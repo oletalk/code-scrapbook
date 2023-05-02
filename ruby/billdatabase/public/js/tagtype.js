@@ -32,3 +32,30 @@ function addTag() {
   }
 
 }
+
+function colorTags() {
+  axios.get('/json/sendertags')
+    .then((response) => {
+      const tagColors = response.data
+      for (color of tagColors) {
+        const tr_name = 'doc_tr_' + color.sender_id
+        const trs = document.getElementsByClassName(tr_name)
+        if (typeof trs !== 'undefined' && trs != null) {
+          for (const tr of trs) {
+            const row = tr.getElementsByTagName('TD')
+            for (let td of row) {
+              if (!(td.classList.contains('accountnumber'))) {
+                td.style['color'] = color.color
+              }
+            }
+          }
+        } else {
+          console.error('could not find element "' + tr_name + '"')
+        }
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+
+}
