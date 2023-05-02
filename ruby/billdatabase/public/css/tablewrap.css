@@ -1,0 +1,28 @@
+#table-wrapper {
+  position: relative;
+}
+
+#table-scroll {
+  height: 50vh;
+  overflow: auto;
+  margin-top: 20px;
+}
+
+#table-wrapper table {
+  width: 100%;
+}
+
+#table-wrapper table thead th {
+  text-align: left;
+  word-spacing: normal;
+  padding-left: 10px;
+}
+
+#table-wrapper table thead th .text {
+  position: absolute;
+  font-weight: 700;
+  top: -20px;
+  z-index: 2;
+  height: 28px;
+  width: auto;
+}

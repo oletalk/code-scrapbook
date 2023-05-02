@@ -3,9 +3,11 @@
   <HEAD>
     <TITLE>view documents</TITLE>
     <link rel="stylesheet" href="/css/default.css">
+    <link rel="stylesheet" href="/css/tablewrap.css">
     <script src="/js/ext/axios.min.js"></script>
     <script src="/js/entity.js" type="text/javascript" ></script>
     <script src="/js/searchfilter.js" type="text/javascript" ></script>
+    <script src="/js/tagtype.js" type="text/javascript" ></script>
   </HEAD>
   <BODY>
     <h2>View Documents</h2>
@@ -26,18 +28,23 @@
              <button onClick="updateDocumentsDates('dateFrom', 'dateTo')">Update</button></span>
       <% end %>
     </div>
+    <div id='table-wrapper'>
+      <div id="table-scroll">
       <table class="documenttable" id='alldocuments'>
+      <thead>
         <tr>
-          <th class="recvd"><label>Received</label></th>
-          <th><label>Type</label></th>
-          <th><label>Sender</label></th>
-          <th><label>Due</label></th>
-          <th><label>Paid</label></th>
-          <th><label>Account (if applicable)</label></th>
-          <th><label>Summary</label></th>
+          <th class="recvd"><span class="text">Received</span></th>
+          <th><span class="text">Type</span></th>
+          <th><span class="text">Sender</span></th>
+          <th><span class="text">Due</span></th>
+          <th><span class="text">Paid</span></th>
+          <th><span class="text">Account</span></th>
+          <th><span class="text">Summary</span></th>
         </tr>
+        </thead>
+        <tbody>
         <% @documents.each_with_index do |document, index| %>
-        <tr>
+        <tr class="doc_tr_<%= document.sender.id %>">
           <td><div>
             <a href="/document/<%= document.id %>">
             <%= document.received_date %></a>
@@ -51,8 +58,15 @@
           <td><div><%= document.summary %></div></td>
         </tr>
         <% end %>
+        </tbody>
       </table>
+      </div>
+      </div>
       <span class='advice'>* receipt/document uploaded</span>
     </div>
     <div class='add_document'><button onClick="go('/document_new')">Add New Document</button></div>
+    <script language="javascript" type="text/javascript">
+    colorTags()
+    </script>
   </BODY>
+  </html>
