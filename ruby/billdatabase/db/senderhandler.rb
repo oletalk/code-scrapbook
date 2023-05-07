@@ -5,6 +5,7 @@ require_relative '../data/sender'
 require_relative '../data/mappers/genericmapper'
 require_relative '../data/mappers/sendermapper'
 require_relative '../data/mappers/sendertagmapper'
+require_relative '../data/collectors/senderobjectcollector'
 
 SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
@@ -221,7 +222,11 @@ class SenderHandler
     connect_for('fetching all senders') do |conn|
       sql = "select #{SENDER_FIELDS} from bills.sender order by name"
       conn.exec(sql) do |result|
-        ret = SenderMapper.new.create_from_result(result)
+        sm = SenderMapper.new
+        result.each do |result_row|
+          sender = sm.create_from_row(result_row)
+          ret.push(sender)
+        end
       end
     end
     ret
@@ -327,32 +332,30 @@ class SenderHandler
 
   def fetch_all_contacts
     ret = []
+
+    soc = SenderObjectCollector.new('sender_id')
+    # 3 procs for SenderObjectCollector
+    so = proc { |result_row| # save sender
+      ret = Sender.new(result_row['sender_id'], nil)
+      ret.name = result_row['sender_name']
+      ret
+    }
+
+    so_contact = proc { |result_row| # save sender object (contact)
+      GenericMapper.new.create_from_row(result_row, SenderContact)
+    }
+
+    so_save_contacts = proc { |sender, objs| # link objects to sender
+      sender.add_contacts(objs)
+    }
+
     connect_for('fetching all sender contacts') do |conn|
       sql = File.read('./sql/fetch_all_contact_info.sql')
-      prev_sender_id = 0
-      curr_sender = nil
-      curr_sender_contacts = []
-      conn.exec(sql) do |result|
-        result.each do |result_row|
-          # we will save them by sender
-          if result_row['sender_id'] != prev_sender_id
-            prev_sender_id = result_row['sender_id']
-            push_sender_account_record(curr_sender_contacts, curr_sender, ret)
-            curr_sender_contacts = [] unless curr_sender_contacts.empty?
-            curr_sender = Sender.new(result_row['sender_id'], nil)
-            curr_sender.name = result_row['sender_name']
-          end
 
-          curr_sender_contacts.push(GenericMapper.new.create_from_row(result_row, SenderContact))
-        end
+      conn.exec(sql) do |result|
+        ret = soc.process_result(result, so, so_contact, so_save_contacts)
       end
-      push_sender_account_record(curr_sender_contacts, curr_sender, ret)
     end
     ret
-  end
-
-  def push_sender_account_record(contact_array, sender, sender_array)
-    sender.add_contacts(contact_array) unless contact_array.empty?
-    sender_array.push(sender) unless sender.nil?
   end
 end
