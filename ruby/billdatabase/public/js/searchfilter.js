@@ -51,3 +51,36 @@ function updateDocumentsDates(dateFromEl, dateToEl) {
     location.href = '/documents/' + dfe + '/' + dte
   }
 }
+
+function setQuarter(fromField, toField) {
+  // today - 3 months, today
+  let d = new Date()
+  setField(toField, ymdStr(d))
+  const mon = d.getMonth()
+  const newMonth = (mon < 3 ? mon + 9 : mon - 3)
+  d.setMonth(newMonth)
+  setField(fromField, ymdStr(d))
+  updateDocumentsDates(fromField, toField)
+}
+
+function setYear(fromField, toField) {
+  // january 1, today
+  let d = new Date()
+  setField(toField, ymdStr(d))
+  d.setDate(1)
+  d.setMonth(1)
+  setField(fromField, ymdStr(d))
+  updateDocumentsDates(fromField, toField)
+}
+
+function setField(fldName, newval) {
+  let field = document.getElementById(fldName)
+  if (field != null) {
+    field.value = newval
+  } else {
+    console.error('Could not find field ' + fldName)
+  }
+}
+function ymdStr(d) {
+  return d.toISOString().split('T')[0]
+}

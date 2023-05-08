@@ -20,12 +20,17 @@
       <% if @dates %>
       <span> From: <input id='dateFrom' type='date' value='<%= @dates[:from] %>' /> 
              To: <input id='dateTo' type='date' value='<%= @dates[:to] %>' /> 
-             <button onClick="updateDocumentsDates('dateFrom', 'dateTo')">Update</button></span>
+             <button onClick="updateDocumentsDates('dateFrom', 'dateTo')">Update</button>
+             <button onClick="setQuarter('dateFrom', 'dateTo')">3 months</button>
+             <button onClick="setYear('dateFrom', 'dateTo')">This year</button>
+      </span>
              <button onClick="go('/documents')">Clear date filter</button></span>
       <% else %>
             <span> From: <input id='dateFrom' type='date' /> 
              To: <input id='dateTo' type='date' /> 
              <button onClick="updateDocumentsDates('dateFrom', 'dateTo')">Update</button></span>
+             <button onClick="setQuarter('dateFrom', 'dateTo')">3 months</button>
+             <button onClick="setYear('dateFrom', 'dateTo')">This year</button>
       <% end %>
     </div>
     <div id='table-wrapper'>
