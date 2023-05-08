@@ -201,17 +201,31 @@ class SenderHandler
 
   ## end sub methods...
   def fetch_senders_and_tags
+    # TODO: rewrite with SenderObjectCollector
     ret = []
+    soc = SenderObjectCollector.new('sender_id')
+
+    # this is how soc should create a sender:
+    so = proc { |result_row|
+      ret = Sender.new(result_row['sender_id'], nil)
+      ret.name = result_row['sender_name']
+      ret
+    }
+
+    # this is how soc should create a tag
+    so_contact = proc { |result_row|
+      SenderTagMapper.new.create_from_row(result_row)
+    }
+
+    # attach the objects to each sender
+    so_save_contacts = proc { |sender, objs|
+      sender.add_tags(objs)
+    }
+
     connect_for('fetching senders and tags') do |conn|
       sql = File.read('./sql/fetch_sender_tags.sql')
       conn.exec(sql) do |result|
-        result.each do |result_row|
-          ret.push({
-                     sender_id: result_row['id'],
-                     tag_name: result_row['tag_name'],
-                     color: result_row['color']
-                   })
-        end
+        ret = soc.process_result(result, so, so_contact, so_save_contacts)
       end
     end
     ret

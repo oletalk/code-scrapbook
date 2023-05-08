@@ -1,4 +1,5 @@
-select distinct s.id,
+select distinct s.id as sender_id,
+  t.id as tag_id,
   t.tag_name,
   t.color
 from bills.sender s
