@@ -266,13 +266,13 @@ class SenderHandler
   end
 
   def add_tagtype(tag)
-    raise TypeError, 'upd_tagtype expects a SenderTag' unless tag.is_a?(SenderTag)
+    raise TypeError, 'add_tagtype expects a SenderTag' unless tag.is_a?(SenderTag)
 
-    ret = { result: success }
+    ret = { result: 'success' }
     sql = 'insert into bills.tag_type (tag_name, color) values ($1, $2)'
     connect_for('inserting new tag type') do |conn|
       conn.prepare('add_tagtype', sql)
-      conn.exec_prepared('add_tagtype', [tag.tag_name, tag.color])
+      conn.exec_prepared('add_tagtype', [tag.description, tag.color])
     rescue StandardError => e
       ret = { result: e.to_s }
     end

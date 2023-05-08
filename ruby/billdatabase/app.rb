@@ -5,6 +5,7 @@ require 'sinatra/base'
 require_relative 'util/date_util'
 require_relative 'db/dochandler'
 require_relative 'db/senderhandler'
+require_relative 'db/pmthandler'
 require_relative 'data/sender'
 require_relative 'data/senderaccount'
 require_relative 'constants'
@@ -284,6 +285,12 @@ class BillDatabase < Sinatra::Base
     st = SenderTag.new(id, nil, params['color'])
     res = s.upd_tagtype(st)
     res.to_json
+  end
+
+  get '/payments' do
+    p = PmtHandler.new
+    @payments = p.fetch_payments
+    erb :payments
   end
 
   # non-erb (axios-only) GET calls here

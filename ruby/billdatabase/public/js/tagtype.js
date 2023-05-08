@@ -24,7 +24,7 @@ function addTag() {
       color: color_val
     }
     axios.post('/tagtype_new', data)
-      .then((response) => reloadOrPrintError(response, 'updating tag type'))
+      .then((response) => reloadOrPrintError(response, 'adding tag type'))
       .catch((error) => {
         console.error(error)
       })
@@ -36,16 +36,19 @@ function addTag() {
 function colorTags() {
   axios.get('/json/sendertags')
     .then((response) => {
-      const tagColors = response.data
-      for (color of tagColors) {
-        const tr_name = 'doc_tr_' + color.sender_id
+      const allSenders = response.data
+      for (sender of allSenders) {
+        const senderTags = sender.sender_tags
+        // use the first one for now
+        const tag = senderTags[0]
+        const tr_name = 'doc_tr_' + sender.id
         const trs = document.getElementsByClassName(tr_name)
         if (typeof trs !== 'undefined' && trs != null) {
           for (const tr of trs) {
             const row = tr.getElementsByTagName('TD')
             for (let td of row) {
               if (!(td.classList.contains('accountnumber'))) {
-                td.style['color'] = color.color
+                td.style['color'] = tag.color
               }
             }
           }

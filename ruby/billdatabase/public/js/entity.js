@@ -121,3 +121,9 @@ function toggleShowSender(senderrow) {
 
 }
 
+function toggleShowPaid(t) {
+  let trs = document.getElementsByClassName('pmt_paid')
+  for (tr of trs) {
+    tr.classList.toggle('hidden')
+  }
+}
