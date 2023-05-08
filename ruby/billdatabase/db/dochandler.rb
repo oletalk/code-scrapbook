@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
-require 'securerandom'
+# require 'securerandom'
 # require 'base64'
 require_relative 'db'
+require_relative '../file/upload'
 require_relative '../data/doctype'
 require_relative '../data/document'
-require_relative '../constants'
 require_relative '../data/mappers/documentmapper'
 
 # fetches document information from the db
 class DocHandler
+  include Upload
   include Db
 
   def fetch_document(id)
@@ -89,14 +90,7 @@ class DocHandler
       ret = { result: 'file not found' }
     else
       # remove file
-      docroot = Bills::Config::File::DOC_ROOT
-      file_loc = "#{docroot}/#{floc}"
-
-      begin
-        File.delete(file_loc)
-      rescue StandardError => e
-        ret = { result: e.to_s }
-      end
+      remove_file(floc)
 
       # remove database entry
       connect_for('updating file location for deleted document') do |conn|
@@ -123,58 +117,27 @@ class DocHandler
       if floc.nil?
         puts 'file not found!'
       else
-        ret = floc
+        ret = download_file_location(floc)
       end
     end
 
-    if floc.nil?
-      puts "no file location for document id #{doc_id} found"
-    else
-      docroot = Bills::Config::File::DOC_ROOT
-      ret = "#{docroot}/#{floc}"
-      puts "file location is #{ret}"
-    end
+    puts "no file location for document id #{doc_id} found" if floc.nil?
     ret
   end
 
-  def upload_file(doc_id, file_name, file_contents, mode)
-    # mode is 'stream' (file contents) or 'copy' (from temp file)
-    # (id, fileupload['filename'], fileupload['tempfile'])
-
+  def upload_file(doc_id, file_name, file_contents)
     ret = { result: 'success' }
 
-    docroot = Bills::Config::File::DOC_ROOT
-    newbasename1 = SecureRandom.urlsafe_base64(4)
-    newbasename2 = File.extname(file_name)
-    filelocation = "#{doc_id}/#{newbasename1}#{newbasename2}"
-    filename = "#{docroot}/#{filelocation}"
-    puts "new file to be saved in #{filename}"
     sql = 'update bills.document set file_location = $1 where id = $2'
 
     # create the subfolder in the doc root and then
     # write the file to the document root
-    begin
-      Dir.mkdir("#{docroot}/#{doc_id}/") unless File.exist?("#{docroot}/#{doc_id}/")
-      # File.binwrite(filename, file_contents)
-      case mode
-      when 'stream'
-        File.open(filename, 'wb') do |f|
-          f.write(file_contents)
-        end
-      when 'copy'
-        puts "Source tempfile path: #{file_contents.path}"
-        puts "Source: #{file_contents.path} -> Target: #{filename}"
-        FileUtils.cp(file_contents.path, filename)
-      else
-        raise "unknown mode #{mode} - should be stream or raise"
-      end
-    rescue StandardError => e
-      puts "Error: #{e}"
-      raise e
-    end
+    res = upload_file_to_filesystem(doc_id, file_name, file_contents)
 
     # record this file location in the database
-    if ret[:result] == 'success'
+    puts res
+    if res[:result] == 'success'
+      filelocation = res[:filename]
       connect_for('updating a document with the filename') do |conn|
         conn.prepare('updfile_document', sql)
         conn.exec_prepared('updfile_document', [filelocation, doc_id])

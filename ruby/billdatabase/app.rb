@@ -140,7 +140,7 @@ class BillDatabase < Sinatra::Base
     # inside of fileupload['tempfile'] so just copy it
 
     d = DocHandler.new
-    ret = d.upload_file(id, fileupload['filename'], fileupload['tempfile'], 'copy')
+    ret = d.upload_file(id, fileupload['filename'], fileupload['tempfile'])
     ret.to_json
   end
 
