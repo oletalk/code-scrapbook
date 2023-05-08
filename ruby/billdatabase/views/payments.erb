@@ -1,0 +1,41 @@
+<!doctype html>
+<HTML>
+  <HEAD>
+    <TITLE>view payments</TITLE>
+    <link rel="stylesheet" href="/css/default.css" />
+    <link rel="stylesheet" href="/css/payments.css" />
+    <script src="/js/entity.js" type="text/javascript" ></script>
+  </HEAD>
+  <BODY>
+
+    <h2>Payments</h2>
+    <%= erb :nav, { :locals => { :page => 'payments'} } %>
+    <!-- TODO make search box here too -->
+    <div class="layout">
+    <input type='checkbox' onClick="toggleShowPaid(this.checked)" checked />Show paid
+      <table class="paymentlist">
+      <tr>
+      <th>Sender</th>
+      <th>Summary</th>
+      <th>Due Date</th>
+      <th>Paid Date</th>
+      <th>Status</th>
+      </tr>
+      <% @payments.each_with_index do |payment, index| %>
+      <tr class='pmt_<%= payment[:status] %>'>
+        <td><%= payment[:name] %></td>
+        <td><a href="/document/<%= payment[:document_id] %>"><%= payment[:summary] %></a></td>
+        <td><%= payment[:due_date] %></td>
+        <td><%= payment[:paid_date] %></td>
+        <td><%= payment[:status] %></td>
+      </tr>
+      <% end %>
+      <tr>
+        <td colspan='5' class='lastrow'>
+          (please go to the relevant Document to log a payment against that Document)
+        </td>
+      </tr>
+      </table>
+    </div>
+  </BODY>
+</HTML>
