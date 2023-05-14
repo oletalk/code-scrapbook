@@ -2,6 +2,10 @@ body {
   font-family: Arial, Helvetica, sans-serif
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 input.sender_field {
   border-top-style: hidden;
   border-right-style: hidden;
@@ -261,4 +265,20 @@ label {
 .not_provided {
   font-style: italic;
   color: lightgrey;
+}
+
+.jumplink button {
+  border: 0;
+  background-color: white;
+  color: midnightblue;
+  text-decoration: underline;
+}
+
+.jumplink {
+  justify-content: right;
+  display: flex;
+  position: relative;
+  width: 100%;
+  bottom: 60px;
+  right: 40px;
 }

@@ -84,3 +84,8 @@ function setField(fldName, newval) {
 function ymdStr(d) {
   return d.toISOString().split('T')[0]
 }
+
+function jumpToBottom() {
+  let pageBottom = document.querySelector("#page-bottom")
+  pageBottom.scrollIntoView()
+}
