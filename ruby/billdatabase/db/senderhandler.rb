@@ -201,7 +201,6 @@ class SenderHandler
 
   ## end sub methods...
   def fetch_senders_and_tags
-    # TODO: rewrite with SenderObjectCollector
     ret = []
     soc = SenderObjectCollector.new('sender_id')
 

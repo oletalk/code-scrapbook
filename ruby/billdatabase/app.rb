@@ -4,6 +4,7 @@ require 'json'
 require 'sinatra/base'
 require_relative 'util/date_util'
 require_relative 'db/dochandler'
+require_relative 'db/doctypehandler'
 require_relative 'db/senderhandler'
 require_relative 'db/pmthandler'
 require_relative 'data/sender'
@@ -51,7 +52,7 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/document_new' do
-    dh = DocHandler.new
+    dh = DocTypeHandler.new
     sh = SenderHandler.new
     @doctypes = dh.fetch_doctypes
     @senders = sh.fetch_senders
@@ -153,7 +154,7 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/doctypes' do
-    d = DocHandler.new
+    d = DocTypeHandler.new
     @doctypes = d.fetch_doctypes
     erb :doctype
   end
