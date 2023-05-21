@@ -61,6 +61,7 @@ table.documenttable {
   padding: 5px;
   border-spacing: 0px;
   font-size: small;
+  line-height: 20px;
 }
 
 .doc_filename {
