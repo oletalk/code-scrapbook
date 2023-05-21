@@ -2,6 +2,7 @@
 
 require 'pg'
 require_relative '../constants'
+require_relative '../util/logging'
 
 # standard database utility class.
 module Db
@@ -13,7 +14,7 @@ module Db
       yield conn
     end
   rescue StandardError => e
-    puts "problem connecting for #{description}"
+    log_error "problem connecting for #{description}"
     raise e
   ensure
     conn&.close # i.e., "conn.close if conn" (Style/SafeNavigation)

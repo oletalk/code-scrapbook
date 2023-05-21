@@ -23,9 +23,9 @@ class SenderObjectCollector
       id_value = result_row[@id_field_name]
 
       if id_value != @prev_id
-        # puts "** new sender - save all info you have for sender #{@prev_id} **"
+
         unless @curr_sender.nil?
-          # puts "  saving sender info for sender #{@curr_sender.id}"
+
           assign_objects_proc.call(@curr_sender, @curr_sender_objects)
           @senders.push(@curr_sender)
 
@@ -38,7 +38,6 @@ class SenderObjectCollector
     end
     # save any leftover rows
     unless @curr_sender.nil?
-      # puts "  saving sender info for sender #{@curr_sender.id}"
       assign_objects_proc.call(@curr_sender, @curr_sender_objects)
       @senders.push(@curr_sender)
 

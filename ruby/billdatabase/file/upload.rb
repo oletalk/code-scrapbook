@@ -2,6 +2,7 @@
 
 require 'securerandom'
 require_relative '../constants'
+require_relative '../util/logging'
 
 # module for uploading/downloading files (use in dochandler)
 module Upload
@@ -13,7 +14,7 @@ module Upload
     begin
       File.delete(file_loc)
     rescue StandardError => e
-      puts "Problem deleting file: #{e}"
+      log_error "Problem deleting file: #{e}"
       ret = false
     end
     ret
@@ -35,17 +36,17 @@ module Upload
     newbasename2 = File.extname(file_name)
     filelocation = "#{doc_id}/#{newbasename1}#{newbasename2}"
     filename = "#{docroot}/#{filelocation}"
-    puts "new file to be saved in #{filename}"
+    log_info "new file to be saved in #{filename}"
     ret[:filename] = filelocation
     begin
       Dir.mkdir("#{docroot}/#{doc_id}/") unless File.exist?("#{docroot}/#{doc_id}/")
       # File.binwrite(filename, file_contents)
 
-      puts "Source tempfile path: #{file_contents.path}"
-      puts "Source: #{file_contents.path} -> Target: #{filename}"
+      log_info "Source tempfile path: #{file_contents.path}"
+      log_info "Source: #{file_contents.path} -> Target: #{filename}"
       FileUtils.cp(file_contents.path, filename)
     rescue StandardError => e
-      puts "Error: #{e}"
+      log_error "Error: #{e}"
       ret[:result] = e
     end
     ret

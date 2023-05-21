@@ -10,10 +10,12 @@ require_relative 'db/pmthandler'
 require_relative 'data/sender'
 require_relative 'data/senderaccount'
 require_relative 'constants'
+require_relative 'util/logging'
 
 # main app
 class BillDatabase < Sinatra::Base
   include DateUtil
+  include Logging
   # writing functionality
   # 1. write or add method to write to db in a handler
   # 2. add method that accesses handler here VV
@@ -76,7 +78,7 @@ class BillDatabase < Sinatra::Base
     new_id = dh.add_document(d)
     if new_id.instance_of?(Hash)
       # uh - oh
-      puts new_id
+      log_info new_id
       ret = new_id
     else
       ret = { 'id': new_id }
@@ -134,9 +136,9 @@ class BillDatabase < Sinatra::Base
 
   post '/document/:id/file' do |id|
     # this is no longer a JSON request as of 22/04/2023
-    puts "received file upload for document id #{id}"
+    log_info "received file upload for document id #{id}"
     fileupload = params['file']
-    # puts fileupload['filename']
+    # log_info fileupload['filename']
     # the FormData object in js seems to reassemble the file in a temp dir
     # inside of fileupload['tempfile'] so just copy it
 
@@ -146,7 +148,7 @@ class BillDatabase < Sinatra::Base
   end
 
   delete '/document/:id/file' do |id|
-    puts "received file #{params['name']} for document #{id}"
+    log_info "received file #{params['name']} for document #{id}"
 
     d = DocHandler.new
     ret = d.delete_file(id)

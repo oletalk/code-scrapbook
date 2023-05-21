@@ -3,6 +3,7 @@
 # require 'securerandom'
 # require 'base64'
 require_relative 'db'
+require_relative '../util/logging'
 require_relative '../file/upload'
 require_relative '../data/doctype'
 require_relative '../data/document'
@@ -12,6 +13,7 @@ require_relative '../data/mappers/documentmapper'
 class DocHandler
   include Upload
   include Db
+  include Logging
 
   def fetch_document(id)
     ret = {}
@@ -30,7 +32,7 @@ class DocHandler
     today = Time.now.strftime('%Y-%m-%d')
     date_from = d_from.nil? ? '1970-01-01' : d_from
     date_to = d_to.nil? ? today : d_to
-    puts "fetching documents from #{date_from} to #{date_to}"
+    log_info "fetching documents from #{date_from} to #{date_to}"
     connect_for('fetching all documents') do |conn|
       sql = File.read('./sql/fetch_all_documents.sql')
       conn.prepare('fetch_docs', sql)
@@ -70,7 +72,7 @@ class DocHandler
       ret = { result: e.to_s }
     end
 
-    puts "new id returned: #{ret}"
+    log_info "new id returned: #{ret}"
     ret
   end
 
@@ -115,13 +117,13 @@ class DocHandler
         end
       end
       if floc.nil?
-        puts 'file not found!'
+        log_error 'file not found!'
       else
         ret = download_file_location(floc)
       end
     end
 
-    puts "no file location for document id #{doc_id} found" if floc.nil?
+    log_error "no file location for document id #{doc_id} found" if floc.nil?
     ret
   end
 
@@ -135,7 +137,7 @@ class DocHandler
     res = upload_file_to_filesystem(doc_id, file_name, file_contents)
 
     # record this file location in the database
-    puts res
+    log_info res
     if res[:result] == 'success'
       filelocation = res[:filename]
       connect_for('updating a document with the filename') do |conn|

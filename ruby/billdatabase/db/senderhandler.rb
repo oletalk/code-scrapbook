@@ -6,6 +6,7 @@ require_relative '../data/mappers/genericmapper'
 require_relative '../data/mappers/sendermapper'
 require_relative '../data/mappers/sendertagmapper'
 require_relative '../data/collectors/senderobjectcollector'
+require_relative '../util/logging'
 
 SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
@@ -15,6 +16,7 @@ CONTACT_FIELDS = 'id, sender_id, name, contact, comments'
 # fetches sender information from the db
 class SenderHandler
   include Db
+  include Logging
 
   def add_sender(sender)
     ret = nil
@@ -35,7 +37,7 @@ class SenderHandler
                            end
                          end
     end
-    puts "new id returned: #{ret}"
+    log_info "new id returned: #{ret}"
     ret
   end
 
