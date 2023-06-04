@@ -49,6 +49,27 @@ function updateDocument(id) {
   }
 }
 
+function loadDocs(sender_id, topElemName) {
+  axios.get('/json/sender/' + sender_id + '/documents')
+    .then((response) => {
+      const docs = response.data
+      // the TD inside this TR
+      let TRelem = document.getElementById(topElemName)
+      let elem = TRelem.firstElementChild
+      let hasDocs = false
+      for (const doc of docs) {
+        let newdoc = document.createElement('div')
+        newdoc.innerHTML = doc.received_date + ': ' + '<a href="/document/'
+          + doc.id + '">' + doc.summary + '</a>'
+        if (!hasDocs) {
+          hasDocs = true
+          elem.innerHTML = 'Documents<br/>'
+        }
+        elem.appendChild(newdoc)
+      }
+    })
+}
+
 // utility methods
 function reloadOrPrintError(response, operation) {
   if (typeof response.data.result !== 'undefined' && response.data.result !== 'success') {
@@ -114,11 +135,26 @@ function getToday() {
 }
 
 function toggleShowSender(senderrow) {
+  // user creds
   let sa0 = document.getElementById(senderrow + '_0')
+  let goingToShow = false
+  if (sa0.classList.contains('hidden')) {
+    goingToShow = true
+  }
   sa0.classList.toggle('hidden')
+  // comments
   let sa1 = document.getElementById(senderrow + '_1')
   sa1.classList.toggle('hidden')
+  // documents (if any)
+  let sa2 = document.getElementById(senderrow + '_2')
+  sa2.classList.toggle('hidden')
 
+  if (goingToShow) {
+    // fetch and show documents
+    const sender_id = senderrow.split('_')[1]
+    console.log('going to show documents for sender ' + sender_id)
+    loadDocs(sender_id, senderrow + '_2')
+  }
 }
 
 function toggleShowPaid(t) {

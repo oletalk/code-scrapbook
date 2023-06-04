@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require_relative 'doctype'
 require_relative 'sender'
 require_relative 'senderaccount'
@@ -26,5 +27,22 @@ class Document
     @file_location = result_row['file_location']
     @comments = result_row['comments']
     @summary = result_row['summary']
+  end
+
+  # TODO: create to_json
+  def to_json(*args)
+    {
+      JSON.create_id => self.class.name,
+      'id' => @id,
+      'created_at' => @created_at,
+      'received_date' => @received_date,
+      'summary' => @summary,
+      'due_date' => @due_date,
+      'paid_date' => @paid_date,
+      'doc_type' => @doc_type,
+      'sender' => @sender,
+      'comments' => @comments,
+      'sender_account' => @sender_account
+    }.to_json(*args)
   end
 end

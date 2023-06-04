@@ -14,13 +14,13 @@
     <!-- TODO make search box here too -->
     <div class="layout" id="doctype_section">
       <table class="senderlist">
-      <% @senders.each_with_index do |sender, index| %>
+      <% @senders.each_with_index do |sender| %>
       <tr>
         <td colspan='3'>
-          <button onClick="toggleShowSender('tr_<%= index %>')"">+</button>
+          <button onClick="toggleShowSender('tr_<%= sender.id %>')"">+</button>
           &nbsp;&nbsp;<span class='sendername'><a href="/sender/<%= sender.id %>"><%= sender.name %></a></span></td>
       </tr>
-      <tr id="tr_<%= index %>_0" class='hidden'>
+      <tr id="tr_<%= sender.id %>_0" class='hidden'>
         <td>
           <label>Username</label><span class='optional'> (optional): </span>
           <% unless (sender.username.empty?) %>
@@ -39,8 +39,11 @@
           <% end %>
         </td>
       </tr>
-      <tr id="tr_<%= index %>_1" class='hidden'>
+      <tr id="tr_<%= sender.id %>_1" class='hidden'>
         <td><label>Comments</label></td><td colspan='3'><%= sender.comments %></td>
+      </tr>
+      <tr id="tr_<%= sender.id %>_2" class='hidden'>
+        <td colspan='3'>(no documents recorded yet...)</td>
       </tr>
       <% end %>
       <tr>

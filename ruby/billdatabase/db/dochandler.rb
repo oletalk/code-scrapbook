@@ -43,6 +43,19 @@ class DocHandler
     ret
   end
 
+  def fetch_sender_documents(sender_id)
+    ret = []
+    log_info "fetching documents for sender #{sender_id}"
+    connect_for('fetching documents for sender') do |conn|
+      sql = File.read('./sql/fetch_sender_documents.sql')
+      conn.prepare('fetch_senderdocs', sql)
+      conn.exec_prepared('fetch_senderdocs', [sender_id]) do |result|
+        ret = DocumentMapper.new.create_from_result(result)
+      end
+    end
+    ret
+  end
+
   def add_document(doc)
     ret = nil
     raise TypeError, 'add_document expects a Document' unless doc.is_a?(Document)
@@ -61,7 +74,7 @@ class DocHandler
                            nil_if_empty(doc.paid_date),
                            doc.file_location,
                            doc.comments,
-                           doc.sender_account.nil? ? nil : doc.sender_account.id
+                           doc.sender_account&.id
 
                          ]) do |result|
         result.each do |result_row|
@@ -170,7 +183,7 @@ class DocHandler
                            nil_if_empty(doc.due_date),
                            nil_if_empty(doc.paid_date),
                            doc.comments,
-                           doc.sender_account.nil? ? nil : doc.sender_account.id,
+                           doc.sender_account&.id,
                            doc.summary,
                            doc.id
                          ])
