@@ -134,6 +134,26 @@ function getToday() {
   return d.toISOString().split('T')[0]
 }
 
+function toggleSenderRow(senderrow, stat) {
+  let saX = document.getElementById(senderrow + '_X')
+  const goingToShow = stat
+
+  let sa0 = document.getElementById(senderrow + '_0')
+  let sa1 = document.getElementById(senderrow + '_1')
+  let sa2 = document.getElementById(senderrow + '_2')
+
+  if (goingToShow) {
+    saX.classList.remove('hidden')
+    sa0.classList.remove('hidden')
+    sa1.classList.remove('hidden')
+    sa2.classList.remove('hidden')
+  } else {
+    saX.classList.add('hidden')
+    sa0.classList.add('hidden')
+    sa1.classList.add('hidden')
+    sa2.classList.add('hidden')
+  }
+}
 function toggleShowSender(senderrow) {
   // user creds
   let sa0 = document.getElementById(senderrow + '_0')
@@ -162,4 +182,71 @@ function toggleShowPaid(t) {
   for (tr of trs) {
     tr.classList.toggle('hidden')
   }
+}
+
+function loadAllTags(topElemName) {
+  axios.get('/json/sendersbytag')
+    .then((response) => {
+
+      const topTR = document.getElementById(topElemName)
+      const tags = response.data
+      let hasTags = false
+      for (const tag of Object.keys(tags)) {
+        hasTags = true
+        const idstr = tag.split('|')
+        const text = tags[tag]
+        const newLi = liof(newCheckbox(idstr[1], text), idstr[0])
+        topTR.appendChild(newLi)
+      }
+      
+      if (hasTags) {
+        const selNone = document.createElement('button')
+        selNone.innerHTML = 'Select None'
+        selNone.addEventListener('click', () => {
+          for (let li of document.getElementById(topElemName).childNodes) {
+            if (li.firstElementChild != null) {
+              if (li.firstElementChild.tagName == 'INPUT') {
+                if (li.firstElementChild.checked) {
+                  // deselect it
+                  li.firstElementChild.click()
+                }
+              }
+            }
+          }
+
+        })
+        topTR.appendChild(selNone)
+      }
+      // the TD inside this TR
+
+    })
+}
+
+function liof(el, text) {
+  const ret = document.createElement('li')
+  ret.appendChild(el)
+  ret.appendChild(document.createTextNode(text))
+  ret.addEventListener('click', selectSenders)
+  return ret
+}
+
+function selectSenders(e) {
+  console.log('selecting ')
+  const ids = e.target.value
+  const chk = e.target.checked
+  console.log(ids + ' which are checked? ' + chk)
+  const idlist = ids.split(',')
+  for (const id of idlist) {
+    console.log(id)
+    toggleSenderRow('tr_' + id, chk)
+  }
+}
+
+function newCheckbox(id, val) {
+  const ret = document.createElement('input')
+  ret.setAttribute('type', 'checkbox')
+  ret.setAttribute('name', id)
+  ret.setAttribute('value', val)
+  ret.setAttribute('checked', true)
+  return ret
 }

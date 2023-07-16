@@ -141,6 +141,24 @@ class SenderHandler
     end
   end
 
+  # fetch sender ids grouped by tag
+  def fetch_sender_tags_and_ids
+    ret = {}
+    connect_for('fetching sender ids by tag') do |conn|
+      sql = File.read('./sql/fetch_senders_grouped_by_tag.sql')
+      conn.exec(sql) do |result|
+        result.each do |result_row|
+          tag_name = result_row['tag_name']
+          color = result_row['color']
+          ind = "#{tag_name}|#{color}"
+          ret[ind] = [] if ret[ind].nil?
+          ret[ind].push(result_row['sender_id'])
+        end
+      end
+    end
+    ret
+  end
+
   # fetch individual sender, also populate its account data
   def fetch_sender(sender_id)
     ret = nil

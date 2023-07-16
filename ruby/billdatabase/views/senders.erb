@@ -12,10 +12,12 @@
     <h2>Sender list</h2>
     <%= erb :nav, { :locals => { :page => 'senders'} } %>
     <!-- TODO make search box here too -->
+    <ul id="tagTable">
+    </ul>
     <div class="layout" id="doctype_section">
       <table class="senderlist">
       <% @senders.each_with_index do |sender| %>
-      <tr>
+      <tr id="tr_<%= sender.id %>_X">
         <td colspan='3'>
           <button onClick="toggleShowSender('tr_<%= sender.id %>')"">+</button>
           &nbsp;&nbsp;<span class='sendername'><a href="/sender/<%= sender.id %>"><%= sender.name %></a></span></td>
@@ -53,5 +55,8 @@
       </tr>
       </table>
     </div>
+    <script type="text/javascript">
+    loadAllTags('tagTable')
+    </script>
   </BODY>
 </HTML>

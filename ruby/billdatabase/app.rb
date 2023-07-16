@@ -322,11 +322,11 @@ class BillDatabase < Sinatra::Base
     end
   end
 
-  get '/sendertags' do
+  get '/json/sendersbytag' do
     content_type 'application/json'
     s = SenderHandler.new
-    tags = s.fetch_sender_tags(id)
-    tags.to_json
+    data = s.fetch_sender_tags_and_ids
+    data.to_json
   end
 
   get '/tags' do
