@@ -8,5 +8,15 @@ module MP3S
       USER = 'web'
       PASSWORD = File.read('config/db_pw.txt').chomp
     end
+    
+    module Sftp
+      SERVER_HOST = '192.168.1.3'
+      USER = 'andr0id'
+      PASSWORD = File.read('config/sftp_pw.txt').chomp
+    end
+
+    module Cache
+      TEMP_ROOT = '/var/tmp/files'
+    end
   end
 end

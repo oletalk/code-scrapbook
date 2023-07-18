@@ -17,6 +17,7 @@ class HashSong
       sql = File.read('./sql/one_tune.sql')
       conn.prepare('song_data', sql)
       found_song = false
+      hash.strip!
       conn.exec_prepared('song_data', [hash]) do |result|
         result.each do |result_row|
           @file_hash = result_row['file_hash']
