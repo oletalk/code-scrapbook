@@ -17,6 +17,7 @@ module MP3S
 
     module Cache
       TEMP_ROOT = '/var/tmp/files'
+      MAX_SIZE = '100M'
     end
   end
 end
