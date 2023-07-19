@@ -2,6 +2,7 @@
 
 require 'net/sftp'
 require_relative '../constants'
+require_relative '../process/player'
 
 # A class for handling streaming from a file
 class SongStream
@@ -18,10 +19,14 @@ class SongStream
     
     # f = File.open(@file, "rb")
     sftp.download!(ftpfile, tempfile)
-    time_end = Time.now
-    puts "Download completed in #{time_end - time_start} seconds."
-    f = File.open(tempfile)
-    f.read
+    time_end_download = Time.now
+    puts "Download completed in #{time_end_download - time_start} seconds."
+
+    # TODO - do we want to make downsampling optional?
+    p = Player.new
+    p.play_downsampled(tempfile)
+    # f = File.open(tempfile)
+    # f.read
   end
   
 end
