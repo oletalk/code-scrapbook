@@ -8,7 +8,7 @@ module MP3S
       USER = 'web'
       PASSWORD = File.read('config/db_pw.txt').chomp
     end
-    
+
     module Sftp
       SERVER_HOST = '192.168.1.3'
       USER = 'andr0id'
@@ -17,6 +17,7 @@ module MP3S
 
     module Cache
       TEMP_ROOT = '/var/tmp/files'
+      CACHE_INTERVAL_SECS = 300
       MAX_SIZE = '100M'
     end
 
@@ -24,8 +25,6 @@ module MP3S
       RAW = '/bin/cat XXXX'
       DOWNSAMPLED_MP3 = '/usr/local/bin/lame --nohist --mp3input -b 32 XXXX - '
       DOWNSAMPLED_OGG = '/usr/local/bin/sox -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - '
-      # PLAY_DOWNSAMPLED_OGG = '/usr/local/bin/ffmpeg -loglevel quiet -i XXXX -acodec libvorbis -f ogg -ac 2 -ab 64k - < /dev/null'
     end
-
   end
 end
