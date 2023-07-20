@@ -6,6 +6,9 @@ require_relative 'util/crypt'
 require_relative 'util/ipwl'
 require_relative 'db/hashsong'
 require_relative 'stream/stream'
+require_relative 'util/filecache'
+require_relative 'common/logging'
+
 require 'sinatra/base'
 require 'sinatra/streaming' # so we can use 'stream do'
 
@@ -14,6 +17,7 @@ require 'sinatra/streaming' # so we can use 'stream do'
 
 # main app to take requests for playlists and songs from clients
 class StreamServer < Sinatra::Base
+  include Logging
   helpers Sinatra::Streaming
   enable :dump_errors
   enable :sessions
@@ -23,7 +27,8 @@ class StreamServer < Sinatra::Base
 
   def initialize
     @users = PwCrypt.new('./config/pw.txt')
-    puts 'loaded users'
+    logger.info 'loaded users'
+    @songcache = FileCache.new
     super
   end
 
@@ -35,7 +40,7 @@ class StreamServer < Sinatra::Base
     @ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
     remote_ip = request.ip
     action = @ipwl.action(remote_ip)
-    puts "Action for #{remote_ip} is #{action}."
+    logger.debug "Action for #{remote_ip} is #{action}."
     halt 403, 'Access Denied' unless action[:allow]
     headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     headers['Access-Control-Allow-Origin'] = '*'
@@ -51,12 +56,12 @@ class StreamServer < Sinatra::Base
 
       # if it exists, stream it back
       if song.found
-        puts "Streaming #{song.song_filepath}"
+        logger.debug "Streaming #{song.song_filepath}"
         st = SongStream.new(song.song_filepath.to_s)
-        out.puts st.readall
+        out.puts st.readall(@songcache)
         out.flush
       else
-        puts 'Invalid hash!'
+        logger.error 'Invalid hash!'
       end
     end
   end
@@ -97,11 +102,11 @@ class StreamServer < Sinatra::Base
   post '/sign_in' do
     if @users.test_password(params['username'], params['password'])
       session['username'] = params['username']
-      puts "login succeeded for user #{params['username']}"
+      logger.info "login succeeded for user #{params['username']}"
       redirect '/main'
     else
       @error = 'User name or password is incorrect.'
-      puts "login failure for user #{params['username']}"
+      logger.error "login failure for user #{params['username']}"
       content_type 'text/html'
       erb :signin
     end
@@ -124,7 +129,8 @@ class StreamServer < Sinatra::Base
       if session['username']
         @users.user_info(session['username'])
       else
-        puts 'sorry, no session...'
+        logger.info 'sorry, no session...'
+        'no session'
       end
     end
   end

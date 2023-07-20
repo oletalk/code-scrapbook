@@ -2,10 +2,12 @@
 
 require 'open3'
 require_relative '../constants'
+require_relative '../common/logging'
 
+# class to handle streaming a (downsampled) song
 class Player
+  include Logging
   def play_downsampled(song)
-
     command = nil
     case song
     when /mp3$/i
@@ -14,7 +16,7 @@ class Player
       command = MP3S::Config::Play::DOWNSAMPLED_OGG
     else
       # TODO: log this
-      puts "No idea how to downsample this song!"
+      logger.error 'No idea how to downsample this song!'
     end
 
     escaped = +song
@@ -23,12 +25,11 @@ class Player
     time_start = Time.now
     cmdexec = command.sub(/XXXX/, arg_song)
     # TODO: setup logging...
-    stdout, stderr, status = Open3.capture3(cmdexec.to_s, binmode: true)
+    stdout, stderr, _status = Open3.capture3(cmdexec.to_s, binmode: true)
     time_end_downsample = Time.now
-    puts "Downsampling completed in #{time_end_downsample - time_start} seconds."
+    logger.info "Downsampling completed in #{time_end_downsample - time_start} seconds."
     puts stderr unless stderr.to_s.strip.empty?
 
     stdout
   end
 end
-
