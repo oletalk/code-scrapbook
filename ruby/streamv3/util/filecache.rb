@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'ipaddr'
+# require 'ipaddr'
+require 'digest/sha1'
 require 'net/sftp'
 require_relative '../constants'
 require_relative '../common/logging'
@@ -18,15 +19,17 @@ class FileCache
 
   def do_periodic_check
     # is it time to check?
-    if Time.now > @next_check
-      maintain_cache_size
-      @next_check = Time.now + MP3S::Config::Cache::CACHE_INTERVAL_SECS
-    end
+    return unless Time.now > @next_check
+
+    maintain_cache_size
+    @next_check = Time.now + MP3S::Config::Cache::CACHE_INTERVAL_SECS
   end
 
   def get_cached_content(ftpfile)
-    time_start = Time.now
-    tempfile = "#{@fileroot}/#{File.basename(ftpfile)}"
+    # filename will be of the form b1c2a6_MyCoolSong.mp3
+    dirhash = Digest::SHA1.hexdigest(File.dirname(ftpfile))
+    hash_pre = dirhash[-6..]
+    tempfile = "#{@fileroot}/#{hash_pre}_#{File.basename(ftpfile)}"
     if File.exist?(tempfile)
       logger.info 'we already have cached file'
       f = File.open(tempfile)
@@ -39,19 +42,17 @@ class FileCache
       )
 
       # f = File.open(@file, "rb")
-      sftp.download!(ftpfile, tempfile) do |event, downloader, *args|
+      sftp.download!(ftpfile, tempfile) do |event, _downloader, *args|
         case event
-        when :open then
+        when :open
           logger.debug "  ## starting download from #{args[0].remote}"
         # when :get then <-- further detail, progress
-        when :close then
+        when :close
           logger.debug "  ## finished with #{args[0].remote}"
-        when :finish then
+        when :finish
           logger.debug '  ## complete'
         end
       end
-      time_end_download = Time.now
-      logger.info "Download completed in #{time_end_download - time_start} seconds."
 
       # TODO: do we want to make downsampling optional?
       p = Player.new
@@ -77,7 +78,8 @@ class FileCache
   end
 
   def maintain_cache_size
-    curr_size = Dir['/var/tmp/files/*'].select { |f| File.file?(f) }.sum { |f| File.size(f) }
+    rootfiles = "#{MP3S::Config::Cache::TEMP_ROOT}/*"
+    curr_size = Dir[rootfiles].select { |f| File.file?(f) }.sum { |f| File.size(f) }
     return unless curr_size > @max_size
 
     logger.warn "Cache size = #{curr_size}, maximum size = #{@max_size}"
