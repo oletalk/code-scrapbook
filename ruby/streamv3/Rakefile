@@ -1,0 +1,6 @@
+require 'rspec/core/rake_task'
+
+task 'test' do |t|
+  RSpec::Core::RakeTask.new(:spec)
+  Rake::Task["spec"].execute
+end

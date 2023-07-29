@@ -15,8 +15,8 @@ class Player
     when /ogg$/i
       command = MP3S::Config::Play::DOWNSAMPLED_OGG
     else
-      # TODO: log this
       logger.error 'No idea how to downsample this song!'
+      raise 'song cannot be downsampled'
     end
 
     escaped = +song

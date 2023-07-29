@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     bcrypt (3.1.19)
+    diff-lcs (1.5.0)
     iostreams (1.10.3)
     multi_json (1.15.0)
     mustermann (3.0.0)
@@ -16,6 +17,19 @@ GEM
     rack (2.2.7)
     rack-protection (3.0.6)
       rack
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.2)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.6)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.1)
     ruby2_keywords (0.0.5)
     sinatra (3.0.6)
       mustermann (~> 3.0)
@@ -32,6 +46,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-20
+  x86_64-darwin-22
   x86_64-freebsd-12
   x86_64-freebsd-13
 
@@ -41,8 +56,9 @@ DEPENDENCIES
   net-sftp (~> 4.0.0)
   pg (~> 1.5)
   puma (~> 6.3.0)
+  rspec (~> 3.12)
   sinatra (~> 3)
   sinatra-contrib (~> 3)
 
 BUNDLED WITH
-   2.4.17
+   2.4.10

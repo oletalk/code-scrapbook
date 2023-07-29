@@ -7,6 +7,6 @@ module Logging
   end
 
   def self.logger
-    @logger ||= Logger.new($stdout)
+    @logger = Logger.new($stdout)
   end
 end
