@@ -18,7 +18,7 @@ class ListGen
       conn.exec(sql) do |result|
         result.each do |result_row|
           hash = result_row['file_hash']
-          url = "http://#{@hh}/play/#{hash}"
+          url = "https://#{@hh}/member/play/#{hash}"
           ret << m3uitem(result_row['secs'], result_row['display_title'], url)
         end
       end
@@ -35,7 +35,7 @@ class ListGen
       conn.exec_prepared('pls_sql', [name]) do |result|
         result.each do |result_row|
           hash = result_row['file_hash']
-          url = "http://#{@hh}/play/#{hash}"
+          url = "https://#{@hh}/member/play/#{hash}"
           ret << m3uitem(result_row['secs'], result_row['display_title'], url)
         end
       end

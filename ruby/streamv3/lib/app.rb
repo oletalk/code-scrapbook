@@ -29,19 +29,30 @@ class StreamServer < Sinatra::Base
     @users = PwCrypt.new('./config/pw.txt')
     logger.info 'loaded users'
     @songcache = FileCache.new
+    @allow_listen = {}
     super
   end
 
-  # initialising
-  # configure do
-  # end
+  before '/member/*' do
+    req_ip = request.ip
+    @allowed = @allow_listen.key?(req_ip)
+    allow_desc = @allowed ? 'allowed' : 'not allowed'
+    logger.info "Request for #{request.path_info} from #{req_ip} is currently #{allow_desc}."
+    halt 403, 'Access Denied' unless @allowed
+
+    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Headers'] = 'Accept, Authorization, Origin'
+    content_type 'text/plain'
+  end
 
   before do
-    @ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
-    remote_ip = request.ip
-    action = @ipwl.action(remote_ip)
-    logger.debug "Action for #{remote_ip} is #{action}."
-    halt 403, 'Access Denied' unless action[:allow]
+    # @ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
+    # remote_ip = request.ip
+    # action = @ipwl.action(remote_ip)
+    # logger.debug "Action for #{remote_ip} is #{action}."
+    # halt 403, 'Access Denied' unless action[:allow]
+
     headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Accept, Authorization, Origin'
@@ -49,7 +60,7 @@ class StreamServer < Sinatra::Base
   end
 
   # PLAY STREAM (main)
-  get '/play/:hsh' do |hsh|
+  get '/member/play/:hsh' do |hsh|
     stream do |out|
       # find file containing that hash
       song = HashSong.new(hash: hsh.to_s)
@@ -67,28 +78,28 @@ class StreamServer < Sinatra::Base
   end
 
   # PLAYLISTS (JSON)
-  get '/playlists' do
+  get '/member/playlists' do
     plg = PlaylistGen.new(hostheader: request.env['HTTP_HOST'])
     plg.fetch_all_playlists
   end
 
-  get '/playlist/:name' do |name|
+  get '/member/playlist/:name' do |name|
     plg = PlaylistGen.new(hostheader: request.env['HTTP_HOST'])
     plg.fetch_tunes(name: name)
   end
 
-  get '/search/:spec' do |spec|
+  get '/member/search/:spec' do |spec|
     plg = PlaylistGen.new(hostheader: request.env['HTTP_HOST'])
     plg.search_playlists(spec: spec.downcase)
   end
 
   # PLAYLISTS (M3U)
-  get '/m3u/all' do
+  get '/member/m3u/all' do
     lg = ListGen.new(hostheader: request.env['HTTP_HOST'])
     lg.fetch_all_tunes
   end
 
-  get '/m3u/:name' do |name|
+  get '/member/m3u/:name' do |name|
     lg = ListGen.new(hostheader: request.env['HTTP_HOST'])
     lg.fetch_playlist(name: name)
   end
@@ -112,11 +123,25 @@ class StreamServer < Sinatra::Base
     end
   end
 
+  get '/allow_listen/:ip' do |ip|
+    @user = current_user
+    if @user
+      logger.info "request to allow listening from #{ip}"
+      # add the ip into a whitelist
+      @allow_listen[ip] = 1
+      'OK, you are allowed - urls under /member'
+    else
+      halt 403, 'Access Denied'
+    end
+  end
+
   get '/main' do
     content_type 'text/html'
     @user = current_user
 
     if @user
+      @curr_ip = request.ip
+      @allowed = @allow_listen.key?(@curr_ip)
       erb :main
     else
       @error = 'Please sign in first'
@@ -130,7 +155,7 @@ class StreamServer < Sinatra::Base
         @users.user_info(session['username'])
       else
         logger.info 'sorry, no session...'
-        'no session'
+        false
       end
     end
   end

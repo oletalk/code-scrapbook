@@ -1,5 +1,5 @@
 run this using
-thin -R config.ru -a 192.168.0.2 -p 1234 start
+bundle exec puma
 
 setting up password auth https://www.postgresql.org/docs/current/auth-password.html
 
