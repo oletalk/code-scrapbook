@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'db'
+require_relative '../sql/sql_read'
 
 # generate playlist contents for /m3u/
 class ListGen
   include Db
+  include SqlRead
 
   def initialize(hostheader:)
     @hh = hostheader
@@ -14,7 +16,7 @@ class ListGen
   def fetch_all_tunes
     ret = "#EXTM3U\n".dup # don't freeze the initial string plz
     connect_for('full playlist') do |conn|
-      sql = File.read('./sql/all_tunes.sql')
+      sql = sqlfrom('all_tunes')
       conn.exec(sql) do |result|
         result.each do |result_row|
           hash = result_row['file_hash']
@@ -29,7 +31,7 @@ class ListGen
   # fetch a named playlist
   def fetch_playlist(name:)
     ret = "#EXTM3U\n".dup # don't freeze the initial string plz
-    playlist_sql = File.read('./sql/named_pls.sql')
+    playlist_sql = sqlfrom('named_pls')
     connect_for('named playlist') do |conn|
       conn.prepare('pls_sql', playlist_sql)
       conn.exec_prepared('pls_sql', [name]) do |result|

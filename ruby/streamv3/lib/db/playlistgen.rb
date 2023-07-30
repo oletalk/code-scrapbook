@@ -3,11 +3,13 @@
 require_relative 'db'
 require_relative '../data/playlist'
 require_relative '../data/playlist_entry'
+require_relative '../sql/sql_read'
 require 'json'
 
 # generate playlist contents for /playlist/
 class PlaylistGen
   include Db
+  include SqlRead
 
   def initialize(hostheader:)
     @hh = hostheader
@@ -16,7 +18,7 @@ class PlaylistGen
   def fetch_all_playlists
     ret = [] # don't freeze the initial string plz
     connect_for('list of playlists') do |conn|
-      sql = File.read('./sql/all_playlists.sql')
+      sql = sqlfrom('all_playlists')
       conn.exec(sql) do |result|
         result.each do |result_row|
           # hash = result_row['file_hash']
@@ -36,7 +38,7 @@ class PlaylistGen
   def search_playlists(spec:)
     ret = [] # don't freeze the initial string plz
 
-    playlist_sql = File.read('./sql/search_playlists.sql')
+    playlist_sql = sqlfrom('search_playlists')
     old_pls = ''.dup
     connect_for('playlists with tune') do |conn|
       conn.prepare('pls_sql', playlist_sql)
@@ -64,7 +66,7 @@ class PlaylistGen
 
   def fetch_tunes(name:)
     ret = []
-    playlist_sql = File.read('./sql/named_pls.sql')
+    playlist_sql = sqlfrom('named_pls')
     connect_for('named playlist') do |conn|
       conn.prepare('pls_sql', playlist_sql)
       conn.exec_prepared('pls_sql', [name]) do |result|

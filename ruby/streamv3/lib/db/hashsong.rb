@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require_relative 'db'
+require_relative '../sql/sql_read'
 
 # fetch song data from given hash
 class HashSong
   include Db
+  include SqlRead
 
   attr_reader :file_hash,
               :secs,
@@ -14,7 +16,7 @@ class HashSong
 
   def initialize(hash:)
     connect_for('fetching song data from hash') do |conn|
-      sql = File.read('./sql/one_tune.sql')
+      sql = sqlfrom('one_tune')
       conn.prepare('song_data', sql)
       found_song = false
       hash.strip!
