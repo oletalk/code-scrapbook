@@ -7,14 +7,15 @@ require_relative '../constants'
 module Db
   def connect_for(description)
     conn = new_connection
-    conn.transaction do
+    conn.transaction do |conn2|
       # pass the connection to the block being called
       # so it can use conn.exec and result processing here
-      yield conn
+      yield conn2
     end
   rescue StandardError => e
     puts "problem connecting for #{description}"
     puts e.message
+    puts e.backtrace
   ensure
     conn&.close # i.e., "conn.close if conn" (Style/SafeNavigation)
   end
