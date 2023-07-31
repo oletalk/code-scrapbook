@@ -24,6 +24,7 @@ describe 'Player' do
 
     p = Player.new
 
+    # TODO separate out logic to make a better test....
     actual = p.play_downsampled('testfiles/file.mp3')
     expect(actual).to eq('downsampledoutput')
   end
