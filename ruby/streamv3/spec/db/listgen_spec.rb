@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/db/playlistgen'
+require_relative '../../lib/db/listgen'
 require_relative '../../lib/db/db'
 require_relative '../../lib/sql/sql_read'
 require_relative '../support/db_helpers'
@@ -10,7 +10,7 @@ RSpec.configure do |c|
   c.include DbHelpers
 end
 
-describe 'PlaylistGen' do
+describe 'ListGen' do
   it 'generates playlist json from db result' do
     # TODO: how do you fake output from module sqlread????
     allow_any_instance_of(SqlRead).to receive(:sqlfrom).and_return('blah')
@@ -28,12 +28,19 @@ describe 'PlaylistGen' do
         'secs' => 42,
         'file_hash' => 'a8d76fe2'
       }
+    ).and_yield(
+      {
+        'display_title' => 'Étude 23 - Señales',
+        'secs' => 34,
+        'file_hash' => 's66f5w6d5'
+      }
     )
     fake_conn(result)
-    actual = PlaylistGen.new(hostheader: 'localhost:3434')
-    expect(actual.fetch_tunes(name: 'foo')).to eq(
-      '[{"title":"my cool song","url":"http://localhost:3434/play/' \
-      'abc125","secs":10},{"title":"another song","url":"http://localhost:3434/play/a8d76fe2","secs":42}]'
+    actual = ListGen.new(hostheader: 'localhost:3434')
+    expect(actual.fetch_all_tunes).to eq(
+      "#EXTM3U\n#EXTINF:10,my cool song\nhttps://localhost:3434/" \
+      "member/play/abc125\n#EXTINF:42,another song\nhttps://localhost:3434/member/play/a8d76fe2\n#EXTINF:34,Étud" \
+      "e 23 - Señales\nhttps://localhost:3434/member/play/s66f5w6d5\n"
     )
   end
 end

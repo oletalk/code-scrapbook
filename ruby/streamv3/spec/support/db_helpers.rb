@@ -10,5 +10,6 @@ module DbHelpers
     allow(conn).to receive(:transaction).and_yield(conn)
     allow(conn).to receive(:prepare)
     allow(conn).to receive(:exec_prepared).and_yield(fake_result)
+    allow(conn).to receive(:exec).and_yield(fake_result)
   end
 end
