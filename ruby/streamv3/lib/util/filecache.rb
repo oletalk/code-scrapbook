@@ -64,8 +64,7 @@ class FileCache
   end
 
   def maintain_cache_size
-    rootfiles = "#{MP3S::Config::Cache::TEMP_ROOT}/*"
-    curr_size = Dir[rootfiles].select { |f| File.file?(f) }.sum { |f| File.size(f) }
+    curr_size = current_cache_size
     return unless curr_size > @max_size
 
     logger.warn "Cache size = #{curr_size}, maximum size = #{@max_size}"
@@ -75,10 +74,15 @@ class FileCache
       exit_code = system "rm #{Shellwords.escape(delfile)}"
       raise 'unable to trim cache file' unless exit_code
 
-      curr_size = Dir['/var/tmp/files/*'].select { |f| File.file?(f) }.sum { |f| File.size(f) }
+      curr_size = current_cache_size
       logger.debug "new cache size is #{curr_size}"
       sleep 0.3
     end
+  end
+
+  def current_cache_size
+    rootfiles = "#{MP3S::Config::Cache::TEMP_ROOT}/*"
+    Dir[rootfiles].select { |f| File.file?(f) }.sum { |f| File.size(f) }
   end
 
   def oldest_filename
