@@ -2,13 +2,15 @@
 
 # require 'ipaddr'
 require 'digest/sha1'
-require 'net/sftp'
 require_relative '../constants'
 require_relative '../common/logging'
+require_relative '../stream/sftpget'
 
 # util cache to manage the size of the cache directory we dump files into
 class FileCache
   include Logging
+  include SftpGet
+
   def initialize
     @fileroot = MP3S::Config::Cache::TEMP_ROOT
     @max_size = sizeparse(MP3S::Config::Cache::MAX_SIZE)
@@ -36,23 +38,7 @@ class FileCache
       f.read
     else
       logger.info "#{tempfile} not found. downloading and downsampling."
-      sftp = Net::SFTP.start(
-        MP3S::Config::Sftp::SERVER_HOST, MP3S::Config::Sftp::USER,
-        password: MP3S::Config::Sftp::PASSWORD
-      )
-
-      # f = File.open(@file, "rb")
-      sftp.download!(ftpfile, tempfile) do |event, _downloader, *args|
-        case event
-        when :open
-          logger.debug "  ## starting download from #{args[0].remote}"
-        # when :get then <-- further detail, progress
-        when :close
-          logger.debug "  ## finished with #{args[0].remote}"
-        when :finish
-          logger.debug '  ## complete'
-        end
-      end
+      sftpget(ftpfile, tempfile)
 
       # TODO: do we want to make downsampling optional?
       p = Player.new
