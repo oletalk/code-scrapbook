@@ -34,7 +34,7 @@ class HashSong
 
   def record_stat
     connect_for('recording that song was played') do |conn|
-      conn.prepare('record_stat', 'select mp3_record_stat($1)')
+      conn.prepare('record_stat', 'select record_mp3_stat($1)')
       conn.exec_prepared('record_stat', [@file_hash])
     end
   end
