@@ -74,7 +74,7 @@ class StreamServer < Sinatra::Base
         st = SongStream.new(song.song_filepath.to_s)
         out.puts st.readall(@songcache)
         out.flush
-        @currently.start(song)
+        @currently.start(song, request.ip)
       else
         logger.error 'Invalid hash!'
       end
@@ -146,7 +146,7 @@ class StreamServer < Sinatra::Base
     if @user
       @curr_ip = request.ip
       @allowed = @allow_listen.key?(@curr_ip)
-      @nowplaying = @currently
+      @nowplaying = @currently.playing(@curr_ip)
 
       erb :main
     else
