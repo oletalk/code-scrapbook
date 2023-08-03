@@ -12,10 +12,13 @@ class NowPlaying
     @end_time = {}
   end
 
-  # TODO playing everywhere in the case of multiple users online
+  # TODO: playing everywhere in the case of multiple users online
 
   def playing(ip)
-    @curr_playing[ip] = nil if @end_time.key?(ip) && @end_time[ip] < Time.now
+    if @end_time.key?(ip) && @end_time[ip] < Time.now
+      @curr_playing[ip] = nil
+      logger.debug 'Past end point of song for this ip'
+    end
     @curr_playing[ip]&.display_title
   end
 
@@ -33,5 +36,6 @@ class NowPlaying
     logger.debug "Recording start of play for song #{hsong.display_title} at #{ip}"
     @curr_playing[ip] = hsong
     @end_time[ip] = Time.now + (hsong.secs.nil? ? 0 : hsong.secs.to_i)
+    logger.debug "Recording end time of song #{hsong.display_title} at #{ip} as #{@end_time[ip]}"
   end
 end
