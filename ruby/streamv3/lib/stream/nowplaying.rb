@@ -15,7 +15,7 @@ class NowPlaying
   # TODO: playing everywhere in the case of multiple users online
 
   def playing(ip)
-    # logger.debug "Comparison of #{@end_time[ip]} <---> #{Time.now}"
+    logger.debug "Comparison of #{@end_time[ip]} <---> #{Time.now}"
     if @end_time.key?(ip) && @end_time[ip] < Time.now
       @curr_playing[ip] = nil
       logger.debug 'Past end point of song for this ip'
