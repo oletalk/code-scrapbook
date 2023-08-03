@@ -8,6 +8,7 @@ require_relative 'db/hashsong'
 require_relative 'stream/stream'
 require_relative 'util/filecache'
 require_relative 'common/logging'
+require_relative 'stream/nowplaying'
 
 require 'sinatra/base'
 require 'sinatra/streaming' # so we can use 'stream do'
@@ -30,6 +31,7 @@ class StreamServer < Sinatra::Base
     logger.info 'loaded users'
     @songcache = FileCache.new
     @allow_listen = {}
+    @currently = NowPlaying.new
     super
   end
 
@@ -67,10 +69,12 @@ class StreamServer < Sinatra::Base
 
       # if it exists, stream it back
       if song.found
+        # 1/8/2023 TODO call song.record_stat ... but when??
         logger.debug "Streaming #{song.song_filepath}"
         st = SongStream.new(song.song_filepath.to_s)
         out.puts st.readall(@songcache)
         out.flush
+        @currently.start(st)
       else
         logger.error 'Invalid hash!'
       end
