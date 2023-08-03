@@ -74,7 +74,7 @@ class StreamServer < Sinatra::Base
         st = SongStream.new(song.song_filepath.to_s)
         out.puts st.readall(@songcache)
         out.flush
-        @currently.start(st)
+        @currently.start(song)
       else
         logger.error 'Invalid hash!'
       end
