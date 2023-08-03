@@ -15,7 +15,7 @@ class NowPlaying
   # TODO: playing everywhere in the case of multiple users online
 
   def playing(ip)
-    logger.debug "Comparison of #{@end_time[ip]} <---> #{Time.now}"
+    # logger.debug "Comparison of #{@end_time[ip]} <---> #{Time.now}"
     if @end_time.key?(ip) && @end_time[ip] < Time.now
       @curr_playing[ip] = nil
       logger.debug 'Past end point of song for this ip'
@@ -26,7 +26,7 @@ class NowPlaying
   def start(hsong, ip)
     raise 'NowPlaying.start was not passed a HashSong' unless hsong.is_a?(HashSong)
 
-    unless @curr_playing.nil? || Time.now < @end_time
+    unless @curr_playing.nil? || Time.now < @end_time[ip]
       # if it IS true that @curr_playing is not nil AND Time.now is past @end_time
       # should we log if (we think) the next song was started
       # before the previous one elapsed?
