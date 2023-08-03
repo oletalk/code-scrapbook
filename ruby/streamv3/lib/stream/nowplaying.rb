@@ -12,6 +12,8 @@ class NowPlaying
     @end_time = {}
   end
 
+  # TODO playing everywhere in the case of multiple users online
+
   def playing(ip)
     @curr_playing[ip] = nil if @end_time.key?(ip) && @end_time[ip] < Time.now
     @curr_playing[ip]&.display_title
