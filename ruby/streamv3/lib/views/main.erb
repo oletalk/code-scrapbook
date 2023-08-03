@@ -15,7 +15,11 @@
     </p>
     <p>
     <% if @allowed %>
-    You are currently allowed to listen to music from this IP. Enjoy!
+    <div>You are currently allowed to listen to music from this IP. Enjoy!</div>
+    <% unless @nowplaying.playing.nil? %>
+    <div><b>Now Playing: </b><%= @nowplaying.playing %></div>
+    <% end %>
+
     <% else %>
     Do you want to listen to music from <%= @curr_ip %>? <a href="/allow_listen/<%= @curr_ip %>">YES!</a>
     <% end %>

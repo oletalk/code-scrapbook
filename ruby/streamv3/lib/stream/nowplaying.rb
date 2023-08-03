@@ -14,7 +14,7 @@ class NowPlaying
 
   def playing
     @curr_playing = nil if @end_time < Time.now
-    @curr_playing.display_title
+    @curr_playing&.display_title
   end
 
   def start(hsong)

@@ -146,6 +146,8 @@ class StreamServer < Sinatra::Base
     if @user
       @curr_ip = request.ip
       @allowed = @allow_listen.key?(@curr_ip)
+      @nowplaying = @currently
+
       erb :main
     else
       @error = 'Please sign in first'
