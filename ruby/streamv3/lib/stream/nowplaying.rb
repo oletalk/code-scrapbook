@@ -4,6 +4,7 @@ require_relative '../db/hashsong'
 require_relative '../data/playing_entry'
 require_relative '../common/logging'
 
+# WRITE TESTS FOR THIS CLASS!!!
 # stats to show on members page
 class NowPlaying
   include Logging
@@ -20,7 +21,13 @@ class NowPlaying
       logger.debug 'Past end point of song for this ip'
     end
     ret = nil
-    ret = @curr_playing[ip].hash_song.display_title if @curr_playing.key?(ip)
+    if @curr_playing.key?(ip)
+      curr_song = @curr_playing[ip]
+      ret = {
+        title: curr_song.hash_song.display_title,
+        remaining: curr_song.end_time - Time.now
+      }
+    end
     ret
   end
 
@@ -32,6 +39,7 @@ class NowPlaying
       # before the previous one elapsed?
       logger.debug 'Previous song duration has elapsed'
       logger.debug 'Recording song played'
+      # TODO: let it guess the song duration if it wasn't given any
       @curr_playing[ip].hash_song.record_stat
       @curr_playing.delete(ip)
     end

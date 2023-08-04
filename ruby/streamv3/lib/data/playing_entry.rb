@@ -9,7 +9,7 @@ class PlayingEntry
     @end_time = endtime
   end
 
-  attr_reader :hash_song
+  attr_reader :hash_song, :end_time
 
   def elapsed?
     @end_time < Time.now

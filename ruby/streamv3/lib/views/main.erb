@@ -1,7 +1,8 @@
 <!doctype html>
 <HTML>
   <HEAD>
-    <TITLE>sign in</TITLE>
+    <meta http-equiv="refresh" content="30">
+    <TITLE>main page</TITLE>
     <link rel="stylesheet" href="/css/default.css">
   </HEAD>
   <BODY>
@@ -17,7 +18,7 @@
     <% if @allowed %>
     <div>You are currently allowed to listen to music from this IP. Enjoy!</div>
     <% unless @nowplaying.nil? %>
-    <div><b>Now Playing: </b><%= @nowplaying %></div>
+    <div><b>Now Playing: </b><%= @nowplaying.title %> (<%= @nowplaying.remaining %> secs remaining)</div>
     <% end %>
 
     <% else %>
