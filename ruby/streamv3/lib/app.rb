@@ -63,6 +63,8 @@ class StreamServer < Sinatra::Base
 
   # PLAY STREAM (main)
   get '/member/play/:hsh' do |hsh|
+    @user = current_user
+
     stream do |out|
       # find file containing that hash
       song = HashSong.new(hash: hsh.to_s)
@@ -74,7 +76,7 @@ class StreamServer < Sinatra::Base
         st = SongStream.new(song.song_filepath.to_s)
         out.puts st.readall(@songcache)
         out.flush
-        @currently.start(song, request.ip)
+        @currently.start(song, request.ip, @user)
       else
         logger.error 'Invalid hash!'
       end
