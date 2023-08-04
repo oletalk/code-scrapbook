@@ -43,7 +43,7 @@ describe 'NowPlaying' do
     puts '<<< Sleeping 2 seconds to let song "finish" >>>'
     sleep 2
     # start another song - the first one should be recorded
-    expect(hsong).to receive(:record_stat)
+    expect(hsong).to receive(:record_stat).once
 
     # fake user checking 'now playing' and us realising the song has finished
     expect(actual.playing(myip)).to be(nil) # it should call record_stat here
@@ -54,13 +54,13 @@ describe 'NowPlaying' do
     expect(result[:title]).to eq('Cool Theme Song')
   end
 
-  it 'records a song as played after it has finished and another song starts' do
+  it 'records songs playing on separate ips separately' do
     actual = NowPlaying.new
     hsong = double('hashsong')
     allow(hsong).to receive(:is_a?).and_return(HashSong)
     allow(hsong).to receive(:display_title).and_return('Another short Song')
     allow(hsong).to receive(:secs).and_return(23)
-    allow(hsong).to receive(:record_stat)
+    allow(hsong).to receive(:record_stat).once
 
     hsong2 = double('hashsong')
     allow(hsong2).to receive(:is_a?).and_return(HashSong)
