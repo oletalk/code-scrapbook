@@ -13,12 +13,12 @@ class NowPlaying
     @curr_playing = {} # keyed by ip
   end
 
-  # TODO: playing everywhere in the case of multiple users online
+  # TODO: function for current users (spit out user component of all curr_playing keys)
 
   def playing(ip)
     if @curr_playing.key?(ip) && @curr_playing[ip].elapsed?
-      @curr_playing.delete(ip)
-      logger.debug 'Past end point of song for this ip'
+      # let's record it as finished
+      record_finished_song(ip)
     end
     ret = nil
     if @curr_playing.key?(ip)
@@ -38,17 +38,20 @@ class NowPlaying
     raise 'PlayingEntry was not given a HashSong' unless hsong.is_a?(HashSong)
 
     if @curr_playing.key?(ip) && @curr_playing[ip].elapsed?
-      # should we log if (we think) the next song was started
-      # before the previous one elapsed?
-      logger.debug 'Previous song duration has elapsed'
-      logger.debug 'Recording song played'
       # TODO: let it guess the song duration if it wasn't given any
-      @curr_playing[ip].hash_song.record_stat
-      @curr_playing.delete(ip)
+      record_finished_song(ip)
     end
     logger.debug "Recording start of play for song #{hsong.display_title} at #{ip}"
     finishtime = Time.now + (hsong.secs.nil? ? 0 : hsong.secs.to_i)
     @curr_playing[ip] = PlayingEntry.new(hsong, finishtime, user)
     logger.debug "Recording end time of song #{hsong.display_title} at #{ip} as #{finishtime}"
+  end
+
+  def record_finished_song(ip)
+    logger.debug 'Previous song duration has elapsed'
+    logger.debug 'Recording song played'
+    # TODO: let it guess the song duration if it wasn't given any
+    @curr_playing[ip].hash_song.record_stat
+    @curr_playing.delete(ip)
   end
 end

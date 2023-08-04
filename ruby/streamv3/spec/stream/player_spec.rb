@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 require_relative '../../lib/stream/player'
+require_relative '../support/logging_helpers'
+
+RSpec.configure do |c|
+  c.include LoggingHelpers
+end
 
 describe 'Player' do
   it 'fails to play an unknown type file' do
-    foo = double('logger')
-    stub_const('Logging::Logger', foo)
-    allow(foo).to receive(:new).and_return(foo)
-    allow(foo).to receive(:error)
+    fake_logging
     p = Player.new
 
     expect {
@@ -16,17 +18,13 @@ describe 'Player' do
   end
 
   it 'plays an mp3' do
-    foo = double('logger')
     allow(Open3).to receive('capture3').and_return('downsampledoutput')
-    stub_const('Logging::Logger', foo)
-    allow(foo).to receive(:new).and_return(foo)
-    allow(foo).to receive(:info)
+    fake_logging
 
     p = Player.new
 
-    # TODO separate out logic to make a better test....
+    # TODO: separate out logic to make a better test....
     actual = p.play_downsampled('testfiles/file.mp3')
     expect(actual).to eq('downsampledoutput')
   end
-
 end
