@@ -34,7 +34,7 @@ class NowPlaying
     ret
   end
 
-  def start(hsong, ip)
+  def start(hsong, ip, user)
     raise 'PlayingEntry was not given a HashSong' unless hsong.is_a?(HashSong)
 
     if @curr_playing.key?(ip) && @curr_playing[ip].elapsed?
@@ -48,7 +48,7 @@ class NowPlaying
     end
     logger.debug "Recording start of play for song #{hsong.display_title} at #{ip}"
     finishtime = Time.now + (hsong.secs.nil? ? 0 : hsong.secs.to_i)
-    @curr_playing[ip] = PlayingEntry.new(hsong, finishtime)
+    @curr_playing[ip] = PlayingEntry.new(hsong, finishtime, user)
     logger.debug "Recording end time of song #{hsong.display_title} at #{ip} as #{finishtime}"
   end
 end
