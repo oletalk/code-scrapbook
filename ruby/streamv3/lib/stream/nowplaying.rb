@@ -23,9 +23,12 @@ class NowPlaying
     ret = nil
     if @curr_playing.key?(ip)
       curr_song = @curr_playing[ip]
+      remng = curr_song.end_time - Time.now
+      remng = remng.to_i
+      remng = 'Unknown' if remng <= 0
       ret = {
         title: curr_song.hash_song.display_title,
-        remaining: curr_song.end_time - Time.now
+        remaining: remng
       }
     end
     ret
