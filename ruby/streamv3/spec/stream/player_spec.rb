@@ -12,9 +12,7 @@ describe 'Player' do
     fake_logging
     p = Player.new
 
-    expect {
-      p.play_downsampled('blah')
-    }.to raise_error(RuntimeError)
+    expect { p.play_downsampled('blah') }.to raise_error(RuntimeError)
   end
 
   it 'plays an mp3' do

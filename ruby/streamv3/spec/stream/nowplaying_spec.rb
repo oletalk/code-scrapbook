@@ -12,10 +12,7 @@ describe 'NowPlaying' do
 
   it 'records starting a song correctly' do
     actual = NowPlaying.new
-    hsong = double('hashsong')
-    allow(hsong).to receive(:is_a?).and_return(HashSong)
-    allow(hsong).to receive(:display_title).and_return('My Cool Song')
-    allow(hsong).to receive(:secs).and_return(3)
+    hsong = fake_hashsong('My Cool Song', 3, false)
     myip = '34.45.21.10'
     actual.start(hsong, myip, 'colin')
     result = actual.playing(myip)
@@ -24,16 +21,8 @@ describe 'NowPlaying' do
 
   it 'records a song as played after it has finished and another song starts' do
     actual = NowPlaying.new
-    hsong = double('hashsong')
-    allow(hsong).to receive(:is_a?).and_return(HashSong)
-    allow(hsong).to receive(:display_title).and_return('Really Short Song')
-    allow(hsong).to receive(:secs).and_return(1)
-    allow(hsong).to receive(:record_stat)
-
-    hsong2 = double('hashsong')
-    allow(hsong2).to receive(:is_a?).and_return(HashSong)
-    allow(hsong2).to receive(:display_title).and_return('Cool Theme Song')
-    allow(hsong2).to receive(:secs).and_return(2)
+    hsong = fake_hashsong('Really Short Song', 1, true)
+    hsong2 = fake_hashsong('Cool Theme Song', 2, false)
 
     myip = '1.2.3.4'
     actual.start(hsong, myip, 'colin')
@@ -56,16 +45,12 @@ describe 'NowPlaying' do
 
   it 'records songs playing on separate ips separately' do
     actual = NowPlaying.new
-    hsong = double('hashsong')
-    allow(hsong).to receive(:is_a?).and_return(HashSong)
-    allow(hsong).to receive(:display_title).and_return('Another short Song')
-    allow(hsong).to receive(:secs).and_return(23)
+    # last param here is whether to setup record_stat
+    # but we'll set it up separately
+    hsong = fake_hashsong('Another short Song', 23, false)
     allow(hsong).to receive(:record_stat).once
 
-    hsong2 = double('hashsong')
-    allow(hsong2).to receive(:is_a?).and_return(HashSong)
-    allow(hsong2).to receive(:display_title).and_return('Cool Theme Song')
-    allow(hsong2).to receive(:secs).and_return(21)
+    hsong2 = fake_hashsong('Cool Theme Song', 21, false)
 
     myip = '1.2.3.4'
     actual.start(hsong, myip, 'colin')
@@ -78,5 +63,4 @@ describe 'NowPlaying' do
     result2 = actual.playing(myip)
     expect(result2[:title]).to eq('Another short Song') # still...
   end
-
 end

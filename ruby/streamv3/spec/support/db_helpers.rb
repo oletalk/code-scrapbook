@@ -12,4 +12,13 @@ module DbHelpers
     allow(conn).to receive(:exec_prepared).and_yield(fake_result)
     allow(conn).to receive(:exec).and_yield(fake_result)
   end
+
+  def fake_hashsong(title, duration, can_record)
+    hsong = double('hashsong')
+    allow(hsong).to receive(:is_a?).and_return(HashSong)
+    allow(hsong).to receive(:display_title).and_return(title)
+    allow(hsong).to receive(:secs).and_return(duration)
+    allow(hsong).to receive(:record_stat) if can_record
+    hsong
+  end
 end
