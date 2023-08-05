@@ -1,7 +1,8 @@
 # Copied from https://gist.github.com/jhass/a5ae80d87f18e53e7b56 on 3/5/21
-
+AllCops:
+  NewCops: enable
 # Commonly used screens these days easily fit more than 80 characters.
-Metrics/LineLength:
+Layout/LineLength:
   Max: 100
 
 # Too short methods lead to extraction of single-use methods, which can make
@@ -11,7 +12,7 @@ Metrics/MethodLength:
 
 # Don't check for Assignment/Branch/Condition
 Metrics/AbcSize:
-  Enabled: false
+  Enabled: true
 
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
@@ -19,7 +20,7 @@ Metrics/ClassLength:
 
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
-Style/SpaceAroundEqualsInParameterDefault:
+Layout/SpaceAroundEqualsInParameterDefault:
   EnforcedStyle: no_space
 
   # Fail is an alias of raise. Avoid aliases, it's more cognitive load for no gain.
