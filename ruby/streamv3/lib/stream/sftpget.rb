@@ -4,10 +4,40 @@ require 'net/sftp'
 require_relative '../constants'
 require_relative '../common/logging'
 
+GROUP = 5
 
 # mixin to separate out SFTP code
 module SftpGet
   include Logging
+
+  def sftpbulkget(filelist, destdir)
+    logger.info 'Logging into server'
+    sftp = Net::SFTP.start(
+      MP3S::Config::Sftp::SERVER_HOST, MP3S::Config::Sftp::USER,
+      password: MP3S::Config::Sftp::PASSWORD
+    )
+    logger.info 'Login complete.'
+
+    @@ctr = 0
+    @@total = filelist.length
+    dls = filelist.map { |file|
+      bn = File.basename(file)
+      destfile = "#{destdir}/#{bn}"
+      logger.debug "Starting download #{file} --> #{destfile}"
+      sftp.download(file, destfile) do |event, _downloader, *args|
+        case event
+          when :finish then
+            @@ctr += 1
+            logger.debug "[progress] #{@@ctr} / #{@@total} complete." if @@ctr % GROUP == 0
+        end
+      end
+    }
+    dls.each { |d|
+      d.wait
+    }
+    logger.info "Downloads complete."
+    
+  end
 
   def sftpget(remotefile, localfile)
     sftp = Net::SFTP.start(
