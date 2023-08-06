@@ -3,7 +3,6 @@
 require_relative 'db/listgen'
 require_relative 'db/playlistgen'
 require_relative 'util/crypt'
-require_relative 'util/ipwl'
 require_relative 'db/hashsong'
 require_relative 'stream/stream'
 require_relative 'util/filecache'
@@ -49,12 +48,6 @@ class StreamServer < Sinatra::Base
   end
 
   before do
-    # @ipwl = IPWhitelist.new(MP3S::Clients::List, MP3S::Clients::Default)
-    # remote_ip = request.ip
-    # action = @ipwl.action(remote_ip)
-    # logger.debug "Action for #{remote_ip} is #{action}."
-    # halt 403, 'Access Denied' unless action[:allow]
-
     headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     headers['Access-Control-Allow-Origin'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Accept, Authorization, Origin'

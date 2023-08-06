@@ -13,6 +13,8 @@ Metrics/MethodLength:
 # Don't check for Assignment/Branch/Condition
 Metrics/AbcSize:
   Enabled: true
+  Max: 18
+  CountRepeatedAttributes: false
 
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
