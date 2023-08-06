@@ -28,7 +28,7 @@ module SftpGet
         case event
         when :finish
           @ctr += 1
-          logger.debug "[progress] #{@@ctr} / #{@@total} complete." if (@ctr % GROUP).zero?
+          logger.debug "[progress] #{@ctr} / #{@total} complete." if (@ctr % GROUP).zero?
         end
       end
     end
