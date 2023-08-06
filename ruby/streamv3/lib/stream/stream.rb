@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../constants'
-require_relative './player'
+require_relative 'player'
 
 # A class for handling streaming from a file
 class SongStream

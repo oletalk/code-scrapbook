@@ -8,24 +8,23 @@ class CopyFromSftp
   include SftpGet
 
   def main(args)
-    files = []
-
     # parse args
     options = {}
     OptionParser.new do |opts|
-      opts.banner = 'Usage: copylistfromscp.rb -l <list of remote sftp files> -d <local destination directory>'
+      opts.banner = 'Usage: copylistfromscp.rb -l <list of remote sftp files> -d ' \
+                    '<local destination directory>'
 
-      opts.on("-lLIST", "--list=LIST", "File with list of SFTP urls") do |l|
+      opts.on('-lLIST', '--list=LIST', 'File with list of SFTP urls') do |l|
         options['list'] = l
       end
-        
-      opts.on("-dDESTDIR", "--destination=DESTDIR", "Local destination dir") do |d|
-        options['destination'] = d 
-      end
 
+      opts.on('-dDESTDIR', '--destination=DESTDIR', 'Local destination dir') do |d|
+        options['destination'] = d
+      end
     end.parse!(args)
 
     raise 'Destination directory not given' unless options.key?('destination')
+
     files = File.readlines(options['list'], chomp: true)
 
     destdir = options['destination']

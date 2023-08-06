@@ -18,25 +18,23 @@ module SftpGet
     )
     logger.info 'Login complete.'
 
-    @@ctr = 0
-    @@total = filelist.length
-    dls = filelist.map { |file|
+    @ctr = 0
+    @total = filelist.length
+    dls = filelist.map do |file|
       bn = File.basename(file)
       destfile = "#{destdir}/#{bn}"
       logger.debug "Starting download #{file} --> #{destfile}"
-      sftp.download(file, destfile) do |event, _downloader, *args|
+      sftp.download(file, destfile) do |event, _downloader, _args|
         case event
-          when :finish then
-            @@ctr += 1
-            logger.debug "[progress] #{@@ctr} / #{@@total} complete." if @@ctr % GROUP == 0
+        when :finish
+          @ctr += 1
+          logger.debug "[progress] #{@@ctr} / #{@@total} complete." if (@ctr % GROUP).zero?
         end
       end
-    }
-    dls.each { |d|
-      d.wait
-    }
-    logger.info "Downloads complete."
-    
+    end
+    # dls.each { |d| d.wait }
+    dls.each(&:wait)
+    logger.info 'Downloads complete.'
   end
 
   def sftpget(remotefile, localfile)
