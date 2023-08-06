@@ -7,8 +7,7 @@ require_relative '../stream/sftpget'
 class CopyFromSftp
   include SftpGet
 
-  def main(args)
-    # parse args
+  def parsedoptions(args)
     options = {}
     OptionParser.new do |opts|
       opts.banner = 'Usage: copylistfromscp.rb -l <list of remote sftp files> -d ' \
@@ -22,7 +21,12 @@ class CopyFromSftp
         options['destination'] = d
       end
     end.parse!(args)
+    options
+  end
 
+  def main(args)
+    options = parsedoptions(args)
+    raise 'List of SFTP URLs not given' unless options.key?('list')
     raise 'Destination directory not given' unless options.key?('destination')
 
     files = File.readlines(options['list'], chomp: true)
