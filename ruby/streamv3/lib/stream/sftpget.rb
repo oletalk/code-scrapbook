@@ -10,6 +10,31 @@ GROUP = 5
 module SftpGet
   include Logging
 
+  def sftpcheckdir(remotedir, secs)
+    logger.info 'Logging into server'
+    sftp = Net::SFTP.start(
+      MP3S::Config::Sftp::SERVER_HOST, MP3S::Config::Sftp::USER,
+      password: MP3S::Config::Sftp::PASSWORD
+    )
+    logger.info 'Login complete.'
+
+    logger.debug "Looking at directory #{remotedir} ..."
+    mintime = Time.now.to_i - secs
+    logger.debug "Earliest modification time #{Time.at(mintime)}"
+    remotedir.chop! if remotedir =~ %r{/$}
+    sftp.dir.foreach(remotedir) do |entry|
+      # TODO: check if directory & descend into directory if so
+      ts = entry.attributes.attributes[:mtime]
+      filename = entry.name
+      fullname = "#{remotedir}/#{filename}"
+      filetimestamp = Time.at(ts)
+      if ts >= mintime && filename !~ /^\./
+        yield fullname
+        puts "-\t#{filetimestamp}"
+      end
+    end
+  end
+
   def sftpbulkget(filelist, destdir)
     logger.info 'Logging into server'
     sftp = Net::SFTP.start(
