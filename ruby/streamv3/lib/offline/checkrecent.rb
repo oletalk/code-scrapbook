@@ -2,6 +2,7 @@
 
 require 'optparse'
 require_relative '../stream/sftpget'
+require_relative '../util/tagget'
 
 # utility to find newly updated files in the SFTP store
 class CheckRecent
@@ -25,11 +26,18 @@ class CheckRecent
   end
 
   def main(args)
+    tagget = TagGet.new
     options = parsedoptions(args)
     raise 'Remote directory not given' unless options.key?(:dir)
 
     sftpcheckdir(options[:dir], options[:secs]) do |remotefile|
-      puts remotefile
+      localfile = "/tmp/#{File.basename(remotefile)}"
+      sftpget(remotefile, localfile)
+      tag = tagget.read(localfile)
+      system "rm #{Shellwords.escape(localfile)}"
+
+      # TODO: write the tag to the database - see streamv2
+      puts tag
     end
   end
 end
