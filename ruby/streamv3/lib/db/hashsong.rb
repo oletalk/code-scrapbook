@@ -14,7 +14,36 @@ class HashSong
               :display_title,
               :found
 
-  def initialize(hash:)
+  def update_tag(**args)
+    path = args[:path]
+    hash = args[:hash]
+    tag = args[:tag]
+    replace = args[:replace]
+    # path is a string, tag is a hashmap
+    # this will generate a new hash
+    raise 'No hash given' if hash.nil?
+
+    sql = sqlfrom(replace ? 'write_tag' : 'write_tag_new_only')
+    song_filepath = path
+    file_hash = hash
+    t_artist = tag[:artist]
+    t_title = tag[:title]
+    t_secs = tag[:secs]
+    connect_for('inserting/updating song metadata') do |conn|
+      conn.prepare('upsert_tag1', sql)
+      conn.exec_prepared('upsert_tag1',
+                         [song_filepath,
+                          file_hash,
+                          t_artist,
+                          t_title,
+                          t_secs])
+    end
+  end
+
+  def initialize(**args)
+    hash = args.fetch(:hash, nil)
+    return if hash.nil?
+
     connect_for('fetching song data from hash') do |conn|
       sql = sqlfrom('one_tune')
       conn.prepare('song_data', sql)
