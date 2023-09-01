@@ -27,10 +27,10 @@ module SftpGet
       ts = entry.attributes.attributes[:mtime]
       filename = entry.name
       fullname = "#{remotedir}/#{filename}"
-      filetimestamp = Time.at(ts)
+      # filetimestamp = Time.at(ts)
       if ts >= mintime && filename !~ /^\./
         yield fullname
-        puts "-\t#{filetimestamp}"
+        # puts "-\t#{filetimestamp}"
       end
     end
   end

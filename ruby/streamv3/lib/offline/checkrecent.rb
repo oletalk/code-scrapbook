@@ -53,22 +53,33 @@ class CheckRecent
     end
 
     sftpcheckdir(options[:dir], options[:secs]) do |remotefile|
-      localfile = "/tmp/#{File.basename(remotefile)}"
-      sftpget(remotefile, localfile)
-      tag = tagget.read(localfile)
-      system "rm #{Shellwords.escape(localfile)}"
+      file_hash = get_hash(remotefile)
+      do_download = true
+      h = HashSong.new(hash: file_hash)
+      if !options[:replace] && h.found
+        puts "- Skipping file with existing tag: #{File.basename(remotefile)}"
+        do_download = false
+      end
+      if do_download
+        localfile = "/tmp/#{File.basename(remotefile)}"
+        puts 'Fetching file to read the tag...'
+        sftpget(remotefile, localfile)
+        tag = tagget.read(localfile)
+        puts 'Deleting local copy of the file.'
+        system "rm #{Shellwords.escape(localfile)}"
 
-      # TODO: write the tag to the database - see streamv2
-      # create an empty hashsong
-      puts "path: #{remotefile}, hash: #{get_hash(remotefile)}, tag: #{tag}"
-      h = HashSong.new
-      h.update_tag(
-        path: remotefile,
-        hash: get_hash(remotefile),
-        tag: tag,
-        replace: options[:replace]
-      )
-      puts tag
+        # TODO: write the tag to the database - see streamv2
+        # create an empty hashsong
+        puts "path: #{remotefile}, hash: #{get_hash(remotefile)}, tag: #{tag}"
+        # h = HashSong.new
+        h.update_tag(
+          path: remotefile,
+          hash: file_hash,
+          tag: tag,
+          replace: options[:replace]
+        )
+        puts tag
+      end
     end
   end
 end
