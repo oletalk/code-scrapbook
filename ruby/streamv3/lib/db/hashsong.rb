@@ -61,6 +61,25 @@ class HashSong
     end
   end
 
+  def playing_stats
+    ret = {}
+
+    fields = %w[display_title artist secs last_played_title total_plays_title
+                last_played_artist total_plays_artist]
+    connect_for('fetching stats') do |conn|
+      sql = sqlfrom('current_tune_stats')
+      conn.prepare('tune_stats', sql)
+      conn.exec_prepared('tune_stats', [@file_hash]) do |result|
+        result.each do |result_row|
+          fields.each do |fld|
+            ret[fld] = result_row[fld]
+          end
+        end
+      end
+    end
+    ret
+  end
+
   def record_stat
     connect_for('recording that song was played') do |conn|
       conn.prepare('record_stat', 'select record_mp3_stat($1)')

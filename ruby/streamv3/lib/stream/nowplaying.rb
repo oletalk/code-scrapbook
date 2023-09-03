@@ -4,7 +4,8 @@ require_relative '../db/hashsong'
 require_relative '../data/playing_entry'
 require_relative '../common/logging'
 
-# WRITE TESTS FOR THIS CLASS!!!
+# TODO: show (current) stats for the TITLE/ARTIST - plays and last played
+#       show (historical) stats for the TITLE/ARTIST - total plays
 # stats to show on members page
 class NowPlaying
   include Logging
