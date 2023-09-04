@@ -29,6 +29,7 @@ class NowPlaying
       remng = 'Unknown' if remng <= 0
       ret = {
         title: curr_song.hash_song.display_title,
+        detail: curr_song.hash_song.playing_stats, # TODO: TEST!
         remaining: remng
       }
     end

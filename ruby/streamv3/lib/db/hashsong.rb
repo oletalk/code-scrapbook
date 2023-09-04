@@ -64,7 +64,7 @@ class HashSong
   def playing_stats
     ret = {}
 
-    fields = %w[display_title artist secs last_played_title total_plays_title
+    fields = %w[artist secs last_played_title total_plays_title
                 last_played_artist total_plays_artist]
     connect_for('fetching stats') do |conn|
       sql = sqlfrom('current_tune_stats')
