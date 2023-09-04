@@ -24,8 +24,16 @@
     <%    if @nowplaying[:detail] %>
     <table>
       <tr>
-        <td>Artist: <%= @nowplaying[:detail]['artist'] %>
-        <td>Last played (song): <%= @nowplaying[:detail]['last_played_title'] %>
+        <td>Artist: </td>
+        <td><%= @nowplaying[:detail]['artist'] %></td>
+      </tr>
+      <tr>
+        <td>Song last played: </td>
+        <% if @nowplaying[:detail]['last_played_title'] %>
+        <td><%= @nowplaying[:detail]['last_played_title'] %></td>
+        <% else %>
+        <td><i>not recently</i></td>
+        <% end %>
       </tr>
     </table>
     <%    end %>
