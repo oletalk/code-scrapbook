@@ -18,6 +18,7 @@ module DbHelpers
     allow(hsong).to receive(:is_a?).and_return(HashSong)
     allow(hsong).to receive(:display_title).and_return(title)
     allow(hsong).to receive(:secs).and_return(duration)
+    allow(hsong).to receive(:playing_stats).and_return([])
     allow(hsong).to receive(:record_stat) if can_record
     hsong
   end
