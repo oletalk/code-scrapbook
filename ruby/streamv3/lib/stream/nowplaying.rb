@@ -27,9 +27,11 @@ class NowPlaying
       remng = curr_song.end_time - Time.now
       remng = remng.to_i
       remng = 'Unknown' if remng <= 0
+      stats = curr_song.hash_song.playing_stats
+
       ret = {
         title: curr_song.hash_song.display_title,
-        detail: curr_song.hash_song.playing_stats, # TODO: TEST!
+        detail: stats, # TODO: TEST!
         remaining: remng
       }
     end
