@@ -8,6 +8,7 @@ require_relative 'stream/stream'
 require_relative 'util/filecache'
 require_relative 'common/logging'
 require_relative 'stream/nowplaying'
+require_relative 'db/generalstats'
 
 require 'sinatra/base'
 require 'sinatra/streaming' # so we can use 'stream do'
@@ -142,6 +143,10 @@ class StreamServer < Sinatra::Base
       @curr_ip = request.ip
       @allowed = @allow_listen.key?(@curr_ip)
       @nowplaying = @currently.playing(@curr_ip)
+      # run general stats as well
+      # is there a better way not to run stats every time this page is called?
+      stats = GeneralStats.new
+      @top_artists = stats.playing_stats
 
       erb :main
     else

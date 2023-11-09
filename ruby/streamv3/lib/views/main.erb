@@ -35,6 +35,17 @@
         <td><i>not recently</i></td>
         <% end %>
       </tr>
+      <% if @top_artists %>
+      <tr>
+        <td>TOP ARTISTS</td>
+        <td>
+          <ul><% @top_artists.each do |info| %>
+            <li><%= info.item %> - <i><%= info.total_plays %> song(s)</i></li>
+            <% end %>
+          </ul>
+        </td>
+      </tr>
+      <% end %>
     </table>
     <%    end %>
     <%  end %>
