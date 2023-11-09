@@ -40,7 +40,7 @@
         <td>TOP ARTISTS</td>
         <td>
           <ul><% @top_artists.each do |info| %>
-            <li><%= info.item %> - <i><%= info.total_plays %> song(s)</i></li>
+            <li><%= info[:item] %> - <i><%= info[:total_plays] %> song(s)</i></li>
             <% end %>
           </ul>
         </td>
