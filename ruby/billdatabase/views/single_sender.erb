@@ -44,8 +44,15 @@
         <% @sender.sender_accounts.each_with_index do |account, index| %>
           <tr>
             <td colspan='3'>
+              <% if account.closed == 'Y' %>
+              <div class='sender_account_closed' id='account_<%= account.id %>'>
+              <% else %>
               <div class='sender_account' id='account_<%= account.id %>'>
+              <% end %>
                 <div>
+                  <% if account.closed == 'Y' %>
+                    <div class='account_closed'>CLOSED</div>
+                  <% end %>
                                 <input type="hidden" name="id" class='fieldval' value="<%= account.id %>" />
                   <%= index+1 %> - Account number: <input name="account_number" class='fieldval' value="<%= account.account_number %>" />
                 </div>
@@ -55,6 +62,11 @@
                 <div>
                   <%= index+1 %> - Comments: <textarea name='comments' class='fieldval' ><%= account.comments %></textarea>
                 </div>
+                  <% if account.closed == 'Y' %>
+                Closed? <input type=checkbox checked name="account_closed" class='fieldval' />
+                  <% else %>
+                Closed? <input type=checkbox name="account_closed" class='fieldval' />
+                  <% end %>
               </div>
             </td>
             <td><button class="update_btn" onClick="updateAccount('account_<%= account.id %>')">update account</button>

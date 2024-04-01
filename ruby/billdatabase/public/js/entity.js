@@ -75,6 +75,7 @@ function reloadOrPrintError(response, operation) {
   if (typeof response.data.result !== 'undefined' && response.data.result !== 'success') {
     console.error('Problem ' + operation + ': ' + response.data.result)
   } else {
+    // alert('click ok to continue')
     location.reload()
     console.log(response.data)
   }
@@ -84,8 +85,13 @@ function reloadOrPrintError(response, operation) {
 function collectElementsOfFrom(className, containerElement) {
   let data = {}
   for (field of containerElement.getElementsByClassName(className)) {
-    const val = field.value
-
+    let val = field.value
+    const typ = field.type
+    if (typ == 'checkbox') {
+      val = field.checked ? 'Y' : 'N'
+    }
+    // console.log('field ' + field.name + ' has type ' + field.type)
+    
     data[field.name] = val
     if (field.classList.contains('mandatory')) {
       console.log('field ' + field.name + ' is mandatory')

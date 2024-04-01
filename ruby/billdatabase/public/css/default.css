@@ -29,6 +29,11 @@ button {
   font-weight: 600;
 }
 
+div.account_closed {
+  font-style: italic;
+  font-weight: 700;
+  color: darkred;
+}
 
 div.top_navigation {
   border: 1px solid grey;
@@ -163,6 +168,11 @@ textarea.field_changed {
 .sender_account {
   border: 1px solid #343434;
   background-color: #ebe6f2;
+}
+
+.sender_account_closed {
+  border: 1px solid #343434;
+  background-color: #ababac;
 }
 
 .sender_contact {

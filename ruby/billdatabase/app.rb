@@ -249,6 +249,7 @@ class BillDatabase < Sinatra::Base
     sa = SenderAccount.new(acc_id, nil) # don't need sender_id for update
     sa.account_number = params['account_number']
     sa.account_details = params['account_details']
+    sa.closed = params['account_closed']
     sa.comments = params['comments']
     s.upd_sender_account(sa)
   end

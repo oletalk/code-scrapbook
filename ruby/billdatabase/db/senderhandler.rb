@@ -10,7 +10,7 @@ require_relative '../util/logging'
 
 SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
-ACCOUNT_FIELDS = 'id, sender_id, account_number, account_details, comments'
+ACCOUNT_FIELDS = 'id, sender_id, account_number, account_details, closed, comments'
 CONTACT_FIELDS = 'id, sender_id, name, contact, comments'
 
 # fetches sender information from the db
@@ -70,14 +70,15 @@ class SenderHandler
     raise ArgumentError, 'provided account has no id' if account.id.nil?
 
     sql = 'update bills.sender_account '\
-          'set account_number = $1, account_details = $2, comments = $3 '\
-          ' where id = $4'
+          'set account_number = $1, account_details = $2, comments = $3, closed = $4 '\
+          ' where id = $5'
     connect_for('updating an account held with a sender') do |conn|
       conn.prepare('upd_sa', sql)
       conn.exec_prepared('upd_sa', [
                            account.account_number,
                            account.account_details,
                            account.comments,
+                           account.closed,
                            account.id
                          ])
     end
