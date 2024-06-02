@@ -4,9 +4,15 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 import './index.css'
+import './css/taglist.css'
+import './css/tooltip.css'
+import './css/default.css'
 
 import Main from './views/Main'
 import MaintainTags from './views/MaintainTags'
+import ViewSenders from './views/ViewSenders'
+import EditSender from './views/EditSender'
+
 // import NotFound from './views/NotFound'
 
 const root = ReactDOM.createRoot(
@@ -17,6 +23,8 @@ root.render(
         <Routes>
         <Route path="/" element={<Main/>}/>
         <Route path="/taglist" element={<MaintainTags/>}/>
+        <Route path="/senders" element={<ViewSenders/>}/>
+        <Route path="/sender/:id" element={<EditSender /> } />
         <Route path="*" element={<Main/>}/>
         </Routes>
     </Router>
