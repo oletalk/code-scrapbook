@@ -21,7 +21,7 @@ export default class Main extends React.Component {
       <div>
         Maintain list of ...
         <ul>
-          <li>Senders</li>
+          <li><Link to="/senders">Senders</Link></li>
           <li><Link to="/taglist">Tags</Link></li>
         </ul>
       </div>

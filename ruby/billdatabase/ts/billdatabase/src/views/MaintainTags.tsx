@@ -1,10 +1,6 @@
 import { TagObject } from '../common/types'
 import React from "react";
 
-/*
- TODO: make the build go into a folder in the main app, like
-    public/spa/
-*/
 type TagProps = {
 
 }
