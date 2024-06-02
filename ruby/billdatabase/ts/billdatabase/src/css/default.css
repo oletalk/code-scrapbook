@@ -1,0 +1,310 @@
+body {
+  font-family: Arial, Helvetica, sans-serif
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+input.sender_field {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 100%;
+}
+
+table.senderdetail label {
+  font-weight: 700;
+}
+th.recvd {
+  min-width: 130px;
+}
+
+button {
+  color: #ffffaa;
+  background-color: #5a55a0;
+  border-radius: 6px;
+  border: 0px;
+  padding: 7px;
+  font-weight: 600;
+}
+
+div.account_closed {
+  font-style: italic;
+  font-weight: 700;
+  color: darkred;
+}
+
+div.top_navigation {
+  border: 1px solid grey;
+  width: 100%;
+  padding: 10px;
+  background-color: linen;
+}
+
+select.sender_field {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 100%;
+}
+
+
+textarea.sender_field {
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 90%;
+}
+
+textarea.fieldval {
+  background-color: #f0f0ff;
+  margin: 2px;
+  width: 90%;
+}
+
+table.dates {
+  width: 100%;
+  margin: 8px;
+}
+
+table.documenttable {
+  padding: 5px;
+  border-spacing: 0px;
+  font-size: small;
+  line-height: 20px;
+}
+
+.doc_filename {
+  color: rgb(51, 131, 51);
+}
+
+table.documenttable tr:nth-child(odd) {
+  background-color: #e8edf4;
+}
+
+table.documenttable tr:nth-child(even) {
+  background-color: #dee3e7;
+}
+
+table.documenttable tr:nth-child(odd):hover {
+  background-color: #cbdcf3;
+}
+
+table.documenttable tr:nth-child(even):hover {
+  background-color: #c9d9e7;
+}
+
+table.documenttable tr {
+  visibility: visible;
+  opacity: 1;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr.hidden td div {
+  max-height: 0;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr td div {
+  max-height: 50px;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr.hidden {
+  visibility: collapse;
+  opacity: 0;
+  transition: all 0.25s ease-in;
+}
+
+table.documenttable tr td {
+  padding: 5px 15px 5px 15px;
+}
+
+ul#tagTable li {
+  display: inline;
+}
+
+.accountnumber {
+  opacity: 1;
+  color: transparent;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.accountnumber:hover {
+  opacity: 1;
+  color: black;
+  text-shadow: 0;
+}
+
+input.fieldval {
+  border-top-style: hidden;
+  border-right-style: hidden;
+  border-left-style: hidden;
+  border-bottom-style: groove;
+  background-color: #f0f0ff;
+  margin: 2px;
+}
+
+input.field_changed {
+  border-top: 2px solid red;
+  border-top-style: dashed;
+}
+
+textarea.field_changed {
+  border-top: 2px solid red;
+  border-top-style: dashed;
+}
+
+.searchbar {
+  border: 1px solid grey;
+  padding: 2px;
+  margin-bottom: 5px;
+  background: rgb(246, 240, 148);
+}
+
+.sender_account {
+  border: 1px solid #343434;
+  background-color: #ebe6f2;
+}
+
+.sender_account_closed {
+  border: 1px solid #343434;
+  background-color: #ababac;
+}
+
+.sender_contact {
+  border: 1px solid #343434;
+  background-color: #d2eee2;
+}
+
+
+#newaccount.hidden {
+  display: none;
+}
+
+#newcontact.hidden {
+  display: none;
+}
+
+table.senderlist tr.hidden {
+  opacity: 0;
+  max-height: 0;
+  height: 0;
+  visibility: collapse;
+  transition: all 0.25s ease-in;
+}
+
+table.senderlist tr {
+  opacity: 1;
+  max-height: 50px;
+  height: auto;
+  visibility: visible;
+  transition: all 0.25s ease-in;
+
+}
+
+table {
+  border: 1px solid grey;
+
+  padding: 5px;
+}
+
+td {
+  color: sienna;
+}
+
+.sendername a:visited {
+  color: rgb(237, 40, 158);
+}
+
+.sendername {
+  font-size: large;
+  font-weight: 700;
+  margin-left: -6px;
+  color: #b66ddd;
+}
+
+.senderdetail {
+  width: 90%;
+  display: table;
+}
+
+.advice {
+  font-size: smaller;
+  font-style: italic;
+  border: 1px solid #000;
+}
+
+.field_value {
+  font-weight: 400;
+  color: #336699;
+}
+
+.optional {
+  font-size: smaller;
+  font-style: italic;
+}
+
+div.filesection {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+button.icon {
+  padding: 0px;
+  border: 0;
+  background-color: transparent;
+}
+
+.fileops {
+  display: inline-flex;
+  padding: 3px;
+}
+
+button.icon img {
+  width: 30px;
+  padding: 0px;
+}
+
+
+label {
+  font-weight: 500;
+  color: darkblue;
+}
+
+.add_document {
+  margin: 10px;
+}
+
+.top_navigation {
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
+.not_provided {
+  font-style: italic;
+  color: lightgrey;
+}
+
+.jumplink button {
+  border: 0;
+  background-color: white;
+  color: midnightblue;
+  text-decoration: underline;
+}
+
+.jumplink {
+  justify-content: right;
+  display: flex;
+  position: relative;
+  width: 100%;
+  bottom: 60px;
+  right: 40px;
+}

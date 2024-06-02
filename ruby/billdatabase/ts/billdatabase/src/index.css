@@ -13,6 +13,12 @@ body {
   padding: 5px;
   margin: 3px;
 }
+.sender-collapsed {
+  display: none;
+}
+.sender-expanded {
+  display: block;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

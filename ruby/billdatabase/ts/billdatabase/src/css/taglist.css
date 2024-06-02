@@ -1,0 +1,53 @@
+.taglist {
+  border: 1px solid #555;
+  padding: 10px;
+  margin: 3px;
+  line-height: 32px;
+  background-color: #cebaba36;
+}
+
+.taglist button {
+  border: 1px solid #909;
+  font-size: small;
+  padding: 5px;
+  color: darkblue;
+  border: 0;
+  background-color: rgb(226 204 146)
+}
+
+.taglist button:hover {
+  background-color: rgba(247, 121, 17, 0.211);
+}
+
+.taglist #addbutton {
+  color: rgb(24, 112, 141);
+}
+
+#taglist.hidden {
+  height: 0;
+  visibility: collapse;
+}
+
+#taglist {
+  position: absolute;
+  height: auto;
+  visibility: visible;
+  margin: 0;
+}
+
+#taglist li {
+  margin-left: 30px;
+  font-size: small;
+  list-style: none;
+  line-height: 16px;
+  background-color: antiquewhite;
+  padding: 4px;
+}
+
+#taglist li:hover {
+  background-color: bisque;
+}
+
+#sendertags {
+  width: fit-content;
+}

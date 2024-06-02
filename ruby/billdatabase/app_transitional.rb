@@ -170,15 +170,20 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/senders' do
+    # CONVERTED
     s = SenderHandler.new
-    @senders = s.fetch_senders
-    erb :senders
+    ret = s.fetch_senders
+    # erb :senders
+    ret.to_json
   end
 
   get '/sender/:id' do |id|
+    # CONVERTED
     s = SenderHandler.new
-    @sender = s.fetch_sender(id)
-    erb :single_sender
+    # @sender = s.fetch_sender(id)
+    # erb :single_sender
+    ret = s.fetch_sender(id)
+    ret.to_json
   end
 
   get '/sender_new' do
@@ -278,6 +283,7 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/taglist' do
+    # CONVERTED
     s = SenderHandler.new
     @tags = s.fetch_all_tags
     @tags.to_json
