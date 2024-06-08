@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { SenderInfo, TagObject, AccountInfo, ContactInfo } from '../common/types'
+import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById } from '../common/types'
 import EditAccountInfo from '../components/AccountInfo'
 import EditContactInfo from '../components/ContactInfo'
 import EditTagList from '../components/TagInfo'
@@ -60,6 +60,25 @@ function EditSender() {
     }})
   }
 
+  const handleAccountChange = (ac: AccountInfo) => {
+    console.log('changing account info for account name ' + ac.id + ', details ' + ac.account_details)
+    let newsender: SenderInfo = {
+      ...sender,
+      sender_accounts: replaceItemById(sender.sender_accounts, ac) as AccountInfo[]
+    }
+    setSender(newsender)
+  }
+
+  const handleContactChange = (co: ContactInfo) => {
+    console.log('changing account info for contact name ' + co.id + ', details ' + co.contact)
+    let newsender: SenderInfo = {
+      ...sender,
+      sender_contacts: replaceItemById(sender.sender_accounts, co) as ContactInfo[]
+    }
+    setSender(newsender)
+  }
+
+
   const getTagList = useCallback(() => {
     console.log('fetching full tag list...')
     fetch('http://localhost:4567/tags')
@@ -75,7 +94,7 @@ function EditSender() {
           ...state,
           tagMenu: json as TagObject[]
         })        })
-  }, [id, state])
+  }, [state])
   
   // confusing advice on using useEffect... or not?
   // https://react.dev/learn/you-might-not-need-an-effect
@@ -95,7 +114,7 @@ function EditSender() {
       .then((json) => {
         setSender(json)
       })
-    }, [id, getTagList])
+    }, [state.saveTs, id])
 
 // i get a react hook warning about missing deps here, which i can quiet by including the sender state variable
 // but then that makes the whole load run in an infinite loop
@@ -158,14 +177,19 @@ function EditSender() {
           : sender.sender_accounts.map(ac => 
             <tr>
               <td colSpan={3} >
-              <EditAccountInfo info={ac} />
+              <EditAccountInfo 
+                  info={ac} 
+                  onChange={(ac: AccountInfo) => handleAccountChange(ac)} />
               </td>
             </tr>
           )}
           {(state.showNewAccount) ? (
             <tr>
             <td colSpan={3} >
-            <EditAccountInfo info={newAccount} />
+            <EditAccountInfo 
+                  info={newAccount} 
+                  onChange={(ac: AccountInfo) => setNewAccount(ac)} />
+
             <input 
             type='button' 
             onClick={() => setState({
@@ -191,14 +215,18 @@ function EditSender() {
           : sender.sender_contacts.map(co =>
             <tr>
             <td colSpan={3} >
-            <EditContactInfo info={co} />
+            <EditContactInfo 
+              info={co} 
+              onChange={(co: ContactInfo) => handleContactChange(co)} />
             </td>
           </tr>
         )}
                   {(state.showNewContact) ? (
             <tr>
             <td colSpan={3} >
-            <EditContactInfo info={newContact} />
+            <EditContactInfo 
+                  info={newContact} 
+                  onChange={(co: ContactInfo) => setNewContact(co)} />
             <input 
             type='button' 
             onClick={() => setState({

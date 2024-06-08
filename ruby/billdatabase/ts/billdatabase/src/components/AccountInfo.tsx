@@ -2,7 +2,8 @@ import { AccountInfo } from '../common/types'
 
 /* TODO: save account info is done separately so do it here */
 interface AccountInfoProps {
-  info: AccountInfo
+  info: AccountInfo,
+  onChange: Function
 }
 
 function EditAccountInfo (props: AccountInfoProps) {
@@ -11,13 +12,31 @@ function EditAccountInfo (props: AccountInfoProps) {
   return (
     <div>
       <div className={info.closed ? 'sender_account_closed' : 'sender_account'}>
-        <label htmlFor='account_number'>Account number: </label><input name="account_number" className='fieldval' value={info.account_number} />
+        <label htmlFor='account_number'>Account number: </label>
+        <input 
+          onChange={(e) => 
+            props.onChange({...props.info, 'account_number': e.target.value} as AccountInfo)} 
+          name="account_number" 
+          className='fieldval' 
+          value={info.account_number} />
       </div>
       <div className='fieldval'>
-        <label htmlFor='account_details'>Account details: </label><input name="account_details" className='fieldval' value={info.account_details} />
+        <label htmlFor='account_details'>Account details: </label>
+        <input 
+          onChange={(e) => 
+            props.onChange({...props.info, 'account_details': e.target.value} as AccountInfo)} 
+          name="account_details" 
+          className='fieldval' 
+          value={info.account_details} />
       </div>
       <div className='fieldval'>
-        <label htmlFor='comments'>Comments: </label><textarea name='comments' className='fieldval' >{info.comments}</textarea>
+        <label htmlFor='comments'>Comments: </label>
+        <textarea 
+            onChange={(e) => 
+              props.onChange({...props.info, 'comments': e.target.value} as AccountInfo)
+            }
+            name='comments' 
+            className='fieldval' >{info.comments}</textarea>
       </div>
     </div>
   )

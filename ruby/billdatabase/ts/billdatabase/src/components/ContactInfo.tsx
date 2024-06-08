@@ -2,7 +2,8 @@ import { ContactInfo } from '../common/types'
 
 /* TODO: save account info is done separately so do it here */
 interface ContactInfoProps {
-  info: ContactInfo
+  info: ContactInfo,
+  onChange: Function
 }
 
 function EditContactInfo (props: ContactInfoProps) {
@@ -11,10 +12,23 @@ function EditContactInfo (props: ContactInfoProps) {
   return (
     <div>
       <div className='sender_contact'>
-        <label htmlFor='contact_info'>Contact info (phone, etc): </label><input name="account_number" className='fieldval' value={info.contact} />
+        <label htmlFor='contact_info'>Contact info (phone, etc): </label>
+        <input 
+        onChange={(e) => 
+          props.onChange({...props.info, 'contact': e.target.value} as ContactInfo)
+        }
+          name="contact_info" 
+          className='fieldval' 
+          value={info.contact} />
       </div>
       <div className='fieldval'>
-        <label htmlFor='comments'>Comments: </label><textarea name='comments' className='fieldval' >{info.comments}</textarea>
+        <label htmlFor='comments'>Comments: </label>
+        <textarea 
+            onChange={(e) => 
+              props.onChange({...props.info, 'comments': e.target.value} as ContactInfo)
+            }
+            name='comments' 
+            className='fieldval' >{info.comments}</textarea>
       </div>
     </div>
   )
