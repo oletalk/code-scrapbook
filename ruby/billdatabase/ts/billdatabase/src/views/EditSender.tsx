@@ -1,13 +1,22 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById } from '../common/types'
+import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById, 
+  emptyAccount, emptyContact
+} from '../common/types'
+import { BACKEND_URL, fetchSenderUrl } from '../common/constants'
 import EditAccountInfo from '../components/AccountInfo'
 import EditContactInfo from '../components/ContactInfo'
 import EditTagList from '../components/TagInfo'
 
+enum SenderTab {
+  General = 1,
+  Accounts = 2,
+  Contacts = 3
+}
 interface EditSenderState {
   changed: boolean,
   saveTs: number,
+  currentTab: SenderTab,
   showNewAccount: boolean,
   showNewContact: boolean,
   tagMenu: TagObject[]
@@ -27,37 +36,43 @@ function EditSender() {
     {
       changed: false,
       saveTs: new Date().getTime(),
+      currentTab: SenderTab.General,
       showNewAccount: false,
       showNewContact: false,
       tagMenu: []
     }
   )
-  const [ newAccount, setNewAccount ] = useState<AccountInfo>({
-    json_class: '',
-    closed: false,
-    id: '',
-    sender_id: '',
-    account_number: '',
-    account_details: '',
-    comments: ''
+
+  const [ newAccount, setNewAccount ] = useState<AccountInfo>(
+    emptyAccount()
+  )
+    const [ newContact, setNewContact ] = useState<ContactInfo>(
+      emptyContact()
+    )
+
+  const tabSelected = (tabNum: SenderTab) => {
+    return tabNum === state.currentTab
+  }
+
+  const switchTab = (newTab: SenderTab) => {
+    setState({
+      ...state,
+      currentTab: newTab
     })
-    const [ newContact, setNewContact ] = useState<ContactInfo>({
-      json_class: '',
-      id: '',
-      sender_id: '',
-      name: '',
-      contact: '',
-      comments: ''
-      })
-  const setChanged = () => {
+  }
+  const doUpdate = () => {
     // do update, POST etc
     console.log('Updating sender id ' + id)
-    setState(prevState => 
-      {
-        return {
-      ...prevState,
+    console.log(sender)
+    // TODO save top-level sender info POST /sender/:id
+
+    // TODO add update button to AccountInfo and ContactInfo tsx's
+    //      should be good to save it off of the props!
+    setState({...state,
       saveTs: new Date().getTime()
-    }})
+    })
+    setNewAccount(emptyAccount)
+    setNewContact(emptyContact)
   }
 
   const handleAccountChange = (ac: AccountInfo) => {
@@ -67,21 +82,33 @@ function EditSender() {
       sender_accounts: replaceItemById(sender.sender_accounts, ac) as AccountInfo[]
     }
     setSender(newsender)
+    setState({...state, changed: true})
   }
 
   const handleContactChange = (co: ContactInfo) => {
-    console.log('changing account info for contact name ' + co.id + ', details ' + co.contact)
+    console.log('changing contact info for contact name ' + co.id + ', details ' + co.contact)
     let newsender: SenderInfo = {
       ...sender,
       sender_contacts: replaceItemById(sender.sender_accounts, co) as ContactInfo[]
     }
     setSender(newsender)
+    setState({...state, changed: true})
   }
 
+  const handleSenderChange = (kv: Object) => {
+    setSender({
+      ...sender,
+      ...kv
+    } as SenderInfo)
+    setState({
+      ...state,
+      changed: true
+    })
+  }
 
   const getTagList = useCallback(() => {
     console.log('fetching full tag list...')
-    fetch('http://localhost:4567/tags')
+    fetch(BACKEND_URL + '/tags')
     .then((response) => {
     // Check if the request was successful
       if (!response.ok) {
@@ -93,7 +120,8 @@ function EditSender() {
         setState({
           ...state,
           tagMenu: json as TagObject[]
-        })        })
+        })
+      })
   }, [state])
   
   // confusing advice on using useEffect... or not?
@@ -102,8 +130,12 @@ function EditSender() {
   useEffect(() => {
     getTagList()
 
+    if (typeof id === 'undefined') {
+      return
+    }
     console.log('fetching sender data.')
-    fetch('http://localhost:4567/sender/' + id)
+
+    fetch(fetchSenderUrl(id))
     .then((response) => {
     // Check if the request was successful
       if (!response.ok) {
@@ -112,7 +144,16 @@ function EditSender() {
         return response.json()
       })
       .then((json) => {
-        setSender(json)
+        // fix the boolean fields
+        let x = json as SenderInfo
+        /* for (let y of x.sender_accounts) {
+          console.log('account id ' + y.id 
+          + ' closed? ' + y.closed
+          + ' open? ' + !y.closed
+        )
+        }  */  
+        setSender(x)
+        setState({...state, changed: false})
       })
     }, [state.saveTs, id])
 
@@ -129,12 +170,24 @@ function EditSender() {
   } else {
     return (
       <div>
-        <table className='senderdetail'>
-          <tr>
+        <table className='tabs'>
+        <tr>
             <td colSpan={4} >
               <span className='sendername'>{ sender.name}</span>
             </td>
           </tr>
+        <tr>
+            <td colSpan={4} >
+            <button className={tabSelected(SenderTab.General) ? 'senderTabSelected' : 'senderTab' } 
+                onClick={() => switchTab(SenderTab.General)}>General</button>|
+            <button className={tabSelected(SenderTab.Accounts) ? 'senderTabSelected' : 'senderTab' } 
+                onClick={() => switchTab(SenderTab.Accounts)}>Accounts</button>|
+            <button className={tabSelected(SenderTab.Contacts) ? 'senderTabSelected' : 'senderTab' }  
+                onClick={() => switchTab(SenderTab.Contacts)}>Contacts</button>
+            </td>
+          </tr>
+        </table>
+        <table className={tabSelected(SenderTab.General) ? 'senderdetail': 'senderdetail_hidden'}>
           <tr>
             <td>
               <EditTagList 
@@ -150,7 +203,7 @@ function EditSender() {
             </td>
             <td colSpan={2}>
               <input name="username" className='sender_field' 
-                onChange={(e) => setSender({...sender, username: e.target.value } as SenderInfo)}
+                onChange={(e) => handleSenderChange({username: e.target.value})}
                 value={sender.username} />
             </td>
             <td>&nbsp;</td>
@@ -162,11 +215,13 @@ function EditSender() {
             </td>
             <td colSpan={2}>
               <input name="password_hint" className='sender_field' 
-                onChange={(e) => setSender({...sender, password_hint: e.target.value } as SenderInfo)}
+                onChange={(e) => handleSenderChange({password_hint: e.target.value})}
                 value={sender.password_hint} />
             </td>
             <td>&nbsp;</td>
           </tr>
+        </table>
+        <table className={tabSelected(SenderTab.Accounts) ? 'senderdetail': 'senderdetail_hidden'}>
           {/* ---- ACCOUNTS WE HAVE WITH THE SENDER ---- */}
           {sender.sender_accounts.length === 0 
           ? <tr>
@@ -178,7 +233,8 @@ function EditSender() {
             <tr>
               <td colSpan={3} >
               <EditAccountInfo 
-                  info={ac} 
+                  info={ac} sender_id={sender.id}
+                  refreshCallback={doUpdate}
                   onChange={(ac: AccountInfo) => handleAccountChange(ac)} />
               </td>
             </tr>
@@ -186,8 +242,9 @@ function EditSender() {
           {(state.showNewAccount) ? (
             <tr>
             <td colSpan={3} >
-            <EditAccountInfo 
+            <EditAccountInfo sender_id={sender.id}
                   info={newAccount} 
+                  refreshCallback={doUpdate}
                   onChange={(ac: AccountInfo) => setNewAccount(ac)} />
 
             <input 
@@ -205,6 +262,8 @@ function EditSender() {
               ...state, showNewAccount: !state.showNewAccount
             })} value='Add new account' />
           </td></tr>)}
+        </table>
+        <table className={tabSelected(SenderTab.Contacts) ? 'senderdetail': 'senderdetail_hidden'}>
           {/* ---- CONTACT DETAILS WE HAVE WITH THE SENDER ---- */}
           {sender.sender_contacts.length === 0 
           ? <tr>
@@ -216,7 +275,7 @@ function EditSender() {
             <tr>
             <td colSpan={3} >
             <EditContactInfo 
-              info={co} 
+              info={co} sender_id={sender.id}
               onChange={(co: ContactInfo) => handleContactChange(co)} />
             </td>
           </tr>
@@ -225,7 +284,7 @@ function EditSender() {
             <tr>
             <td colSpan={3} >
             <EditContactInfo 
-                  info={newContact} 
+                  info={newContact} sender_id={sender.id}
                   onChange={(co: ContactInfo) => setNewContact(co)} />
             <input 
             type='button' 
@@ -243,7 +302,7 @@ function EditSender() {
             })} value='Add new contact' />
           </td></tr>)}
         </table>
-        <input type="button" onClick={() => setChanged()} value="Update" />
+        <input type="button" disabled={!state.changed} onClick={() => doUpdate()} value="Update" />
     </div>
   )
   }

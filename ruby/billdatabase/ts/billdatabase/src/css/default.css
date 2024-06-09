@@ -6,6 +6,21 @@ html {
   scroll-behavior: smooth;
 }
 
+button.senderTab {
+  background: white;
+  color: darkblue;
+  border-bottom: 0;
+  border-radius: 0;
+}
+
+button.senderTab {
+  background: white;
+  color: rgb(73, 142, 142);
+  border-bottom: 1px solid black;
+  border-radius: 0;
+}
+
+
 input.sender_field {
   border-top-style: hidden;
   border-right-style: hidden;
@@ -136,6 +151,18 @@ ul#tagTable li {
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
+.account_info_container {
+  border-bottom: 1px dashed darkgray;
+  padding-bottom: 10px;
+  background-color: #dddddd;
+}
+.account_info_container_closed {
+  opacity: 0.8;
+  border-bottom: 1px dashed darkgray;
+  padding-bottom: 10px;
+  background-color: #bbbbbb;
+}
+
 .accountnumber:hover {
   opacity: 1;
   color: black;
@@ -175,7 +202,11 @@ textarea.field_changed {
 
 .sender_account_closed {
   border: 1px solid #343434;
-  background-color: #ababac;
+  background-color: #5a5a61;
+}
+
+.sender_account_closed span.account_closed {
+  color: coral;
 }
 
 .sender_contact {
@@ -230,6 +261,9 @@ td {
   color: #b66ddd;
 }
 
+.senderdetail_hidden {
+  display: none;
+}
 .senderdetail {
   width: 90%;
   display: table;
