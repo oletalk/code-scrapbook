@@ -68,11 +68,14 @@ function EditSender() {
 
     // TODO add update button to AccountInfo and ContactInfo tsx's
     //      should be good to save it off of the props!
-    setState({...state,
-      saveTs: new Date().getTime()
-    })
+
     setNewAccount(emptyAccount)
     setNewContact(emptyContact)
+    setState({...state,
+      saveTs: new Date().getTime(),
+      showNewAccount: false,
+      showNewContact: false
+    })
   }
 
   const handleAccountChange = (ac: AccountInfo) => {
