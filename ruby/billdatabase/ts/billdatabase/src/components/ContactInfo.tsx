@@ -1,13 +1,21 @@
-import { ContactInfo } from '../common/types'
+import { ContactInfo, isBlank } from '../common/types'
 
 /* TODO: save account info is done separately so do it here */
 interface ContactInfoProps {
   info: ContactInfo,
+  sender_id: string,
   onChange: Function
 }
 
 function EditContactInfo (props: ContactInfoProps) {
   const info = props.info
+
+  const saveContact = () => {
+    console.log('SAVING CONTACT')
+    console.log(info)
+
+    // TODO
+  }
 
   return (
     <div>
@@ -30,6 +38,8 @@ function EditContactInfo (props: ContactInfoProps) {
             name='comments' 
             className='fieldval' >{info.comments}</textarea>
       </div>
+      <input type="button" onClick={() => saveContact()} value={isBlank(props.info.id) ? 'Save new' : 'Update'} />
+
     </div>
   )
 }

@@ -35,6 +35,29 @@ export type SenderInfo = Common & {
   sender_tags: TagObject[]
 }
 
+export const emptyAccount = () => {
+  return {
+    json_class: '',
+    closed: false,
+    id: '',
+    sender_id: '',
+    account_number: '',
+    account_details: '',
+    comments: ''
+  } as AccountInfo
+}
+
+  export const emptyContact = () => {
+    return {
+    json_class: '',
+    id: '',
+    sender_id: '',
+    name: '',
+    contact: '',
+    comments: ''
+  } as ContactInfo 
+}
+
 type CommonListItem = AccountInfo | ContactInfo | TagObject
 
 export const replaceItemById = (list: CommonListItem[], newItem: CommonListItem) : CommonListItem[] => {
@@ -47,4 +70,27 @@ export const replaceItemById = (list: CommonListItem[], newItem: CommonListItem)
     }
   }
   return ret
+}
+
+export const adaptedFields = (ac: AccountInfo) => {
+  return {
+      id: ac.id,
+      account_closed: ac.closed ? 'Y' : 'N',
+      sender_id: ac.sender_id,
+      account_number: ac.account_number,
+      account_details: ac.account_details,
+      comments: ac.comments
+  }
+}
+
+export const isBlank = (str: Object) => {
+  if (typeof str == 'undefined') {
+    return true
+  } else if (typeof str == 'string') {
+    if (str.trim() === '') {
+      return true
+    } else {
+      return false
+    }
+  }
 }
