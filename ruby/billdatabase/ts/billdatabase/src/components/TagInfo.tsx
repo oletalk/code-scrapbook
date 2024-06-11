@@ -28,6 +28,7 @@ function EditTagList (props: TagListProps) {
 
   const addTag = (sender: string, id: string) => {
     console.log('adding tag ' + id)
+    setState({showTagList: false})
   }
 
 

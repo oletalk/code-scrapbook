@@ -18,8 +18,7 @@ interface EditSenderState {
   saveTs: number,
   currentTab: SenderTab,
   showNewAccount: boolean,
-  showNewContact: boolean,
-  tagMenu: TagObject[]
+  showNewContact: boolean
 }
 
 // 27/05/24 i had to rewrite this as a function-based component in order to 
@@ -27,6 +26,8 @@ interface EditSenderState {
 function EditSender() {
   const { id } = useParams()
   // console.log('starting up') <- this seems to fire EVERY TIME i make a change
+  const [ tagMenu, setTagMenu ] = useState<TagObject[]>([])
+
   const [ sender, setSender ] = useState<SenderInfo>({
       json_class: '', id: '', name: '', created_at: new Date(), 
       username: '', password_hint: '', comments: '', 
@@ -38,8 +39,7 @@ function EditSender() {
       saveTs: new Date().getTime(),
       currentTab: SenderTab.General,
       showNewAccount: false,
-      showNewContact: false,
-      tagMenu: []
+      showNewContact: false
     }
   )
 
@@ -120,10 +120,7 @@ function EditSender() {
         return response.json()
       })
       .then((json) => {
-        setState({
-          ...state,
-          tagMenu: json as TagObject[]
-        })
+        setTagMenu(json as TagObject[])
       })
   }, [state])
   
@@ -180,11 +177,11 @@ function EditSender() {
             </td>
           </tr>
         <tr>
-            <td colSpan={4} >
+            <td colSpan={4} className='tabContainer' >
             <button className={tabSelected(SenderTab.General) ? 'senderTabSelected' : 'senderTab' } 
-                onClick={() => switchTab(SenderTab.General)}>General</button>|
+                onClick={() => switchTab(SenderTab.General)}>General</button>&nbsp;
             <button className={tabSelected(SenderTab.Accounts) ? 'senderTabSelected' : 'senderTab' } 
-                onClick={() => switchTab(SenderTab.Accounts)}>Accounts</button>|
+                onClick={() => switchTab(SenderTab.Accounts)}>Accounts</button>&nbsp;
             <button className={tabSelected(SenderTab.Contacts) ? 'senderTabSelected' : 'senderTab' }  
                 onClick={() => switchTab(SenderTab.Contacts)}>Contacts</button>
             </td>
@@ -196,7 +193,7 @@ function EditSender() {
               <EditTagList 
                   sender_id={sender.id} 
                   info={sender.sender_tags}
-                  taglist={state.tagMenu} />
+                  taglist={tagMenu} />
             </td>
           </tr>
           <tr>
