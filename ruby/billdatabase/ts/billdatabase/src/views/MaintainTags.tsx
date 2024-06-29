@@ -1,5 +1,7 @@
 import { TagObject } from '../common/types-class'
 import React from "react";
+import * as Constants from '../common/constants'
+
 
 type TagProps = {
 
@@ -25,7 +27,7 @@ export default class MaintainTags extends React.Component<TagProps,TagState> {
 
   fetchTags = () => {
     console.log('fetching up-to-date tag data.')
-    fetch('http://localhost:4567/taglist')
+    fetch(Constants.BACKEND_URL + '/taglist')
     .then((response) => {
     // Check if the request was successful
       if (!response.ok) {

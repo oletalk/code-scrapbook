@@ -1,6 +1,7 @@
 import { SenderInfo } from '../common/types-class'
 import React from "react";
 import { Link } from 'react-router-dom';
+import * as Constants from '../common/constants'
 
 type SenderProps = {
 
@@ -66,7 +67,7 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
 
   fetchSenders = () => {
     console.log('fetching sender data.')
-    fetch('http://localhost:4567/senders')
+    fetch(Constants.BACKEND_URL + '/senders')
     .then((response) => {
     // Check if the request was successful
       if (!response.ok) {
