@@ -1,4 +1,4 @@
-import { SenderInfo } from '../common/types'
+import { SenderInfo } from '../common/types-class'
 import React from "react";
 import { Link } from 'react-router-dom';
 

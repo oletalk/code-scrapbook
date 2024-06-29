@@ -1,4 +1,4 @@
-import { TagObject } from '../common/types'
+import { TagObject } from '../common/types-class'
 import React from "react";
 
 type TagProps = {

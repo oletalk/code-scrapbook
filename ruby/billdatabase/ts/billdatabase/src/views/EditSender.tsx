@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById, 
+// import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById, 
+//   emptyAccount, emptyContact
+//} from '../common/types'
+import { SenderInfo, TagObject, AccountInfo, ContactInfo, ListUtils,
   emptyAccount, emptyContact
-} from '../common/types'
+  } from '../common/types-class'
 import { BACKEND_URL, fetchSenderUrl } from '../common/constants'
 import EditAccountInfo from '../components/AccountInfo'
 import EditContactInfo from '../components/ContactInfo'
@@ -79,20 +82,22 @@ function EditSender() {
   }
 
   const handleAccountChange = (ac: AccountInfo) => {
+    const lu = new ListUtils<AccountInfo>()
     console.log('changing account info for account name ' + ac.id + ', details ' + ac.account_details)
     let newsender: SenderInfo = {
       ...sender,
-      sender_accounts: replaceItemById(sender.sender_accounts, ac) as AccountInfo[]
+      sender_accounts: lu.replaceItemById(sender.sender_accounts, ac)
     }
     setSender(newsender)
     setState({...state, changed: true})
   }
 
   const handleContactChange = (co: ContactInfo) => {
+    const lu = new ListUtils<ContactInfo>()
     console.log('changing contact info for contact name ' + co.id + ', details ' + co.contact)
     let newsender: SenderInfo = {
       ...sender,
-      sender_contacts: replaceItemById(sender.sender_accounts, co) as ContactInfo[]
+      sender_contacts: lu.replaceItemById(sender.sender_contacts, co)
     }
     setSender(newsender)
     setState({...state, changed: true})
@@ -276,6 +281,7 @@ function EditSender() {
             <td colSpan={3} >
             <EditContactInfo 
               info={co} sender_id={sender.id}
+              refreshCallback={doUpdate}
               onChange={(co: ContactInfo) => handleContactChange(co)} />
             </td>
           </tr>
@@ -285,6 +291,7 @@ function EditSender() {
             <td colSpan={3} >
             <EditContactInfo 
                   info={newContact} sender_id={sender.id}
+                  refreshCallback={doUpdate}
                   onChange={(co: ContactInfo) => setNewContact(co)} />
             <input 
             type='button' 

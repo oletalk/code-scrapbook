@@ -1,11 +1,12 @@
-import { AccountInfo, isBlank, adaptedFields } from '../common/types'
+import { isBlank } from '../common/types'
+import { AccountInfo, adaptedFields } from '../common/types-class'
+import { doPost } from '../common/fetch'
 import * as Constants from '../common/constants'
 
-/* TODO: save account info is done separately so do it here */
 interface AccountInfoProps {
   sender_id: string,
   info: AccountInfo,
-  onChange: Function,
+  onChange: (ac : AccountInfo) => void,
   refreshCallback: Function
 }
 
@@ -14,7 +15,7 @@ function EditAccountInfo (props: AccountInfoProps) {
 
   const toggleChecked = () => {
     // TODO move back inline
-    props.onChange({...props.info, 'closed': !props.info.closed} as AccountInfo) 
+    props.onChange({...props.info, 'closed': !props.info.closed}) 
   }
 
   const saveAccount = () => {
@@ -28,27 +29,10 @@ function EditAccountInfo (props: AccountInfoProps) {
     } else {
       console.log('updating account id ' + props.info.id)
     }
-    fetch(url,
-      {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify(adaptedFields(props.info))
-      })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok')
-        }
-      })
-      .then((json) => {
-        console.log(json)
-        if (addingAccount) {
-          console.log('need to refresh sender data from db')
-          props.refreshCallback()
-        }
-      })
+    
+    doPost(url, adaptedFields(props.info),
+            addingAccount, props.refreshCallback, 
+            'refresh sender data from db')
   }
 
   return (
@@ -57,7 +41,7 @@ function EditAccountInfo (props: AccountInfoProps) {
         <label htmlFor='account_number'>Account number: </label>
         <input 
           onChange={(e) => 
-            props.onChange({...props.info, 'account_number': e.target.value} as AccountInfo)} 
+            props.onChange({...props.info, 'account_number': e.target.value})} 
           name="account_number" 
           className='fieldval' 
           value={info.account_number} />
@@ -69,7 +53,7 @@ function EditAccountInfo (props: AccountInfoProps) {
         <label htmlFor='account_details'>Account details: </label>
         <input 
           onChange={(e) => 
-            props.onChange({...props.info, 'account_details': e.target.value} as AccountInfo)} 
+            props.onChange({...props.info, 'account_details': e.target.value})} 
           name="account_details" 
           className='fieldval' 
           value={info.account_details} />
@@ -78,12 +62,12 @@ function EditAccountInfo (props: AccountInfoProps) {
         <label htmlFor='comments'>Comments: </label>
         <textarea 
             onChange={(e) => 
-              props.onChange({...props.info, 'comments': e.target.value} as AccountInfo)
+              props.onChange({...props.info, 'comments': e.target.value})
             }
             name='comments' 
             className='fieldval' >{info.comments}</textarea>
       </div>
-      <input type="button" onClick={() => saveAccount()} value={isBlank(props.info.id) ? 'Save new' : 'Update'} />
+      <input type="button" onClick={() => saveAccount()} value={isBlank(props.info.id) ? 'Save new Account' : 'Update Account'} />
     </div>
   )
 }
