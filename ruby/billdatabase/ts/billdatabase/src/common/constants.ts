@@ -17,3 +17,12 @@ export const updateAccountUrl = (account_id: String) => {
   return BACKEND_URL + '/senderaccount/' + account_id
 }
 
+export const saveNewContactUrl = (sender_id: String) => {
+  return BACKEND_URL + '/sender/' + sender_id + '/contact_new'
+}
+
+export const updateContactUrl = (contact_id: String) => {
+  return BACKEND_URL + '/sendercontact/' + contact_id
+}
+
+
