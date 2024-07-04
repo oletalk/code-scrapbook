@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
+import { NavType } from '../common/types-class'
 import { useParams } from 'react-router-dom'
+import Nav from '../components/Nav'
+
 // import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById, 
 //   emptyAccount, emptyContact
 //} from '../common/types'
@@ -175,6 +178,7 @@ function EditSender() {
   } else {
     return (
       <div>
+        <Nav page={NavType.EditSender} />
         <table className='tabs'>
         <tr>
             <td colSpan={4} >

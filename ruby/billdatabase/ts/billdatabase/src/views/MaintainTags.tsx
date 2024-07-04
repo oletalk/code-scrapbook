@@ -1,6 +1,7 @@
-import { TagObject } from '../common/types-class'
+import { TagObject, NavType } from '../common/types-class'
 import React from "react";
 import * as Constants from '../common/constants'
+import Nav from '../components/Nav'
 
 
 type TagProps = {
@@ -93,6 +94,7 @@ export default class MaintainTags extends React.Component<TagProps,TagState> {
   render() {
     return (
       <div className="App">
+        <Nav page={NavType.TagTypes} />
         <table className="tags">
           <tbody>
           {this.state.tags.map(tag => {

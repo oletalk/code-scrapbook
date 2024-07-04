@@ -3,6 +3,12 @@ interface Common {
   id:string
 }
 
+export enum NavType {
+  Home, Documents, NewDocument, EditDocument,
+  Payments, Senders, NewSender, EditSender, SenderContacts,
+  DocumentTypes,
+  TagTypes
+}
 export interface AccountInfo extends Common {
   closed: boolean,
   sender_id: string,

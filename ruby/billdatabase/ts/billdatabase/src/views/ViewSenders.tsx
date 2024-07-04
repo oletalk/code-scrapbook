@@ -1,7 +1,8 @@
-import { SenderInfo } from '../common/types-class'
+import { SenderInfo, NavType } from '../common/types-class'
 import React from "react";
 import { Link } from 'react-router-dom';
 import * as Constants from '../common/constants'
+import Nav from '../components/Nav'
 
 type SenderProps = {
 
@@ -95,6 +96,7 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
   render() {
     return (
       <div className="App">
+              <Nav page={NavType.Senders} />
         <h2>Sender List</h2>
         <table className="senderlist">
           <tbody>
