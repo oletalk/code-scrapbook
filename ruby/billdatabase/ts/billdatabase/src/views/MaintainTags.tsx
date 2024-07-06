@@ -1,5 +1,6 @@
 import { TagObject, NavType } from '../common/types-class'
-import React from "react";
+import React from "react"
+import { doFetch } from '../common/fetch'
 import * as Constants from '../common/constants'
 import Nav from '../components/Nav'
 
@@ -28,16 +29,9 @@ export default class MaintainTags extends React.Component<TagProps,TagState> {
 
   fetchTags = () => {
     console.log('fetching up-to-date tag data.')
-    fetch(Constants.BACKEND_URL + '/taglist')
-    .then((response) => {
-    // Check if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-        return response.json()
-      })
+    doFetch<TagObject[]>(Constants.BACKEND_URL + '/taglist')
       .then((json) => {
-        let setTags = json as TagObject[]
+        let setTags = json
         setTags.forEach(t => {
           t.changed = false
         })

@@ -1,3 +1,23 @@
+
+
+export async function doFetch<T> (
+  url: string
+) {
+  let response = await fetch(url)
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok')
+  }
+  let ret : T = await response.json()
+
+  return new Promise<T>((resolve) => {
+    resolve(ret)
+  })
+
+}
+
+
+
 export const doPost = (
   url: string, 
   postbody: object,

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { doFetch } from '../common/fetch'
 import { NavType } from '../common/types-class'
 import { useParams } from 'react-router-dom'
 import Nav from '../components/Nav'
@@ -119,16 +120,9 @@ function EditSender() {
 
   const getTagList = useCallback(() => {
     console.log('fetching full tag list...')
-    fetch(BACKEND_URL + '/tags')
-    .then((response) => {
-    // Check if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-        return response.json()
-      })
+    doFetch<TagObject[]>(BACKEND_URL + '/tags')
       .then((json) => {
-        setTagMenu(json as TagObject[])
+        setTagMenu(json)
       })
   }, [state])
   
@@ -143,23 +137,10 @@ function EditSender() {
     }
     console.log('fetching sender data.')
 
-    fetch(fetchSenderUrl(id))
-    .then((response) => {
-    // Check if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-        return response.json()
-      })
+    doFetch<SenderInfo>(fetchSenderUrl(id))
       .then((json) => {
         // fix the boolean fields
-        let x = json as SenderInfo
-        /* for (let y of x.sender_accounts) {
-          console.log('account id ' + y.id 
-          + ' closed? ' + y.closed
-          + ' open? ' + !y.closed
-        )
-        }  */  
+        let x = json
         setSender(x)
         setState({...state, changed: false})
       })

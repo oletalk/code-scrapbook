@@ -9,6 +9,21 @@ export enum NavType {
   DocumentTypes,
   TagTypes
 }
+export interface DocumentType extends Common {
+  name: string
+}
+export interface DocumentInfo extends Common {
+  created_at: string,
+  received_date: string,
+  summary: string,
+  due_date: string,
+  paid_date: string,
+  doc_type: DocumentType,
+  sender: SenderInfo,
+  comments: string,
+  sender_account: AccountInfo
+
+}
 export interface AccountInfo extends Common {
   closed: boolean,
   sender_id: string,

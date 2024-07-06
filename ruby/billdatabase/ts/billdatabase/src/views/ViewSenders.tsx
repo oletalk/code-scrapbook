@@ -1,4 +1,5 @@
 import { SenderInfo, NavType } from '../common/types-class'
+import { doFetch } from '../common/fetch';
 import React from "react";
 import { Link } from 'react-router-dom';
 import * as Constants from '../common/constants'
@@ -68,17 +69,10 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
 
   fetchSenders = () => {
     console.log('fetching sender data.')
-    fetch(Constants.BACKEND_URL + '/senders')
-    .then((response) => {
-    // Check if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-        return response.json()
-      })
-      .then((json) => {
-        let allSenders = json as SenderInfo[]
-        let sendermap : senderbox[] = allSenders.map(
+    doFetch<SenderInfo[]>(Constants.BACKEND_URL + '/senders')
+    .then((json) => {
+        // let allSenders : SenderInfo[] = json
+        let sendermap : senderbox[] = json.map(
           s => {
             return {
               info: s,

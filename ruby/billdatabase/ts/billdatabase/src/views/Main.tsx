@@ -12,7 +12,7 @@ export default class Main extends React.Component {
         View/search for ...
         <ul>
           <li>Payments</li>
-          <li>All documents</li>
+          <li><Link to="/documents">All documents</Link></li>
           <li>Contact a Sender...</li>
           <li>List of document types</li>
         </ul>

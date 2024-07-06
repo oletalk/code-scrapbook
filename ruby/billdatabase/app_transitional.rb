@@ -44,20 +44,16 @@ class BillDatabase < Sinatra::Base
   get '/documents' do
     dh = DocHandler.new
     @documents = dh.fetch_documents(nil, nil)
-    erb :documents
+    @documents.to_json
   end
 
   get '/documents/:fromdate/:todate' do |fromdate, todate|
     if check_ymd(fromdate) && check_ymd(todate)
       dh = DocHandler.new
       @documents = dh.fetch_documents(fromdate, todate)
-      @dates = {
-        from: fromdate,
-        to: todate
-      }
-      erb :documents
+      @documents.to_json
     else
-      erb 'Sorry, the dates are not formatted correctly'
+      { 'error': 'dates not formatted correctly'}
     end
   end
 
@@ -117,10 +113,10 @@ class BillDatabase < Sinatra::Base
 
     d = DocHandler.new
     @doc = d.fetch_document(id)
-    s = SenderHandler.new
-    @sender = s.fetch_sender(@doc.sender.id)
-
-    erb :single_document
+ #   s = SenderHandler.new
+ #   @sender = s.fetch_sender(@doc.sender.id)
+   @doc.to_json
+ #   erb :single_document
   end
 
   get '/document/:id/file' do |id|

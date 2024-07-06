@@ -1,0 +1,64 @@
+span.date_rcvd {
+  width: 10%;
+  display: inline-block;
+}
+div.hidden {
+  display:none;
+}
+.bkg_1 {
+  padding-left: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #eee;
+}
+.bkg_2 {
+  padding-left: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #ddd;
+}
+.bkg_1:hover {
+  padding-left: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(219, 181, 181);
+}
+.bkg_2:hover {
+  padding-left: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(200, 165, 165);
+}
+div.titlerow {
+  width: 100%;
+}
+div.verticalspacer {
+  margin-bottom: 5px;
+}
+div.titlefixed {
+  width: 100%;
+  position: fixed;
+  background: white;
+  display: block;
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
+}
+.doc_account {
+  width: 10%; 
+}
+.doc_summary {
+  width: 20%;
+}
+.doc_title {
+  font-weight: 700;
+  text-align: left;
+}
+span.doc_type {
+  width: 12%;
+  display: inline-block;
+}
+
+span.doc_sender{
+  width: 20%;
+  display: inline-block;
+}
