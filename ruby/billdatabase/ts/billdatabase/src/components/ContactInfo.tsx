@@ -1,16 +1,11 @@
 import { isBlank } from '../common/types'
 import { ContactInfo } from '../common/types-class'
+import { SenderComponentProps } from '../common/interfaces'
 import * as Constants from '../common/constants'
 import { doPost } from '../common/fetch'
 /* TODO: save account info is done separately so do it here */
-interface ContactInfoProps {
-  info: ContactInfo,
-  sender_id: string,
-  onChange: (co : ContactInfo) => void,
-  refreshCallback: Function
-}
 
-function EditContactInfo (props: ContactInfoProps) {
+function EditContactInfo (props: SenderComponentProps<ContactInfo>) {
   const info = props.info
 
   const saveContact = () => {

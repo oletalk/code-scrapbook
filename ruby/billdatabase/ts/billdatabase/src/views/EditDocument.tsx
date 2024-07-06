@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { doFetch } from '../common/fetch'
 import { NavType, DocumentInfo } from '../common/types-class'
-import { BACKEND_URL, fetchSenderUrl } from '../common/constants'
+import { BACKEND_URL } from '../common/constants'
 import Nav from '../components/Nav'
 
 function EditDocument() {

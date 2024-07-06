@@ -2,15 +2,9 @@ import { isBlank } from '../common/types'
 import { AccountInfo, adaptedFields } from '../common/types-class'
 import { doPost } from '../common/fetch'
 import * as Constants from '../common/constants'
+import { SenderComponentProps } from '../common/interfaces'
 
-interface AccountInfoProps {
-  sender_id: string,
-  info: AccountInfo,
-  onChange: (ac : AccountInfo) => void,
-  refreshCallback: Function
-}
-
-function EditAccountInfo (props: AccountInfoProps) {
+function EditAccountInfo (props: SenderComponentProps<AccountInfo>) {
   const info = props.info
 
   const toggleChecked = () => {
