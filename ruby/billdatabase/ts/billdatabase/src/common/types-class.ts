@@ -20,6 +20,7 @@ export interface DocumentInfo extends Common {
   paid_date: string,
   doc_type: DocumentType,
   sender: SenderInfo,
+  file_location: string,
   comments: string,
   sender_account: AccountInfo
 

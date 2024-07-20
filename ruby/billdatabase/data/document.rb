@@ -42,7 +42,8 @@ class Document
       'doc_type' => @doc_type,
       'sender' => @sender,
       'comments' => @comments,
-      'sender_account' => @sender_account
+      'sender_account' => @sender_account,
+      'file_location' => @file_location
     }.to_json(*args)
   end
 end
