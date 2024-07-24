@@ -1,8 +1,9 @@
 import { TagObject, NavType } from '../common/types-class'
 import React from "react"
-import { doFetch } from '../common/fetch'
+import { doFetch, doPost } from '../common/fetch'
 import * as Constants from '../common/constants'
 import Nav from '../components/Nav'
+import { BACKEND_URL } from '../common/constants'
 
 
 type TagProps = {
@@ -63,25 +64,10 @@ export default class MaintainTags extends React.Component<TagProps,TagState> {
     console.log(tagId + ' to be updated with colour ' + tagColor)
     // update in db
 
-    fetch('http://localhost:4567/tagtype/' + tagId, {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-    },
-    body: JSON.stringify({
-      color: tagColor
-    })
-  })
-  .then((response) => {
-    // Check if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-        return response.json()
-      })
-      // wait a second for the update
-      setTimeout(() => this.fetchTags(), 1000)
+    doPost(BACKEND_URL + '/tagtype/' + tagId, 
+      { color: tagColor },
+      true, this.fetchTags, 're-fetching tags'
+    )
       
   }
 
