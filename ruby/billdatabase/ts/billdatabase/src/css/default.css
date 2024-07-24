@@ -19,7 +19,15 @@ button.senderTabSelected {
   border-bottom-right-radius: 0;
   min-width: 140px;
 }
-
+.link-style {
+    font-weight: 600;
+    font-size: 14px;
+    background: midnightblue;
+    padding: 6px;
+    border-radius: 5px;
+    color: yellow;
+    margin-left: 4px;
+}
 button.senderTab {
   background: white;
   color: rgb(73, 142, 142);

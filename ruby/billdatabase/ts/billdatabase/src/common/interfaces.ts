@@ -15,3 +15,4 @@ export interface SenderComponentProps<T> {
   onChange: (ac : T) => void,
   refreshCallback: Function
 }
+

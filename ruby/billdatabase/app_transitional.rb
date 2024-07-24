@@ -53,7 +53,7 @@ class BillDatabase < Sinatra::Base
       @documents = dh.fetch_documents(fromdate, todate)
       @documents.to_json
     else
-      { 'error': 'dates not formatted correctly'}
+      { 'error': 'dates not formatted correctly' }
     end
   end
 
@@ -113,10 +113,10 @@ class BillDatabase < Sinatra::Base
 
     d = DocHandler.new
     @doc = d.fetch_document(id)
- #   s = SenderHandler.new
- #   @sender = s.fetch_sender(@doc.sender.id)
-   @doc.to_json
- #   erb :single_document
+    #   s = SenderHandler.new
+    #   @sender = s.fetch_sender(@doc.sender.id)
+    @doc.to_json
+    #   erb :single_document
   end
 
   get '/document/:id/file' do |id|
