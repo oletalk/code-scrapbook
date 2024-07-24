@@ -12,6 +12,7 @@ import './css/payments.css'
 import Main from './views/Main'
 import MaintainTags from './views/MaintainTags'
 import ViewSenders from './views/ViewSenders'
+import CreateDocument from './views/CreateDocument';
 import EditSender from './views/EditSender'
 import EditDocument from './views/EditDocument'
 import ViewDocuments from './views/ViewDocuments'
@@ -30,6 +31,7 @@ root.render(
         <Route path="/sender/:id" element={<EditSender /> } />
         <Route path="/documents" element={<ViewDocuments /> } />
         <Route path="/document/:id" element={<EditDocument /> } />
+        <Route path="/document_new" element={<CreateDocument />} />
         <Route path="*" element={<Main/>}/>
         </Routes>
     </Router>

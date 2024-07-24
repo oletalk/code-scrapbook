@@ -29,7 +29,7 @@ export default class Main extends React.Component {
       <div>
         Add new ...
         <ul>
-          <li>Document</li>
+          <li><Link to="/document_new">Document</Link></li>
           <li>Sender</li>
         </ul>
       </div>
