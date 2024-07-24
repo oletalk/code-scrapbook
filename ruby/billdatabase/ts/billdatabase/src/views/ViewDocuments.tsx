@@ -6,7 +6,7 @@ import { NavType, DocumentInfo, SenderInfo, TagObject } from '../common/types-cl
 import ViewDocumentInfo from '../components/DocumentInfo'
 import FilterBox from '../components/FilterBox'
 import { BACKEND_URL } from '../common/constants'
-import { FilterProps, FilterState } from '../common/interfaces'
+import { FilterState } from '../common/interfaces'
 type documentbox = {
   info: DocumentInfo,
   colour: string,
@@ -30,15 +30,6 @@ function ViewDocuments() {
       ret = colour
     }
     return ret
-  }
-
-  const getFilterString = () : string => {
-    // do the date filtering
-    if (!filters.fromDate || !filters.toDate) {
-      return ''
-    } else {
-      return '/' + filters.fromDate + '/' + filters.toDate
-    }
   }
 
   const shouldFilter = (doc : DocumentInfo, fstr : string) : boolean => {
@@ -71,7 +62,11 @@ function ViewDocuments() {
 
       // FETCH DOCUMENTS
       // filter on dates if requested
-      let extraFilter = getFilterString()
+      const extraFilter = 
+          (filters.fromDate && filters.toDate) 
+          ? '/' + filters.fromDate + '/' + filters.toDate 
+          : ''
+
       console.log(' need to add this to url: ' + extraFilter)
       // if search string is there, use it to filter
       // TODO
