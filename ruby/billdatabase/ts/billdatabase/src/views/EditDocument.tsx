@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { doFetch } from '../common/fetch'
 import FileUploadSection from '../components/FileUploadSection'
 import { NavType, DocumentInfo, AccountInfo } from '../common/types-class'
-import { BACKEND_URL } from '../common/constants'
+import { fetchSenderAccountsUrl, fetchDocumentUrl } from '../common/constants'
 import Nav from '../components/Nav'
 
 interface EditDocumentState {
@@ -18,10 +18,10 @@ function EditDocument() {
     changed: false
   })
 
-  const loadSenders = useCallback((sender_id: string) => {
+  const loadSenderAccounts = useCallback((sender_id: string) => {
     console.log('need to load account numbers for sender ' + sender_id) 
     if (sender_id !== 'X') {
-      doFetch<AccountInfo[]>(BACKEND_URL + '/json/sender/' + sender_id + '/accounts')
+      doFetch<AccountInfo[]>(fetchSenderAccountsUrl(sender_id))
       .then((accounts) => {
         setAccountList(accounts)
       })
@@ -46,7 +46,7 @@ function EditDocument() {
 
   const fetchDocument = useCallback((id: number) => {
    // FETCH DOCUMENT INFO
-   doFetch<DocumentInfo>(BACKEND_URL + '/document/' + id)
+   doFetch<DocumentInfo>(fetchDocumentUrl(id.toString()))
    .then((json) => {
      // let info: DocumentInfo = json as DocumentInfo
      setDocumentInfo(json)
@@ -58,15 +58,17 @@ function EditDocument() {
      return 'X'
    })
    .then((sender_id) => {
-    loadSenders(sender_id)
+    loadSenderAccounts(sender_id)
    })
-  }, [loadSenders])
+  }, [loadSenderAccounts])
 
 
   const doUpdate = () => {
     if (documentInfo !== undefined)
     console.log('Updating document id ' + documentInfo.id)
   }
+
+  // 'onMounted'...
   useEffect(() => {
     fetchDocument(Number(id))
  

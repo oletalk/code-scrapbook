@@ -9,6 +9,14 @@ export const fetchSenderUrl = (sender_id: String) => {
   return BACKEND_URL + '/sender/' + sender_id
 }
 
+export const fetchDocumentUrl = (document_id: String) => {
+  return BACKEND_URL + '/document/' + document_id
+}
+
+export const fetchSenderAccountsUrl = (sender_id: String) => {
+  return BACKEND_URL + '/json/sender/' + sender_id + '/accounts'
+}
+
 export const saveNewAccountUrl = (sender_id: String) => {
   return BACKEND_URL + '/sender/' + sender_id + '/account_new'
 }

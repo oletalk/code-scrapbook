@@ -12,6 +12,11 @@ export enum NavType {
 export interface DocumentType extends Common {
   name: string
 }
+
+export interface NamedType extends Common {
+  name: string
+}
+
 export interface DocumentInfo extends Common {
   created_at: string,
   received_date: string,
@@ -33,9 +38,8 @@ export interface AccountInfo extends Common {
   comments: string
 }
 
-export interface ContactInfo extends Common {
+export interface ContactInfo extends NamedType {
   sender_id: string,
-  name: string,
   contact: string,
   comments: string
 }
@@ -45,8 +49,7 @@ export interface TagObject extends Common {
   changed: boolean
 }
 
-export interface SenderInfo extends Common {
-  name: string,
+export interface SenderInfo extends NamedType {
   created_at: Date,
   username: string,
   password_hint: string,
@@ -56,6 +59,49 @@ export interface SenderInfo extends Common {
   sender_tags: TagObject[]
 }
 
+export interface SelectFromListOfNamedTypes<T extends NamedType | AccountInfo> {
+  itemList: T[] | undefined,
+  selectName: string,
+  selectedItem: string | undefined,
+  changeCallback: (id : string) => void,
+  noItemMessage: string | undefined
+}
+
+export function emptyDocument() : DocumentInfo {
+  return {
+    id: '',
+    json_class: '',
+    created_at: '',
+    received_date: '',
+    summary: '',
+    due_date: '',
+    paid_date: '',
+    doc_type: {
+      name: '',
+      id: '',
+      json_class: ''
+    },
+    sender: emptySender(),
+    file_location: '',
+    comments: '',
+    sender_account: emptyAccount()
+  
+  }
+}
+export function emptySender() : SenderInfo {
+  return {
+    name: '',
+    id: '',
+    json_class: '',
+    created_at: new Date(),
+    username: '',
+    password_hint: '',
+    comments: '',
+    sender_accounts: [],
+    sender_contacts: [],
+    sender_tags: []  
+  }
+}
 export function emptyAccount() : AccountInfo {
   return {
     json_class: '',
