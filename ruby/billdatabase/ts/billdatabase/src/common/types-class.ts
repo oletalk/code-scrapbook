@@ -9,8 +9,7 @@ export enum NavType {
   DocumentTypes,
   TagTypes
 }
-export interface DocumentType extends Common {
-  name: string
+export interface DocumentType extends NamedType {
 }
 
 export interface NamedType extends Common {
@@ -63,7 +62,7 @@ export interface SelectFromListOfNamedTypes<T extends NamedType | AccountInfo> {
   itemList: T[] | undefined,
   selectName: string,
   selectedItem: string | undefined,
-  changeCallback: (id : string) => void,
+  changeCallback: (id : T | undefined) => void,
   noItemMessage: string | undefined
 }
 

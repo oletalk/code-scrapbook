@@ -161,8 +161,8 @@ class BillDatabase < Sinatra::Base
 
   get '/doctypes' do
     d = DocTypeHandler.new
-    @doctypes = d.fetch_doctypes
-    erb :doctype
+    ret = d.fetch_doctypes
+    ret.to_json
   end
 
   get '/senders' do

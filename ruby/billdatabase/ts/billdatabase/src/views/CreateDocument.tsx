@@ -1,4 +1,4 @@
-import { NavType, DocumentInfo, SenderInfo, AccountInfo, 
+import { NavType, DocumentInfo, SenderInfo, AccountInfo, DocumentType,
   emptyDocument, emptyAccount, emptySender } from '../common/types-class'
 import { useCallback, useEffect, useState } from 'react'
 import SelectBox from '../components/SelectBox'
@@ -8,11 +8,11 @@ import { doFetch } from '../common/fetch'
 
 import Nav from "../components/Nav"
 import AccountSelectBox from '../components/AccountSelectBox'
-import { idText } from 'typescript'
 
 function CreateDocument () {
   const [ documentInfo, setDocumentInfo ] = useState<DocumentInfo>(emptyDocument())
   const [ senderList, setSenderList ] = useState<SenderInfo[]>()
+  const [ docTypeList, setDocTypeList ] = useState<DocumentType[]>()
   const [ accountList, setAccountList ] = useState<AccountInfo[]>()
 
   /* TODO: change dependency to documentInfo.sender.id */
@@ -37,32 +37,51 @@ const loadAllSenders = useCallback(() => {
   })
 }, [])
 
-const changeSenderId = (newid : string) => {
-  if (documentInfo !== undefined && documentInfo.sender !== undefined) {
-    console.log('sender id is now ' + newid)
-    let newSender : SenderInfo = emptySender()
+const loadAllDocTypes = useCallback(() => {
+  doFetch<DocumentType[]>(BACKEND_URL + '/doctypes')
+  .then((json) => {
+    console.log(json)
+    setDocTypeList(json)
+  })
+}, [])
+
+const changeSenderId = (newsender : SenderInfo | undefined) => {
+  if (documentInfo !== undefined && newsender !== undefined) {
+    console.log('sender id is now ' + newsender)
+    // let newSender : SenderInfo = emptySender()
     let newSenderAccount : AccountInfo = emptyAccount()
-    newSender.id = newid
+    // newSender.id = newid
 
     setDocumentInfo({
       ...documentInfo,
-      sender: newSender,
+      sender: newsender,
       sender_account: newSenderAccount
     })
-    loadSenderAccounts(newid)
+    loadSenderAccounts(newsender.id)
   }
 
 }
 
-const changeSenderAccountId = (newid : string) => {
-  if (documentInfo !== undefined && documentInfo.sender !== undefined) {
-    console.log('sender account id is now ' + newid)
-    let newAccount : AccountInfo = emptyAccount()
-    newAccount.id = newid
+const changeDocTypeId = (newtype : DocumentType | undefined) => {
+  if (documentInfo !== undefined && newtype !== undefined) {
+    console.log('document doc type is now ' + newtype)
+    documentInfo.doc_type = newtype
+  }
+}
+
+const addDocument = () => {
+  console.log('saving new document')
+  console.log(documentInfo)
+}
+const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
+  if (documentInfo !== undefined && newsenderaccount !== undefined) {
+    console.log('sender account id is now ' + newsenderaccount)
+    // let newAccount : AccountInfo = emptyAccount()
+    // newAccount.id = newid
       
     setDocumentInfo({
       ...documentInfo,
-      sender_account: newAccount
+      sender_account: newsenderaccount
     }
     )
   }
@@ -71,7 +90,8 @@ const changeSenderAccountId = (newid : string) => {
    // 'onMounted'
    useEffect(() => {
     loadAllSenders()
-   }, [loadAllSenders])
+    loadAllDocTypes()
+   }, [loadAllSenders, loadAllDocTypes])
 
   return (
     <div>
@@ -88,9 +108,12 @@ const changeSenderAccountId = (newid : string) => {
 
           <div>Document Type:</div>
           <div>
-            <select className='sender_field mandatory' id="doctypes" name="doc_type_id">
-            <option value=''> - Please select - </option>
-            </select>
+            <SelectBox<DocumentType> 
+              itemList={docTypeList}
+              selectedItem={documentInfo.doc_type.id}
+              selectName='docTypeList'
+              changeCallback={(id) => changeDocTypeId(id)}
+              noItemMessage="no doc types available" />
           </div>
 
           <div>Sender:</div>
@@ -134,6 +157,19 @@ const changeSenderAccountId = (newid : string) => {
           </table>
         </td>
       </tr>
+      <tr>
+        <td>
+        <div><label>Receipt photo/PDF:</label></div>
+        <div className="advice">(Please save the document first)</div>
+        <div><label>Comments:</label></div>
+        <div><textarea name='comments' className='sender_field' rows={5}></textarea></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button onClick={() => addDocument()}>add document</button>
+        </td>        
+        </tr>
         </table>
       </div>
     </div>
