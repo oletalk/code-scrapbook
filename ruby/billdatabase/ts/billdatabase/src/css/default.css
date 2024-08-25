@@ -58,7 +58,11 @@ th.recvd {
   min-width: 130px;
 }
 
+button:disabled {
+  opacity: .6;
+}
 button {
+  opacity: 1;
   color: #ffffaa;
   background-color: #5a55a0;
   border-radius: 6px;

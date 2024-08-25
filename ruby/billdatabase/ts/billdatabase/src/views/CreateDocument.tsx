@@ -1,7 +1,8 @@
 import { NavType, DocumentInfo, SenderInfo, AccountInfo, DocumentType,
-  emptyDocument, emptyAccount, emptySender } from '../common/types-class'
+  emptyDocument, emptyAccount } from '../common/types-class'
 import { useCallback, useEffect, useState } from 'react'
 import SelectBox from '../components/SelectBox'
+import EditField from '../components/EditField'
 import { BACKEND_URL, fetchSenderAccountsUrl } from '../common/constants'
 
 import { doFetch } from '../common/fetch'
@@ -9,11 +10,18 @@ import { doFetch } from '../common/fetch'
 import Nav from "../components/Nav"
 import AccountSelectBox from '../components/AccountSelectBox'
 
+interface EditDocumentState {
+  changed: boolean
+}
+
 function CreateDocument () {
   const [ documentInfo, setDocumentInfo ] = useState<DocumentInfo>(emptyDocument())
   const [ senderList, setSenderList ] = useState<SenderInfo[]>()
   const [ docTypeList, setDocTypeList ] = useState<DocumentType[]>()
   const [ accountList, setAccountList ] = useState<AccountInfo[]>()
+  const [ state, setState ] = useState<EditDocumentState>({
+    changed: false
+  })
 
   /* TODO: change dependency to documentInfo.sender.id */
   const loadSenderAccounts = useCallback((sender_id: string | undefined) => {
@@ -69,9 +77,36 @@ const changeDocTypeId = (newtype : DocumentType | undefined) => {
   }
 }
 
+  // check mandatory fields - doc type, sender, summary, received
+  const mandatoryFieldsMissing = useCallback(() : boolean => {
+  // console.log('mandatory fields missing check...')
+    let missingFields = true
+  if (documentInfo !== undefined) {
+    if (documentInfo.doc_type.id 
+      && documentInfo.sender.id
+      && documentInfo.summary
+      && documentInfo.received_date 
+    ) {
+      missingFields = false
+    }
+  }
+  return missingFields
+}, [documentInfo])
+
+const handleDocumentChange = (kv: Object) => {
+  setDocumentInfo({
+    ...documentInfo,
+    ...kv
+  } as DocumentInfo)
+  setState({
+    ...state,
+    changed: true
+  })
+ }
+
 const addDocument = () => {
-  console.log('saving new document')
   console.log(documentInfo)
+
 }
 const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
   if (documentInfo !== undefined && newsenderaccount !== undefined) {
@@ -106,7 +141,7 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
         <td>
 
 
-          <div>Document Type:</div>
+          <div>Document Type: *</div>
           <div>
             <SelectBox<DocumentType> 
               itemList={docTypeList}
@@ -116,7 +151,7 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
               noItemMessage="no doc types available" />
           </div>
 
-          <div>Sender:</div>
+          <div>Sender: *</div>
           <div>
           <SelectBox<SenderInfo> 
                 itemList={senderList} 
@@ -135,8 +170,11 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
                   noItemMessage="sender not selected" />
           </div>
 
-          <div>Summary:
-          <input name="summary" className='sender_field' />
+          <div>Summary: *
+          <EditField 
+              fieldType="text"
+              fieldName="summary" 
+              changeCallback={(val) => handleDocumentChange(val)}/>
           </div>
 
         </td>
@@ -144,15 +182,28 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
           <table className='dates'>
             <tr>
               <td><label>Received</label> *</td><td>
-                <input className='sender_field mandatory' type="date" id='date_received' name="received_date" /></td>
+                <EditField 
+                  fieldType="date"
+                  fieldName="received_date"
+                  changeCallback={handleDocumentChange}
+                />
+              </td>
             </tr>
             <tr>
               <td><label>Date Due</label></td><td>
-                <input className='sender_field' type="date" name="due_date"/></td>
+              <EditField 
+                  fieldType="date"
+                  fieldName="due_date"
+                  changeCallback={handleDocumentChange}
+                /></td>
             </tr>
             <tr>
               <td><label>Date Paid</label></td><td>
-                <input className='sender_field' type="date" name="paid_date"/></td>
+              <EditField 
+                  fieldType="date"
+                  fieldName="paid_date"
+                  changeCallback={handleDocumentChange}
+                /></td>
             </tr>
           </table>
         </td>
@@ -162,12 +213,16 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
         <div><label>Receipt photo/PDF:</label></div>
         <div className="advice">(Please save the document first)</div>
         <div><label>Comments:</label></div>
-        <div><textarea name='comments' className='sender_field' rows={5}></textarea></div>
+        <div><EditField 
+                  fieldType="textarea"
+                  fieldName="comments"
+                  changeCallback={handleDocumentChange}
+                /></div>
         </td>
       </tr>
       <tr>
         <td>
-          <button onClick={() => addDocument()}>add document</button>
+          <button disabled={mandatoryFieldsMissing()} onClick={() => addDocument()}>add document</button>
         </td>        
         </tr>
         </table>
