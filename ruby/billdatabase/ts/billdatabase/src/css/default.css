@@ -9,6 +9,16 @@ html {
 .tabContainer {
   border-bottom: 1px solid gray;
 }
+button.senderTabContent {
+  background: #e3dddd;
+  color: #222b2b;
+  border-bottom: 0;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  min-width: 140px;
+}
 button.senderTabSelected {
   background: rgb(172, 189, 193);
   color: darkblue;

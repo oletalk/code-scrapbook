@@ -6,9 +6,6 @@ import TabbedDisplay from '../components/TabbedDisplay'
 import EditField from '../components/EditField'
 import Nav from '../components/Nav'
 
-// import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById, 
-//   emptyAccount, emptyContact
-//} from '../common/types'
 import { SenderInfo, TagObject, AccountInfo, ContactInfo, ListUtils,
   emptyAccount, emptyContact
   } from '../common/types-class'
@@ -142,11 +139,12 @@ function EditSender() {
       <div>Sender info not yet loaded.</div>
     )
   } else {
-    /* START TABBED CONTENT */
+    /* DEFINE CONTENT FOR EACH OF THE TABS */
     // general, accounts, contacts
     const tabContent : JSX.Element[] =
       [<table>
-        <tr>
+        <tr>      
+          {/* ---- GENERAL SENDER INFO ---- */}
           <td>
             <EditTagList 
                 sender_id={sender.id} 
@@ -186,7 +184,7 @@ function EditSender() {
         </tr>
       </table>, 
 
-      /* ------- ACCOUNTS -------- */
+
       <table>
       {/* ---- ACCOUNTS WE HAVE WITH THE SENDER ---- */}
       {sender.sender_accounts.length === 0 
@@ -230,7 +228,7 @@ function EditSender() {
       </td></tr>)}
       </table>, 
       
-      /* ------- CONTACTS -------- */
+
       <table>
       {/* ---- CONTACT DETAILS WE HAVE WITH THE SENDER ---- */}
       {sender.sender_contacts.length === 0 
@@ -273,14 +271,17 @@ function EditSender() {
       </td></tr>)}
     </table>]
     /* END TABBED CONTENT */
+    
     return (
       <div>
         <Nav page={NavType.EditSender} />
         <div>
           <TabbedDisplay 
-            tabNames={['General', 'Accounts', 'Contacts']}
+            tabs={[{ name: 'General', content: tabContent[0] },
+                   { name: 'Accounts', content: tabContent[1], nonEmpty: sender.sender_accounts.length > 0 },
+                   { name: 'Contacts', content: tabContent[2], nonEmpty: sender.sender_contacts.length > 0  }]
+            }
             headerContent={<span className='sendername'>{ sender.name}</span>}
-            content={tabContent}
           />
 
         </div>
