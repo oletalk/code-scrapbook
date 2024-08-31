@@ -100,6 +100,16 @@ function EditSender() {
     })
   }
 
+  const nonEmpty = (str : string) : boolean => {
+    if (str.length === 0) {
+      return false
+    }
+    if (str.match(/^\s+$/)) {
+      return false
+    }
+    return true
+  }
+
   const getTagList = useCallback(() => {
     console.log('fetching full tag list...')
     doFetch<TagObject[]>(BACKEND_URL + '/tags')
@@ -277,7 +287,7 @@ function EditSender() {
         <Nav page={NavType.EditSender} />
         <div>
           <TabbedDisplay 
-            tabs={[{ name: 'General', content: tabContent[0] },
+            tabs={[{ name: 'General', content: tabContent[0], nonEmpty: (nonEmpty(sender.username) || nonEmpty(sender.password_hint)) },
                    { name: 'Accounts', content: tabContent[1], nonEmpty: sender.sender_accounts.length > 0 },
                    { name: 'Contacts', content: tabContent[2], nonEmpty: sender.sender_contacts.length > 0  }]
             }
