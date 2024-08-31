@@ -60,6 +60,7 @@ export interface SenderInfo extends NamedType {
 
 export interface SelectFromListOfNamedTypes<T extends NamedType | AccountInfo> {
   itemList: T[] | undefined,
+  mandatory?: boolean,
   selectName: string,
   selectedItem: string | undefined,
   changeCallback: (id : T | undefined) => void,

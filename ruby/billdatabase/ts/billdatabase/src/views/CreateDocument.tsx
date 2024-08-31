@@ -13,7 +13,7 @@ import AccountSelectBox from '../components/AccountSelectBox'
 interface EditDocumentState {
   changed: boolean
 }
-
+// TODO: initialise with initial value from parent.
 function CreateDocument () {
   const [ documentInfo, setDocumentInfo ] = useState<DocumentInfo>(emptyDocument())
   const [ senderList, setSenderList ] = useState<SenderInfo[]>()
@@ -147,17 +147,18 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
               itemList={docTypeList}
               selectedItem={documentInfo.doc_type.id}
               selectName='docTypeList'
-              changeCallback={(id) => changeDocTypeId(id)}
+              changeCallback={changeDocTypeId}
               noItemMessage="no doc types available" />
           </div>
 
           <div>Sender: *</div>
           <div>
           <SelectBox<SenderInfo> 
+                mandatory
                 itemList={senderList} 
                 selectedItem={documentInfo?.sender.id}
                 selectName="senderList" 
-                changeCallback={(id) => changeSenderId(id)}
+                changeCallback={changeSenderId}
                 noItemMessage="no senders available" />
           </div>
           <div>Sender account:</div>
@@ -165,16 +166,17 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
             <AccountSelectBox 
                   selectName="sender_account" 
                   selectedItem={documentInfo?.sender_account.id}
-                  changeCallback={(id) => changeSenderAccountId(id)}
+                  changeCallback={changeSenderAccountId}
                   itemList={accountList} 
                   noItemMessage="sender not selected" />
           </div>
 
           <div>Summary: *
           <EditField 
+              mandatory
               fieldType="text"
               fieldName="summary" 
-              changeCallback={(val) => handleDocumentChange(val)}/>
+              changeCallback={handleDocumentChange}/>
           </div>
 
         </td>
@@ -183,6 +185,7 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
             <tr>
               <td><label>Received</label> *</td><td>
                 <EditField 
+                  mandatory
                   fieldType="date"
                   fieldName="received_date"
                   changeCallback={handleDocumentChange}
@@ -222,7 +225,7 @@ const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
       </tr>
       <tr>
         <td>
-          <button disabled={mandatoryFieldsMissing()} onClick={() => addDocument()}>add document</button>
+          <button disabled={mandatoryFieldsMissing()} onClick={addDocument}>add document</button>
         </td>        
         </tr>
         </table>
