@@ -30,7 +30,7 @@ export default class Main extends React.Component {
         Add new ...
         <ul>
           <li><Link to="/document_new">Document</Link></li>
-          <li>Sender</li>
+          <li><Link to="/sender_new">Sender</Link></li>
         </ul>
       </div>
 

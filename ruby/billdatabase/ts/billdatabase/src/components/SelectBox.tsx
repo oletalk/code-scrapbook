@@ -3,7 +3,8 @@ import { NamedType, SelectFromListOfNamedTypes } from '../common/types-class'
 
 function SelectBox<T extends NamedType>(props: SelectFromListOfNamedTypes<T>) {
 
-  // TODO: onChange handler
+  const isMandatory = !(props.mandatory === undefined || props.mandatory === false)
+  const firstOptionName = isMandatory ? '- mandatory, please select -' : '- none -'
   const itemList = props.itemList
   const noItemMessage: string = props.noItemMessage !== undefined ? props.noItemMessage : 'no items available'
 
@@ -22,7 +23,7 @@ function SelectBox<T extends NamedType>(props: SelectFromListOfNamedTypes<T>) {
           onChange={(e) => props.changeCallback(rtnObj(e.currentTarget.value))}
           className='sender_field' 
           name={props.selectName}>
-    <option value="">- none -</option>
+    <option value="">{ firstOptionName }</option>
     {itemList 
       ? itemList.map(s => (<option 
             value={s.id}

@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { doFetch } from '../common/fetch'
 import FileUploadSection from '../components/FileUploadSection'
 import { NavType, DocumentInfo, AccountInfo } from '../common/types-class'
+import AccountSelectBox from '../components/AccountSelectBox'
+import EditField from '../components/EditField'
 import { fetchSenderAccountsUrl, fetchDocumentUrl } from '../common/constants'
 import Nav from '../components/Nav'
 
@@ -62,7 +64,9 @@ function EditDocument() {
    })
   }, [loadSenderAccounts])
 
-
+  const changeSenderAccountId = (id : AccountInfo | undefined) => {
+    console.log('TODO changeSenderAccountId to ' + id?.account_number)
+  }
   const doUpdate = () => {
     if (documentInfo !== undefined)
     console.log('Updating document id ' + documentInfo.id)
@@ -98,30 +102,51 @@ if (typeof documentInfo === 'undefined') {
               
               <div>Sender account:</div>
               <div>
-                {accountList && accountList.length > 0 ? 
-                <select>
-                  <option>Select...</option>
-                {accountList?.map((acc) => {
-                  return (<option selected={acc.id === documentInfo.sender_account.id} value={acc.id}>{acc.account_number}</option>)
-                })}
-                </select>
-                : <i>No accounts available</i>}
+              <AccountSelectBox 
+                  selectName="sender_account" 
+                  selectedItem={documentInfo.sender_account?.id}
+                  changeCallback={(id) => changeSenderAccountId(id)}
+                  itemList={accountList} 
+                  noItemMessage="sender not selected" />
               </div>
               <div>Summary:
-                <input name="summary" onChange={(e) => handleDocumentChange({summary: e.target.value})} className='sender_field' value={documentInfo.summary} />
+              <EditField 
+              initialValue={documentInfo.summary}
+              fieldType="text"
+              fieldName="summary" 
+              changeCallback={(val) => handleDocumentChange(val)}/>
               </div>
 
             </td>
             <td>
           <table className='dates'>
-            <tr>
-              <td><label>Received</label> *</td><td><input onChange={(e) => handleDocumentChange({received_date: e.target.value})} className='sender_field mandatory' type="date" id='date_received' name="received_date" value={documentInfo.received_date} /></td>
+          <tr>
+              <td><label>Received</label> *</td><td>
+                <EditField 
+                  initialValue={documentInfo.received_date}
+                  fieldType="date"
+                  fieldName="received_date"
+                  changeCallback={handleDocumentChange}
+                />
+              </td>
             </tr>
             <tr>
-              <td><label>Date Due</label></td><td><input onChange={(e) => handleDocumentChange({due_date: e.target.value})} className='sender_field' type="date" name="due_date" value={documentInfo.due_date}/></td>
+              <td><label>Date Due</label></td><td>
+              <EditField 
+                  initialValue={documentInfo.due_date}
+                  fieldType="date"
+                  fieldName="due_date"
+                  changeCallback={handleDocumentChange}
+                /></td>
             </tr>
             <tr>
-              <td><label>Date Paid</label></td><td><input onChange={(e) => handleDocumentChange({paid_date: e.target.value})} className='sender_field' type="date" name="paid_date" value={documentInfo.paid_date} /></td>
+              <td><label>Date Paid</label></td><td>
+              <EditField 
+                  initialValue={documentInfo.paid_date}
+                  fieldType="date"
+                  fieldName="paid_date"
+                  changeCallback={handleDocumentChange}
+                /></td>
             </tr>
           </table>
         </td>
@@ -131,13 +156,12 @@ if (typeof documentInfo === 'undefined') {
             <td>
               <FileUploadSection documentInfo={documentInfo} />
         <div><label>Comments:</label></div>
-        <div><textarea 
-          onChange={(e) => handleDocumentChange({comments: e.target.value})}
-          name='comments' 
-          className='sender_field' 
-          rows={5}>
-          {documentInfo.comments}
-        </textarea></div>
+        <div><EditField 
+                  initialValue={documentInfo.comments}
+                  fieldType="textarea"
+                  fieldName="comments"
+                  changeCallback={handleDocumentChange}
+                /></div>
             </td>
           </tr>
           <tr>
