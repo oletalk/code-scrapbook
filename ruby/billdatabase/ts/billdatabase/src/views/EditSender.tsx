@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { doFetch } from '../common/fetch'
 import { NavType } from '../common/types-class'
 import { useParams } from 'react-router-dom'
+import TabbedDisplay from '../components/TabbedDisplay'
+import EditField from '../components/EditField'
 import Nav from '../components/Nav'
 
 // import { SenderInfo, TagObject, AccountInfo, ContactInfo, replaceItemById, 
@@ -15,15 +17,9 @@ import EditAccountInfo from '../components/AccountInfo'
 import EditContactInfo from '../components/ContactInfo'
 import EditTagList from '../components/TagInfo'
 
-enum SenderTab {
-  General = 1,
-  Accounts = 2,
-  Contacts = 3
-}
 interface EditSenderState {
   changed: boolean,
   saveTs: number,
-  currentTab: SenderTab,
   showNewAccount: boolean,
   showNewContact: boolean
 }
@@ -44,7 +40,6 @@ function EditSender() {
     {
       changed: false,
       saveTs: new Date().getTime(),
-      currentTab: SenderTab.General,
       showNewAccount: false,
       showNewContact: false
     }
@@ -57,16 +52,6 @@ function EditSender() {
       emptyContact()
     )
 
-  const tabSelected = (tabNum: SenderTab) => {
-    return tabNum === state.currentTab
-  }
-
-  const switchTab = (newTab: SenderTab) => {
-    setState({
-      ...state,
-      currentTab: newTab
-    })
-  }
   const doUpdate = () => {
     // do update, POST etc
     console.log('Updating sender id ' + id)
@@ -157,143 +142,148 @@ function EditSender() {
       <div>Sender info not yet loaded.</div>
     )
   } else {
+    /* START TABBED CONTENT */
+    // general, accounts, contacts
+    const tabContent : JSX.Element[] =
+      [<table>
+        <tr>
+          <td>
+            <EditTagList 
+                sender_id={sender.id} 
+                info={sender.sender_tags}
+                taglist={tagMenu} />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label>Username</label>
+            <span className='optional'> (optional)</span>: 
+          </td>
+          <td colSpan={2}>
+          <EditField 
+            initialValue={sender.username}
+            fieldType="text"
+            fieldName="username"
+            changeCallback={handleSenderChange}
+        />
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>
+            <label>Password hint</label>
+            <span className='optional'> (optional): </span>
+          </td>
+          <td colSpan={2}>
+          <EditField 
+            initialValue={sender.password_hint}
+            fieldType="text"
+            fieldName="password_hint"
+            changeCallback={handleSenderChange}
+        />
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+      </table>, 
+
+      /* ------- ACCOUNTS -------- */
+      <table>
+      {/* ---- ACCOUNTS WE HAVE WITH THE SENDER ---- */}
+      {sender.sender_accounts.length === 0 
+      ? <tr>
+        <td>
+          <div className='sender_account'>No Accounts yet setup for this sender</div>
+        </td>
+      </tr> 
+      : sender.sender_accounts.map(ac => 
+        <tr>
+          <td colSpan={3} >
+          <EditAccountInfo 
+              info={ac} sender_id={sender.id}
+              refreshCallback={doUpdate}
+              onChange={(ac: AccountInfo) => handleAccountChange(ac)} />
+          </td>
+        </tr>
+      )}
+      {(state.showNewAccount) ? (
+        <tr>
+        <td colSpan={3} >
+        <EditAccountInfo sender_id={sender.id}
+              info={newAccount} 
+              refreshCallback={doUpdate}
+              onChange={(ac: AccountInfo) => setNewAccount(ac)} />
+
+        <input 
+        type='button' 
+        onClick={() => setState({
+          ...state, showNewAccount: !state.showNewAccount
+        })} value='Hide' />
+
+          </td>
+        </tr>
+      ): (<tr><td>
+        <input 
+        type='button' 
+        onClick={() => setState({
+          ...state, showNewAccount: !state.showNewAccount
+        })} value='Add new account' />
+      </td></tr>)}
+      </table>, 
+      
+      /* ------- CONTACTS -------- */
+      <table>
+      {/* ---- CONTACT DETAILS WE HAVE WITH THE SENDER ---- */}
+      {sender.sender_contacts.length === 0 
+      ? <tr>
+        <td>
+          <div className='sender_contact'>No Contacts yet setup for this sender</div>
+        </td>
+      </tr>
+      : sender.sender_contacts.map(co =>
+        <tr>
+        <td colSpan={3} >
+        <EditContactInfo 
+          info={co} sender_id={sender.id}
+          refreshCallback={doUpdate}
+          onChange={(co: ContactInfo) => handleContactChange(co)} />
+        </td>
+      </tr>
+    )}
+              {(state.showNewContact) ? (
+        <tr>
+        <td colSpan={3} >
+        <EditContactInfo 
+              info={newContact} sender_id={sender.id}
+              refreshCallback={doUpdate}
+              onChange={(co: ContactInfo) => setNewContact(co)} />
+        <input 
+        type='button' 
+        onClick={() => setState({
+          ...state, showNewContact: !state.showNewContact
+        })} value='Hide' />
+
+          </td>
+        </tr>
+      ): (<tr><td>
+        <input 
+        type='button' 
+        onClick={() => setState({
+          ...state, showNewContact: !state.showNewContact
+        })} value='Add new contact' />
+      </td></tr>)}
+    </table>]
+    /* END TABBED CONTENT */
     return (
       <div>
         <Nav page={NavType.EditSender} />
-        <table className='tabs'>
-        <tr>
-            <td colSpan={4} >
-              <span className='sendername'>{ sender.name}</span>
-            </td>
-          </tr>
-        <tr>
-            <td colSpan={4} className='tabContainer' >
-            <button className={tabSelected(SenderTab.General) ? 'senderTabSelected' : 'senderTab' } 
-                onClick={() => switchTab(SenderTab.General)}>General</button>&nbsp;
-            <button className={tabSelected(SenderTab.Accounts) ? 'senderTabSelected' : 'senderTab' } 
-                onClick={() => switchTab(SenderTab.Accounts)}>Accounts</button>&nbsp;
-            <button className={tabSelected(SenderTab.Contacts) ? 'senderTabSelected' : 'senderTab' }  
-                onClick={() => switchTab(SenderTab.Contacts)}>Contacts</button>
-            </td>
-          </tr>
-        </table>
-        <table className={tabSelected(SenderTab.General) ? 'senderdetail': 'senderdetail_hidden'}>
-          <tr>
-            <td>
-              <EditTagList 
-                  sender_id={sender.id} 
-                  info={sender.sender_tags}
-                  taglist={tagMenu} />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label>Username</label>
-              <span className='optional'> (optional)</span>: 
-            </td>
-            <td colSpan={2}>
-              <input name="username" className='sender_field' 
-                onChange={(e) => handleSenderChange({username: e.target.value})}
-                value={sender.username} />
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <td>
-              <label>Password hint</label>
-              <span className='optional'> (optional): </span>
-            </td>
-            <td colSpan={2}>
-              <input name="password_hint" className='sender_field' 
-                onChange={(e) => handleSenderChange({password_hint: e.target.value})}
-                value={sender.password_hint} />
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-        </table>
-        <table className={tabSelected(SenderTab.Accounts) ? 'senderdetail': 'senderdetail_hidden'}>
-          {/* ---- ACCOUNTS WE HAVE WITH THE SENDER ---- */}
-          {sender.sender_accounts.length === 0 
-          ? <tr>
-            <td>
-              <div className='sender_account'>No Accounts yet setup for this sender</div>
-            </td>
-          </tr> 
-          : sender.sender_accounts.map(ac => 
-            <tr>
-              <td colSpan={3} >
-              <EditAccountInfo 
-                  info={ac} sender_id={sender.id}
-                  refreshCallback={doUpdate}
-                  onChange={(ac: AccountInfo) => handleAccountChange(ac)} />
-              </td>
-            </tr>
-          )}
-          {(state.showNewAccount) ? (
-            <tr>
-            <td colSpan={3} >
-            <EditAccountInfo sender_id={sender.id}
-                  info={newAccount} 
-                  refreshCallback={doUpdate}
-                  onChange={(ac: AccountInfo) => setNewAccount(ac)} />
+        <div>
+          <TabbedDisplay 
+            tabNames={['General', 'Accounts', 'Contacts']}
+            headerContent={<span className='sendername'>{ sender.name}</span>}
+            content={tabContent}
+          />
 
-            <input 
-            type='button' 
-            onClick={() => setState({
-              ...state, showNewAccount: !state.showNewAccount
-            })} value='Hide' />
-
-              </td>
-            </tr>
-          ): (<tr><td>
-            <input 
-            type='button' 
-            onClick={() => setState({
-              ...state, showNewAccount: !state.showNewAccount
-            })} value='Add new account' />
-          </td></tr>)}
-        </table>
-        <table className={tabSelected(SenderTab.Contacts) ? 'senderdetail': 'senderdetail_hidden'}>
-          {/* ---- CONTACT DETAILS WE HAVE WITH THE SENDER ---- */}
-          {sender.sender_contacts.length === 0 
-          ? <tr>
-            <td>
-              <div className='sender_contact'>No Contacts yet setup for this sender</div>
-            </td>
-          </tr>
-          : sender.sender_contacts.map(co =>
-            <tr>
-            <td colSpan={3} >
-            <EditContactInfo 
-              info={co} sender_id={sender.id}
-              refreshCallback={doUpdate}
-              onChange={(co: ContactInfo) => handleContactChange(co)} />
-            </td>
-          </tr>
-        )}
-                  {(state.showNewContact) ? (
-            <tr>
-            <td colSpan={3} >
-            <EditContactInfo 
-                  info={newContact} sender_id={sender.id}
-                  refreshCallback={doUpdate}
-                  onChange={(co: ContactInfo) => setNewContact(co)} />
-            <input 
-            type='button' 
-            onClick={() => setState({
-              ...state, showNewContact: !state.showNewContact
-            })} value='Hide' />
-
-              </td>
-            </tr>
-          ): (<tr><td>
-            <input 
-            type='button' 
-            onClick={() => setState({
-              ...state, showNewContact: !state.showNewContact
-            })} value='Add new contact' />
-          </td></tr>)}
-        </table>
+        </div>
         <input type="button" disabled={!state.changed} onClick={() => doUpdate()} value="Update" />
     </div>
   )
