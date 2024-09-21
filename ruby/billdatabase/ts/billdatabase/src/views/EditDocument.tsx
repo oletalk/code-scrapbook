@@ -1,8 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
-import { doFetch } from '../common/fetch'
+import { doFetch, doPost } from '../common/fetch'
 import FileUploadSection from '../components/FileUploadSection'
-import { NavType, DocumentInfo, AccountInfo } from '../common/types-class'
+import { NavType, DocumentInfo, 
+  AccountInfo, Common, adaptedDocInfoFields } from '../common/types-class'
 import AccountSelectBox from '../components/AccountSelectBox'
 import EditField from '../components/EditField'
 import { fetchSenderAccountsUrl, fetchDocumentUrl } from '../common/constants'
@@ -30,10 +31,20 @@ function EditDocument() {
     }
    }, [])
 
-   const updateDocument = (id : string | undefined) => {
-    console.log('updating document ' + id)
-    console.log(documentInfo)
-   }
+  const updateDocument = (id : string | undefined) => {
+    if (typeof id !== 'undefined' && typeof documentInfo !== 'undefined') {
+      console.log('updating document ' + id)
+      console.log(adaptedDocInfoFields(documentInfo))
+      const url = fetchDocumentUrl(id)
+      doPost(url, adaptedDocInfoFields(documentInfo),
+        true, postUpdate, 'updating document')
+ 
+    }
+  }
+
+  const postUpdate = () => {
+    window.location.reload()
+  }
 
    const handleDocumentChange = (kv: Object) => {
     setDocumentInfo({
