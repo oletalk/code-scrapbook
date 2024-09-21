@@ -105,6 +105,7 @@ class BillDatabase < Sinatra::Base
     d.sender_account = sa unless sa.nil?
     dh = DocHandler.new
     ret = dh.update_document(d)
+    puts ret.to_json
     ret.to_json
   end
 

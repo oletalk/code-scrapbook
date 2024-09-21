@@ -165,7 +165,7 @@ class DocHandler
   end
 
   def nil_if_empty(str)
-    str.empty? ? nil : str
+    str.nil? || str.empty? ? nil : str
   end
 
   def update_document(doc)

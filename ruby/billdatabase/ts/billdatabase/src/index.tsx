@@ -10,6 +10,7 @@ import './css/default.css'
 import './css/payments.css'
 
 import Main from './views/Main'
+import ListDocTypes from './views/ListDocTypes';
 import MaintainTags from './views/MaintainTags'
 import ViewSenders from './views/ViewSenders'
 import CreateDocument from './views/CreateDocument'
@@ -31,6 +32,7 @@ root.render(
         <Route path="/senders" element={<ViewSenders/>}/>
         <Route path="/sender/:id" element={<EditSender /> } />
         <Route path="/sender_new" element={<CreateSender />} />
+        <Route path="/doctypes" element={<ListDocTypes />} />
         <Route path="/documents" element={<ViewDocuments /> } />
         <Route path="/document/:id" element={<EditDocument /> } />
         <Route path="/document_new" element={<CreateDocument />} />

@@ -9,6 +9,10 @@ export const fetchSenderUrl = (sender_id: String) => {
   return BACKEND_URL + '/sender/' + sender_id
 }
 
+export const updateSenderTagUrl = (sender_id: String, tag_id: String) => {
+  return BACKEND_URL + '/sendertag/' + sender_id + '/' + tag_id
+}
+/** URL to fetch or update a document */
 export const fetchDocumentUrl = (document_id: String) => {
   return BACKEND_URL + '/document/' + document_id
 }
@@ -19,6 +23,14 @@ export const fetchSenderAccountsUrl = (sender_id: String) => {
 
 export const saveNewAccountUrl = (sender_id: String) => {
   return BACKEND_URL + '/sender/' + sender_id + '/account_new'
+}
+
+export const saveNewDocumentUrl = () => {
+  return BACKEND_URL + '/document_new'
+}
+
+export const saveNewSenderUrl = () => {
+  return BACKEND_URL + '/sender_new'
 }
 
 export const updateAccountUrl = (account_id: String) => {

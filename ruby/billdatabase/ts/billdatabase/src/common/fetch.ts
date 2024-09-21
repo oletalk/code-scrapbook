@@ -60,6 +60,27 @@ export const doPost = (
     })
 }
 
+export async function doPostAndReturn<T> (
+  url: string, 
+  postbody: object) {
+  let response = await fetch(url,
+    {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify(postbody)
+    })
+
+    handleFetchError(response)
+    let ret : T = await response.json()
+
+    return new Promise<T>((resolve) => {
+      resolve(ret)
+    })
+  }
+
 export const doUpload = (url : string, fileinput : HTMLInputElement) => {
   // const file = document.getElementById(elementId).files[0]
   const file = fileinput?.files?.[0]
@@ -86,7 +107,13 @@ export const doUpload = (url : string, fileinput : HTMLInputElement) => {
 }
 
 
-
+// const handleRtnOrError = (res: Response) => {
+//   if (res.ok) {
+//     return res.body
+//   } else {
+//     throw new Error('HTTP ' + res.status + ' response returned: ' + res.statusText)
+//   }
+// }
 const handleFetchError = (res: Response) => {
   if (!res.ok) {
     throw new Error('HTTP ' + res.status + ' response returned: ' + res.statusText)
