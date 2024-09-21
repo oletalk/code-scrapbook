@@ -1,22 +1,35 @@
 import Nav from "../components/Nav"
-import { NavType, SenderInfo, emptySender } from '../common/types-class'
+import { NavType, Common, SenderInfo, emptySender } from '../common/types-class'
 import { useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import * as Constants from '../common/constants'
 import EditField from "../components/EditField"
+import { doPostAndReturn } from "../common/fetch"
 
-const addSender = () => {
-  console.log('saving sender info')
-}
+
 interface EditSenderState {
   changed: boolean
 }
 
 function CreateSender() {
-
+  const navigate = useNavigate()
   const [ senderInfo, setSenderInfo ] = useState<SenderInfo>(emptySender())
   const [ state, setState ] = useState<EditSenderState>({
     changed: false
   })
 
+  const addSender = () => {
+    console.log('saving sender info')
+    const url = Constants.saveNewSenderUrl()
+    doPostAndReturn<Common>(url, senderInfo)
+    .then((response) => {
+      if (response !== undefined && response.id !== undefined) {
+        // redirect to editing newly created sender
+        navigate('/sender/' + response.id)
+      }
+    })
+  
+  }
   /*
   can i put this into a library somewhere?
 

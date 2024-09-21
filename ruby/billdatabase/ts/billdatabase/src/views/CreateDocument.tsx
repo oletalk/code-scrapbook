@@ -1,11 +1,15 @@
-import { NavType, DocumentInfo, SenderInfo, AccountInfo, DocumentType,
-  emptyDocument, emptyAccount } from '../common/types-class'
+import { 
+  NavType, Common, DocumentInfo, SenderInfo, AccountInfo, 
+  DocumentType, emptyDocument, emptyAccount, 
+  adaptedDocInfoFields } from '../common/types-class'
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import SelectBox from '../components/SelectBox'
 import EditField from '../components/EditField'
 import { BACKEND_URL, fetchSenderAccountsUrl } from '../common/constants'
+import * as Constants from '../common/constants'
 
-import { doFetch } from '../common/fetch'
+import { doFetch, doPostAndReturn } from '../common/fetch'
 
 import Nav from "../components/Nav"
 import AccountSelectBox from '../components/AccountSelectBox'
@@ -15,6 +19,7 @@ interface EditDocumentState {
 }
 // TODO: initialise with initial value from parent.
 function CreateDocument () {
+  const navigate = useNavigate()
   const [ documentInfo, setDocumentInfo ] = useState<DocumentInfo>(emptyDocument())
   const [ senderList, setSenderList ] = useState<SenderInfo[]>()
   const [ docTypeList, setDocTypeList ] = useState<DocumentType[]>()
@@ -106,6 +111,17 @@ const handleDocumentChange = (kv: Object) => {
 
 const addDocument = () => {
   console.log(documentInfo)
+  const url = Constants.saveNewDocumentUrl()
+  doPostAndReturn<Common>(url, adaptedDocInfoFields(documentInfo))
+  .then((response) => { /* backend returns { 'id': the new id }  */
+    if (response !== undefined && response.id !== undefined) {
+      // redirect to editing newly created document
+      navigate('/document/' + response.id)
+    }
+
+  }).catch((error) => {
+    console.error("Caught error: " + error)
+  })
 
 }
 const changeSenderAccountId = (newsenderaccount : AccountInfo | undefined) => {
