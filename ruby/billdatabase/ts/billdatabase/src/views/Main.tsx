@@ -14,7 +14,7 @@ export default class Main extends React.Component {
           <li>Payments</li>
           <li><Link to="/documents">All documents</Link></li>
           <li>Contact a Sender...</li>
-          <li>List of document types</li>
+          <li><Link to="/doctypes">List of document types</Link></li>
         </ul>
       </div>
 
