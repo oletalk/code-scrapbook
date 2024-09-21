@@ -1,4 +1,6 @@
 import { TagObject } from '../common/types-class'
+import * as Constants from '../common/constants'
+import { doDelete, doPost } from '../common/fetch'
 import { useState } from 'react'
 
 interface TagListProps {
@@ -22,13 +24,21 @@ function EditTagList (props: TagListProps) {
     showTagList: false
   })
 
+  const reloadScreen = () => {
+    window.location.reload()
+  }
+
   const delTag = (sender: string, id: string) => {
     console.log('deleting tag ' + id)
+    const url = Constants.updateSenderTagUrl(sender, id)
+    doDelete(url, reloadScreen)
   }
 
   const addTag = (sender: string, id: string) => {
     console.log('adding tag ' + id)
-    setState({showTagList: false})
+    const url = Constants.updateSenderTagUrl(sender, id)
+    doPost(url, {}, true, reloadScreen, 'adding tag')
+    // setState({showTagList: false})
   }
 
 

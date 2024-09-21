@@ -104,7 +104,10 @@ select.sender_field {
   width: 100%;
 }
 
-
+.tagFilterList-Active {
+  margin-left:3px;
+  border-bottom: 3px solid #fd6262;
+}
 textarea.sender_field {
   background-color: #f0f0ff;
   margin: 2px;
@@ -255,6 +258,9 @@ textarea.field_changed {
 
 #newcontact.hidden {
   display: none;
+}
+.tagFilterList {
+  margin-left:3px;
 }
 
 table.senderlist tr.hidden {

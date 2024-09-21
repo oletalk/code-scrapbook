@@ -1,4 +1,4 @@
-interface Common {
+export interface Common {
   json_class: string
   id:string
 }
@@ -125,6 +125,19 @@ export function emptyAccount() : AccountInfo {
   }
 }
 
+export function adaptedDocInfoFields(di: DocumentInfo) : Object {
+  return {
+    id: di.id,
+    doc_type_id: di.doc_type?.id,
+    sender_id: di.sender?.id,
+    sender_account_id: di.sender_account?.id,
+    received_date: di.received_date,
+    due_date: di.due_date,
+    paid_date: di.paid_date,
+    comments: di.comments,
+    summary: di.summary
+  }
+}
 export function adaptedFields(ac: AccountInfo) : Object {
   return {
       id: ac.id,
