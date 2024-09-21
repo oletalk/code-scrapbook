@@ -20,9 +20,23 @@ function FileUploadSection(props: FileUploadProps) {
     if (typeof docId !== 'undefined') {
       let fileupload = document.getElementById(elementId)
       if (fileupload !== null) {
+        console.log('doing upload')
         doUpload('/document/' + docId + '/file', fileupload as HTMLInputElement) // any other way to do this?
+        window.location.reload()
       }
     }
+  }
+
+  const hasFileLocation = (info : DocumentInfo | undefined) : boolean => {
+    if (typeof info !== 'undefined') {
+      const fileloc = info.file_location
+      if (typeof fileloc !== 'undefined') {
+        if (fileloc !== null && fileloc.trim() !== '') {
+          return true
+        }
+      }
+    }
+    return false
   }
 
   const deleteFile = (docId : string | undefined) => {
@@ -41,17 +55,20 @@ function FileUploadSection(props: FileUploadProps) {
   return ( 
   <div className='filesection'>
 <label>Receipt photo/PDF:</label> 
-      {(typeof documentInfo !== 'undefined' && typeof documentInfo.file_location !== 'undefined')
-      ? <span className="doc_filename">{documentInfo?.file_location}</span>
+      {hasFileLocation(documentInfo)
+      ? <div>
+        <span className="doc_filename">{documentInfo?.file_location}</span>
+        <div className="fileops">
+          <button className='icon icon-download' onClick={() => openFileInWindow(documentInfo?.id)}><img alt="download" src='/img/download.svg'/></button>
+          <button className='icon icon-trash' onClick={() => deleteFile(documentInfo?.id)}><img alt="delete" src='/img/trash.svg'/></button>
+        </div>
+
+        </div>
       :       
       <div className="fileops"><input id='file_location' name='file_location' type='file' />
       <button onClick={() => uploadFile('file_location', documentInfo?.id)}>Upload</button></div>
 
  }
- <div className="fileops">
-      <button className='icon icon-download' onClick={() => openFileInWindow(documentInfo?.id)}><img alt="download" src='/img/download.svg'/></button>
-      <button className='icon icon-trash' onClick={() => deleteFile(documentInfo?.id)}><img alt="delete" src='/img/trash.svg'/></button>
-    </div>
   
     </div>)
 }
