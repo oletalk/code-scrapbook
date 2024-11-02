@@ -166,6 +166,12 @@ class BillDatabase < Sinatra::Base
     ret.to_json
   end
 
+  get '/senders_with_tags' do
+    s = SenderHandler.new
+    ret = s.fetch_senders_with_tags
+    ret.to_json
+  end
+
   get '/senders' do
     # CONVERTED
     s = SenderHandler.new

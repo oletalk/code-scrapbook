@@ -223,12 +223,13 @@ class SenderHandler
   ## end sub methods...
   def fetch_senders_and_tags
     ret = []
-    soc = SenderObjectCollector.new('sender_id')
+    soc = SenderObjectCollector.new('id')
 
     # this is how soc should create a sender:
     so = proc { |result_row|
-      ret = Sender.new(result_row['sender_id'], nil)
-      ret.name = result_row['sender_name']
+      # ret = Sender.new(result_row['sender_id'], nil)
+      # ret.name = result_row['sender_name']
+      ret = SenderMapper.new.create_from_row(result_row)
       ret
     }
 
@@ -243,7 +244,8 @@ class SenderHandler
     }
 
     connect_for('fetching senders and tags') do |conn|
-      sql = File.read('./sql/fetch_sender_tags.sql')
+      #sql = File.read('./sql/fetch_sender_tags.sql')
+      sql = File.read('./sql/fetch_senders_with_tags.sql')
       conn.exec(sql) do |result|
         ret = soc.process_result(result, so, so_contact, so_save_contacts)
       end
@@ -259,6 +261,26 @@ class SenderHandler
         sm = SenderMapper.new
         result.each do |result_row|
           sender = sm.create_from_row(result_row)
+          ret.push(sender)
+        end
+      end
+    end
+    ret
+  end
+
+  # TODO: the sql fetches denormalised data - have to roll up the tag info into the sender info
+  def fetch_senders_with_tags
+    ret = []
+    connect_for('fetching all senders') do |conn|
+      sql = File.read('./sql/fetch_senders_with_tags.sql')
+      conn.exec(sql) do |result|
+        sm = SenderMapper.new
+        tm = SenderTagMapper.new
+
+        result.each do |result_row|
+          sender = sm.create_from_row(result_row)
+          tg = tm.create_from_row(result_row)
+
           ret.push(sender)
         end
       end

@@ -38,9 +38,9 @@ function EditField (props: EditFieldProps) {
       <textarea 
       placeholder={isMandatory ? 'Mandatory field' : ''}
       className={classNameStr} 
+      defaultValue={props.initialValue !== undefined ? props.initialValue : ''}
       onChange={(e) => doCallbackWithField(props.fieldName, e.target.value)}
       name={props.fieldName} rows={5} >
-        {props.initialValue !== undefined ? props.initialValue : ''}
       </textarea>
     )
   }
