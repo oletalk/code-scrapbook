@@ -21,6 +21,7 @@ class SenderObjectCollector
                      populate_sender_proc, populate_senderobject_proc, assign_objects_proc)
     result.each do |result_row|
       id_value = result_row[@id_field_name]
+      raise 'ID VALUE WAS NOT GIVEN' if id_value.nil?
 
       if id_value != @prev_id
 

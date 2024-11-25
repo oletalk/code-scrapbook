@@ -28,7 +28,7 @@ function EditContactInfo (props: SenderComponentProps<ContactInfo>) {
   }
 
   return (
-    <div>
+    <div className='contact_info_container'>
       <div className='sender_contact'>
         <label htmlFor='contact_info'>Contact info (phone, etc): </label>
         <input 

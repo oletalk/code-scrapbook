@@ -1,29 +1,45 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    mustermann (3.0.0)
+    diff-lcs (1.5.1)
+    mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
-    pg (1.5.3)
-    rack (2.2.8.1)
+    pg (1.5.8)
+    rack (2.2.9)
     rack-protection (3.0.6)
       rack
+    rspec (3.13.0)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.2)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.2)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.1)
     ruby2_keywords (0.0.5)
     sinatra (3.0.6)
       mustermann (~> 3.0)
       rack (~> 2.2, >= 2.2.4)
       rack-protection (= 3.0.6)
       tilt (~> 2.0)
-    tilt (2.2.0)
+    tilt (2.4.0)
 
 PLATFORMS
   arm64-darwin-23
+  arm64-darwin-24
   x86_64-darwin-22
   x86_64-freebsd-12
   x86_64-linux
 
 DEPENDENCIES
   pg (~> 1.5.3)
+  rspec
   sinatra (~> 3.0.4)
 
 BUNDLED WITH
-   2.2.22
+   2.5.21

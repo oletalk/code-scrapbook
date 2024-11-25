@@ -1,11 +1,29 @@
 body {
-  font-family: Arial, Helvetica, sans-serif
+  font-family: 'Microsoft Sans Serif', 'Helvetica Neue', sans-serif
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+tr.tr-show td div {
+  visibility: visible;
+  height: auto;
+  opacity: 1;
+  transition: all 200ms ease-in;
+}
+tr.tr-hide {
+  height: 0px;
+}
+tr.tr-hide td {
+  height: 0px;
+}
+tr.tr-hide td div {
+  visibility: collapse;
+  height: 0px;
+  opacity: 0;
+  transition: opacity 100ms ease-in, visibility 400ms ease-in 100ms, height 300ms ease-out 500ms;
+}
 .tabContainer {
   border-bottom: 1px solid gray;
 }
@@ -18,6 +36,10 @@ button.senderTabContent {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   min-width: 140px;
+}
+table.tabs {
+  border: 0;
+  padding-bottom: 0;
 }
 button.senderTabSelected {
   background: rgb(172, 189, 193);
@@ -114,12 +136,22 @@ textarea.sender_field {
   width: 90%;
 }
 
+div.fieldval {
+  padding: 6px;
+}
 textarea.fieldval {
   background-color: #f0f0ff;
   margin: 2px;
   width: 90%;
 }
 
+table.documentdetail {
+  background-color: #ddd;
+    border-radius: 9px;
+    border: 0;
+    padding: 25px;
+    margin: 9px;
+}
 table.dates {
   width: 100%;
   margin: 8px;
@@ -136,6 +168,12 @@ table.documenttable {
   color: rgb(51, 131, 51);
 }
 
+table.tabContent {
+  width: 100%;
+}
+table.tabContent tr td:first-child {
+  width: 200px;
+}
 table.documenttable tr:nth-child(odd) {
   background-color: #e8edf4;
 }
@@ -188,6 +226,17 @@ ul#tagTable li {
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
+.contact_info_container {
+  border-bottom: 1px dashed darkgray;
+  padding-bottom: 10px;
+  background-color: #dddddd;
+}
+.contact_info_container_closed {
+  opacity: 0.8;
+  border-bottom: 1px dashed darkgray;
+  padding-bottom: 10px;
+  background-color: #bbbbbb;
+}
 .account_info_container {
   border-bottom: 1px dashed darkgray;
   padding-bottom: 10px;
@@ -213,6 +262,7 @@ input.fieldval {
   border-bottom-style: groove;
   background-color: #f0f0ff;
   margin: 2px;
+  padding: 6px;
 }
 
 input.field_changed {
@@ -235,6 +285,7 @@ textarea.field_changed {
 .sender_account {
   border: 1px solid #343434;
   background-color: #ebe6f2;
+  padding: 6px;
 }
 
 .sender_account_closed {
@@ -246,9 +297,16 @@ textarea.field_changed {
   color: coral;
 }
 
+input.senderBtnToggle {
+  border-radius: 10px;
+  border: 0;
+  background: #a55;
+  color: #fff;
+}
 .sender_contact {
   border: 1px solid #343434;
   background-color: #d2eee2;
+  padding: 6px;
 }
 
 
@@ -280,6 +338,11 @@ table.senderlist tr {
 
 }
 
+table.senderlist tr td {
+  padding-top:3px;
+  padding-bottom:3px;
+}
+
 table {
   border: 1px solid grey;
 
@@ -297,7 +360,7 @@ td {
 .sendername {
   font-size: large;
   font-weight: 700;
-  margin-left: -6px;
+  margin-left: 6px;
   color: #b66ddd;
 }
 
@@ -305,8 +368,11 @@ td {
   display: none;
 }
 .senderdetail {
-  width: 90%;
   display: table;
+  background: #ddd;
+  width: 90%;
+  border: 0;
+  border-radius: 8px;
 }
 
 .advice {

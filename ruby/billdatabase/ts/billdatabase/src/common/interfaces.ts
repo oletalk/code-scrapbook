@@ -9,6 +9,16 @@ export type FilterProps = {
   onChange: (fs : FilterState) => void,
 }
 
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc'
+}
+
+export type SortColumnProps = {
+  name: string,
+  sorting: SortOrder | undefined,
+  onToggle: (name: string, fs : SortOrder | undefined) => void,
+}
 export interface SenderComponentProps<T> {
   sender_id: string,
   info: T,

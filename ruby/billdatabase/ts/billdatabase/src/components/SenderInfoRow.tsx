@@ -40,7 +40,7 @@ function SenderInfoRow (props: senderbox) {
       <tr className={sbox.filtered ? 'tr-hide' : 'tr-show'} key={sbox.info.id}>
                     <td>
                     <div>
-                        <input type='button' onClick={toggleExpand} value=" + " />
+                        <input className='senderBtnToggle' type='button' onClick={toggleExpand} value=" + " />
                        <Link to={"/sender/" + sbox.info.id }>{sbox.info.name}</Link>
   
                       </div>

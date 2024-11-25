@@ -1,20 +1,17 @@
-import { SenderInfo, NavType } from '../common/types-class'
-import { doFetch } from '../common/fetch';
-import React from "react";
-import { Link } from 'react-router-dom';
+import { SenderInfo, NavType, TagObject, senderbox } from '../common/types-class'
+import { doFetch } from '../common/fetch'
+import React from "react"
+import SenderInfoRow from '../components/SenderInfoRow'
 import * as Constants from '../common/constants'
+import TagFilter from '../components/TagFilter'
 import Nav from '../components/Nav'
 
 type SenderProps = {
 
 }
-type senderbox = {
-  info: SenderInfo,
-  expanded: boolean,
-  changed: boolean
-}
 type SenderState = {
-  senders:  senderbox[]
+  senders:  senderbox[],
+  tags: TagObject[]
 }
 
 /*
@@ -27,49 +24,29 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
 
     // this.fetchTags = this.fetchTags.bind(this)
     this.fetchSenders()
-    this.toggleExpand = this.toggleExpand.bind(this)
+    this.getTagList()
   }
 
   state: SenderState = {
-    senders: []
+    senders: [],
+    tags: []
   }
 
-  getSenderBox = (id: string) : senderbox | undefined => {
-    return this.state.senders.find(s => s.info.id === id)
-  }
-
-  saveSenderBox = (senderId: string, sb: senderbox) => {
-    const newState = [...this.state.senders]
-
-    newState.map(sbox => {
-      if (sbox.info.id === senderId) {
-        sbox.changed = (sbox.info !== sb.info) // TODO: does it do a deep compare??
-        sbox.info = sb.info
-        return sbox
-      } else {
-        return sbox
-      }
-    })
-
-    this.setState({
-       senders: newState
-    })    
+  getTagList = () => {
+    console.log('fetching all tags.')
+    doFetch<TagObject[]>(Constants.BACKEND_URL + '/tags')
+    .then((json) => {
+      this.setState({
+        tags: json
+      })
+      })
 
   }
 
-  toggleExpand = (id: string) => {
-    let sbox = this.getSenderBox(id)
-    if (sbox !== undefined) {
-      sbox.expanded = !sbox.expanded
-      this.saveSenderBox(id, sbox)
-    } else {
-      console.error('sender box id #' + id + ' not found!')
-    }
-  }
 
   fetchSenders = () => {
     console.log('fetching sender data.')
-    doFetch<SenderInfo[]>(Constants.BACKEND_URL + '/senders')
+    doFetch<SenderInfo[]>(Constants.BACKEND_URL + '/json/sendertags')
     .then((json) => {
         // let allSenders : SenderInfo[] = json
         let sendermap : senderbox[] = json.map(
@@ -77,7 +54,7 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
             return {
               info: s,
               expanded: false,
-              changed: false
+              filtered: false
             }
           }
         )
@@ -87,33 +64,52 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
       })
   }
 
+  intersects = (x: string[], y: string[]) => {
+    console.log(x)
+    console.log(y)
+    console.log('--------')
+    return x.filter(val => y.includes(val)).length > 0
+  }
+
+  // TODO this doesn't work 
+  //      because the screen doesn't have each sender's actual tags
+  doTagFilter = (x: string[]) => {
+    console.log('need to filter on ' + x)
+    let senderList = this.state.senders
+    let filtering = (x.length > 0)
+
+    for (let sender of senderList) {
+      // sender's tags
+      const sendertags = sender.info.sender_tags.map(t => t.id)
+      // do the sender's tags coincide with the tags in x?
+      if (filtering) {
+        sender.filtered = !this.intersects(x, sendertags)
+        console.log('filtering sender id ' + sender.info.id + '? ' + sender.filtered)
+      } else {
+        sender.filtered = false
+      }
+    }
+    this.setState({
+      senders: senderList
+    })
+  }
+
   render() {
     return (
       <div className="App">
               <Nav page={NavType.Senders} />
         <h2>Sender List</h2>
+        <TagFilter 
+            tags={this.state.tags} 
+            filterCallbackOn={(x) => this.doTagFilter(x)}
+            />
         <table className="senderlist">
           <tbody>
-          {this.state.senders.map(sbox => {
-               return <tr key={sbox.info.id}>
-                  <td>
-                  <div>
-                      <input type='button' onClick={() => this.toggleExpand(sbox.info.id)} value=" + " />
-                     <Link to={"/sender/" + sbox.info.id }>{sbox.info.name}</Link>
-
-                    </div>
-                    <div className={sbox.expanded ? 'sender-expanded' : 'sender-collapsed'} >
-                      <div>
-                      <label>Username</label><span className='optional'> (optional): </span>
-                      { sbox.info.username !== '' ? sbox.info.username : 'N/A' }
-                      </div>
-                      <div className="tooltip">
-                      <label>Password hint:</label>
-                      <span className='tooltiptext'>{ sbox.info.password_hint }</span>
-                      </div>
-                    </div>
-                  </td>
-              </tr>
+          {this.state.senders.sort((a,b) => { return ('' + a.info.name).localeCompare(b.info.name) }).map(sbox => {
+               return <SenderInfoRow 
+                    info={sbox.info}
+                    expanded={sbox.expanded}
+                    filtered={sbox.filtered} />
         })}
                   </tbody>
         </table>

@@ -16,6 +16,13 @@ export interface NamedType extends Common {
   name: string
 }
 
+export interface senderbox {
+  info: SenderInfo,
+  expanded: boolean,
+  /* changed: boolean, */
+  filtered: boolean
+}
+
 export interface DocumentInfo extends Common {
   created_at: string,
   received_date: string,

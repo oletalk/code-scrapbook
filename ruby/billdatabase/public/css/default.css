@@ -146,6 +146,7 @@ input.fieldval {
   border-bottom-style: groove;
   background-color: #f0f0ff;
   margin: 2px;
+  padding: 6px;
 }
 
 input.field_changed {
@@ -168,6 +169,7 @@ textarea.field_changed {
 .sender_account {
   border: 1px solid #343434;
   background-color: #ebe6f2;
+  padding: 6px;
 }
 
 .sender_account_closed {

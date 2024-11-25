@@ -6,17 +6,23 @@ import { NavType, DocumentInfo, SenderInfo, TagObject } from '../common/types-cl
 import ViewDocumentInfo from '../components/DocumentInfo'
 import FilterBox from '../components/FilterBox'
 import { BACKEND_URL } from '../common/constants'
-import { FilterState } from '../common/interfaces'
+import { FilterState, SortOrder } from '../common/interfaces'
+import SortColumn from '../components/SortColumn'
 type documentbox = {
   info: DocumentInfo,
   colour: string,
   filtered: boolean
 }
 
+type sortingorder = {
+  columnName: string,
+  sortOrder: SortOrder | undefined
+}
 
 function ViewDocuments() {
 
   const [ documents, setDocuments ] = useState<documentbox[]>([])
+  const [ sorting, setSorting ] = useState<sortingorder[]>()
   const [ filters, setFilter ] = useState<FilterState>({
     search: '',
     fromDate: '',
@@ -46,6 +52,67 @@ function ViewDocuments() {
     }
   
     return !match
+  }
+
+  const changeSortOrder = (colName: string, order: SortOrder | undefined) => {
+    // set the general sort order (can only sort on one column at a time)
+    let newState : sortingorder[] = []
+    newState.push({
+      columnName: colName,
+      sortOrder: order
+    })
+    setSorting(newState)
+  }
+
+  const sortOrder = (colName: string) : SortOrder | undefined => {
+    let ret : SortOrder | undefined = undefined
+    if (typeof sorting !== 'undefined') {
+      for (let i of sorting) {
+        if (i.columnName === colName) {
+          ret = i.sortOrder
+        }
+      }  
+    }
+    return ret
+  }
+
+  const sortFunc = (sorting : sortingorder[] | undefined) => {
+    return (a: documentbox, b: documentbox) : number => { 
+      let field1 = a.info.id
+      let field2 = b.info.id
+      if (typeof sorting !== 'undefined' && sorting.length > 0) {
+        // look at the first one
+        const sortingInfo = sorting[0]
+        const colName = sortingInfo.columnName
+        const order = sortingInfo.sortOrder
+        console.log('sorting on ' + colName + ' ordering ' + order)
+        if (typeof order !== 'undefined') {
+          if (colName === 'date_rcvd') {
+            field1 = sortField(order, true, a.info.received_date, b.info.received_date)
+            field2 = sortField(order, false, a.info.received_date, b.info.received_date)
+          } else if (colName === 'doc_type') {
+            field1 = sortField(order, true, a.info.doc_type.name, b.info.doc_type.name)
+            field2 = sortField(order, false, a.info.doc_type.name, b.info.doc_type.name)
+          } else if (colName === 'sender') {
+            field1 = sortField(order, true, a.info.sender.name, b.info.sender.name)
+            field2 = sortField(order, false, a.info.sender.name, b.info.sender.name)
+          } else {
+            console.error("Unknown sort order '" + colName + "' -- please fix!")
+          }  
+        }
+  
+      }
+      
+      return field1.localeCompare(field2)
+    }
+  }
+
+  const sortField = (ordr: SortOrder, onLHS: boolean, a: string, b: string) => {
+    if (ordr === SortOrder.ASC) {
+      return onLHS ? a : b
+    } else { // descending
+      return onLHS ? b : a
+    }
   }
 
   const fetchTagsAndDocuments = useCallback(() => {
@@ -109,9 +176,9 @@ function ViewDocuments() {
           onChange={(f: FilterState) => setFilter(f)} />
           <div className='titlefixed'>
             <div className='titlerow'>
-              <span className='date_rcvd doc_title'>Received</span>
-              <span className='doc_type doc_title'>Type</span>
-              <span className='doc_sender doc_title'>Sender</span>
+              <span className='date_rcvd doc_title'>Received <SortColumn sorting={sortOrder('date_rcvd')} name='date_rcvd' onToggle={changeSortOrder}/></span>
+              <span className='doc_type doc_title'>Type<SortColumn sorting={sortOrder('doc_type')} name='doc_type' onToggle={changeSortOrder}/></span>
+              <span className='doc_sender doc_title'>Sender<SortColumn sorting={sortOrder('sender')} name='sender' onToggle={changeSortOrder}/></span>
               <span className='date_rcvd doc_title'>Due</span>
               <span className='date_rcvd doc_title'>Paid</span>
               <span className='doc_account doc_title'>Account</span>
@@ -121,7 +188,7 @@ function ViewDocuments() {
           <div className='verticalspacer'>
             &nbsp;
           </div>
-      {documents.map((doc, index) => {
+      {documents.sort(sortFunc(sorting)).map((doc, index) => {
         return doc.filtered ? 
         (<div className='hidden'>(hidden)</div>) : (
         <ViewDocumentInfo colour={doc.colour} index={index} info={doc.info} />

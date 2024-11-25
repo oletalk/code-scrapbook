@@ -152,10 +152,10 @@ function EditSender() {
     /* DEFINE CONTENT FOR EACH OF THE TABS */
     // general, accounts, contacts
     const tabContent : JSX.Element[] =
-      [<table>
+      [<table className='tabContent'>
         <tr>      
           {/* ---- GENERAL SENDER INFO ---- */}
-          <td>
+          <td colSpan={4}>
             <EditTagList 
                 sender_id={sender.id} 
                 info={sender.sender_tags}
@@ -192,10 +192,20 @@ function EditSender() {
           </td>
           <td>&nbsp;</td>
         </tr>
+        <tr>
+        <td><label>Comments</label></td><td colSpan={3}>
+        <EditField 
+            initialValue={sender.comments}
+            fieldType="textarea"
+              fieldName="comments"
+              changeCallback={handleSenderChange}
+          />
+          </td>
+      </tr>
       </table>, 
 
 
-      <table>
+    <table className='tabContent'>
       {/* ---- ACCOUNTS WE HAVE WITH THE SENDER ---- */}
       {sender.sender_accounts.length === 0 
       ? <tr>
@@ -239,7 +249,7 @@ function EditSender() {
       </table>, 
       
 
-      <table>
+      <table className='tabContent'>
       {/* ---- CONTACT DETAILS WE HAVE WITH THE SENDER ---- */}
       {sender.sender_contacts.length === 0 
       ? <tr>
@@ -287,7 +297,7 @@ function EditSender() {
         <Nav page={NavType.EditSender} />
         <div>
           <TabbedDisplay 
-            tabs={[{ name: 'General', content: tabContent[0], nonEmpty: (nonEmpty(sender.username) || nonEmpty(sender.password_hint)) },
+            tabs={[{ name: 'General', content: tabContent[0], nonEmpty: (nonEmpty(sender.username) || nonEmpty(sender.password_hint) || nonEmpty(sender.comments)) },
                    { name: 'Accounts', content: tabContent[1], nonEmpty: sender.sender_accounts.length > 0 },
                    { name: 'Contacts', content: tabContent[2], nonEmpty: sender.sender_contacts.length > 0  }]
             }
