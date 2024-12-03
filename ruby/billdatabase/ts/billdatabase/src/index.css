@@ -20,7 +20,8 @@ body {
   margin-left: 32px;
   background: #eed;
   border-radius: 7px;
-}
+  max-height: 150px;
+  overflow-y: scroll;}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

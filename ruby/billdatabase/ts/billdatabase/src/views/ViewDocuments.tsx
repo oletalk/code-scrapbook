@@ -6,7 +6,7 @@ import { NavType, DocumentInfo, SenderInfo, TagObject } from '../common/types-cl
 import ViewDocumentInfo from '../components/DocumentInfo'
 import FilterBox from '../components/FilterBox'
 import { BACKEND_URL } from '../common/constants'
-import { FilterState, SortOrder } from '../common/interfaces'
+import { FilterState, SortOrder, DocColName } from '../common/interfaces'
 import SortColumn from '../components/SortColumn'
 type documentbox = {
   info: DocumentInfo,
@@ -22,7 +22,9 @@ type sortingorder = {
 function ViewDocuments() {
 
   const [ documents, setDocuments ] = useState<documentbox[]>([])
-  const [ sorting, setSorting ] = useState<sortingorder[]>()
+  const [ sorting, setSorting ] = useState<sortingorder[]>(
+    [{columnName:'date_rcvd', sortOrder: SortOrder.DESC}] /* default sort order */
+  )
   const [ filters, setFilter ] = useState<FilterState>({
     search: '',
     fromDate: '',
@@ -85,15 +87,15 @@ function ViewDocuments() {
         const sortingInfo = sorting[0]
         const colName = sortingInfo.columnName
         const order = sortingInfo.sortOrder
-        console.log('sorting on ' + colName + ' ordering ' + order)
+        // console.log('sorting on ' + colName + ' ordering ' + order)
         if (typeof order !== 'undefined') {
-          if (colName === 'date_rcvd') {
+          if (colName === DocColName.RCVD) {
             field1 = sortField(order, true, a.info.received_date, b.info.received_date)
             field2 = sortField(order, false, a.info.received_date, b.info.received_date)
-          } else if (colName === 'doc_type') {
+          } else if (colName === DocColName.DOC_TYPE) {
             field1 = sortField(order, true, a.info.doc_type.name, b.info.doc_type.name)
             field2 = sortField(order, false, a.info.doc_type.name, b.info.doc_type.name)
-          } else if (colName === 'sender') {
+          } else if (colName === DocColName.SENDER) {
             field1 = sortField(order, true, a.info.sender.name, b.info.sender.name)
             field2 = sortField(order, false, a.info.sender.name, b.info.sender.name)
           } else {
@@ -176,9 +178,9 @@ function ViewDocuments() {
           onChange={(f: FilterState) => setFilter(f)} />
           <div className='titlefixed'>
             <div className='titlerow'>
-              <span className='date_rcvd doc_title'>Received <SortColumn sorting={sortOrder('date_rcvd')} name='date_rcvd' onToggle={changeSortOrder}/></span>
-              <span className='doc_type doc_title'>Type<SortColumn sorting={sortOrder('doc_type')} name='doc_type' onToggle={changeSortOrder}/></span>
-              <span className='doc_sender doc_title'>Sender<SortColumn sorting={sortOrder('sender')} name='sender' onToggle={changeSortOrder}/></span>
+              <span className='date_rcvd doc_title'>Received <SortColumn sorting={sortOrder(DocColName.RCVD)} name={DocColName.RCVD} onToggle={changeSortOrder}/></span>
+              <span className='doc_type doc_title'>Type<SortColumn sorting={sortOrder(DocColName.DOC_TYPE)} name={DocColName.DOC_TYPE} onToggle={changeSortOrder}/></span>
+              <span className='doc_sender doc_title'>Sender<SortColumn sorting={sortOrder(DocColName.SENDER)} name={DocColName.SENDER} onToggle={changeSortOrder}/></span>
               <span className='date_rcvd doc_title'>Due</span>
               <span className='date_rcvd doc_title'>Paid</span>
               <span className='doc_account doc_title'>Account</span>

@@ -5,6 +5,7 @@ require_relative '../data/sender'
 require_relative '../data/mappers/genericmapper'
 require_relative '../data/mappers/sendermapper'
 require_relative '../data/mappers/sendertagmapper'
+require_relative '../data/mappers/sendernotemapper'
 require_relative '../data/collectors/senderobjectcollector'
 require_relative '../util/logging'
 
@@ -12,6 +13,7 @@ SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
                 'comments'
 ACCOUNT_FIELDS = 'id, sender_id, account_number, account_details, closed, comments'
 CONTACT_FIELDS = 'id, sender_id, name, contact, comments'
+NOTE_FIELDS = 'id, created_at, sender_id, notes'
 
 # fetches sender information from the db
 class SenderHandler
@@ -294,6 +296,18 @@ class SenderHandler
       sql = 'select id as tag_id, tag_name, color from bills.tag_type order by tag_name'
       conn.exec(sql) do |result|
         ret = SenderTagMapper.new.create_from_result(result)
+      end
+    end
+    ret
+  end
+
+  def fetch_sender_notes(sender_id)
+    ret = []
+    connect_for('fetching all notes for a sender') do |conn|
+      sql = "select #{NOTE_FIELDS} from bills.sender_notes where sender_id = $1"
+      conn.prepare('fetch_notes', sql)
+      conn.exec_prepared('fetch_notes', [sender_id]) do |result|
+        ret = SenderNoteMapper.new.create_from_result(result)
       end
     end
     ret

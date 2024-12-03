@@ -322,6 +322,13 @@ class BillDatabase < Sinatra::Base
     ret.to_json
   end
 
+  get '/json/sender/:id/notes' do |sender|
+    content_type 'application/json'
+    s = SenderHandler.new
+    ret = s.fetch_sender_notes(sender)
+    ret.to_json
+  end
+
   get '/json/sender/:id/documents' do |sender_id|
     content_type 'application/json'
     d = DocHandler.new

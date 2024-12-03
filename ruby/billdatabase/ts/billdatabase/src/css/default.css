@@ -337,7 +337,10 @@ table.senderlist tr {
   transition: all 0.25s ease-in;
 
 }
-
+.senderDocumentListNone {
+  font-style: italic;
+  color: #888;
+}
 table.senderlist tr td {
   padding-top:3px;
   padding-bottom:3px;

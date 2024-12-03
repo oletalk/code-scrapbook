@@ -31,7 +31,10 @@ function ViewDocumentInfo(props: DocumentInfoProps) {
       <Link to={'/document/' + props.info.id}>{info.received_date}</Link>
       </span>
       <span className='doc_type'>{props.info.doc_type.name}</span>
-      <span className='doc_sender'>{props.info.sender.name}</span>
+      <span className='doc_sender'>
+      <Link to={"/sender/" + props.info.sender.id }>{props.info.sender.name}</Link>
+      
+      </span>
       <span className='date_rcvd'>{dateornull(props.info.due_date)}</span>
       <span className='date_rcvd'>{dateornull(props.info.paid_date)}</span>
       <span className='doc_account accountnumber'>{accountNumOrSpace(props.info.sender_account)}</span>

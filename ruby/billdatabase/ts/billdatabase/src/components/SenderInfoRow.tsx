@@ -1,5 +1,6 @@
 import { senderbox } from "../common/types-class"
 import { useState } from "react"
+import SenderDocuments from "./SenderDocuments"
 import { Link } from 'react-router-dom'
 
 // state kept here for the expanded property...
@@ -52,6 +53,9 @@ function SenderInfoRow (props: senderbox) {
                         <div className="tooltip">
                         <label>Password hint:</label>
                         <span className='tooltiptext'>{ sbox.info.password_hint }</span>
+                        </div>
+                        <div>
+                        <SenderDocuments sender_id={sbox.info.id} />
                         </div>
                       </div>
                     </td>

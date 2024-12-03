@@ -9,6 +9,11 @@ export type FilterProps = {
   onChange: (fs : FilterState) => void,
 }
 
+export enum DocColName {
+  RCVD = 'date_rcvd',
+  DOC_TYPE = 'doc_type',
+  SENDER = 'sender'
+}
 export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc'
