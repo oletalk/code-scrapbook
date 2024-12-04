@@ -313,6 +313,20 @@ class SenderHandler
     ret
   end
 
+  def add_sender_note(note)
+    raise TypeError, 'add_sender_note expects a SenderNote' unless note.is_a?(SenderNote)
+
+    ret = { 'result' => 'success' }
+    sql = 'insert into bills.sender_notes (sender_id, notes) values ($1, $2)'
+    connect_for('inserting new sender note') do |conn|
+      conn.prepare('add_sendernote', sql)
+      conn.exec_prepared('add_sendernote', [note.sender_id, note.notes])
+    rescue StandardError => e
+      ret = { 'result' => e.to_s }
+    end
+    ret
+  end
+
   def fetch_sender_tags(sender_id)
     ret = []
     connect_for('fetching sender tags') do |conn|

@@ -218,6 +218,17 @@ class BillDatabase < Sinatra::Base
     s.update_sender(sender)
   end
 
+  post '/sender/:id/note' do |id|
+    params = JSON.parse(request.body.read)
+    s = SenderHandler.new
+    sn = SenderNote.new(nil, id)
+    sn.notes = params['notes']
+    ret = s.add_sender_note(sn)
+    # TODO: 3/12 add senderhandler method!
+    puts ret.to_json
+    ret.to_json
+  end
+
   post '/sender/:id/account_new' do |id|
     params = JSON.parse(request.body.read)
     s = SenderHandler.new
