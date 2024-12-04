@@ -12,6 +12,7 @@ import { SenderInfo, TagObject, AccountInfo, ContactInfo, ListUtils,
 import { BACKEND_URL, fetchSenderUrl } from '../common/constants'
 import EditAccountInfo from '../components/AccountInfo'
 import EditContactInfo from '../components/ContactInfo'
+import ViewSenderNotes from '../components/ViewSenderNotes'
 import EditTagList from '../components/TagInfo'
 
 interface EditSenderState {
@@ -305,7 +306,14 @@ function EditSender() {
           />
 
         </div>
-        <input type="button" disabled={!state.changed} onClick={() => doUpdate()} value="Update" />
+        <div>        
+          <input type="button" disabled={!state.changed} onClick={() => doUpdate()} value="Update" />
+        </div>
+        <div>
+          <ViewSenderNotes sender_id={sender.id}/>
+        </div>
+    
+    
     </div>
   )
   }

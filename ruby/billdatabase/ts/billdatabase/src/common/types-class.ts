@@ -55,6 +55,9 @@ export interface TagObject extends Common {
   changed: boolean
 }
 
+export interface PostMessage {
+  result: string
+}
 export interface SenderInfo extends NamedType {
   created_at: Date,
   username: string,
@@ -63,6 +66,11 @@ export interface SenderInfo extends NamedType {
   sender_accounts: AccountInfo[],
   sender_contacts: ContactInfo[],
   sender_tags: TagObject[]
+}
+
+export interface SenderNote extends NamedType {
+  created_at: Date,
+  notes: string
 }
 
 export interface SelectFromListOfNamedTypes<T extends NamedType | AccountInfo> {

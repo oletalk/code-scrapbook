@@ -1,3 +1,4 @@
+import { PostMessage } from "./types-class"
 
 export async function doFetch<T> (
   url: string
@@ -13,6 +14,7 @@ export async function doFetch<T> (
 }
 
 // note - does not return any response body/json from the endpoint!
+/** send an HTTP delete (no body) then perform a specified callback function */
 export const doDelete = (url: string, callback: Function | undefined) => {
   fetch(url, {
     method: "DELETE"
@@ -33,6 +35,7 @@ export const doDelete = (url: string, callback: Function | undefined) => {
 }
 
 // note - does not return any response body/json from the endpoint!
+/** POST a request then perform a specified callback function */
 export const doPost = (
   url: string, 
   postbody: object,
@@ -60,6 +63,32 @@ export const doPost = (
     })
 }
 
+/** POST a request then return a promise with either (a) a json with a message in a 'result' member, or (b) an error message.  */
+export async function doPostAndReturnMessage (
+  url: string, 
+  postbody: object) {
+  let response = await fetch(url,
+    {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify(postbody)
+    })
+
+    handleFetchError(response)
+    let ret : PostMessage = await response.json()
+      return new Promise<PostMessage>((resolve, reject) => {
+        if (ret.result === 'success') {
+          resolve(ret)
+        }
+        console.log(ret.result)
+        reject(ret.result)
+      })  
+  }
+
+/** POST a request then return a promise with a JSON that serializes to a given object type.  */
 export async function doPostAndReturn<T> (
   url: string, 
   postbody: object) {

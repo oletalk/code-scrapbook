@@ -21,6 +21,16 @@ export const fetchSenderAccountsUrl = (sender_id: String) => {
   return BACKEND_URL + '/json/sender/' + sender_id + '/accounts'
 }
 
+export const fetchSenderNotesUrl = (sender_id: String) => {
+  return BACKEND_URL + '/json/sender/' + sender_id + '/notes'
+}
+
+export const saveNewSenderNoteUrl = (sender_id: String) => {
+  return BACKEND_URL + '/sender/' + sender_id + '/note'
+}
+
+
+
 export const saveNewAccountUrl = (sender_id: String) => {
   return BACKEND_URL + '/sender/' + sender_id + '/account_new'
 }

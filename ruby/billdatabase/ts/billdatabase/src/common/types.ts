@@ -15,6 +15,22 @@ export const isBlank = (str: Object) => {
   return false
 }
 
+export const displayDate = (dte: Date) : string => {
+  // YY-MM-DD hh:mm
+  let newDate = new Date(dte)
+  newDate.setSeconds(0, 0)
+  newDate.setMilliseconds(0)
+  const options : Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  };
+  return newDate.toLocaleString('en-GB', options)
+}
+
 export const nullSafeContains = (outer: string, inner: string) : boolean => {
   if (outer === null) {
     return inner === null

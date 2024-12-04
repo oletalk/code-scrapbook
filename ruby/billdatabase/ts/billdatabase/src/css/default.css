@@ -337,6 +337,23 @@ table.senderlist tr {
   transition: all 0.25s ease-in;
 
 }
+span.dispDate {
+  font-weight: 700;
+}
+span.dispNote {
+  color: #3255b5;
+}
+ul.senderNotes {
+  background: #eadbf0;
+}
+ul.senderNotes li {
+  list-style:none;
+  padding: 9px;
+}
+ul.senderNotes li input {
+  width: 90%;
+}
+
 .senderDocumentListNone {
   font-style: italic;
   color: #888;
