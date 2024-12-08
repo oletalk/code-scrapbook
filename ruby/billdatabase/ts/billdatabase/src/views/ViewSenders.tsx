@@ -99,6 +99,8 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
       <div className="App">
               <Nav page={NavType.Senders} />
         <h2>Sender List</h2>
+        <div className='advice'>Expand each sender to view documents added under each sender. You can add notes for a sender in the maintenance screen for the sender.</div>
+
         <TagFilter 
             tags={this.state.tags} 
             filterCallbackOn={(x) => this.doTagFilter(x)}

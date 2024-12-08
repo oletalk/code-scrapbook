@@ -12,6 +12,15 @@ export enum NavType {
 export interface DocumentType extends NamedType {
 }
 
+export interface PaymentInfo extends Common {
+  name: string,
+  summary: string,
+  due_date: string,
+  paid_date: string,
+  document_id: string,
+  status: string
+}
+
 export interface NamedType extends Common {
   name: string
 }

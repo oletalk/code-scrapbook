@@ -18,6 +18,7 @@ import CreateSender from './views/CreateSender'
 import EditSender from './views/EditSender'
 import EditDocument from './views/EditDocument'
 import ViewDocuments from './views/ViewDocuments'
+import ViewPayments from './views/ViewPayments';
 
 // import NotFound from './views/NotFound'
 
@@ -29,6 +30,7 @@ root.render(
         <Routes>
         <Route path="/" element={<Main/>}/>
         <Route path="/taglist" element={<MaintainTags/>}/>
+        <Route path="/payments" element={<ViewPayments/>}/>
         <Route path="/senders" element={<ViewSenders/>}/>
         <Route path="/sender/:id" element={<EditSender /> } />
         <Route path="/sender_new" element={<CreateSender />} />
