@@ -5,7 +5,32 @@ body {
 html {
   scroll-behavior: smooth;
 }
-
+span.paymentAlert {
+  vertical-align: super;
+  font-size: small;
+  font-weight: 700;
+  color: red;
+  margin-left: 3px;
+}
+table.paymentInfo {
+  border-spacing: 0;
+}
+tr.payment-paid td {
+  color: rgb(8, 82, 5);
+  font-weight: 400;
+  padding:3px;
+}
+tr.payment-unpaid td {
+  color: #ff6439;
+  font-weight: 700;
+  padding:3px;
+}
+tr.payment-overdue td {
+  background: #ff6439;
+  color: white;
+  font-weight: 700;
+  padding:3px;
+}
 tr.tr-show td div {
   visibility: visible;
   height: auto;
@@ -43,7 +68,8 @@ table.tabs {
 }
 button.senderTabSelected {
   background: rgb(172, 189, 193);
-  color: darkblue;
+  color: #f02626;
+  font-size: 16px;
   border-bottom: 0;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;

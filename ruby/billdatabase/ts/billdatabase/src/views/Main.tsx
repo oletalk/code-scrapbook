@@ -1,4 +1,5 @@
 import React from "react";
+import CheckPayments from "../components/CheckPayments";
 import { Link } from 'react-router-dom';
 
 export default class Main extends React.Component {
@@ -11,7 +12,7 @@ export default class Main extends React.Component {
       <div>
         View/search for ...
         <ul>
-          <li>Payments</li>
+          <li><Link to="/payments">Payments</Link><CheckPayments /></li>
           <li><Link to="/documents">All documents</Link></li>
           <li>Contact a Sender...</li>
           <li><Link to="/doctypes">List of document types</Link></li>
