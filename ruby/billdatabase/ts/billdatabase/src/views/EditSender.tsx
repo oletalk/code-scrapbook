@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { doFetch } from '../common/fetch'
+import { doFetch, doPostAndReturnMessage } from '../common/fetch'
 import { NavType } from '../common/types-class'
 import { useParams } from 'react-router-dom'
 import TabbedDisplay from '../components/TabbedDisplay'
@@ -52,20 +52,35 @@ function EditSender() {
 
   const doUpdate = () => {
     // do update, POST etc
-    console.log('Updating sender id ' + id)
-    console.log(sender)
-    // TODO save top-level sender info POST /sender/:id
-
-    // TODO add update button to AccountInfo and ContactInfo tsx's
-    //      should be good to save it off of the props!
-
-    setNewAccount(emptyAccount)
-    setNewContact(emptyContact)
-    setState({...state,
-      saveTs: new Date().getTime(),
-      showNewAccount: false,
-      showNewContact: false
-    })
+    if (typeof id !== 'undefined') {
+      console.log('Updating sender id ' + id)
+      console.log(sender)
+      // TODO save top-level sender info POST /sender/:id
+      const data = {
+        username: sender.username,
+        password_hint: sender.password_hint,
+        comments: sender.comments
+      }
+      doPostAndReturnMessage(fetchSenderUrl(id), data)
+      .then((res) => {
+        setState({...state, changed: false})
+      }).catch((err) => {
+        console.log(err)
+        alert(err)
+      })
+  
+      // TODO add update button to AccountInfo and ContactInfo tsx's
+      //      should be good to save it off of the props!
+  
+      setNewAccount(emptyAccount)
+      setNewContact(emptyContact)
+      setState({...state,
+        saveTs: new Date().getTime(),
+        showNewAccount: false,
+        showNewContact: false
+      })
+  
+    }
   }
 
   const handleAccountChange = (ac: AccountInfo) => {

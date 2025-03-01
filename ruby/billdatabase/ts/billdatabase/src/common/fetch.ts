@@ -83,7 +83,6 @@ export async function doPostAndReturnMessage (
         if (ret.result === 'success') {
           resolve(ret)
         }
-        console.log(ret.result)
         reject(ret.result)
       })  
   }

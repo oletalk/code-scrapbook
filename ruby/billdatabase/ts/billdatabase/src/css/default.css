@@ -119,7 +119,7 @@ th.recvd {
 button:disabled {
   opacity: .6;
 }
-button {
+button.deflt {
   opacity: 1;
   color: #ffffaa;
   background-color: #5a55a0;
@@ -493,4 +493,19 @@ label {
   width: 100%;
   bottom: 60px;
   right: 40px;
+}
+.compactCloseButton {
+  float: right;
+}
+div.compactDocumentInfo {
+  position: absolute;
+  background: wheat;
+  width: 500px;
+  border: 1px solid darkblue;
+  box-shadow: 10px 5px #253131;
+  padding: 8px;
+  top: 200px;
+  left: 200px;
+  z-index: 99;
+  margin: 10px;
 }

@@ -20,7 +20,12 @@ export interface PaymentInfo extends Common {
   document_id: string,
   status: string
 }
-
+export interface EventType {
+  id: number,
+  title: string,
+  start: Date,
+  end: Date
+}
 export interface NamedType extends Common {
   name: string
 }

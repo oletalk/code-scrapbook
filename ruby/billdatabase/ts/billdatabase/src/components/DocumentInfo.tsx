@@ -4,12 +4,19 @@ import { Link } from 'react-router-dom';
 interface DocumentInfoProps {
   colour: string,
   index: number,
-  info: DocumentInfo
+  info: DocumentInfo,
+  format?: string,
+  closeCallback?: () => void,
 }
 
-function ViewDocumentInfo(props: DocumentInfoProps) {
-  const index = props.index
-  const info = props.info
+function ViewDocumentInfo({
+  colour,
+  index,
+  info,
+  format = "default",
+  closeCallback = () => {}
+}: DocumentInfoProps) {
+
 
   function textcolour(c: string) {
     return (c === '') ? 'black' : c
@@ -21,27 +28,56 @@ function ViewDocumentInfo(props: DocumentInfoProps) {
     return (dte ? dte : '-')
   }
 
+  function isnotblank(dte: string) {
+    if (typeof dte === 'undefined') {
+      return false;
+    }
+    if (dte == null) {
+      return false;
+    }
+    if (dte.trim() === '' || dte === '-') {
+      return false;
+    }
+    return true;
+  }
+
   function accountNumOrSpace(ac: AccountInfo) {
     return ac ? ac.account_number : '&nbsp;'
   }
   // TODO these should all be fixed-width as if they were in a table!
-  return (
-    <div style={{color: textcolour(props.colour)}} className={background(index)}>
-      <span className='date_rcvd'>
-      <Link to={'/document/' + props.info.id}>{info.received_date}</Link>
-      </span>
-      <span className='doc_type'>{props.info.doc_type.name}</span>
-      <span className='doc_sender'>
-      <Link to={"/sender/" + props.info.sender.id }>{props.info.sender.name}</Link>
-      
-      </span>
-      <span className='date_rcvd'>{dateornull(props.info.due_date)}</span>
-      <span className='date_rcvd'>{dateornull(props.info.paid_date)}</span>
-      <span className='doc_account accountnumber'>{accountNumOrSpace(props.info.sender_account)}</span>
-      <span className='doc_summary'>{props.info.summary}</span>
+  if (format === 'compact') {
+    return (
+      <div style={{color: textcolour(colour)}} className="compactDocumentInfo">
+        <div ><b>DOCUMENT DETAILS</b></div>
+        <div>{info.summary}</div>
+        <div className='date_rcvd'>
+        <Link to={'/document/' + info.id}>{info.received_date}</Link> {info.doc_type.name} <Link to={"/sender/" + info.sender.id }>{info.sender.name}</Link>
 
-    </div>
-  )
+        </div><div className="compactCloseButton"><button onClick={closeCallback}>X</button></div>
+        {isnotblank(info.due_date) ? <div className='date_rcvd'>Due {dateornull(info.due_date)} Paid {dateornull(info.paid_date)}</div> : <div>&nbsp;</div>}
+  
+      </div>
+    )  
+  } else { /* NORMAL VIEW */
+    return (
+      <div style={{color: textcolour(colour)}} className={background(index)}>
+        <span className='date_rcvd'>
+        <Link to={'/document/' + info.id}>{info.received_date}</Link>
+        </span>
+        <span className='doc_type'>{info.doc_type.name}</span>
+        <span className='doc_sender'>
+        <Link to={"/sender/" + info.sender.id }>{info.sender.name}</Link>
+        
+        </span>
+        <span className='date_rcvd'>{dateornull(info.due_date)}</span>
+        <span className='date_rcvd'>{dateornull(info.paid_date)}</span>
+        <span className='doc_account accountnumber'>{accountNumOrSpace(info.sender_account)}</span>
+        <span className='doc_summary'>{info.summary}</span>
+  
+      </div>
+    )
+  
+  }
 }
 
 export default ViewDocumentInfo;

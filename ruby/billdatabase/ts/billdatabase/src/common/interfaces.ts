@@ -14,6 +14,10 @@ export enum DocColName {
   DOC_TYPE = 'doc_type',
   SENDER = 'sender'
 }
+export enum ViewMode {
+  NORMAL = 'normal',
+  CALENDAR = 'calendar'
+}
 export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc'
