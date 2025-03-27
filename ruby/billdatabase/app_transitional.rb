@@ -215,7 +215,8 @@ class BillDatabase < Sinatra::Base
     sender.username = params['username']
     sender.password_hint = params['password_hint']
     sender.comments = params['comments']
-    s.update_sender(sender)
+    ret = s.update_sender(sender)
+    ret.to_json
   end
 
   post '/sender/:id/note' do |id|
