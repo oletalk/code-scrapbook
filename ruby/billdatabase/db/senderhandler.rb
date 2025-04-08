@@ -9,7 +9,7 @@ require_relative '../data/mappers/sendernotemapper'
 require_relative '../data/collectors/senderobjectcollector'
 require_relative '../util/logging'
 
-SENDER_FIELDS = 'id, created_at, name, username, password_hint, '\
+SENDER_FIELDS = 'id, created_at, is_active, name, username, password_hint, '\
                 'comments'
 ACCOUNT_FIELDS = 'id, sender_id, account_number, account_details, closed, comments'
 CONTACT_FIELDS = 'id, sender_id, name, contact, comments'
@@ -131,6 +131,7 @@ class SenderHandler
   def update_sender(sender)
     raise TypeError, 'update_sender expects a Sender' unless sender.is_a?(Sender)
 
+    ret = { result: 'success' }
     sql = 'update bills.sender set username = $1, password_hint = $2, '\
           'comments = $3 where id = $4'
     connect_for('updating a sender') do |conn|
@@ -141,7 +142,10 @@ class SenderHandler
                            sender.comments,
                            sender.id
                          ])
+    rescue StandardError => e
+      ret = { 'result' => e.to_s }
     end
+    ret
   end
 
   # fetch sender ids grouped by tag
@@ -246,7 +250,7 @@ class SenderHandler
     }
 
     connect_for('fetching senders and tags') do |conn|
-      #sql = File.read('./sql/fetch_sender_tags.sql')
+      # sql = File.read('./sql/fetch_sender_tags.sql')
       sql = File.read('./sql/fetch_senders_with_tags.sql')
       conn.exec(sql) do |result|
         ret = soc.process_result(result, so, so_contact, so_save_contacts)

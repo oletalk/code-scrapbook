@@ -76,6 +76,7 @@ export interface SenderInfo extends NamedType {
   created_at: Date,
   username: string,
   password_hint: string,
+  is_active: boolean,
   comments: string,
   sender_accounts: AccountInfo[],
   sender_contacts: ContactInfo[],
@@ -121,6 +122,7 @@ export function emptySender() : SenderInfo {
   return {
     name: '',
     id: '',
+    is_active: true,
     json_class: '',
     created_at: new Date(),
     username: '',
