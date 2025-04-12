@@ -4,9 +4,12 @@ import { doDelete, doPost } from '../common/fetch'
 import { useState } from 'react'
 
 interface TagListProps {
+  /** sender ID in the database */
   sender_id: string,
-  info: TagObject[],
-  taglist: TagObject[]
+  /** only the tags attached to this sender, for display */
+  info: TagObject[], 
+  /** list of ALL tags, used to generate dropdown */
+  taglist: TagObject[] 
 }
 
 interface TagListState {
@@ -14,7 +17,7 @@ interface TagListState {
 }
 
 
-
+/** editor of a sender's list of tags */
 function EditTagList (props: TagListProps) {
   const sender = props.sender_id
   const tags = props.info

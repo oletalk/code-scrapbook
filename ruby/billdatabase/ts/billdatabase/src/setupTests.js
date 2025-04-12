@@ -11,7 +11,9 @@ async function mockFetch(url, config) {
     case BASEURL + '/sendertag/22/3': { // add tag test case
       return simpleOkResponse()
     }
-
+    case BASEURL + '/senderaccount/111': { // save sender account
+      return simpleOkResponse()
+    }
     case BASEURL + '/payments': { // payment check on main page
       return OkResponse(getMainScreenPayments())
     }

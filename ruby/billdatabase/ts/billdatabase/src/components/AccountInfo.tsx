@@ -4,6 +4,7 @@ import { doPost } from '../common/fetch'
 import * as Constants from '../common/constants'
 import { SenderComponentProps } from '../common/interfaces'
 
+/** Component to edit one of the accounts for a given sender */
 function EditAccountInfo (props: SenderComponentProps<AccountInfo>) {
   const info = props.info
 
@@ -36,11 +37,12 @@ function EditAccountInfo (props: SenderComponentProps<AccountInfo>) {
         <input 
           onChange={(e) => 
             props.onChange({...props.info, 'account_number': e.target.value})} 
+          id="account_number"
           name="account_number" 
           className='fieldval' 
           value={info.account_number} />
           <span className='account_closed'>Closed? 
-            <input onClick={toggleChecked} type='checkbox' checked={props.info.closed} />
+            <input onClick={toggleChecked} type='checkbox' defaultChecked={props.info.closed} />
           </span>
       </div>
       <div className='fieldval'>
@@ -58,8 +60,10 @@ function EditAccountInfo (props: SenderComponentProps<AccountInfo>) {
             onChange={(e) => 
               props.onChange({...props.info, 'comments': e.target.value})
             }
+            id='comments'
             name='comments' 
-            className='fieldval' >{info.comments}</textarea>
+            className='fieldval' 
+            defaultValue={info.comments} />
       </div>
       <input type="button" onClick={() => saveAccount()} value={isBlank(props.info.id) ? 'Save new Account' : 'Update Account'} />
     </div>

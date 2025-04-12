@@ -49,9 +49,5 @@ test('adds a new tag', async () => {
   const linkElement = screen.getByText(/third/);
   expect(linkElement).toBeInTheDocument();
   fireEvent.click(linkElement);
-  /* await waitFor(() => {
-    const paymentAlert = screen.getByText(/unpaid/i);
-    expect(paymentAlert).toBeInTheDocument();
-  }) */
 
 });
