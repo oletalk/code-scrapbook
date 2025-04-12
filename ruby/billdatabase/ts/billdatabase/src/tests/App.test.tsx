@@ -12,6 +12,7 @@ test('renders learn react link', async () => {
     <BrowserRouter> 
   <Main />
   </BrowserRouter>);
+await new Promise(process.nextTick);
 
   const linkElement = screen.getByText(/Maintain bills/i);
   expect(linkElement).toBeInTheDocument();

@@ -1,37 +1,27 @@
+import { getAllSendersWithTags, getMainScreenPayments, getTags,
+  simpleOkResponse, OkResponse } from './testdata/payloads'
+
 const BASEURL = 'http://localhost:4567'
 
 async function mockFetch(url, config) {
 	switch (url) {
-    case BASEURL + '/sendertag/22/2': {
-      return {
-        ok: true,
-        status: 200
-      }
+    case BASEURL + '/sendertag/22/2': { // delete tag test case
+      return simpleOkResponse()
     }
-    case BASEURL + '/sendertag/22/3': {
-      return {
-        ok: true,
-        status: 200
-      }
+    case BASEURL + '/sendertag/22/3': { // add tag test case
+      return simpleOkResponse()
     }
 
-    case BASEURL + '/payments': {
-      return {
-				ok: true,
-				status: 200,
-				json: async () => (
-          [
-            {
-              "name":"MacFie & Co",
-              "summary":"Quarterly Common Charges from 01/06 to 31/08",
-              "due_date":"2024-09-09",
-              "paid_date":"",
-              "document_id":"35",
-              "status":"unpaid"
-            }
-          ]
-         ),
-      }
+    case BASEURL + '/payments': { // payment check on main page
+      return OkResponse(getMainScreenPayments())
+    }
+
+    case BASEURL + '/tags': { // get tags
+      return OkResponse(getTags)
+    }
+
+    case BASEURL + '/json/sendertags': {
+      return OkResponse(getAllSendersWithTags())
     }
 		default: {
 			throw new Error(`Unhandled request: ${url}`)
