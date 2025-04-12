@@ -194,6 +194,18 @@ table.documenttable {
   color: rgb(51, 131, 51);
 }
 
+div.sender-active {
+  opacity: 1;
+}
+div.sender-inactive {
+  font-style: italic;
+  background-color:rgb(217, 198, 198);
+  opacity: 0.5 !important;
+}
+table.tabInactive {
+  opacity: 0.5;
+  background: #8b8989;
+}
 table.tabContent {
   width: 100%;
 }

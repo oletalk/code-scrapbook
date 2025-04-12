@@ -2,6 +2,19 @@ const BASEURL = 'http://localhost:4567'
 
 async function mockFetch(url, config) {
 	switch (url) {
+    case BASEURL + '/sendertag/22/2': {
+      return {
+        ok: true,
+        status: 200
+      }
+    }
+    case BASEURL + '/sendertag/22/3': {
+      return {
+        ok: true,
+        status: 200
+      }
+    }
+
     case BASEURL + '/payments': {
       return {
 				ok: true,
