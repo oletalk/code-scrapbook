@@ -63,7 +63,7 @@ class Sender
       'username' => @username,
       'password_hint' => @password_hint,
       'comments' => @comments,
-      'is_active' => @is_active,
+      'is_active' => @is_active == 'Y',
       'sender_accounts' => @sender_accounts,
       'sender_contacts' => @sender_contacts,
       'sender_tags' => @sender_tags

@@ -175,7 +175,8 @@ class BillDatabase < Sinatra::Base
   get '/senders' do
     # CONVERTED
     s = SenderHandler.new
-    ret = s.fetch_senders
+    active = params['active']
+    ret = s.fetch_senders(active)
     # erb :senders
     ret.to_json
   end
@@ -215,6 +216,7 @@ class BillDatabase < Sinatra::Base
     sender.username = params['username']
     sender.password_hint = params['password_hint']
     sender.comments = params['comments']
+    sender.is_active = params['is_active']
     ret = s.update_sender(sender)
     ret.to_json
   end

@@ -133,13 +133,14 @@ class SenderHandler
 
     ret = { result: 'success' }
     sql = 'update bills.sender set username = $1, password_hint = $2, '\
-          'comments = $3 where id = $4'
+          'comments = $3, is_active = $4 where id = $5'
     connect_for('updating a sender') do |conn|
       conn.prepare('upd_sender', sql)
       conn.exec_prepared('upd_sender', [
                            sender.username,
                            sender.password_hint,
                            sender.comments,
+                           sender.is_active,
                            sender.id
                          ])
     rescue StandardError => e
@@ -259,10 +260,15 @@ class SenderHandler
     ret
   end
 
-  def fetch_senders
+  def fetch_senders(active_only=false)
     ret = []
+    puts "fetch_senders: active_only = #{active_only}"
     connect_for('fetching all senders') do |conn|
-      sql = "select #{SENDER_FIELDS} from bills.sender order by name"
+      sql = if active_only
+              "select #{SENDER_FIELDS} from bills.sender where is_active = 'Y' order by name"
+            else
+              "select #{SENDER_FIELDS} from bills.sender order by name"
+            end
       conn.exec(sql) do |result|
         sm = SenderMapper.new
         result.each do |result_row|

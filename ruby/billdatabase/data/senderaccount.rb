@@ -26,7 +26,7 @@ class SenderAccount
       'sender_id' => @sender_id,
       'account_number' => @account_number,
       'account_details' => @account_details,
-      'closed' => @closed == 'Y' ? true : false,
+      'closed' => @closed == 'Y',
       'comments' => @comments
     }.to_json(*args)
   end
