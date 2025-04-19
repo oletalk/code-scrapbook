@@ -43,7 +43,7 @@ function CreateDocument () {
    }, [])
 
 const loadAllSenders = useCallback(() => {
-  doFetch<SenderInfo[]>(BACKEND_URL + '/senders')
+  doFetch<SenderInfo[]>(BACKEND_URL + '/senders?active=true')
   .then((json) => {
     console.log(json)
     setSenderList(json)

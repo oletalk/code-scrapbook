@@ -4,11 +4,11 @@ import SenderDocuments from "./SenderDocuments"
 import { Link } from 'react-router-dom'
 
 // state kept here for the expanded property...
-interface SenderInfoState {
+/*interface SenderInfoState {
   expanded: boolean,
   changed: boolean,
   filtered: boolean
-}
+}*/
 
 function SenderInfoRow (props: senderbox) {
   const sbox = props
@@ -40,8 +40,10 @@ function SenderInfoRow (props: senderbox) {
     return (
       <tr className={sbox.filtered ? 'tr-hide' : 'tr-show'} key={sbox.info.id}>
                     <td>
-                    <div>
-                        <input className='senderBtnToggle' type='button' onClick={toggleExpand} value=" + " />
+                    <div className={sbox.info.is_active ? 'sender-active' : 'sender-inactive'}>
+                        {sbox.info.is_active 
+                          ? <input className='senderBtnToggle' type='button' onClick={toggleExpand} value=" + " />
+                          : <input className='senderBtnToggle' type='button' value=" x " />}
                        <Link to={"/sender/" + sbox.info.id }>{sbox.info.name}</Link>
   
                       </div>

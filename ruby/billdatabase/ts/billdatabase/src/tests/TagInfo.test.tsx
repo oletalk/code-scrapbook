@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom'
-import { fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 
 import { render, screen } from '@testing-library/react';
 import TagInfo from '../components/TagInfo';

@@ -3,7 +3,7 @@ import { doFetch } from '../common/fetch'
 import React from "react"
 import SenderInfoRow from '../components/SenderInfoRow'
 import * as Constants from '../common/constants'
-import TagFilter from '../components/TagFilter'
+import FilterByTag from '../components/TagFilter'
 import Nav from '../components/Nav'
 
 type SenderProps = {
@@ -101,9 +101,9 @@ export default class ViewSenders extends React.Component<SenderProps, SenderStat
         <h2>Sender List</h2>
         <div className='advice'>Expand each sender to view documents added under each sender. You can add notes for a sender in the maintenance screen for the sender.</div>
 
-        <TagFilter 
+        <FilterByTag 
             tags={this.state.tags} 
-            filterCallbackOn={(x) => this.doTagFilter(x)}
+            filterCallbackOn={(x : any) => this.doTagFilter(x)}
             />
         <table className="senderlist">
           <tbody>

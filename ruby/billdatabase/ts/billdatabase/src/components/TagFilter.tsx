@@ -2,7 +2,9 @@ import { TagObject } from "../common/types-class"
 import { useState, useEffect, useCallback } from 'react'
 
 interface TagProps {
+  /** list of tags to show in this component */
   tags: TagObject[],
+  /** callback function for parent component (e.g. to filter list below) */
   filterCallbackOn: (activeIds : string[]) => void
 }
 interface tagfilter {
@@ -13,18 +15,23 @@ interface TagFilterState {
   filters: tagfilter[]
 }
 
-function TagFilter(props: TagProps) {
+/** filter below list by tag(s) selected in this component */
+function FilterByTag(props: TagProps) {
 
   const tagList = props.tags
   const [ tagFilters, setTagFilters ] = useState<TagFilterState>()
 
   useEffect(() => {
-    setTagFilters({
-      filters: tagList.map(tag => ({
-        info: tag,
-        filtering: false
-      }))
-    })
+    if (typeof tagList !== 'undefined') {
+      setTagFilters({
+        filters: tagList.map(tag => ({
+          info: tag,
+          filtering: false
+        }))
+      })  
+    } else {
+      console.error("tags not yet loaded")
+    }
   
   }, [tagList])
 
@@ -85,4 +92,4 @@ function TagFilter(props: TagProps) {
 
 }
 
-export default TagFilter
+export default FilterByTag

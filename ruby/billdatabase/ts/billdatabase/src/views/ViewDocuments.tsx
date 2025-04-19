@@ -259,7 +259,7 @@ if (screenMode === ViewMode.NORMAL) {
       <div className='swapviews'>
         <span><button onClick={() => swapView(ViewMode.NORMAL)}>Normal</button> | <b>Calendar view</b></span>
         <div>
-          {typeof selectedDocument !== 'undefined' ? (<ViewDocumentInfo closeCallback={selectNoDoc} format='compact' colour='#000' info={selectedDocument} index={1} />) : <div>&nbsp;</div>}
+          {typeof selectedDocument !== 'undefined' ? (<div>&nbsp;<ViewDocumentInfo closeCallback={selectNoDoc} format='compact' colour='#000' info={selectedDocument} index={1} /></div>) : <div>&nbsp;</div>}
  
         <Calendar
         onSelectEvent={(event) => handleSelectedEvent(event)}

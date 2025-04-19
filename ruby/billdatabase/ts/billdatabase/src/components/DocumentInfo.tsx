@@ -44,16 +44,16 @@ function ViewDocumentInfo({
   function accountNumOrSpace(ac: AccountInfo) {
     return ac ? ac.account_number : '&nbsp;'
   }
-  // TODO these should all be fixed-width as if they were in a table!
   if (format === 'compact') {
     return (
       <div style={{color: textcolour(colour)}} className="compactDocumentInfo">
+        <div className="compactCloseButton"><button onClick={closeCallback}>X</button></div>
         <div ><b>DOCUMENT DETAILS</b></div>
         <div>{info.summary}</div>
         <div className='date_rcvd'>
-        <Link to={'/document/' + info.id}>{info.received_date}</Link> {info.doc_type.name} <Link to={"/sender/" + info.sender.id }>{info.sender.name}</Link>
+        <Link title="view/edit document" to={'/document/' + info.id}>{info.received_date}</Link> {info.doc_type.name} <i>from</i> <Link title="view/edit sender" to={"/sender/" + info.sender.id }>{info.sender.name}</Link>
 
-        </div><div className="compactCloseButton"><button onClick={closeCallback}>X</button></div>
+        </div>
         {isnotblank(info.due_date) ? <div className='date_rcvd'>Due {dateornull(info.due_date)} Paid {dateornull(info.paid_date)}</div> : <div>&nbsp;</div>}
   
       </div>

@@ -30,7 +30,7 @@ function EditSender() {
   const [ tagMenu, setTagMenu ] = useState<TagObject[]>([])
 
   const [ sender, setSender ] = useState<SenderInfo>({
-      json_class: '', id: '', name: '', created_at: new Date(), 
+      json_class: '', id: '', name: '', is_active: true, created_at: new Date(), 
       username: '', password_hint: '', comments: '', 
       sender_accounts: [], sender_contacts: [], sender_tags: []
   })
@@ -52,6 +52,9 @@ function EditSender() {
 
   const doUpdate = () => {
     // do update, POST etc
+    if (state.changed) {
+      console.log('Saving sender info')
+    }
     if (typeof id !== 'undefined') {
       console.log('Updating sender id ' + id)
       console.log(sender)
@@ -59,7 +62,8 @@ function EditSender() {
       const data = {
         username: sender.username,
         password_hint: sender.password_hint,
-        comments: sender.comments
+        comments: sender.comments,
+        is_active: sender.is_active ? 'Y' : 'N'
       }
       doPostAndReturnMessage(fetchSenderUrl(id), data)
       .then((res) => {
@@ -132,7 +136,7 @@ function EditSender() {
       .then((json) => {
         setTagMenu(json)
       })
-  }, [state])
+  }, [])
   
   // confusing advice on using useEffect... or not?
   // https://react.dev/learn/you-might-not-need-an-effect
@@ -152,7 +156,7 @@ function EditSender() {
         setSender(x)
         setState({...state, changed: false})
       })
-    }, [state.saveTs, id])
+    }, [])
 
 // i get a react hook warning about missing deps here, which i can quiet by including the sender state variable
 // but then that makes the whole load run in an infinite loop
@@ -168,7 +172,7 @@ function EditSender() {
     /* DEFINE CONTENT FOR EACH OF THE TABS */
     // general, accounts, contacts
     const tabContent : JSX.Element[] =
-      [<table className='tabContent'>
+      [<table className={sender.is_active ? 'tabContent' : 'tabContent tabInactive'}>
         <tr>      
           {/* ---- GENERAL SENDER INFO ---- */}
           <td colSpan={4}>
@@ -217,6 +221,12 @@ function EditSender() {
               changeCallback={handleSenderChange}
           />
           </td>
+      </tr>
+      <tr>
+        <td colSpan={4}>
+          <td><label htmlFor="is_active">Active?</label> <input name="is_active" onClick={() => handleSenderChange({...sender, 'is_active': !sender.is_active})} type='checkbox' checked={sender.is_active}></input>
+          </td>
+        </td>
       </tr>
       </table>, 
 
@@ -317,7 +327,7 @@ function EditSender() {
                    { name: 'Accounts', content: tabContent[1], nonEmpty: sender.sender_accounts.length > 0 },
                    { name: 'Contacts', content: tabContent[2], nonEmpty: sender.sender_contacts.length > 0  }]
             }
-            headerContent={<span className='sendername'>{ sender.name}</span>}
+            headerContent={<span className='sendername'>{ sender.name} {sender.is_active ? '' : ' (inactive)'}</span>}
           />
 
         </div>
