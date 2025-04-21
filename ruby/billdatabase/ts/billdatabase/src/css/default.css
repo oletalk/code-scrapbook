@@ -359,6 +359,9 @@ input.senderBtnToggle {
   margin-left:3px;
 }
 
+.filterBtnList {
+  padding: 5px;
+}
 table.senderlist tr.hidden {
   opacity: 0;
   max-height: 0;

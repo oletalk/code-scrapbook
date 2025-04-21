@@ -6,12 +6,9 @@ import { render, screen } from '@testing-library/react';
 import AccountSelectBox from '../components/AccountSelectBox';
 import { BrowserRouter } from 'react-router-dom'
 import { AccountInfo } from '../common/types-class';
+import { CaptureUtils } from '../testdata/captureutils';
 
-let captured : AccountInfo | undefined
-
-const captureChange = (acinfo : AccountInfo | undefined) => {
-  captured = acinfo
-}
+const utils = new CaptureUtils<AccountInfo>()
 
 test('dropdown with no accounts available', async () => {
   // TODO fix bug where no items but still showing select box...
@@ -20,7 +17,7 @@ test('dropdown with no accounts available', async () => {
   <AccountSelectBox 
   selectName='test_sa_dropdown'
   selectedItem='10'
-  changeCallback={(id) => captureChange(id)}
+  changeCallback={(id) => utils.capture('ac_info', id)}
   itemList={[]}
   noItemMessage='no items available'
   />
@@ -39,7 +36,7 @@ test('dropdown with a few accounts', async () => {
   <AccountSelectBox 
   selectName='test_sa_dropdown'
   selectedItem='10'
-  changeCallback={(id) => captureChange(id)}
+  changeCallback={(id) => utils.capture('ac_info', id)}
   itemList={[
     fakeAccount('123456', '10', '3'),
     fakeAccount('342433', '11', '3')

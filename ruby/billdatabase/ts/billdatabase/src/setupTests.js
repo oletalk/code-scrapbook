@@ -1,4 +1,5 @@
 import { getAllSendersWithTags, getMainScreenPayments, getTags,
+  getSenderDocuments, getADocument,
   simpleOkResponse, OkResponse } from './testdata/payloads'
 
 const BASEURL = 'http://localhost:4567'
@@ -10,6 +11,9 @@ async function mockFetch(url, config) {
     }
     case BASEURL + '/sendertag/22/3': { // add tag test case
       return simpleOkResponse()
+    }
+    case BASEURL + '/document/23': { // view a document
+      return OkResponse(getADocument())
     }
     case BASEURL + '/senderaccount/111': { // save sender account
       return simpleOkResponse()
@@ -24,6 +28,9 @@ async function mockFetch(url, config) {
 
     case BASEURL + '/json/sendertags': {
       return OkResponse(getAllSendersWithTags())
+    }
+    case BASEURL + '/json/sender/10/documents': {
+      return OkResponse(getSenderDocuments())
     }
 		default: {
 			throw new Error(`Unhandled request: ${url}`)
