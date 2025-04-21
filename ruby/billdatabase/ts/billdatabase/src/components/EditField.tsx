@@ -45,7 +45,7 @@ function EditField (props: EditFieldProps) {
     )
   }
   return (
-    <input 
+    <input type='text'
     className={classNameStr} 
     placeholder={isMandatory ? 'Mandatory field' : ''}
     defaultValue={props.initialValue !== undefined ? props.initialValue : ''}

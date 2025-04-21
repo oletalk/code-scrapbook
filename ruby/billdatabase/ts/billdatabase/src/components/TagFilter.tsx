@@ -72,19 +72,17 @@ function FilterByTag(props: TagProps) {
 
   if (typeof tagList === 'undefined') {
     return (
-      <p>no tags loaded yet</p>
+      <div>no tags loaded yet</div>
     )
   } else {
     return (
-      <p>
-        <ul>
+      <div className='filterBtnList'>
         {tagList.map(tag => 
           <button 
               className={isFiltering(tag.id) ? 'tagFilterList-Active' : 'tagFilterList'} 
               onClick={() => doFilterOnTag(tag.id)}>{tag.description}</button>
         )}
-      </ul>
-      </p>
+      </div>
    
     )
   }

@@ -25,9 +25,9 @@ function AccountSelectBox(props: SelectFromListOfNamedTypes<AccountInfo>) {
             onChange={(e) => props.changeCallback(rtnObj(e.currentTarget.value))}
             className='sender_account_field' 
             name={props.selectName}>
-      <option value="">- none -</option>s
+              defaultValue={props.selectedItem}
+      <option value="">- none -</option>
       {itemList.map(s => (<option 
-          selected={s.id === props.selectedItem}
           value={s.id}>{s.account_number}</option>))}
       </select>
   )

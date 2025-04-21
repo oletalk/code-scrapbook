@@ -29,7 +29,7 @@ function SenderDocuments(props: SenderDocumentListProps) {
       <div className='senderDocumentList'>
         <ul>
         {documents?.map(d => 
-          (<li><span><Link to={'/document/' + d.id}>{d.received_date}</Link> - </span><span>{d.summary}</span></li>)
+          (<li key={d.id}><span><Link to={'/document/' + d.id}>{d.received_date}</Link> - </span><span>{d.summary}</span></li>)
         )}
         </ul>
       </div>
