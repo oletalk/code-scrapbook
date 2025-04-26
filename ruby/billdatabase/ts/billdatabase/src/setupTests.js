@@ -1,36 +1,39 @@
 import { getAllSendersWithTags, getMainScreenPayments, getTags,
   getSenderDocuments, getADocument,
   simpleOkResponse, OkResponse } from './testdata/payloads'
+import { vi } from 'vitest'
+import { create } from 'domain'
 
 const BASEURL = 'http://localhost:4567'
 
-async function mockFetch(url, config) {
+function mockFetchBody(url) {
+  console.log('[setupTests]: url = ' + url)
 	switch (url) {
     case BASEURL + '/sendertag/22/2': { // delete tag test case
-      return simpleOkResponse()
+      return {}
     }
     case BASEURL + '/sendertag/22/3': { // add tag test case
-      return simpleOkResponse()
+      return {}
     }
     case BASEURL + '/document/23': { // view a document
-      return OkResponse(getADocument())
+      return getADocument()
     }
     case BASEURL + '/senderaccount/111': { // save sender account
-      return simpleOkResponse()
+      return {}
     }
     case BASEURL + '/payments': { // payment check on main page
-      return OkResponse(getMainScreenPayments())
+      return getMainScreenPayments()
     }
 
     case BASEURL + '/tags': { // get tags
-      return OkResponse(getTags)
+      return getTags()
     }
 
     case BASEURL + '/json/sendertags': {
-      return OkResponse(getAllSendersWithTags())
+      return getAllSendersWithTags()
     }
     case BASEURL + '/json/sender/10/documents': {
-      return OkResponse(getSenderDocuments())
+      return getSenderDocuments()
     }
 		default: {
 			throw new Error(`Unhandled request: ${url}`)
@@ -38,5 +41,17 @@ async function mockFetch(url, config) {
 	}
 }
 
-beforeAll(() => jest.spyOn(window, 'fetch'))
-beforeEach(() => window.fetch.mockImplementation(mockFetch))
+// beforeAll(() => jest.spyOn(window, 'fetch'))
+// beforeEach(() => window.fetch.mockImplementation(mockFetch))
+
+beforeEach(() => {
+  global.fetch = vi.fn((url) =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(
+        mockFetchBody(url)
+      ),
+    }),
+  );
+}
+)
