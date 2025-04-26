@@ -21,7 +21,6 @@ import ViewDocuments from './views/ViewDocuments'
 import ViewPayments from './views/ViewPayments';
 
 // import NotFound from './views/NotFound'
-
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
