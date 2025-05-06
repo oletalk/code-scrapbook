@@ -3,7 +3,7 @@
 module MP3S
   module Config
     module Db
-      SERVER_HOST = '192.168.0.2'
+      SERVER_HOST = '192.168.0.3'
       NAME = 'postgres'
       USER = 'web'
       PASSWORD = File.read('config/db_pw.txt').chomp

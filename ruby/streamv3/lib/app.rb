@@ -31,21 +31,9 @@ class StreamServer < Sinatra::Base
     logger.info 'loaded users'
     @songcache = FileCache.new
     @allow_listen = {}
+    @testip = {}
     @currently = NowPlaying.new
     super
-  end
-
-  before '/member/*' do
-    req_ip = request.ip
-    @allowed = @allow_listen.key?(req_ip)
-    allow_desc = @allowed ? 'allowed' : 'not allowed'
-    logger.info "Request for #{request.path_info} from #{req_ip} is currently #{allow_desc}."
-    halt 403, 'Access Denied' unless @allowed
-
-    headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    headers['Access-Control-Allow-Origin'] = '*'
-    headers['Access-Control-Allow-Headers'] = 'Accept, Authorization, Origin'
-    content_type 'text/plain'
   end
 
   before do
@@ -57,7 +45,7 @@ class StreamServer < Sinatra::Base
 
   # PLAY STREAM (main)
   get '/member/play/:hsh' do |hsh|
-    @user = current_user
+    # @user = current_user # SESSIONS BROKEN IN HTTPS 15/02/2025
 
     stream do |out|
       # find file containing that hash
@@ -70,7 +58,7 @@ class StreamServer < Sinatra::Base
         st = SongStream.new(song.song_filepath.to_s)
         out.puts st.readall(@songcache)
         out.flush
-        @currently.start(song, request.ip, @user)
+        @currently.start(song, request.ip, 'anonymous')
       else
         logger.error 'Invalid hash!'
       end
@@ -112,57 +100,17 @@ class StreamServer < Sinatra::Base
 
   post '/sign_in' do
     if @users.test_password(params['username'], params['password'])
-      session['username'] = params['username']
+      session[:username] = params['username']
+      puts 'session username is'
+      puts session[:username]
       logger.info "login succeeded for user #{params['username']}"
+      @testip[:username] = params['username']
       redirect '/main'
     else
       @error = 'User name or password is incorrect.'
       logger.error "login failure for user #{params['username']}"
       content_type 'text/html'
       erb :signin
-    end
-  end
-
-  get '/allow_listen/:ip' do |ip|
-    @user = current_user
-    if @user
-      logger.info "request to allow listening from #{ip}"
-      # add the ip into a whitelist
-      @allow_listen[ip] = 1
-      'OK, you are allowed - urls under /member'
-    else
-      halt 403, 'Access Denied'
-    end
-  end
-
-  get '/main' do
-    content_type 'text/html'
-    @user = current_user
-
-    if @user
-      @curr_ip = request.ip
-      @allowed = @allow_listen.key?(@curr_ip)
-      @nowplaying = @currently.playing(@curr_ip)
-      # run general stats as well
-      # is there a better way not to run stats every time this page is called?
-      stats = GeneralStats.new
-      @top_artists = stats.playing_stats
-
-      erb :main
-    else
-      @error = 'Please sign in first'
-      erb :signin
-    end
-  end
-
-  helpers do
-    def current_user
-      if session['username']
-        @users.user_info(session['username'])
-      else
-        logger.info 'sorry, no session...'
-        false
-      end
     end
   end
 
