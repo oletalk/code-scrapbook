@@ -23,8 +23,10 @@ module MP3S
 
     module Play
       RAW = '/bin/cat XXXX'
-      DOWNSAMPLED_MP3 = '/usr/local/bin/lame --nohist --mp3input -b 32 XXXX - '
-      DOWNSAMPLED_OGG = '/usr/local/bin/sox -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - '
+      LAME_CMD = `which lame`.strip
+      SOX_CMD = `which sox`.strip
+      DOWNSAMPLED_MP3 = LAME_CMD << ' --nohist --mp3input -b 32 XXXX - '
+      DOWNSAMPLED_OGG = SOX_CMD << ' -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - '
     end
   end
 end
