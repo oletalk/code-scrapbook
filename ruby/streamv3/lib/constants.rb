@@ -17,6 +17,7 @@ module MP3S
 
     module Cache
       TEMP_ROOT = '/var/tmp/files'
+      raise "cache root #{TEMP_ROOT} directory doesn't exist" unless Dir.exist?(TEMP_ROOT)
       CACHE_INTERVAL_SECS = 300
       MAX_SIZE = '100M'
     end

@@ -22,6 +22,9 @@ class StreamServer < Sinatra::Base
   helpers Sinatra::Streaming
   enable :dump_errors
   enable :sessions
+  # see https://github.com/gma/nesta/issues/203 (Sinatra now requires Host Authorization - breaks prod deployments otherwise)
+  # mine is what i've configured X-Forwarded-For header on my reverse proxy
+  set :host_authorization, { permitted_hosts: ["vega"] }
   # TODO: -
   # 1. introduce ERBs including login screen
   # 2. include code to check sessions in login screens
