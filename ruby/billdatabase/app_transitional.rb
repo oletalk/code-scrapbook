@@ -120,10 +120,20 @@ class BillDatabase < Sinatra::Base
     #   erb :single_document
   end
 
+  get '/document/:id/remote' do |id|
+    d = DocHandler.new
+    doc = d.download_file(id, 1)
+    fname = File.basename(doc)
+    opts = {
+      filename: fname,
+      type: 'application/octet-stream'
+    }
+    d.file_contents(doc)
+  end
+
   get '/document/:id/file' do |id|
     d = DocHandler.new
     doc = d.download_file(id)
-    #       send_file(filename, :filename => "t.cer", :type => "application/octet-stream")
     fname = File.basename(doc)
     opts = {
       filename: fname,
