@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'digest/sha1'
 require 'net/sftp'
 require 'securerandom'
 require_relative '../constants'
@@ -34,6 +35,7 @@ module Sftp
   end
 
   def file_contents(remoteurl)
+    log_info "remote location = #{remoteurl}"
     log_info 'logging into remote server'
     sftp = Net::SFTP.start(
       Bills::Config::Sftp::SERVER_HOST, Bills::Config::Sftp::USER,
@@ -41,13 +43,24 @@ module Sftp
     )
     log_info 'login complete.'
     # FIXME: - use tempfile or something else not hardcoded
-    sftp.download!(remoteurl, '/tmp/filefile111') do |event, _downloader, *args|
-      case event
-      when :open
-        log_info '   ## starting download'
-      when :finish
-        log_info '   ## complete'
+    dirhash = Digest::SHA1.hexdigest(File.dirname(remoteurl))
+    bname = File.basename(remoteurl)
+    fname1 = "/tmp/bdb_#{dirhash}_#{bname}"
+    begin
+      sftp.download!(remoteurl, fname1) do |event, _downloader, *args|
+        case event
+        when :open
+          log_info '   ## starting download'
+        when :finish
+          log_info '   ## complete'
+        end
       end
+    rescue Exception => e
+      log_error 'SFTP download failed'
+      log_error e.message
+      fname1 = 'DOWNLOAD_FAILED'
     end
+
+    fname1
   end
 end
