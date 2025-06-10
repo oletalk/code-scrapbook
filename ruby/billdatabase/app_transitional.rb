@@ -11,11 +11,13 @@ require_relative 'data/sender'
 require_relative 'data/senderaccount'
 require_relative 'constants'
 require_relative 'util/logging'
+require_relative 'util/mime'
 
 # main app
 class BillDatabase < Sinatra::Base
   include DateUtil
   include Logging
+  include Mime
   # writing functionality
   # 1. write or add method to write to db in a handler
   # 2. add method that accesses handler here VV
@@ -122,13 +124,25 @@ class BillDatabase < Sinatra::Base
 
   get '/document/:id/remote' do |id|
     d = DocHandler.new
-    doc = d.download_file(id, 1)
+    floc = d.download_file(id, true)
+    doc = d.file_contents(floc)
+    puts 'fetching from remote...'
+    puts doc
     fname = File.basename(doc)
     opts = {
       filename: fname,
-      type: 'application/octet-stream'
+      type: 'text/html'
     }
-    d.file_contents(doc)
+    if File.exist?(doc)
+      content_type TypeFor(doc)
+      #  content_type 'application/octet-stream'
+      #  attachment fname
+
+      #  send_file doc, opts: opts
+      "<img src=\"#{send_file(doc)}\" alt='image'>"
+    else
+      'sorry, remote link is broken'
+    end
   end
 
   get '/document/:id/file' do |id|

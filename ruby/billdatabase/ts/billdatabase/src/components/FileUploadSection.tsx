@@ -3,7 +3,8 @@ import { DocumentInfo } from '../common/types-class'
 import { BACKEND_URL } from '../common/constants'
 
 export type FileUploadProps = {
-  documentInfo: DocumentInfo | undefined
+  documentInfo: DocumentInfo | undefined,
+  sftp: boolean
 }
 
 function FileUploadSection(props: FileUploadProps) {
@@ -12,7 +13,8 @@ function FileUploadSection(props: FileUploadProps) {
 
   const openFileInWindow = (docId : string | undefined) => {
     if (typeof docId === 'string') {
-      window.open('/document/' + docId + '/file')
+      const suff = props.sftp ? '/remote' : '/file'
+      window.open('/document/' + docId + suff)
     }
   }
 

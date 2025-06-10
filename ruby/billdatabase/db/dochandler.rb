@@ -124,7 +124,7 @@ class DocHandler
   # @param doc_id [String] the document identifier
   # @param is_sftp [Number] 0 to specify storage on filesystem, 1 for remote SFTP
   # @return [String] the download location
-  def download_file(doc_id, is_sftp=0)
+  def download_file(doc_id, is_sftp=false)
     # TODO: how does rubydoc for methods work?? above isn't showing up in VSCode
     floc = nil
     ret = nil
@@ -140,6 +140,7 @@ class DocHandler
       if floc.nil?
         log_error 'file not found!'
       else
+        log_info "is sftp? #{is_sftp}"
         ret = is_sftp ? sftp_file_location(floc) : download_file_location(floc)
       end
     end

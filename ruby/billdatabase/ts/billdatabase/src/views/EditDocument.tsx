@@ -165,7 +165,7 @@ if (typeof documentInfo === 'undefined') {
           </tr>
           <tr>
             <td>
-              <FileUploadSection documentInfo={documentInfo} />
+              <FileUploadSection documentInfo={documentInfo} sftp={true}/>
         <div><label>Comments:</label></div>
         <div><EditField 
                   initialValue={documentInfo.comments}
