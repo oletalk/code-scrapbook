@@ -3,12 +3,16 @@ require 'json'
 # WIP
 module Mime
   def TypeFor(extension)
-    if extension =~ /.jpg$/
+    puts 'extension = ' << extension
+    case extension
+    when /.jpe?g$/
       'image/jpeg'
-    elsif extension =~ /.gif$/
+    when /.gif$/
       'image/gif'
-    elsif extension =~ /.pdf$/
+    when /.pdf$/
       'application/pdf'
+    when /.txt$/
+      'text/plain'
     else
       'text/html'
     end

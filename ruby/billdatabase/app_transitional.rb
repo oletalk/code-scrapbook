@@ -123,6 +123,7 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/document/:id/remote' do |id|
+    log_info '/document/remote'
     d = DocHandler.new
     floc = d.download_file(id, true)
     doc = d.file_contents(floc)
@@ -133,6 +134,7 @@ class BillDatabase < Sinatra::Base
       filename: fname,
       type: 'text/html'
     }
+    log_info TypeFor(doc)
     if File.exist?(doc)
       content_type TypeFor(doc)
       #  content_type 'application/octet-stream'
@@ -146,6 +148,7 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/document/:id/file' do |id|
+    log_info '/document/file'
     d = DocHandler.new
     doc = d.download_file(id)
     fname = File.basename(doc)
