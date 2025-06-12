@@ -46,7 +46,7 @@ module Upload
       log_info "Source: #{file_contents.path} -> Target: #{filename}"
       FileUtils.cp(file_contents.path, filename)
     rescue StandardError => e
-      log_error "Error: #{e}"
+      log_error "Error: #{e.message} (#{e.class})"
       ret[:result] = e
     end
     ret

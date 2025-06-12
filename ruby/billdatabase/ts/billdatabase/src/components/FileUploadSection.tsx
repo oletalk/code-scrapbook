@@ -23,7 +23,8 @@ function FileUploadSection(props: FileUploadProps) {
       let fileupload = document.getElementById(elementId)
       if (fileupload !== null) {
         console.log('doing upload')
-        doUpload('/document/' + docId + '/file', fileupload as HTMLInputElement) // any other way to do this?
+        // doUpload('/document/' + docId + '/file', fileupload as HTMLInputElement) // any other way to do this?
+        doUpload('/document/' + docId + '/remote', fileupload as HTMLInputElement) // any other way to do this?
         window.location.reload()
       }
     }

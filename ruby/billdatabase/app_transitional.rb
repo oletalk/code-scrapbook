@@ -134,7 +134,6 @@ class BillDatabase < Sinatra::Base
       filename: fname,
       type: 'text/html'
     }
-    log_info TypeFor(doc)
     if File.exist?(doc)
       content_type TypeFor(doc)
       #  content_type 'application/octet-stream'
@@ -148,7 +147,6 @@ class BillDatabase < Sinatra::Base
   end
 
   get '/document/:id/file' do |id|
-    log_info '/document/file'
     d = DocHandler.new
     doc = d.download_file(id)
     fname = File.basename(doc)
@@ -164,6 +162,15 @@ class BillDatabase < Sinatra::Base
     else
       'sorry, file link is broken'
     end
+  end
+
+  post '/document/:id/remote' do |id|
+    log_info "received file upload for document id #{id}"
+    fileupload = params['file']
+
+    d = DocHandler.new
+    ret = d.upload_file(id, fileupload['filename'], fileupload['tempfile'], true)
+    ret.to_json
   end
 
   post '/document/:id/file' do |id|

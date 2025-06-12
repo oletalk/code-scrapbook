@@ -149,15 +149,18 @@ class DocHandler
     ret
   end
 
-  def upload_file(doc_id, file_name, file_contents)
+  def upload_file(doc_id, file_name, file_content, is_sftp=false)
     ret = { result: 'success' }
 
     sql = 'update bills.document set file_location = $1 where id = $2'
 
     # create the subfolder in the doc root and then
     # write the file to the document root
-    res = upload_file_to_filesystem(doc_id, file_name, file_contents)
-
+    res = if is_sftp
+            upload_file_to_remote(doc_id, file_name, file_content)
+          else
+            upload_file_to_filesystem(doc_id, file_name, file_content)
+          end
     # record this file location in the database
     log_info res
     if res[:result] == 'success'

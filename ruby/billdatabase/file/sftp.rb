@@ -2,6 +2,7 @@
 
 require 'digest/sha1'
 require 'net/sftp'
+# require 'stringio'
 require 'securerandom'
 require_relative '../constants'
 require_relative '../util/logging'
@@ -25,7 +26,32 @@ module Sftp
       result: 'success'
     }
 
-    docroot = Bills::Config::File::REMOTE_ROOT
+    docroot = Bills::Config::Sftp::REMOTE_ROOT
+    newbasename1 = SecureRandom.urlsafe_base64(4)
+    newbasename2 = File.extname(file_name)
+    filelocation = "#{doc_id}/#{newbasename1}#{newbasename2}"
+    filename = "#{docroot}/#{filelocation}"
+    log_info "new file to be saved in #{filename}"
+    ret[:filename] = filelocation
+    # and save
+    begin
+      log_info 'logging into remote server'
+      sftp = Net::SFTP.start(
+        Bills::Config::Sftp::SERVER_HOST, Bills::Config::Sftp::USER,
+        password: Bills::Config::Sftp::PASSWORD
+      )
+      log_info 'login complete.'
+      # io = StringIO.new(file_contents)
+      localfile = file_contents.path
+      log_info "remotefile = #{filename}"
+      # check dir is there first
+      fdir = File.dirname(filename)
+      sftp.mkdir(fdir, permissions: 0o0550).wait
+      sftp.upload!(localfile, filename)
+    rescue StandardError => e
+      log_error "Error: #{e}"
+      ret[:result] = e
+    end
     ret
   end
 

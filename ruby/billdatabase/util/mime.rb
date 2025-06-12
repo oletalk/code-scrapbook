@@ -3,7 +3,6 @@ require 'json'
 # WIP
 module Mime
   def TypeFor(extension)
-    puts 'extension = ' << extension
     case extension
     when /.jpe?g$/
       'image/jpeg'
