@@ -10,6 +10,8 @@ module Mime
       'image/gif'
     when /.pdf$/
       'application/pdf'
+    when /.zip$/
+      'application/x-zip'
     when /.txt$/
       'text/plain'
     else

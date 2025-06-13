@@ -9,12 +9,6 @@ require_relative '../util/logging'
 
 # module for uploading/downloading files from a remote SFTP server (use in dochandler)
 module Sftp
-  def remove_remote_file(file_location_in_db)
-    ret = false
-    puts 'NOT YET SUPPORTED'
-    ret
-  end
-
   def download_remote_file_location(file_location_in_db)
     docroot = Bills::Config::Sftp::REMOTE_ROOT
     "#{docroot}/#{file_location_in_db}"
@@ -36,10 +30,7 @@ module Sftp
     # and save
     begin
       log_info 'logging into remote server'
-      sftp = Net::SFTP.start(
-        Bills::Config::Sftp::SERVER_HOST, Bills::Config::Sftp::USER,
-        password: Bills::Config::Sftp::PASSWORD
-      )
+      sftp = new_sftp_connection
       log_info 'login complete.'
       # io = StringIO.new(file_contents)
       localfile = file_contents.path
@@ -63,12 +54,8 @@ module Sftp
   def file_contents(remoteurl)
     log_info "remote location = #{remoteurl}"
     log_info 'logging into remote server'
-    sftp = Net::SFTP.start(
-      Bills::Config::Sftp::SERVER_HOST, Bills::Config::Sftp::USER,
-      password: Bills::Config::Sftp::PASSWORD
-    )
+    sftp = new_sftp_connection
     log_info 'login complete.'
-    # FIXME: - use tempfile or something else not hardcoded
     dirhash = Digest::SHA1.hexdigest(File.dirname(remoteurl))
     bname = File.basename(remoteurl)
     fname1 = "/tmp/bdb_#{dirhash}_#{bname}"
@@ -88,5 +75,28 @@ module Sftp
     end
 
     fname1
+  end
+
+  def delete_remote(file_location_in_db)
+    ret = true
+    docroot = Bills::Config::Sftp::REMOTE_ROOT
+    file_loc = "#{docroot}/#{file_location_in_db}"
+
+    sftp = new_sftp_connection
+
+    begin
+      sftp.remove(file_loc).wait
+    rescue StandardError => e
+      log_error "Problem deleting file: #{e}"
+      ret = false
+    end
+    ret
+  end
+
+  def new_sftp_connection
+    Net::SFTP.start(
+      Bills::Config::Sftp::SERVER_HOST, Bills::Config::Sftp::USER,
+      password: Bills::Config::Sftp::PASSWORD
+    )
   end
 end

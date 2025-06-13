@@ -91,7 +91,7 @@ class DocHandler
     ret
   end
 
-  def delete_file(doc_id)
+  def delete_file(doc_id, is_sftp=false)
     ret = { result: 'success' }
     floc = nil
     connect_for('fetching file location for the document') do |conn|
@@ -107,8 +107,11 @@ class DocHandler
       ret = { result: 'file not found' }
     else
       # remove file
-      remove_file(floc)
-
+      if is_sftp
+        delete_remote(floc)
+      else
+        remove_file(floc)
+      end
       # remove database entry
       connect_for('updating file location for deleted document') do |conn|
         sql = 'update bills.document set file_location = null where id = $1'

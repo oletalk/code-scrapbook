@@ -194,6 +194,14 @@ class BillDatabase < Sinatra::Base
     ret.to_json
   end
 
+  delete '/document/:id/remote' do |id|
+    log_info "received file #{params['name']} for document #{id}"
+
+    d = DocHandler.new
+    ret = d.delete_file(id, true)
+    ret.to_json
+  end
+
   get '/doctypes' do
     d = DocTypeHandler.new
     ret = d.fetch_doctypes
