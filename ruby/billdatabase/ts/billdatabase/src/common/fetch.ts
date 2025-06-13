@@ -109,7 +109,7 @@ export async function doPostAndReturn<T> (
     })
   }
 
-export const doUpload = (url : string, fileinput : HTMLInputElement) => {
+export const doUpload = (url : string, fileinput : HTMLInputElement, callback: Function | undefined) => {
   // const file = document.getElementById(elementId).files[0]
   const file = fileinput?.files?.[0]
   if (typeof file === 'undefined') {
@@ -120,12 +120,20 @@ export const doUpload = (url : string, fileinput : HTMLInputElement) => {
     formData.append('file', file)
 
     // POST - for this app url should be /document/<docId>/file
+    //      - or /document/<docId>/remote
     fetch(url, {
       method: "POST",
       body: formData
     })
       .then((response) => {
         handleFetchError(response)
+      })
+      .then(() => {
+        if (typeof callback !== 'undefined') {
+          console.log('calling callback after upload')
+          callback()
+        }
+
       })
       .catch((error) => {
         console.error(error)
