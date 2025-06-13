@@ -11,11 +11,13 @@ require_relative 'data/sender'
 require_relative 'data/senderaccount'
 require_relative 'constants'
 require_relative 'util/logging'
+require_relative 'util/mime'
 
 # main app
 class BillDatabase < Sinatra::Base
   include DateUtil
   include Logging
+  include Mime
   # writing functionality
   # 1. write or add method to write to db in a handler
   # 2. add method that accesses handler here VV
@@ -120,10 +122,33 @@ class BillDatabase < Sinatra::Base
     #   erb :single_document
   end
 
+  get '/document/:id/remote' do |id|
+    log_info '/document/remote'
+    d = DocHandler.new
+    floc = d.download_file(id, true)
+    doc = d.file_contents(floc)
+    puts 'fetching from remote...'
+    puts doc
+    fname = File.basename(doc)
+    opts = {
+      filename: fname,
+      type: 'text/html'
+    }
+    if File.exist?(doc)
+      content_type TypeFor(doc)
+      #  content_type 'application/octet-stream'
+      #  attachment fname
+
+      #  send_file doc, opts: opts
+      "<img src=\"#{send_file(doc)}\" alt='image'>"
+    else
+      'sorry, remote link is broken'
+    end
+  end
+
   get '/document/:id/file' do |id|
     d = DocHandler.new
     doc = d.download_file(id)
-    #       send_file(filename, :filename => "t.cer", :type => "application/octet-stream")
     fname = File.basename(doc)
     opts = {
       filename: fname,
@@ -137,6 +162,15 @@ class BillDatabase < Sinatra::Base
     else
       'sorry, file link is broken'
     end
+  end
+
+  post '/document/:id/remote' do |id|
+    log_info "received file upload for document id #{id}"
+    fileupload = params['file']
+
+    d = DocHandler.new
+    ret = d.upload_file(id, fileupload['filename'], fileupload['tempfile'], true)
+    ret.to_json
   end
 
   post '/document/:id/file' do |id|
@@ -157,6 +191,14 @@ class BillDatabase < Sinatra::Base
 
     d = DocHandler.new
     ret = d.delete_file(id)
+    ret.to_json
+  end
+
+  delete '/document/:id/remote' do |id|
+    log_info "received file #{params['name']} for document #{id}"
+
+    d = DocHandler.new
+    ret = d.delete_file(id, true)
     ret.to_json
   end
 
