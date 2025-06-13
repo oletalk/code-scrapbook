@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom'
 
 test('renders learn react link', async () => {
   
-  render(
+render(
     <BrowserRouter> 
   <SenderDocuments sender_id='10'/>
   </BrowserRouter>);

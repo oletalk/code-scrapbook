@@ -5,6 +5,7 @@
 require_relative 'db'
 require_relative '../util/logging'
 require_relative '../file/upload'
+require_relative '../file/sftp'
 require_relative '../data/doctype'
 require_relative '../data/document'
 require_relative '../data/mappers/documentmapper'
@@ -12,6 +13,7 @@ require_relative '../data/mappers/documentmapper'
 # fetches document information from the db
 class DocHandler
   include Upload
+  include Sftp
   include Db
   include Logging
 
@@ -89,7 +91,7 @@ class DocHandler
     ret
   end
 
-  def delete_file(doc_id)
+  def delete_file(doc_id, is_sftp=false)
     ret = { result: 'success' }
     floc = nil
     connect_for('fetching file location for the document') do |conn|
@@ -105,8 +107,11 @@ class DocHandler
       ret = { result: 'file not found' }
     else
       # remove file
-      remove_file(floc)
-
+      if is_sftp
+        delete_remote(floc)
+      else
+        remove_file(floc)
+      end
       # remove database entry
       connect_for('updating file location for deleted document') do |conn|
         sql = 'update bills.document set file_location = null where id = $1'
@@ -117,7 +122,13 @@ class DocHandler
     ret
   end
 
-  def download_file(doc_id)
+  # Gets the download location of the file for this document.
+  #
+  # @param doc_id [String] the document identifier
+  # @param is_sftp [Number] 0 to specify storage on filesystem, 1 for remote SFTP
+  # @return [String] the download location
+  def download_file(doc_id, is_sftp=false)
+    # TODO: how does rubydoc for methods work?? above isn't showing up in VSCode
     floc = nil
     ret = nil
     # so far can't think of why you'd want > 1 file per document
@@ -132,7 +143,8 @@ class DocHandler
       if floc.nil?
         log_error 'file not found!'
       else
-        ret = download_file_location(floc)
+        log_info "is sftp? #{is_sftp}"
+        ret = is_sftp ? sftp_file_location(floc) : download_file_location(floc)
       end
     end
 
@@ -140,15 +152,18 @@ class DocHandler
     ret
   end
 
-  def upload_file(doc_id, file_name, file_contents)
+  def upload_file(doc_id, file_name, file_content, is_sftp=false)
     ret = { result: 'success' }
 
     sql = 'update bills.document set file_location = $1 where id = $2'
 
     # create the subfolder in the doc root and then
     # write the file to the document root
-    res = upload_file_to_filesystem(doc_id, file_name, file_contents)
-
+    res = if is_sftp
+            upload_file_to_remote(doc_id, file_name, file_content)
+          else
+            upload_file_to_filesystem(doc_id, file_name, file_content)
+          end
     # record this file location in the database
     log_info res
     if res[:result] == 'success'

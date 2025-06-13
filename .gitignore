@@ -28,3 +28,4 @@ node_modules
 /java/ResourceScheduling/target/
 /java/SimpleSolution/nbproject/private/
 /java/SimpleSolution/build/
+ruby/billdatabase/config/sftp_pw.txt

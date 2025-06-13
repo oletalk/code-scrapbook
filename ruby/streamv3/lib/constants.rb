@@ -3,7 +3,7 @@
 module MP3S
   module Config
     module Db
-      SERVER_HOST = '192.168.0.2'
+      SERVER_HOST = '192.168.0.3'
       NAME = 'postgres'
       USER = 'web'
       PASSWORD = File.read('config/db_pw.txt').chomp
@@ -17,14 +17,17 @@ module MP3S
 
     module Cache
       TEMP_ROOT = '/var/tmp/files'
+      raise "cache root #{TEMP_ROOT} directory doesn't exist" unless Dir.exist?(TEMP_ROOT)
       CACHE_INTERVAL_SECS = 300
       MAX_SIZE = '100M'
     end
 
     module Play
       RAW = '/bin/cat XXXX'
-      DOWNSAMPLED_MP3 = '/usr/local/bin/lame --nohist --mp3input -b 32 XXXX - '
-      DOWNSAMPLED_OGG = '/usr/local/bin/sox -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - '
+      LAME_CMD = `which lame`.strip
+      SOX_CMD = `which sox`.strip
+      DOWNSAMPLED_MP3 = LAME_CMD << ' --nohist --mp3input -b 32 XXXX - '
+      DOWNSAMPLED_OGG = SOX_CMD << ' -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - '
     end
   end
 end
