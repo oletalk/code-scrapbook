@@ -18,7 +18,7 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.8)
-    puma (6.3.1)
+    puma (6.4.3)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.1.16)
@@ -82,7 +82,7 @@ PLATFORMS
 DEPENDENCIES
   net-sftp (~> 4.0.0)
   pg (~> 1.5.3)
-  puma (~> 6.3.0)
+  puma (~> 6.4.3)
   rackup (~> 2.2)
   rspec
   rubocop (~> 1.71, >= 1.71.1)
