@@ -9,6 +9,7 @@ require_relative 'util/filecache'
 require_relative 'common/logging'
 require_relative 'stream/nowplaying'
 require_relative 'db/generalstats'
+require_relative 'util/startupcheck'
 
 require 'sinatra/base'
 require 'sinatra/streaming' # so we can use 'stream do'
@@ -24,7 +25,7 @@ class StreamServer < Sinatra::Base
   enable :sessions
   # see https://github.com/gma/nesta/issues/203 (Sinatra now requires Host Authorization - breaks prod deployments otherwise)
   # mine is what i've configured X-Forwarded-For header on my reverse proxy
-  set :host_authorization, { permitted_hosts: ["vega"] }
+  set :host_authorization, { permitted_hosts: ["vega", "maughan.homelinux.net"] }
   # TODO: -
   # 1. introduce ERBs including login screen
   # 2. include code to check sessions in login screens
@@ -117,5 +118,6 @@ class StreamServer < Sinatra::Base
     end
   end
 
+  StartupCheck.new
   run! if app_file == $PROGRAM_NAME
 end

@@ -26,8 +26,8 @@ module MP3S
       RAW = '/bin/cat XXXX'
       LAME_CMD = `which lame`.strip
       SOX_CMD = `which sox`.strip
-      DOWNSAMPLED_MP3 = LAME_CMD << ' --nohist --mp3input -b 32 XXXX - '
-      DOWNSAMPLED_OGG = SOX_CMD << ' -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - '
+      DOWNSAMPLED_MP3 = "#{LAME_CMD} --nohist --mp3input -b 32 XXXX - " 
+      DOWNSAMPLED_OGG = "#{SOX_CMD} -t ogg XXXX -t raw - | oggenc --raw --downmix -b 64 - "
     end
   end
 end

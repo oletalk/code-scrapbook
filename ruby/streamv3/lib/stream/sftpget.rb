@@ -62,6 +62,18 @@ module SftpGet
     logger.info 'Downloads complete.'
   end
 
+  def check_sftp
+    begin
+      Net::SFTP.start(
+        MP3S::Config::Sftp::SERVER_HOST, MP3S::Config::Sftp::USER,
+        password: MP3S::Config::Sftp::PASSWORD
+      )
+      logger.info 'SFTP setup seems okay'
+    rescue StandardError
+      raise 'SFTP setup has an issue - aborting startup'
+    end
+  end
+
   def sftpget(remotefile, localfile)
     sftp = Net::SFTP.start(
       MP3S::Config::Sftp::SERVER_HOST, MP3S::Config::Sftp::USER,

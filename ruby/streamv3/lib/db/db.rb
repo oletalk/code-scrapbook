@@ -24,4 +24,17 @@ module Db
     PG.connect(host: MP3S::Config::Db::SERVER_HOST, dbname: MP3S::Config::Db::NAME,
                user: MP3S::Config::Db::USER, password: MP3S::Config::Db::PASSWORD)
   end
+
+  def check_db
+    begin
+      conn = new_connection
+      conn.exec('select 1')
+      puts 'database test ok'
+    rescue StandardError => e
+      raise 'problem with database connection'
+    ensure
+      conn&.close
+    end
+  end
+
 end
