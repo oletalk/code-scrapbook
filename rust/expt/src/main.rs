@@ -38,11 +38,11 @@ impl fmt::Display for MyStruct {
 
 
 fn main() {
-    let v = vec!(
+    let v =[ 
         MyStruct::new(1, 2, District::East), 
         MyStruct::new(4, 6, District::South), 
         MyStruct::new(3, 4, District::North)
-    );
+    ];
     for x in v.iter() { /* .enumerate for an extra counter in a tuple e.g. (x, index) */
         println!("{}", x);
         println!("{}", x.foobar())
