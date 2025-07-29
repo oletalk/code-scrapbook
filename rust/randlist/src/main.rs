@@ -25,10 +25,7 @@ fn get_args<'a>(matches: &'a ArgMatches) -> RandlistDetails<'a> {
     let source_arg = matches.value_of("source").unwrap();
     let omitfile_arg = matches.value_of("omitfile").unwrap_or("");
     let listsize_arg = matches.value_of("listsize").unwrap_or("");
-    let verbose_arg = match matches.occurrences_of("verbose") {
-        0 => false,
-        _ => true,
-    };
+    let verbose_arg = !matches!(matches.occurrences_of("verbose"), 0); 
     RandlistDetails {
         source: source_arg,
         omitfile: omitfile_arg,
