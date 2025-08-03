@@ -22,22 +22,20 @@ fn filecontents(filename: &str) -> Result<String, std::io::Error> {
 }
 
 fn get_args<'a>(matches: &'a ArgMatches) -> RandlistDetails<'a> {
-    let source_arg = matches.value_of("source").unwrap();
-    let omitfile_arg = matches.value_of("omitfile").unwrap_or("");
-    let listsize_arg = matches.value_of("listsize").unwrap_or("");
+    // let source_arg = matches.value_of("source").unwrap();
+    let source_arg = matches.get_one::<String>("source").unwrap();
+    let omitfile_arg = matches.get_one::<String>("omitfile").unwrap();
+    let listsize_arg = matches.get_one::<String>("listsize").unwrap();
     let verbose_arg = !matches!(matches.occurrences_of("verbose"), 0); 
     RandlistDetails {
         source: source_arg,
         omitfile: omitfile_arg,
-        listsize: match listsize_arg {
-            "" => -1,
-            _ => match listsize_arg.to_string().parse::<i32>() {
+        listsize: match listsize_arg.to_string().parse::<i32>() {
                 Ok(data) => data,
                 Err(f) => {
-                    panic!("Invalid list size provided ({})", f.to_string());
+                    panic!("Invalid list size provided ({})", f);
                 }
             },
-        },
         verbose: verbose_arg,
     }
 }
