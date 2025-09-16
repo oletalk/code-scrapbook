@@ -8,3 +8,9 @@ fn output_sequence(numbers: [u8; 5]) {
         println!("{}", n);
     }
 }
+
+fn testme() {
+    let s1 = String::from("Hello");
+   // let s2 = s1;
+    println!("{s1}");
+}
