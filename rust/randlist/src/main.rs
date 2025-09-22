@@ -26,16 +26,16 @@ fn get_args<'a>(matches: &'a ArgMatches) -> RandlistDetails<'a> {
     let source_arg = matches.get_one::<String>("source").unwrap();
     let omitfile_arg = matches.get_one::<String>("omitfile").unwrap();
     let listsize_arg = matches.get_one::<String>("listsize").unwrap();
-    let verbose_arg = !matches!(matches.occurrences_of("verbose"), 0); 
+    let verbose_arg = !matches!(matches.occurrences_of("verbose"), 0);
     RandlistDetails {
         source: source_arg,
         omitfile: omitfile_arg,
         listsize: match listsize_arg.to_string().parse::<i32>() {
-                Ok(data) => data,
-                Err(f) => {
-                    panic!("Invalid list size provided ({})", f);
-                }
-            },
+            Ok(data) => data,
+            Err(f) => {
+                panic!("Invalid list size provided ({})", f);
+            }
+        },
         verbose: verbose_arg,
     }
 }
@@ -80,7 +80,7 @@ fn main() {
 
     for line in randlist {
         println!("{}", line);
-        count = count + 1;
+        count += 1;
         if count == app_options.listsize {
             break;
         }
