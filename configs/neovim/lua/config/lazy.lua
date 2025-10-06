@@ -34,51 +34,11 @@ require("lazy").setup({
   checker = { enabled = true },
 })
 
--- TEST 28/9/25 enable inlay hints
--- Setup vim-lsp-endhints
--- default settings
-require("lsp-endhints").setup {
-	icons = {
-		type = "󰜁 ",
-		parameter = "󰏪 ",
-		offspec = " ", -- hint kind not defined in official LSP spec
-		unknown = " ", -- hint kind is nil
-	},
-	label = {
-		truncateAtChars = 20,
-		padding = 1,
-		marginLeft = 0,
-		sameKindSeparator = ", ",
-	},
-	extmark = {
-		priority = 50,
-	},
-	autoEnableHints = true,
-}
-vim.lsp.inlay_hint.enable(true)
-
--- Enable lsp for ruby
-vim.lsp.config['ruby_lsp'] = require("lsp.ruby_lsp")
-vim.lsp.enable('ruby_lsp')
--- Enable lsp for go
-vim.lsp.config['gopls'] = require("lsp.gopls")
-vim.lsp.enable('gopls')
--- Enable lsp for bash
-vim.lsp.config['bashls'] = require("lsp.bashls")
-vim.lsp.enable('bashls')
--- Enable lsp for python
-vim.lsp.config['jedi_language_server'] = require("lsp.jedi_language_server")
-vim.lsp.enable('jedi_language_server')
 
 -- Configure toggleterm (in-nvim terminal)
 require("toggleterm").setup{
 	open_mapping = [[<c-#>]]
 }
-
--- Configure snacks (scratch buffers) TEST 28/9/2025
--- require("snacks").setup{
-  
--- }
 
 -- Configure neogit
 require("neogit").setup({
@@ -89,27 +49,6 @@ require("neogit").setup({
     hunk = { "", "" },
   },
 	integrations = { diffview = true, fzf_lua = true },
-})
-
--- Configure conform formatter
-require("conform").setup({
-	formatters_by_ft = {
-		go = { "gofmt" },
-		json = { "jq" },
-		python = { "black" },
-		rust = { "rustfmt", lsp_format = "fallback" },
-		xml = { "xmlstarlet" },
-	},
-	format_on_save = {
-		timeout_ms = 500,
-		lsp_format = "fallback"
-	},
-})
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*",
-  callback = function(args)
-    require("conform").format({ bufnr = args.buf })
-  end,
 })
 
 -- use catppuccin
@@ -125,6 +64,3 @@ require("catppuccin").setup({
 	}
 })
 vim.cmd.colorscheme "catppuccin"
-
--- python debugging with nvim-dap and nvim-dap-python
-require("dap-python").setup("/home/colin/.virtualenvs/debugpy/bin/python")
