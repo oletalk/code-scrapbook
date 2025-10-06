@@ -12,12 +12,22 @@ return {
     explorer = { enabled = false },
     indent = { enabled = true },
     input = { enabled = true },
-    picker = { enabled = false },
+    picker = { enabled = true },
     notifier = { enabled = false },
     quickfile = { enabled = false },
     scope = { enabled = true },
     scroll = { enabled = false },
     statuscolumn = { enabled = false },
+    win = { enabled = false },
     words = { enabled = true },
+    styles = {
+			input = {
+				position = "float"
+      }
+    },
   },
+  keys = {
+    { "<leader>.",  function() Snacks.scratch() end, desc = "Toggle Scratch Buffer" },
+    { "<leader>S",  function() Snacks.scratch.select() end, desc = "Select Scratch Buffer" },
+  }
 }
