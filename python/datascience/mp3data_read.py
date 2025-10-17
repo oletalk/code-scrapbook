@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import pandas as pd
 
 df = pd.read_csv("/var/tmp/mp3s_stats_20251003.csv")

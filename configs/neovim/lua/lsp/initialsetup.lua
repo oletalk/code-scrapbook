@@ -32,4 +32,6 @@ vim.lsp.enable('bashls')
 -- Enable lsp for python
 vim.lsp.config['jedi_language_server'] = require("lsp.jedi_language_server")
 vim.lsp.enable('jedi_language_server')
-
+-- Enable lsp for lua
+vim.lsp.config['lua_ls'] = require("lsp.lua_ls")
+vim.lsp.enable('lua_ls')

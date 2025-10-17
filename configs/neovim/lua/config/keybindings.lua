@@ -9,6 +9,9 @@ vim.keymap.set('n', '<leader>R', ':lua vim.lsp.buf.rename()<CR>' )
 -- show list of current-open buffers (using snacks/picker):
 vim.keymap.set('n', '<leader>B', ':lua Snacks.picker.buffers()<CR>' )
 
+-- open NeoTree
+vim.keymap.set('n', '<C-l>', ':Neotree float <CR>' )
+
 -- open neogit
 vim.keymap.set("n", "<Leader>g", function()
   require('neogit').open()
