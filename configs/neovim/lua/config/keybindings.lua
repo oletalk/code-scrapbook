@@ -6,11 +6,13 @@
 -- rename a variable (lsp-aware)
 vim.keymap.set('n', '<leader>R', ':lua vim.lsp.buf.rename()<CR>' )
 
--- show list of current-open buffers (using snacks/picker):
-vim.keymap.set('n', '<leader>B', ':lua Snacks.picker.buffers()<CR>' )
+-- grep (using snacks/picker):
+vim.keymap.set('n', '<leader>pg', ':lua Snacks.picker.grep()<CR>' )
+vim.keymap.set('n', '<leader>pl', ':lua Snacks.picker.git_log_line()<CR>' )
 
 -- open NeoTree
 vim.keymap.set('n', '<C-l>', ':Neotree float <CR>' )
+vim.keymap.set('n', '<Leader>t', ':Neotree left <CR>' )
 
 -- open neogit
 vim.keymap.set("n", "<Leader>g", function()
@@ -26,6 +28,6 @@ vim.keymap.set("n", "[t", function()
   require("todo-comments").jump_prev()
 end, { desc = "Previous todo comment" })
 
---  vim.keymap.set('n', '<leader>fu', ':lua require("telescope.builtin").lsp_references()<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>fu', ':lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true })
-
+vim.keymap.set('n', '<F3>', ':lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true })
+-- restart lsp if you need to
+vim.keymap.set('n', '<F10>', ':LspRestart<CR>' )

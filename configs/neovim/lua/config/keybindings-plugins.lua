@@ -21,6 +21,17 @@ require('gitsigns').setup{
   end
 }
 
+-- setup keybindings for refactor
+vim.keymap.set(
+    {"n", "x"},
+    "<leader>rr",
+    function() require('refactoring').select_refactor({prefer_ex_cmd = true}) end
+)
+
+-- setup keybindings for overseer
+vim.keymap.set('n', '<F8>', ':OverseerRun<CR>' )
+vim.keymap.set('n', '<Leader><F8>', ':OverseerToggle<CR>' )
+
 -- setup keybindings for swenv
 vim.keymap.set("n", "<Leader>ph", function()
 	require('swenv.api').pick_venv()

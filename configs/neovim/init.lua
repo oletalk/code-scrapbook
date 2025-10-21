@@ -28,16 +28,24 @@ require("config.keybindings-plugins")
 require("config.virtualenvs")
 
 -- setup lualine (status line)
-require('lualine').setup()
-
--- setup aerial
-require("aerial").setup({
-  -- optionally use on_attach to set keymaps when aerial has attached to a buffer
-  on_attach = function(bufnr)
-    -- Jump forwards/backwards with '{' and '}'
-    vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-    vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
-  end,
+local mytheme = require'lualine.themes.nightfly'
+require('lualine').setup({
+	options = { theme = mytheme },
 })
--- You probably also want to set a keymap to toggle aerial
-vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
+
+-- setup overseer (run jobs like your cargo build...)
+require('overseer').setup({
+  templates = { "builtin", "user.run_script", "user.run_script_with_python3" }
+})
+
+-- setup bufferline
+vim.opt.termguicolors = true
+require("bufferline").setup({
+	options = {
+		separator_style = "thin"
+  },
+})
+
+-- setup refactoring
+require('refactoring').setup({
+})
