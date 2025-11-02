@@ -91,7 +91,7 @@ class DocHandler
     ret
   end
 
-  def delete_file(doc_id, is_sftp=false)
+  def delete_file(doc_id, is_sftp: false)
     ret = { result: 'success' }
     floc = nil
     connect_for('fetching file location for the document') do |conn|
