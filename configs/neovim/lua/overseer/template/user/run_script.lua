@@ -17,6 +17,6 @@ return {
     }
   end,
   condition = {
-    filetype = { "sh", "lua", "python", "go" },
+    filetype = { "sh", "lua", "python", "go", "ruby" },
   },
 }

@@ -19,6 +19,9 @@ vim.keymap.set("n", "<Leader>g", function()
   require('neogit').open()
 end, { desc = "Open NeoGit" })
 
+-- toggle dapview
+vim.keymap.set('n', '<F10>', ':DapViewToggle <CR>' )
+
 -- jump between TODO comments
 vim.keymap.set("n", "]t", function()
   require("todo-comments").jump_next()
@@ -30,4 +33,4 @@ end, { desc = "Previous todo comment" })
 
 vim.keymap.set('n', '<F3>', ':lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true })
 -- restart lsp if you need to
-vim.keymap.set('n', '<F10>', ':LspRestart<CR>' )
+vim.keymap.set('n', '<F5>', ':LspRestart<CR>' )
