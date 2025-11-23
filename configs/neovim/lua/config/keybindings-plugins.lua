@@ -18,8 +18,23 @@ require('gitsigns').setup{
     map('n', '<Leader>tb', gitsigns.toggle_current_line_blame)
     -- diff
 	  map('n', '<Leader>hd', gitsigns.diffthis)
+    -- preview hunk inline
+	  map('n', '<Leader>hi', gitsigns.preview_hunk_inline)
+    -- stage hunk
+	  map('v', '<Leader>hs', function()
+			gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    end)
+    -- reset hunk
+	  map('v', '<Leader>hr', function()
+			gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    end)
   end
 }
+
+-- setup keybindings for neotest
+vim.keymap.set("n", "<F4>", function()
+	require('neotest').run.run()
+end, { desc = "Run nearest test" })
 
 -- setup keybindings for refactor
 vim.keymap.set(

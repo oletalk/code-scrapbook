@@ -1,8 +1,11 @@
 -- Configure conform formatter
 require("conform").setup({
 	formatters_by_ft = {
+		css = { "biome" },
 		go = { "gofmt" },
 		json = { "jq" },
+		javascript = { "biome" },
+		typescript = { "biome" },
 		python = { "black" },
 		rust = { "rustfmt", lsp_format = "fallback" },
 		xml = { "xmlstarlet" },

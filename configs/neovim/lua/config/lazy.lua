@@ -51,16 +51,3 @@ require("neogit").setup({
 	integrations = { diffview = true, fzf_lua = true },
 })
 
--- use catppuccin
-require("catppuccin").setup({
-	flavour = "mocha",
-
-	color_overrides = {
-		mocha = {
-			base = "#090909",
-			mantle = "#101412",
-			crust = "#090909"
-		}
-	}
-})
-vim.cmd.colorscheme "catppuccin"
