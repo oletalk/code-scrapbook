@@ -36,7 +36,7 @@ require('lualine').setup({
 
 -- setup overseer (run jobs like your cargo build...)
 require('overseer').setup({
-  templates = { "builtin", "user.run_script", "user.run_script_with_python3" },
+  templates = { "builtin", "user.run_script", "user.run_script_with_python3", "user.build_go_module" },
   strategy = "toggleterm",
 })
 

@@ -5,7 +5,7 @@ require("conform").setup({
 		go = { "gofmt" },
 		json = { "jq" },
 		javascript = { "biome" },
-		typescript = { "biome" },
+		typescriptreact = { "biome" },
 		python = { "black" },
 		rust = { "rustfmt", lsp_format = "fallback" },
 		xml = { "xmlstarlet" },
