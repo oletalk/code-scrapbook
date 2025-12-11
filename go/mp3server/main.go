@@ -1,12 +1,17 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-  "os"
-
-  _ "github.com/lib/pq"
 )
 
 func main() {
+	var allPls []Song
+
+	allPls, err := getAllSongs()
+	if err != nil {
+		panic(err)
+	} else {
+		// print them out
+		fmt.Printf("Songs found: %v\n", allPls)
+	}
 }
