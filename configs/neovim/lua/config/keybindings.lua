@@ -6,6 +6,10 @@
 -- rename a variable (lsp-aware)
 vim.keymap.set('n', '<leader>R', ':lua vim.lsp.buf.rename()<CR>' )
 
+-- TEST go to line end and continue insert
+vim.keymap.set('i', '<C-;>', '<Esc>A')
+vim.keymap.set('n', '<Leader>;', 'A {<CR>}<Esc>kA<CR>')
+
 -- grep (using snacks/picker):
 vim.keymap.set('n', '<leader>pg', ':lua Snacks.picker.grep()<CR>' )
 vim.keymap.set('n', '<leader>pl', ':lua Snacks.picker.git_log_line()<CR>' )
@@ -31,6 +35,5 @@ vim.keymap.set("n", "[t", function()
   require("todo-comments").jump_prev()
 end, { desc = "Previous todo comment" })
 
-vim.keymap.set('n', '<F3>', ':lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true })
 -- restart lsp if you need to
 vim.keymap.set('n', '<F5>', ':LspRestart<CR>' )

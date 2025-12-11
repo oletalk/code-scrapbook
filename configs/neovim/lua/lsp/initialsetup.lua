@@ -20,6 +20,9 @@ require("lsp-endhints").setup {
 }
 vim.lsp.inlay_hint.enable(true)
 
+-- Enable lsp for docker
+vim.lsp.config['docker_language_server'] = require("lsp.docker_language_server")
+vim.lsp.enable('docker_language_server')
 -- Enable lsp for ruby
 vim.lsp.config['ruby_lsp'] = require("lsp.ruby_lsp")
 vim.lsp.enable('ruby_lsp')

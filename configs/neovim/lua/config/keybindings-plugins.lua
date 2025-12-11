@@ -5,7 +5,7 @@
 
 -- setup keybindings for Gitsigns
 -- your 'Leader' key was setup as [Spacebar] in lazy.lua
-require('gitsigns').setup{
+require('gitsigns').setup {
   on_attach = function(bufnr)
     local gitsigns = require('gitsigns')
 
@@ -17,37 +17,43 @@ require('gitsigns').setup{
     -- blame
     map('n', '<Leader>tb', gitsigns.toggle_current_line_blame)
     -- diff
-	  map('n', '<Leader>hd', gitsigns.diffthis)
+    map('n', '<Leader>hd', gitsigns.diffthis)
     -- preview hunk inline
-	  map('n', '<Leader>hi', gitsigns.preview_hunk_inline)
+    map('n', '<Leader>hi', gitsigns.preview_hunk_inline)
     -- stage hunk
-	  map('v', '<Leader>hs', function()
-			gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    map('v', '<Leader>hs', function()
+      gitsigns.stage_hunk({ vim.fn.line('.'), vim.fn.line('v') })
     end)
     -- reset hunk
-	  map('v', '<Leader>hr', function()
-			gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
+    map('v', '<Leader>hr', function()
+      gitsigns.reset_hunk({ vim.fn.line('.'), vim.fn.line('v') })
     end)
   end
 }
 
 -- setup keybindings for neotest
 vim.keymap.set("n", "<F4>", function()
-	require('neotest').run.run()
+  require('neotest').run.run()
 end, { desc = "Run nearest test" })
 
 -- setup keybindings for refactor
 vim.keymap.set(
-    {"n", "x"},
-    "<leader>rr",
-    function() require('refactoring').select_refactor({prefer_ex_cmd = true}) end
+  { "n", "x" },
+  "<leader>rr",
+  function() require('refactoring').select_refactor({ prefer_ex_cmd = true }) end
 )
 
 -- setup keybindings for overseer
-vim.keymap.set('n', '<F8>', ':OverseerRun<CR>' )
-vim.keymap.set('n', '<Leader><F8>', ':OverseerToggle<CR>' )
+vim.keymap.set('n', '<F8>', ':OverseerRun<CR>')
+vim.keymap.set('n', '<Leader><F8>', ':OverseerToggle<CR>')
 
 -- setup keybindings for swenv
 vim.keymap.set("n", "<Leader>ph", function()
-	require('swenv.api').pick_venv()
+  require('swenv.api').pick_venv()
 end, { desc = "Next todo comment" })
+
+-- setup keybindings for goto-preview
+vim.keymap.set("n", "<F6>d", "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", { noremap = true })
+vim.keymap.set("n", "<F6>t", "<cmd>lua require('goto-preview').goto_preview_type_definition()<CR>", { noremap = true })
+vim.keymap.set("n", "<F6>r", "<cmd>lua require('goto-preview').goto_preview_references()<CR>", { noremap = true })
+vim.keymap.set("n", "<F6>q", "<cmd>lua require('goto-preview').close_all_win()<CR>", { noremap = true })

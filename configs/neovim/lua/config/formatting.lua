@@ -1,19 +1,19 @@
 -- Configure conform formatter
 require("conform").setup({
-	formatters_by_ft = {
-		css = { "biome" },
-		go = { "gofmt" },
-		json = { "jq" },
-		javascript = { "biome" },
-		typescriptreact = { "biome" },
-		python = { "black" },
-		rust = { "rustfmt", lsp_format = "fallback" },
-		xml = { "xmlstarlet" },
-	},
-	format_on_save = {
-		timeout_ms = 500,
-		lsp_format = "fallback"
-	},
+  formatters_by_ft = {
+    css = { "biome" },
+    go = { "gofmt" },
+    json = { "jq" },
+    javascript = { "biome" },
+    typescriptreact = { "biome" },
+    python = { "ruff" },
+    rust = { "rustfmt", lsp_format = "fallback" },
+    xml = { "xmlstarlet" },
+  },
+  format_on_save = {
+    timeout_ms = 500,
+    lsp_format = "fallback"
+  },
 })
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*",
@@ -21,4 +21,3 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     require("conform").format({ bufnr = args.buf })
   end,
 })
-
