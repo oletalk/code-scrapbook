@@ -1,0 +1,6 @@
+* create data model
+* fetch data from db tables
+   - check expected json from existing mp3 server
+* generate playlist
+* sftp fetch
+* rest endpoints
