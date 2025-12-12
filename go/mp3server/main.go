@@ -12,6 +12,6 @@ func main() {
 		panic(err)
 	} else {
 		// print them out
-		fmt.Printf("Songs found: %v\n", allPls)
+		fmt.Println(generatePlaylist(allPls, "https://foobar.org:8180"))
 	}
 }
