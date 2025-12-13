@@ -1,6 +1,8 @@
-* create data model
-* fetch data from db tables
-   - check expected json from existing mp3 server
-* generate playlist
+* DONE create data model
+* DONE fetch data from db tables
+* DONE generate playlist
 * sftp fetch
+* don't forget to write tests!
+  -- see https://www.gyata.ai/golang/writing-tests
 * rest endpoints
+  -- how to find out host header?
