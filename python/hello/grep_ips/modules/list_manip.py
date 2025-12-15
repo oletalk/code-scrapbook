@@ -19,7 +19,7 @@ def getrules(f) -> (dict, dict):
             ip = st.strip()
             # print('KEY: ', st.strip())
             if ip.endswith("/24"):
-                print('CIDR: ', ip)
+                ##print('CIDR: ', ip)
                 addrs = ipaddress.ip_network(ip)
                 for eachip in addrs:
                     rules[format(eachip)] = 0
@@ -28,7 +28,8 @@ def getrules(f) -> (dict, dict):
                 rules[ip] = 0
     return rules, cidrs
 
-def get_unused_cidrs(cidrmap, all_rules) -> dict:
+def get_unused_rules(cidrmap, all_rules) -> (dict, dict):
+    """Returns two sets of unused rules, first CIDRs and second ips"""
     # compile list of USED IPs and CIDRs
     ##used_rules = {}
     all_ips = set()
@@ -48,8 +49,7 @@ def get_unused_cidrs(cidrmap, all_rules) -> dict:
             if ip not in cidrmap:
                 all_ips.add(ip)
 
-    print("*** UNUSED IP RULES: ", all_ips - used_ips)
-    return set(cidrmap.values()) - used_cidrs
+    return set(cidrmap.values()) - used_cidrs, all_ips - used_ips
             
 
 def iplists(chk, f) -> dict:

@@ -2,6 +2,7 @@
 import re
 import modules.list_manip as l
 
+LOWER_BOUND = 50 
 JOURNAL_FILE = "/home/colin/scrap/journal.txt"
 NFTABLES_CONFIG_FILE = "/etc/nftables.conf"
 # developed with regex101.com
@@ -15,13 +16,21 @@ ips = l.iplists(JOURNAL_NFT_BLOCK_LOG, f)
 f = open(NFTABLES_CONFIG_FILE, "rt", encoding="utf-8")
 rules, cidrmap = l.getrules(f)
 
-print('### JOURNAL BLOCKED IPS ###')
+f.close()
+
+print('1. JOURNAL BLOCKED IPS')
+hiddencount = 0
 for blockedip in sorted(ips.keys(), key=lambda k: ips[k], reverse=True):
-    print(blockedip, " --> ", ips[blockedip])
+    hits = ips[blockedip]
+    if hits >= LOWER_BOUND:
+        print(f"   {blockedip} --> {hits}")
+    else:
+        hiddencount += 1
     if blockedip in rules:
         num = rules[blockedip]
         rules[blockedip] = num + 1
-f.close()
+if hiddencount > 0:
+    print(f"[{hiddencount} hidden hosts below hit threshold]")
 
 # we have rules -- all rules in the blacklist with /24 cidrs expanded.
 #                  with a value of how many times that ip was blocked in the nft log
@@ -30,4 +39,6 @@ f.close()
 #                  ip -> cidr it's from, to help link them back
 
 # which CIDRs had no ips that triggered the blocklist?
-print("--> UNUSED CIDR RULES: ", l.get_unused_cidrs(cidrmap, rules))
+unused_cidrs, unused_ips = l.get_unused_rules(cidrmap, rules)
+print("2. UNUSED CIDR RULES: ", unused_cidrs)
+print("3. UNUSED IP RULES: ", unused_ips)
