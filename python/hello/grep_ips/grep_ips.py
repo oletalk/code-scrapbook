@@ -42,5 +42,12 @@ if hiddencount > 0:
 
 # which CIDRs had no ips that triggered the blocklist?
 unused_cidrs, unused_ips = l.get_unused_rules(cidrmap, rules)
-print("2. UNUSED CIDR RULES: ", unused_cidrs)
-print("3. UNUSED IP RULES: ", unused_ips)
+if len(unused_cidrs) > 0:
+    print("2. UNUSED CIDR RULES: ", unused_cidrs)
+else:
+    print("2. -- NO UNUSED CIDR RULES --")
+
+if len(unused_ips) > 0:
+    print("3. UNUSED IP RULES: ", unused_ips)
+else:
+    print("3. -- NO UNUSED IP RULES --")
