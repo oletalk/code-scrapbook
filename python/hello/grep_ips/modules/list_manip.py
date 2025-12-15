@@ -23,10 +23,34 @@ def getrules(f) -> (dict, dict):
                 addrs = ipaddress.ip_network(ip)
                 for eachip in addrs:
                     rules[format(eachip)] = 0
-                    cidrs[eachip] = ip
+                    cidrs[format(eachip)] = ip
             else:
                 rules[ip] = 0
     return rules, cidrs
+
+def get_unused_cidrs(cidrmap, all_rules) -> dict:
+    # compile list of USED IPs and CIDRs
+    ##used_rules = {}
+    all_ips = set()
+    used_ips = set()
+    used_cidrs = set()
+
+    for ip in all_rules.keys():
+        if all_rules[ip] > 0:
+            if ip in cidrmap: # it's contained in a CIDR rule
+                cidr = cidrmap[ip]
+                #print(" ip ", ip, " is in CIDR ", cidr)
+                used_cidrs.add(cidr)
+            else:
+                used_ips.add(ip)
+                all_ips.add(ip)
+        else:
+            if ip not in cidrmap:
+                all_ips.add(ip)
+
+    print("*** UNUSED IP RULES: ", all_ips - used_ips)
+    return set(cidrmap.values()) - used_cidrs
+            
 
 def iplists(chk, f) -> dict:
     """Returns a dict of ip addresses found (using chk regex) in opened file f"""

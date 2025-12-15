@@ -22,16 +22,12 @@ for blockedip in sorted(ips.keys(), key=lambda k: ips[k], reverse=True):
         num = rules[blockedip]
         rules[blockedip] = num + 1
 f.close()
-print('### UNUSED RULES ###')
-# TODO:rewrite this to use cidrs object instead of rules object
-# because we want an indication of which of them haven't been used either
 
-# we have rules -- all ips with a line in the journal
-#                  where a blacklisted ip was blocked,
-#                  including those expanded from CIDRs
+# we have rules -- all rules in the blacklist with /24 cidrs expanded.
+#                  with a value of how many times that ip was blocked in the nft log
+
 # we have cidrmap -- a map of ips expanded from CIDRs, of the form
 #                  ip -> cidr it's from, to help link them back
 
 # which CIDRs had no ips that triggered the blocklist?
-# - get list of CIDRs
-
+print("--> UNUSED CIDR RULES: ", l.get_unused_cidrs(cidrmap, rules))
