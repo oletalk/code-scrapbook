@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 import re
 import modules.list_manip as l
+import modules.argvalidate as a
 
 LOWER_BOUND = 50 
-JOURNAL_FILE = "/home/colin/scrap/journal.txt"
-NFTABLES_CONFIG_FILE = "/etc/nftables.conf"
+JOURNAL_FILE, NFTABLES_CONFIG_FILE = a.get_args()
+#JOURNAL_FILE = args.extract
+#NFTABLES_CONFIG_FILE = args.config
+#JOURNAL_FILE = "/home/colin/scrap/journal.txt"
+#NFTABLES_CONFIG_FILE = "/etc/nftables.conf"
 # developed with regex101.com
 JOURNAL_NFT_BLOCK_LOG = re.compile(r"DROP.*SRC=(.*?)\s")
 
-
-        
 f = open(JOURNAL_FILE, "rt", encoding="utf-8")
 ips = l.iplists(JOURNAL_NFT_BLOCK_LOG, f)
 
