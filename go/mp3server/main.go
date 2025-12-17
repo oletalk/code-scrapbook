@@ -13,5 +13,6 @@ func main() {
 	} else {
 		// print them out
 		fmt.Println(generatePlaylist(allPls, "https://foobar.org:8180"))
+		fmt.Printf("location = %s\n", getSongLocation("ff7db7c3573e38f20e4e3a877f3ec639dbced4af"))
 	}
 }

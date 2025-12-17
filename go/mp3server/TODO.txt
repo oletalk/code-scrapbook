@@ -2,7 +2,13 @@
 * DONE fetch data from db tables
 * DONE generate playlist
 * sftp fetch
+  -- fetch location from db
+  -- download file into cache
+  -- (another time) downsample file too
+
 * don't forget to write tests!
   -- see https://www.gyata.ai/golang/writing-tests
 * rest endpoints
+  -- first playlist contents
+  -- then streamed files from cache
   -- how to find out host header?

@@ -15,6 +15,27 @@ const (
 	dbname = "postgres"
 )
 
+// fetch song sftp location for a given hash
+func getSongLocation(hash string) string {
+	pathsql := "SELECT song_filepath FROM mp3s_metadata WHERE file_hash = $1"
+	db, err := getConn()
+
+	if err != nil {
+		panic(err)
+	}
+	var loc string
+
+	row := db.QueryRow(pathsql, hash)
+	switch err := row.Scan(&loc); err {
+	case sql.ErrNoRows:
+		return ""
+	case nil:
+		return loc
+	default:
+		panic(err)
+	}
+}
+
 // fetch all songs from mp3s_metadata
 func getAllSongs() ([]Song, error) {
 	var songs []Song
