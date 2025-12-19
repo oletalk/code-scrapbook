@@ -2,7 +2,7 @@
 * DONE fetch data from db tables
 * DONE generate playlist
 * sftp fetch
-  -- fetch location from db
+  -- (DONE) fetch location from db
     -- see https://docs.couchdrop.io/walkthroughs/sftp-recipes/using-sftp-clients/using-sftp-with-golang
   -- download file into cache
   -- (another time) downsample file too
