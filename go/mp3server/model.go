@@ -39,7 +39,7 @@ func (s Song) m3uline(hostheader string) string {
 	if s.artist != "" && s.title != "" {
 		displayTitle = fmt.Sprintf("%s - %s", s.artist, s.title)
 	} else {
-		displayTitle = songfrompath(s.filepath)
+		displayTitle = songfrompath(s.filepath, true)
 	}
 
 	return fmt.Sprintf("%s:%d,%s\n%s/member/play/%s\n",
