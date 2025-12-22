@@ -7,6 +7,7 @@ require("conform").setup({
     javascript = { "biome" },
     typescriptreact = { "biome" },
     python = { "ruff" },
+    ruby = { "rubocop" },
     rust = { "rustfmt", lsp_format = "fallback" },
     xml = { "xmlstarlet" },
   },

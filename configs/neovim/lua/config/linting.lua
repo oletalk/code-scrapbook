@@ -4,6 +4,7 @@ require('lint').linters_by_ft = {
   javascript = {'biomejs'},
   typescriptreact = {'biomejs'},
 	python = {'ruff'},
+  ruby = {'rubocop'},
   xml = {'yq'},
   yaml = {'yq'}
 }

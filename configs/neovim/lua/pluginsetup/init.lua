@@ -1,8 +1,8 @@
--- setup lualine (status line)
-local mytheme = require 'lualine.themes.nightfly'
-require('lualine').setup({
-  options = { theme = mytheme },
-})
+-- setup neogit, neoterm and toggleterm
+require('pluginsetup.windowandterm')
+
+-- setup lualine(status line at bottom) and bufferline (buffers at top)
+require('pluginsetup.bufferstatus')
 
 -- setup overseer (run jobs like your cargo build...)
 require('overseer').setup({
@@ -10,30 +10,6 @@ require('overseer').setup({
   strategy = "toggleterm",
 })
 
--- setup bufferline
-vim.opt.termguicolors = true
-require("bufferline").setup({
-  options = {
-    separator_style = "thin"
-  },
-})
-
 -- setup refactoring
 require('refactoring').setup({
-})
-
--- Configure toggleterm (in-nvim terminal)
-require("toggleterm").setup {
-  open_mapping = [[<c-#>]]
-}
-
--- Configure neogit
-require("neogit").setup({
-  kind = "vsplit",
-  signs = {
-    section = { "", "" },
-    item = { "", "" },
-    hunk = { "", "" },
-  },
-  integrations = { diffview = true, fzf_lua = true },
 })
