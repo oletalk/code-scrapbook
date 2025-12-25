@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -11,15 +12,17 @@ func main() {
 	if fcerr != nil {
 		panic(fcerr)
 	}
-	fmt.Printf("max cache size = %v", fc.maxSize)
+	log.Printf("(config) max cache size = %v\n", fc.maxSize)
+	log.Printf("(actual) cache current size = %d\n", fc.currentSize())
+
 	allPls, err := getAllSongs()
 	if err != nil {
 		panic(err)
 	} else {
 		// print them out
 		// fmt.Println(generatePlaylist(allPls, "https://foobar.org:8180"))
-		fmt.Println(len(allPls))
-		song_remote, err := getSongLocation("FOX ff7db7c3573e38f20e4e3a877f3ec639dbced4af")
+		fmt.Printf("number of songs in playlist = %d\n", len(allPls))
+		song_remote, err := getSongLocation("FOO ff7db7c3573e38f20e4e3a877f3ec639dbced4af")
 		if err == nil {
 			song_local := cachedFilename(song_remote)
 			fmt.Printf("location = %s\n", song_remote)

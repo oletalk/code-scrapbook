@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -79,8 +80,7 @@ func getAllSongs() ([]Song, error) {
 func getConn() (*sql.DB, error) {
 	password := os.Getenv("DBPASS")
 	if password == "" {
-		fmt.Println("Please provide DBPASS environment variable!")
-		os.Exit(1)
+		log.Fatal("Please provide DBPASS environment variable!")
 	}
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
