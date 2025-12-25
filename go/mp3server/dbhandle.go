@@ -16,23 +16,23 @@ const (
 )
 
 // fetch song sftp location for a given hash
-func getSongLocation(hash string) string {
+func getSongLocation(hash string) (string, error) {
 	pathsql := "SELECT song_filepath FROM mp3s_metadata WHERE file_hash = $1"
 	db, err := getConn()
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	var loc string
 
 	row := db.QueryRow(pathsql, hash)
 	switch err := row.Scan(&loc); err {
 	case sql.ErrNoRows:
-		return ""
+		return "", &ApplicationError{"song not found"}
 	case nil:
-		return loc
+		return loc, nil
 	default:
-		panic(err)
+		return "", err
 	}
 }
 
