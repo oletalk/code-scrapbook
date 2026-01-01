@@ -10,20 +10,24 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func downloadFile(remotePath string, localFilename string) {
+func downloadFile(remotePath string, localFilename string) error {
 	cache_dir := os.Getenv("CACHE_DIR")
 	sftpClient, err := getClient()
+	if err != nil {
+		log.Println("Failed to open sftp connection:", err)
+		return err
+	}
 	remoteFile, err := sftpClient.Open(remotePath)
 	if err != nil {
 		log.Println("Failed to open remote file:", err)
-		return
+		return err
 	}
 	defer sftpClient.Close()
 	defer remoteFile.Close()
 	localFile, err := os.Create(cache_dir + "/" + localFilename)
 	if err != nil {
 		log.Println("Failed to create local file:", err)
-		return
+		return err
 	}
 	defer localFile.Close()
 
@@ -31,8 +35,9 @@ func downloadFile(remotePath string, localFilename string) {
 	_, err = io.Copy(localFile, remoteFile)
 	if err != nil {
 		log.Println("Failed to download file:", err)
-		return
+		return err
 	}
+	return nil
 }
 
 func getClient() (*sftp.Client, error) {

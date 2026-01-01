@@ -12,8 +12,10 @@ func main() {
 	if fcerr != nil {
 		panic(fcerr)
 	}
-	log.Printf("(config) max cache size = %v\n", fc.maxSize)
-	log.Printf("(actual) cache current size = %d\n", fc.currentSize())
+	pgerr := fc.prune()
+	if pgerr != nil {
+		log.Printf("Unable to prune cache dir: %v", pgerr)
+	}
 
 	allPls, err := getAllSongs()
 	if err != nil {
@@ -22,13 +24,15 @@ func main() {
 		// print them out
 		// fmt.Println(generatePlaylist(allPls, "https://foobar.org:8180"))
 		fmt.Printf("number of songs in playlist = %d\n", len(allPls))
-		song_remote, err := getSongLocation("FOO ff7db7c3573e38f20e4e3a877f3ec639dbced4af")
-		if err == nil {
+		if song_remote, err := getSongLocation("FOO ff7db7c3573e38f20e4e3a877f3ec639dbced4af"); err == nil {
+			// if err == nil {
 			song_local := cachedFilename(song_remote)
 			fmt.Printf("location = %s\n", song_remote)
 			fmt.Printf("local file to save = %s\n", song_local)
 			// TODO: don't clobber file on download...
-			downloadFile(song_remote, song_local)
+			if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
+				// TODO stream locally downloaded file
+			}
 
 		} else {
 			fmt.Printf("Failed to get song location: %v\n", err)

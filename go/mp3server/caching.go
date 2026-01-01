@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
 )
+
+const MAX_DELETES = 5
 
 type FileInfo struct {
 	name       string
@@ -41,13 +44,13 @@ func NewFileCache() (*FileCache, error) {
 	if err := os.MkdirAll(cacheDir, 0755); err != nil {
 		return nil, &ApplicationError{fmt.Sprintf("failed to create cache directory: %v", err)}
 	}
-
+	log.Printf("Cache directory: %s\n", cacheDir)
 	// read files in directory and create FileInfo entries
 	entries, err := getFileInfos(cacheDir)
 	if err != nil {
 		return nil, err
 	}
-
+	log.Printf("Number of files in cache: %d\n", len(entries))
 	return &FileCache{
 		cacheDir: cacheDir,
 		maxSize:  maxSize,
@@ -61,6 +64,26 @@ func (f FileCache) currentSize() int64 {
 	}
 	return total
 }
+func (f FileCache) prune() error {
+	log.Printf("(actual) cache current size = %d\n", f.currentSize())
+	if f.maxSize < f.currentSize() {
+		log.Println("PRUNE NEEDED")
+		// get oldest file and delete it
+		if oldest, oerr := f.oldestFile(); oerr == nil {
+			log.Printf("*** removing %s/%s (%dK)\n", f.cacheDir, oldest.name, oldest.size)
+		}
+		// TODO delete file :-) os.Remove...
+
+		// now refresh cache from OS
+		if newFiles, nferr := getFileInfos(f.cacheDir); nferr == nil {
+			f.files = newFiles
+			log.Printf("(updated) cache current size = %d\n", f.currentSize())
+		}
+
+	}
+	return nil
+}
+
 func getFileInfos(dir string) ([]FileInfo, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -75,6 +98,7 @@ func getFileInfos(dir string) ([]FileInfo, error) {
 			fs, err := entry.Info()
 			if err == nil {
 				fin.size = fs.Size() / 1024
+				fin.accessTime = fs.ModTime()
 			} else {
 				// TODO proper logging pls
 				fmt.Printf("error getting file info for %s: %v\n", entry.Name(), err)
@@ -85,4 +109,23 @@ func getFileInfos(dir string) ([]FileInfo, error) {
 
 	}
 	return files, nil
+}
+
+func (f FileCache) oldestFile() (*FileInfo, error) {
+	tme := time.Now()
+	var old FileInfo
+	found := false
+	for _, fi := range f.files {
+		if fi.accessTime.Before(tme) {
+			old = fi
+			tme = fi.accessTime
+			found = true
+		}
+
+	}
+	if found {
+		return &old, nil
+	} else {
+		return nil, &ApplicationError{"No values in list"}
+	}
 }
