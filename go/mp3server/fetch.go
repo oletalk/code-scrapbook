@@ -12,6 +12,7 @@ import (
 
 func downloadFile(remotePath string, localFilename string) error {
 	cache_dir := os.Getenv("CACHE_DIR")
+	log.Println("downloading file from SFTP location...")
 	sftpClient, err := getClient()
 	if err != nil {
 		log.Println("Failed to open sftp connection:", err)
@@ -24,12 +25,18 @@ func downloadFile(remotePath string, localFilename string) error {
 	}
 	defer sftpClient.Close()
 	defer remoteFile.Close()
+	log.Println("Creating file locally")
 	localFile, err := os.Create(cache_dir + "/" + localFilename)
 	if err != nil {
 		log.Println("Failed to create local file:", err)
 		return err
 	}
-	defer localFile.Close()
+	defer func() {
+		if cerr := localFile.Close(); cerr != nil && err == nil {
+			// err = cerr
+			log.Println("Problem closing local file:", cerr)
+		}
+	}()
 
 	// copy file remote to local
 	_, err = io.Copy(localFile, remoteFile)

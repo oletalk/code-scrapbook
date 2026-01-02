@@ -24,14 +24,21 @@ func main() {
 		// print them out
 		// fmt.Println(generatePlaylist(allPls, "https://foobar.org:8180"))
 		fmt.Printf("number of songs in playlist = %d\n", len(allPls))
-		if song_remote, err := getSongLocation("FOO ff7db7c3573e38f20e4e3a877f3ec639dbced4af"); err == nil {
+		if song_remote, err := getSongLocation("ff7db7c3573e38f20e4e3a877f3ec639dbced4af"); err == nil {
 			// if err == nil {
-			song_local := cachedFilename(song_remote)
+			song_local := filenameForCache(song_remote)
 			fmt.Printf("location = %s\n", song_remote)
 			fmt.Printf("local file to save = %s\n", song_local)
-			// TODO: don't clobber file on download...
-			if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
-				// TODO stream locally downloaded file
+			// don't clobber file on download...
+			if songInCache(song_local) {
+				fmt.Println("song is already in cache")
+			} else {
+				if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
+					// TODO stream locally downloaded file
+					fmt.Println("download completed.")
+				} else {
+					fmt.Printf("Error downloading file: %v\n", dlerr)
+				}
 			}
 
 		} else {

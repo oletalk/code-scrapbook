@@ -34,7 +34,7 @@ func TestMakeFilename(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if str := cachedFilename(c.in); str != c.out {
+		if str := filenameForCache(c.in); str != c.out {
 			t.Errorf(`cachedFilename(%s) = %q, want %s `, c.in, str, c.out)
 		}
 	}

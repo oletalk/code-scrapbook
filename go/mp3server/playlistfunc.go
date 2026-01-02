@@ -28,7 +28,7 @@ func removedSuffix(s string, suf string) string {
 }
 
 // construct filename needed to save a newly downloaded song file in cache location
-func cachedFilename(filename string) string {
+func filenameForCache(filename string) string {
 	data := []byte(filename)
 	// first 6 characters of this, underscore then base filename
 	fullhash := fmt.Sprintf("%x", sha1.Sum(data))[:6]

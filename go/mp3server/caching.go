@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -57,6 +58,13 @@ func NewFileCache() (*FileCache, error) {
 		files:    entries,
 	}, nil
 }
+
+func songInCache(filename string) bool {
+	cache_dir := os.Getenv("CACHE_DIR")
+	_, err := os.Stat(cache_dir + "/" + filename)
+	return !errors.Is(err, os.ErrNotExist)
+}
+
 func (f FileCache) currentSize() int64 {
 	var total int64 = 0
 	for _, entry := range f.files {
