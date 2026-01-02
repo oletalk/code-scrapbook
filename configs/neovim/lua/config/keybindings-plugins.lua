@@ -31,6 +31,11 @@ require('gitsigns').setup {
   end
 }
 
+-- setup keybindings for bafa
+vim.keymap.set("n", "<Leader>b", function()
+  require('bafa').toggle({ with_jump_labels = true })
+end, { desc = "Toggle bafa buffer list" })
+
 -- setup keybindings for neotest
 vim.keymap.set("n", "<F4>", function()
   require('neotest').run.run()
