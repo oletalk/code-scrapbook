@@ -14,9 +14,9 @@ vim.keymap.set('n', '<Leader>;', 'A {<CR>}<Esc>kA<CR>')
 vim.keymap.set('n', '<leader>pg', ':lua Snacks.picker.grep()<CR>' )
 vim.keymap.set('n', '<leader>pl', ':lua Snacks.picker.git_log_line()<CR>' )
 
--- open NeoTree
-vim.keymap.set('n', '<C-l>', ':Neotree float <CR>' )
-vim.keymap.set('n', '<Leader>t', ':Neotree left <CR>' )
+-- NeoTree removed as of 04/01/2026
+-- Configure snacks-picker
+vim.keymap.set('n', '<Leader>t', ':lua Snacks.explorer() <CR>' )
 
 -- open neogit
 vim.keymap.set("n", "<Leader>g", function()

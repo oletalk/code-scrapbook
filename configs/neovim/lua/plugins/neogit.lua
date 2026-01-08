@@ -5,6 +5,7 @@ return {
 		"sindrets/diffview.nvim",
 
     -- Only one of these is needed.
-    "ibhagwan/fzf-lua", -- optional
+    --"ibhagwan/fzf-lua", -- optional
+		"folke/snacks.nvim",
   },
 }

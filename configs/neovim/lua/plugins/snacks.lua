@@ -9,7 +9,11 @@ return {
     -- refer to the configuration section below
     bigfile = { enabled = false },
     dashboard = { enabled = false },
-    explorer = { enabled = false },
+    explorer = { 
+			enabled = true,
+			replace_netrw = true,
+      trash = true,
+		},
     indent = { enabled = true },
     input = { enabled = true },
     picker = { enabled = true },
