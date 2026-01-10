@@ -3,9 +3,13 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
-func main() {
+func run_test() {
 	var allPls []Song
 
 	fc, fcerr := NewFileCache()
@@ -45,4 +49,19 @@ func main() {
 			fmt.Printf("Failed to get song location: %v\n", err)
 		}
 	}
+}
+
+func main() {
+	// run_test()
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Mount("/members", SongRoutes())
+	http.ListenAndServe(":4567", r)
+}
+
+func SongRoutes() chi.Router {
+	r := chi.NewRouter()
+	songHandler := SongHandler{}
+	r.Get("/m3u/all", songHandler.GetAllSongs)
+	return r
 }

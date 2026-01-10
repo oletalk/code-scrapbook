@@ -4,7 +4,7 @@
 * sftp fetch
   -- (DONE) fetch location from db
     -- see https://docs.couchdrop.io/walkthroughs/sftp-recipes/using-sftp-clients/using-sftp-with-golang
-  -- prepend file name with sha1 hash of filehash
+  DONE prepend file name with sha1 hash of filehash
     -- see https://golang.google.cn/pkg/crypto/sha1/#pkg-examples
   DONE download file into cache
   -- also trim cache to maxSize (when?)
