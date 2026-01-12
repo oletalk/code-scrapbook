@@ -9,7 +9,8 @@
   DONE download file into cache
   -- also trim cache to maxSize (when?)
   -- (another time) downsample file too
-
+  -- get file location from hash
+  -- stream file. see https://www.slingacademy.com/article/streaming-large-files-with-go-http/
 * don't forget to write tests!
   -- see https://www.gyata.ai/golang/writing-tests
 * rest endpoints

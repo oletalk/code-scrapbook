@@ -10,6 +10,11 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+func getCacheFilepath(cacheFilename string) string {
+	cache_dir := os.Getenv("CACHE_DIR")
+	return cache_dir + "/" + cacheFilename
+}
+
 func downloadFile(remotePath string, localFilename string) error {
 	cache_dir := os.Getenv("CACHE_DIR")
 	log.Println("downloading file from SFTP location...")

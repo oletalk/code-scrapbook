@@ -55,7 +55,7 @@ func main() {
 	// run_test()
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Mount("/members", SongRoutes())
+	r.Mount("/member", SongRoutes())
 	http.ListenAndServe(":4567", r)
 }
 
@@ -63,5 +63,6 @@ func SongRoutes() chi.Router {
 	r := chi.NewRouter()
 	songHandler := SongHandler{}
 	r.Get("/m3u/all", songHandler.GetAllSongs)
+	r.Get("/play/{hash}", songHandler.FetchSong)
 	return r
 }
