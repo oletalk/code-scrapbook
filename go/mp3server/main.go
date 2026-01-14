@@ -38,7 +38,7 @@ func run_test() {
 				fmt.Println("song is already in cache")
 			} else {
 				if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
-					// TODO stream locally downloaded file
+					// TODO: stream locally downloaded file
 					fmt.Println("download completed.")
 				} else {
 					fmt.Printf("Error downloading file: %v\n", dlerr)

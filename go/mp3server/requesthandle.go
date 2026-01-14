@@ -21,16 +21,17 @@ func (s SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Error", http.StatusInternalServerError)
 		return
 	}
-	// TODO get ACTUAL host header!
-	// hh := "http://localhost:4567"
 
-	hh := r.Host
-	if r.TLS != nil {
-		hh = "https://" + hh
+	hostHeader := r.Host
+	// check if behind proxy
+	if proto := r.Header.Get("X-Forwarded-Proto"); proto != "" {
+		hostHeader = proto + "://" + hostHeader
+	} else if r.TLS != nil {
+		hostHeader = "https://" + hostHeader
 	} else {
-		hh = "http://" + hh
+		hostHeader = "http://" + hostHeader
 	}
-	_, err := w.Write([]byte(generatePlaylist(allPls, hh)))
+	_, err := w.Write([]byte(generatePlaylist(allPls, hostHeader)))
 	if err != nil {
 		log.Printf("Error outputting playlist: %v\n", err)
 	}
@@ -47,11 +48,12 @@ func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
 				log.Println("download completed.")
+				// TODO: also trim cache?
 			} else {
 				log.Printf("Error downloading file: %v\n", dlerr)
 			}
 		}
-		// TODO stream locally downloaded file
+		// TODO: stream locally downloaded file
 		filePath := getCacheFilepath(song_local)
 		file, err := os.Open(filePath)
 		if err != nil {
