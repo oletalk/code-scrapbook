@@ -7,13 +7,13 @@
   DONE prepend file name with sha1 hash of filehash
     -- see https://golang.google.cn/pkg/crypto/sha1/#pkg-examples
   DONE download file into cache
-  -- also trim cache to maxSize (when?)
+  -- also trim cache to maxSize (when? background thread?)
   -- (another time) downsample file too
-  -- get file location from hash
-  -- stream file. see https://www.slingacademy.com/article/streaming-large-files-with-go-http/
+  DONE get file location from hash
+  DONE stream file. see https://www.slingacademy.com/article/streaming-large-files-with-go-http/
 * don't forget to write tests!
   -- see https://www.gyata.ai/golang/writing-tests
-* rest endpoints
-  -- first playlist contents
-  -- then streamed files from cache
-  -- how to find out host header?
+* DONE rest endpoints
+  DONE first playlist contents
+  DONE then streamed files from cache
+  DONE how to find out host header?
