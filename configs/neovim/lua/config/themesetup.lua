@@ -12,4 +12,5 @@ require("catppuccin").setup({
 })
 -- no setup for tokyonight
 
-vim.cmd.colorscheme "catppuccin"
+-- vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme "tokyonight-storm"

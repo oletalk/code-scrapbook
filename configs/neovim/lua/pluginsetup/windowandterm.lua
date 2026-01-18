@@ -11,6 +11,6 @@ require("neogit").setup({
     item = { "", "" },
     hunk = { "", "" },
   },
-  integrations = { diffview = true, fzf_lua = true },
+  integrations = { diffview = true, snacks = true },
 })
 

@@ -5,7 +5,7 @@ vim.o.expandtab = true
 vim.o.number = true
 vim.o.shiftwidth = 2
 vim.o.tabstop = 2
-vim.o.autochdir = true
+-- vim.o.autochdir = true
 
 vim.g.transparent_enabled = true
 

@@ -31,11 +31,12 @@ require('gitsigns').setup {
   end
 }
 
--- setup keybindings for bafa
-vim.keymap.set("n", "<Leader>b", function()
-  require('bafa').toggle()
-end, { desc = "Toggle bafa buffer list" })
+-- ssetup keybindings for dropbar TEST
 
+local dropbar_api = require('dropbar.api')
+vim.keymap.set('n', '<Leader>;', function()
+  require('dropbar.api').pick()
+end, { desc = 'Pick symbols in winbar' })
 -- setup keybindings for treewalker
 vim.keymap.set({ 'n', 'v' }, '<C-k>', '<cmd>Treewalker Up<cr>', { silent = true })
 vim.keymap.set({ 'n', 'v' }, '<C-j>', '<cmd>Treewalker Down<cr>', { silent = true })
