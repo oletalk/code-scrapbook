@@ -59,12 +59,18 @@ func NewFileCache() (*FileCache, error) {
 	}, nil
 }
 
-func songInCache(filename string) bool {
+func cacheFilename(filename string) string {
 	cache_dir := os.Getenv("CACHE_DIR")
-	_, err := os.Stat(cache_dir + "/" + filename)
+	return cache_dir + "/" + filename
+}
+
+// is a song with this filename in the cache?
+func songInCache(filename string) bool {
+	_, err := os.Stat(cacheFilename(filename))
 	return !errors.Is(err, os.ErrNotExist)
 }
 
+// current total size of files in the cache
 func (f FileCache) currentSize() int64 {
 	var total int64 = 0
 	for _, entry := range f.files {
@@ -72,15 +78,22 @@ func (f FileCache) currentSize() int64 {
 	}
 	return total
 }
-func (f FileCache) prune() error {
+
+// deletes the oldest file in the cache if it is over the maxSize.
+func (f *FileCache) prune() error {
 	log.Printf("(actual) cache current size = %d\n", f.currentSize())
 	if f.maxSize < f.currentSize() {
 		log.Println("PRUNE NEEDED")
 		// get oldest file and delete it
 		if oldest, oerr := f.oldestFile(); oerr == nil {
 			log.Printf("*** removing %s/%s (%dK)\n", f.cacheDir, oldest.name, oldest.size)
+			// delete file
+			if err := os.Remove(cacheFilename(oldest.name)); err != nil {
+				log.Printf("error removing file: %v", err)
+			}
+		} else {
+			log.Printf("error figuring out oldest file: %v", oerr)
 		}
-		// TODO: delete file :-) os.Remove...
 
 		// now refresh cache from OS
 		if newFiles, nferr := getFileInfos(f.cacheDir); nferr == nil {
@@ -135,5 +148,22 @@ func (f FileCache) oldestFile() (*FileInfo, error) {
 		return &old, nil
 	} else {
 		return nil, &ApplicationError{"No values in list"}
+	}
+}
+
+func manage_cache() {
+	fc, fcerr := NewFileCache()
+	if fcerr != nil {
+		panic(fcerr)
+	}
+
+	// periodically prune
+	for {
+		log.Printf("checking if cache directory needs pruning.")
+		pgerr := fc.prune()
+		if pgerr != nil {
+			log.Printf("Unable to prune cache dir: %v", pgerr)
+		}
+		time.Sleep(time.Minute * 1)
 	}
 }

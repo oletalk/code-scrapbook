@@ -9,10 +9,14 @@ import (
 
 func main() {
 	// run_test()
+	go manage_cache()
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Mount("/member", SongRoutes())
-	http.ListenAndServe(":4567", r)
+	if err := http.ListenAndServe(":4567", r); err != nil {
+		panic(err)
+	}
 }
 
 func SongRoutes() chi.Router {
