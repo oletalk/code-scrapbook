@@ -19,5 +19,3 @@ set_theme()
 
 --local mytheme = require 'lualine.themes.nightfly'
 
--- setup quicker (quickfix)
-require("quicker").setup()

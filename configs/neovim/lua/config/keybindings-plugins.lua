@@ -70,8 +70,3 @@ vim.keymap.set("n", "<Leader>ph", function()
   require('swenv.api').pick_venv()
 end, { desc = "Next todo comment" })
 
--- setup keybindings for goto-preview
-vim.keymap.set("n", "<F6>d", "<cmd>lua require('goto-preview').goto_preview_definition()<CR>", { noremap = true })
-vim.keymap.set("n", "<F6>t", "<cmd>lua require('goto-preview').goto_preview_type_definition()<CR>", { noremap = true })
-vim.keymap.set("n", "<F6>r", "<cmd>lua require('goto-preview').goto_preview_references()<CR>", { noremap = true })
-vim.keymap.set("n", "<F6>q", "<cmd>lua require('goto-preview').close_all_win()<CR>", { noremap = true })
