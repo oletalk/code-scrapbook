@@ -48,12 +48,13 @@ func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
 				log.Println("download completed.")
-				// TODO: also trim cache?
 			} else {
 				log.Printf("Error downloading file: %v\n", dlerr)
 			}
 		}
-		// TODO: stream locally downloaded file
+		// TODO: downsample it
+
+		// stream locally downloaded file
 		filePath := getCacheFilepath(song_local)
 		file, err := os.Open(filePath)
 		if err != nil {

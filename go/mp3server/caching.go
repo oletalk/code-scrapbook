@@ -121,7 +121,6 @@ func getFileInfos(dir string) ([]FileInfo, error) {
 				fin.size = fs.Size() / 1024
 				fin.accessTime = fs.ModTime()
 			} else {
-				// TODO: proper logging pls
 				fmt.Printf("error getting file info for %s: %v\n", entry.Name(), err)
 			}
 			// fmt.Printf("DEBUG: %v\n", fin)

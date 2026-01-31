@@ -7,8 +7,14 @@
   DONE prepend file name with sha1 hash of filehash
     -- see https://golang.google.cn/pkg/crypto/sha1/#pkg-examples
   DONE download file into cache
-  -- also trim cache to maxSize (when? background thread?)
-  -- (another time) downsample file too
+  DONE also trim cache to maxSize
+  -- downsample file too, as part of downloadFile (fetch.go)
+  -- see https://zetcode.com/golang/exec-command/
+     -- downsample first and then ServeContent?
+     1. on startup, parse command/args from dotenv file
+     2. upon each download, run command to generate downsampled file
+     3. delete original file (but ensure downsampled file is marked as the cached file)
+     4. stream downsampled file
   DONE get file location from hash
   DONE stream file. see https://www.slingacademy.com/article/streaming-large-files-with-go-http/
 * don't forget to write tests!
