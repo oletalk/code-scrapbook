@@ -59,6 +59,7 @@ func NewFileCache() (*FileCache, error) {
 	}, nil
 }
 
+// prepends filename with the cache dir
 func cacheFilename(filename string) string {
 	cache_dir := os.Getenv("CACHE_DIR")
 	return cache_dir + "/" + filename

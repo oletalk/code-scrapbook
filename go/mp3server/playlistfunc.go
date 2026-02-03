@@ -27,7 +27,7 @@ func removedSuffix(s string, suf string) string {
 	return s
 }
 
-// construct filename needed to save a newly downloaded song file in cache location
+// construct filename needed to save a newly downloaded song file in cache location. includes a sha1sum prefix for the original filename
 func filenameForCache(filename string) string {
 	data := []byte(filename)
 	// first 6 characters of this, underscore then base filename

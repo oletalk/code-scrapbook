@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	// run_test()
+	run_test()
+}
+
+func new_main() {
 	go manage_cache()
 
 	r := chi.NewRouter()

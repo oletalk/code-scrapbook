@@ -10,6 +10,7 @@
   DONE also trim cache to maxSize
   -- downsample file too, as part of downloadFile (fetch.go)
   -- see https://zetcode.com/golang/exec-command/
+  -- see also https://mojoauth.com/escaping/shell-escaping-in-go/#syntax-and-special-characters-of-shell-escaping-in-go
      -- downsample first and then ServeContent?
      1. on startup, parse command/args from dotenv file
      2. upon each download, run command to generate downsampled file

@@ -1,12 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"log"
 )
 
 // this was originally in main.go but i'm cleaning it up
 func run_test() {
+	/*
+		  test run:
+			1. load up a playlist of all songs
+			2. print a few stats from this
+			3. get song location for a particular (known) hash
+			4. check if it's in the cache
+			5. if it is, STOP
+			6. download the file for the given hash from the SFTP server
+			7. downsample to a temporary file
+			8. replace the file in the cache with this file
+	*/
 	var allPls []Song
 
 	fc, fcerr := NewFileCache()
@@ -24,25 +34,29 @@ func run_test() {
 	} else {
 		// print them out
 		// fmt.Println(generatePlaylist(allPls, "https://foobar.org:8180"))
-		fmt.Printf("number of songs in playlist = %d\n", len(allPls))
+		log.Printf("number of songs in playlist = %d\n", len(allPls))
 		if song_remote, err := getSongLocation("ff7db7c3573e38f20e4e3a877f3ec639dbced4af"); err == nil {
 			// if err == nil {
 			song_local := filenameForCache(song_remote)
-			fmt.Printf("location = %s\n", song_remote)
-			fmt.Printf("local file to save = %s\n", song_local)
+			log.Printf("location = %s\n", song_remote)
+			log.Printf("local file to save = %s\n", song_local)
 			// don't clobber file on download...
 			if songInCache(song_local) {
-				fmt.Println("song is already in cache")
+				log.Println("song is already in cache")
 			} else {
 				if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
-					fmt.Println("download completed.")
+					log.Println("download completed.")
+					// try downsampling it
+					if err := processDownsampleAndReplace("MP3", cacheFilename(song_local)); err != nil {
+						log.Printf("Downsampling failed: %v\n", err)
+					}
 				} else {
-					fmt.Printf("Error downloading file: %v\n", dlerr)
+					log.Printf("Error downloading file: %v\n", dlerr)
 				}
 			}
 
 		} else {
-			fmt.Printf("Failed to get song location: %v\n", err)
+			log.Printf("Failed to get song location: %v\n", err)
 		}
 	}
 }
