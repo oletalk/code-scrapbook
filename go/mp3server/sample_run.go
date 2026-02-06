@@ -28,7 +28,8 @@ func run_test() {
 		log.Printf("Unable to prune cache dir: %v", pgerr)
 	}
 
-	allPls, err := getAllSongs()
+	// allPls, err := getAllSongs()
+	allPls, err := getLatestSongs()
 	if err != nil {
 		panic(err)
 	} else {

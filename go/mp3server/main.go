@@ -26,6 +26,7 @@ func SongRoutes() chi.Router {
 	r := chi.NewRouter()
 	songHandler := SongHandler{}
 	r.Get("/m3u/all", songHandler.GetAllSongs)
+	r.Get("/m3u/latest", songHandler.GetLatestSongs)
 	r.Get("/play/{hash}", songHandler.FetchSong)
 	return r
 }

@@ -39,6 +39,15 @@ func getSongLocation(hash string) (string, error) {
 
 // fetch all songs from mp3s_metadata
 func getAllSongs() ([]Song, error) {
+	return getSongsFor(" ORDER BY date_added")
+}
+
+// fetch latest 30 songs
+func getLatestSongs() ([]Song, error) {
+	return getSongsFor(" ORDER BY date_added desc LIMIT 30")
+}
+
+func getSongsFor(specifier string) ([]Song, error) {
 	var songs []Song
 	// TODO initialise db...
 	db, err := getConn()
@@ -48,7 +57,7 @@ func getAllSongs() ([]Song, error) {
 	}
 
 	// TODO check actual sql
-	rows, err := db.Query("SELECT song_filepath, file_hash, artist, title, secs, date_added FROM mp3s_metadata ORDER BY date_added")
+	rows, err := db.Query("SELECT song_filepath, file_hash, artist, title, secs, date_added FROM mp3s_metadata" + specifier)
 	if err != nil {
 		return nil, fmt.Errorf("getAllSongs %v", err)
 	}

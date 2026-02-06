@@ -21,7 +21,31 @@ func (s SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Error", http.StatusInternalServerError)
 		return
 	}
+	writeResults(w, r, allPls)
+}
 
+func (s SongHandler) GetLatestSongs(w http.ResponseWriter, r *http.Request) {
+	log.Printf("GetLatestSongs called")
+	allPls, gerr := getLatestSongs()
+	if gerr != nil {
+
+		log.Printf("Error getting latest songs for playlist: %v\n", gerr)
+		http.Error(w, "Internal Error", http.StatusInternalServerError)
+		return
+	}
+	writeResults(w, r, allPls)
+}
+
+func writeResults(w http.ResponseWriter, r *http.Request, songs []Song) {
+	hostHeader := GetHostHeader(r)
+	_, err := w.Write([]byte(generatePlaylist(songs, hostHeader)))
+	if err != nil {
+		log.Printf("Error outputting playlist: %v\n", err)
+	}
+
+}
+
+func GetHostHeader(r *http.Request) string {
 	hostHeader := r.Host
 	// check if behind proxy
 	if proto := r.Header.Get("X-Forwarded-Proto"); proto != "" {
@@ -31,11 +55,7 @@ func (s SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 	} else {
 		hostHeader = "http://" + hostHeader
 	}
-	_, err := w.Write([]byte(generatePlaylist(allPls, hostHeader)))
-	if err != nil {
-		log.Printf("Error outputting playlist: %v\n", err)
-	}
-
+	return hostHeader
 }
 
 func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
