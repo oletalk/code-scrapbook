@@ -55,8 +55,7 @@ func processDownsample(filetype string, filepath string) (string, error) {
 	}
 	if outfile != "" {
 		// execute
-		output, err := cmd.CombinedOutput()
-		if err == nil {
+		if output, err := cmd.CombinedOutput(); err == nil {
 			duration := time.Since(dsStart).Milliseconds()
 			log.Printf("Downsample took %d milliseconds.\n", duration)
 		} else {
@@ -66,6 +65,3 @@ func processDownsample(filetype string, filepath string) (string, error) {
 	}
 	return outfile, nil
 }
-
-/* MP3 = "$(LAME_CMD) --nohist --mp3input -b 32 XXXX "
-   OGG = "$(SOX_CMD) XXXX -r 22050 " */

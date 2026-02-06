@@ -14,32 +14,31 @@ type SongHandler struct {
 
 func (s SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 	log.Printf("GetAllSongs called")
-	allPls, gerr := getAllSongs()
-	if gerr != nil {
+	if allPls, gerr := getAllSongs(); gerr != nil {
 
 		log.Printf("Error getting all songs for playlist: %v\n", gerr)
 		http.Error(w, "Internal Error", http.StatusInternalServerError)
 		return
+	} else {
+		writeResults(w, r, allPls)
 	}
-	writeResults(w, r, allPls)
 }
 
 func (s SongHandler) GetLatestSongs(w http.ResponseWriter, r *http.Request) {
 	log.Printf("GetLatestSongs called")
-	allPls, gerr := getLatestSongs()
-	if gerr != nil {
+	if allPls, gerr := getLatestSongs(); gerr != nil {
 
 		log.Printf("Error getting latest songs for playlist: %v\n", gerr)
 		http.Error(w, "Internal Error", http.StatusInternalServerError)
 		return
+	} else {
+		writeResults(w, r, allPls)
 	}
-	writeResults(w, r, allPls)
 }
 
 func writeResults(w http.ResponseWriter, r *http.Request, songs []Song) {
 	hostHeader := GetHostHeader(r)
-	_, err := w.Write([]byte(generatePlaylist(songs, hostHeader)))
-	if err != nil {
+	if _, err := w.Write([]byte(generatePlaylist(songs, hostHeader))); err != nil {
 		log.Printf("Error outputting playlist: %v\n", err)
 	}
 
