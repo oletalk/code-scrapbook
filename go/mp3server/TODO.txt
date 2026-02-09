@@ -1,3 +1,10 @@
+
+PRE-DEPLOYMENT LIST:
+ * gather list of panics - when is it valid for the service to panic?
+ * record stat
+ * record only when we think 95% (or so) of the tune has played
+
+OLD LIST:
 * DONE create data model
 * DONE fetch data from db tables
 * DONE generate playlist

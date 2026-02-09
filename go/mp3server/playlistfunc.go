@@ -20,6 +20,17 @@ func songfrompath(path string, removeSuffix bool) string {
 	return displayTitle
 }
 
+func downsampleType(filename string) string {
+	fname := strings.ToUpper(filename)
+	if strings.HasSuffix(fname, "MP3") {
+		return "MP3"
+	}
+	if strings.HasSuffix(fname, "OGG") {
+		return "OGG"
+	}
+	return "???"
+}
+
 func removedSuffix(s string, suf string) string {
 	if strings.HasSuffix(s, suf) {
 		return s[:len(s)-len(suf)]

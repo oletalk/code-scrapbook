@@ -7,17 +7,17 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func main() {
+func old_main() {
 	run_test()
 }
 
-func new_main() {
+func main() {
 	go manage_cache()
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Mount("/member", SongRoutes())
-	if err := http.ListenAndServe(":4567", r); err != nil {
+	if err := http.ListenAndServe(":2345", r); err != nil {
 		panic(err)
 	}
 }

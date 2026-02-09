@@ -67,12 +67,15 @@ func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if dlerr := downloadFile(song_remote, song_local); dlerr == nil {
 				log.Println("download completed.")
-				// TODO: downsample and replace (see sample_run.go)
+				// downsample and replace (see sample_run.go)
+				filetype := downsampleType(song_local)
+				if err := processDownsampleAndReplace(filetype, cacheFilename(song_local)); err != nil {
+					log.Printf("Downsampling failed: %v\n", err)
+				}
 			} else {
 				log.Printf("Error downloading file: %v\n", dlerr)
 			}
 		}
-		// TODO: downsample it
 
 		// stream locally downloaded file
 		filePath := getCacheFilepath(song_local)
