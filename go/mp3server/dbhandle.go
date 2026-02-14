@@ -16,6 +16,20 @@ const (
 	dbname = "postgres"
 )
 
+// record a song was played
+func recordStat(hash string) error {
+	db, err := getConn()
+
+	if err != nil {
+		return err
+	}
+	if _, perr := db.Exec("select record_mp3_stat($1)", hash); perr != nil {
+		return perr
+	}
+	log.Println("recorded song as played")
+	return nil
+}
+
 // fetch song sftp location for a given hash
 func getSongLocation(hash string) (string, error) {
 	pathsql := "SELECT song_filepath FROM mp3s_metadata WHERE file_hash = $1"
@@ -53,7 +67,8 @@ func getSongsFor(specifier string) ([]Song, error) {
 	db, err := getConn()
 
 	if err != nil {
-		panic(err)
+		// panic(err)
+		return nil, fmt.Errorf("getting db connection: %v", err)
 	}
 
 	// TODO check actual sql

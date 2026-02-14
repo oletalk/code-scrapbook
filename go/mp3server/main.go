@@ -7,11 +7,11 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func old_main() {
+func main() {
 	run_test()
 }
 
-func main() {
+func new_main() {
 	go manage_cache()
 
 	r := chi.NewRouter()

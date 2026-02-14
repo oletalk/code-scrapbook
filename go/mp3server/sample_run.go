@@ -55,7 +55,9 @@ func run_test() {
 					log.Printf("Error downloading file: %v\n", dlerr)
 				}
 			}
-
+			if rerr := recordStat("ff7db7c3573e38f20e4e3a877f3ec639dbced4af"); rerr != nil {
+				log.Printf("Error recording statistic: %v\n", rerr)
+			}
 		} else {
 			log.Printf("Failed to get song location: %v\n", err)
 		}
