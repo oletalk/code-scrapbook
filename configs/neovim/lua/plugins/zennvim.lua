@@ -1,0 +1,3 @@
+return {
+  'nendix/zen.nvim'
+}
