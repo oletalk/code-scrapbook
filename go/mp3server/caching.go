@@ -95,15 +95,20 @@ func (f *FileCache) prune() error {
 		} else {
 			log.Printf("error figuring out oldest file: %v", oerr)
 		}
-
-		// now refresh cache from OS
-		if newFiles, nferr := getFileInfos(f.cacheDir); nferr == nil {
-			f.files = newFiles
-			log.Printf("(updated) cache current size = %d\n", f.currentSize())
-		}
-
 	}
-	return nil
+	// always update the cache at the end of each run
+	return f.updateFiles()
+}
+
+// refresh cache from OS
+func (f *FileCache) updateFiles() error {
+	if newFiles, nferr := getFileInfos(f.cacheDir); nferr == nil {
+		f.files = newFiles
+		log.Printf("(updated) cache current size = %d\n", f.currentSize())
+		return nil
+	} else {
+		return nferr
+	}
 }
 
 func getFileInfos(dir string) ([]FileInfo, error) {
@@ -164,6 +169,6 @@ func manage_cache() {
 		if pgerr != nil {
 			log.Printf("Unable to prune cache dir: %v", pgerr)
 		}
-		time.Sleep(time.Minute * 1)
+		time.Sleep(time.Minute * 3)
 	}
 }

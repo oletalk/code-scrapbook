@@ -94,7 +94,10 @@ func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
 		w.Header().Set("Content-Length", strconv.FormatInt(fileStat.Size(), 10))
-
+		// record file requested
+		if rerr := recordStat(songhash); rerr != nil {
+			log.Printf("unable to record song requested: %v\n", rerr)
+		}
 		// stream the file
 		http.ServeContent(w, r, song_local, fileStat.ModTime(), file)
 	}
