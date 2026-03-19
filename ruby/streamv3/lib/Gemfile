@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-gem 'bcrypt', '~> 3.1.19'
+gem 'bcrypt', '~> 3.1.22'
 gem 'iostreams', '~> 1.10.3'
 gem 'net-sftp', '~> 4.0.0'
 gem 'pg', '~> 1.5'
