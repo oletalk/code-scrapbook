@@ -11,6 +11,11 @@ function themelib.get_scheme_for_now(current_time)
     start_hour = 16,
     start_min = 0,
   }
+  local evening_chunk = {
+    colourscheme = 'vimbones',
+    bg = 'light',
+    lualine_theme = 'lualine.themes.gruvbox_light'
+  }
   local light_chunk = {
     -- colourscheme = 'catppuccin-latte',
     colourscheme = 'modus_operandi',
@@ -21,7 +26,12 @@ function themelib.get_scheme_for_now(current_time)
   }
   f = io.open('/home/colin/.config/nvim/light.theme.txt')
   if not f then
-    return dark_chunk
+    f = io.open('/home/colin/.config/nvim/evening.theme.txt')
+    if f then
+      return evening_chunk
+    else
+      return dark_chunk
+    end
   else
     f:close()
     return light_chunk
