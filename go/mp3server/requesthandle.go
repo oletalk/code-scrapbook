@@ -88,6 +88,7 @@ func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
 
 		fileStat, err := file.Stat()
 		if err != nil {
+			log.Printf("Internal error with file: %v\n", err)
 			http.Error(w, "Internal server error", 500)
 			return
 		}
@@ -100,5 +101,7 @@ func (s SongHandler) FetchSong(w http.ResponseWriter, r *http.Request) {
 		}
 		// stream the file
 		http.ServeContent(w, r, song_local, fileStat.ModTime(), file)
+	} else {
+		log.Printf("unable to get song location: %v\n", err)
 	}
 }

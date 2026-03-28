@@ -8,6 +8,9 @@ PRE-DEPLOYMENT LIST:
  * record stat - check out record_stat.sql in streamv3 project
  * record only when we think 95% (or so) of the tune has played
 
+ POST-DEPLOYMENT:
+ * ensure no pruning if only 1 file in cache dir
+ 
 OLD LIST:
 * DONE create data model
 * DONE fetch data from db tables

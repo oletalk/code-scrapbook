@@ -76,7 +76,11 @@ func getSongsFor(specifier string) ([]Song, error) {
 	if err != nil {
 		return nil, fmt.Errorf("getAllSongs %v", err)
 	}
-	defer rows.Close()
+	defer func() {
+		if rerr := rows.Close(); rerr != nil {
+			log.Println("Problem closing rows object after query: ", rerr)
+		}
+	}()
 
 	// loop through rows, using Scan to assign column data to struct fields
 	for rows.Next() {

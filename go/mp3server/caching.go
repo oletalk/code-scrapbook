@@ -83,7 +83,8 @@ func (f FileCache) currentSize() int64 {
 // deletes the oldest file in the cache if it is over the maxSize.
 func (f *FileCache) prune() error {
 	log.Printf("(actual) cache current size = %d\n", f.currentSize())
-	if f.maxSize < f.currentSize() {
+	// we only prune if there is more than one file in the directory
+	if f.maxSize < f.currentSize() && len(f.files) > 1 {
 		log.Println("PRUNE NEEDED")
 		// get oldest file and delete it
 		if oldest, oerr := f.oldestFile(); oerr == nil {
