@@ -9,6 +9,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// TODO this works, but it's not the best thing having a global variable
+// better to explicitly initialise in main() and pass the db around.
+var db *sql.DB
+
 const (
 	host   = "localhost"
 	port   = 5432
@@ -18,11 +22,8 @@ const (
 
 // record a song was played
 func recordStat(hash string) error {
-	db, err := getConn()
+	//db, err := getConn()
 
-	if err != nil {
-		return err
-	}
 	if _, perr := db.Exec("select record_mp3_stat($1)", hash); perr != nil {
 		return perr
 	}
@@ -33,11 +34,6 @@ func recordStat(hash string) error {
 // fetch song sftp location for a given hash
 func getSongLocation(hash string) (string, error) {
 	pathsql := "SELECT song_filepath FROM mp3s_metadata WHERE file_hash = $1"
-	db, err := getConn()
-
-	if err != nil {
-		return "", err
-	}
 	var loc string
 
 	row := db.QueryRow(pathsql, hash)
@@ -63,13 +59,6 @@ func getLatestSongs() ([]Song, error) {
 
 func getSongsFor(specifier string) ([]Song, error) {
 	var songs []Song
-	// TODO initialise db...
-	db, err := getConn()
-
-	if err != nil {
-		// panic(err)
-		return nil, fmt.Errorf("getting db connection: %v", err)
-	}
 
 	// TODO check actual sql
 	rows, err := db.Query("SELECT song_filepath, file_hash, artist, title, secs, date_added FROM mp3s_metadata" + specifier)
@@ -105,13 +94,19 @@ func getSongsFor(specifier string) ([]Song, error) {
 }
 
 // get a connection from the database
-func getConn() (*sql.DB, error) {
+func init() {
 	password := os.Getenv("DBPASS")
 	if password == "" {
 		log.Fatal("Please provide DBPASS environment variable!")
 	}
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
-
-	return sql.Open("postgres", psqlInfo)
+	var err error
+	db, err = sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err = db.Ping(); err != nil {
+		log.Fatal(err)
+	}
 }
