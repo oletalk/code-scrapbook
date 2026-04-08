@@ -12,6 +12,7 @@ func old_main() {
 }
 
 func main() {
+	initialiseDb()
 	go manage_cache()
 
 	r := chi.NewRouter()

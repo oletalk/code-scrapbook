@@ -94,7 +94,7 @@ func getSongsFor(specifier string) ([]Song, error) {
 }
 
 // get a connection from the database
-func init() {
+func initialiseDb() {
 	password := os.Getenv("DBPASS")
 	if password == "" {
 		log.Fatal("Please provide DBPASS environment variable!")
