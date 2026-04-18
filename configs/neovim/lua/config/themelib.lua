@@ -4,8 +4,8 @@ local themelib = {}
 function themelib.get_scheme_for_now(current_time)
   local dark_chunk = {
     -- colourscheme = 'catppuccin-mocha',
-    colourscheme = 'oasis-starlight',
-    -- colourscheme = 'oldworld',
+    -- colourscheme = 'oasis-starlight',
+    colourscheme = 'sora',
     bg = 'dark',
     lualine_theme = 'lualine.themes.nightfly',
     start_hour = 16,

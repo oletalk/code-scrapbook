@@ -32,4 +32,4 @@ vim.keymap.set("n", "[t", function()
 end, { desc = "Previous todo comment" })
 
 -- restart lsp if you need to
-vim.keymap.set('n', '<F5>', ':LspRestart<CR>' )
+vim.keymap.set('n', '<F5>', ':lsp restart<CR>' )

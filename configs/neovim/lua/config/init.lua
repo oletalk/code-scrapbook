@@ -16,5 +16,7 @@ require("config.dapsetup")
 require("config.keybindings")
 require("config.keybindings-plugins")
 
+-- fidget/noice messaging
+require("config.ui2")
 -- python virtual environments with swenv
 require("config.virtualenvs")
