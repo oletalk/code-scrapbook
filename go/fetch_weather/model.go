@@ -1,5 +1,10 @@
 package main
 
+type WaybarOutput struct {
+	Text    string `json:"text"`
+	Tooltip string `json:"tooltip"`
+}
+
 type Measurements struct {
 	Day   float32
 	Min   float32
