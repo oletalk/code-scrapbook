@@ -16,6 +16,51 @@ type Song struct {
 	date_added time.Time
 }
 
+type StatItem struct {
+	item  string
+	count int64
+}
+
+type StatDetail struct {
+	item   string
+	detail string
+}
+
+type StatDisplay struct {
+	topArtists []StatItem
+	songsToday []StatItem
+	errors     []StatDetail
+}
+
+func formatStatItems(items []StatItem, itemDesc string) string {
+	var sb strings.Builder
+	if len(items) > 0 {
+		fmt.Fprintf(&sb, "<h2>All %s</h2>", itemDesc)
+		for _, s := range items {
+			fmt.Fprintf(&sb, "<b>%s</b>: %d<br/>", s.item, s.count)
+		}
+	} else {
+		fmt.Fprintf(&sb, "no %s", itemDesc)
+	}
+	return sb.String()
+}
+
+func formatStatDetails(items []StatDetail, itemDesc string) string {
+	var sb strings.Builder
+	if len(items) > 0 {
+		fmt.Fprintf(&sb, "<h2>All %s</h2>", itemDesc)
+		for _, s := range items {
+			fmt.Fprintf(&sb, "<b>%s</b>: %s<br/>", s.item, s.detail)
+		}
+	} else {
+		fmt.Fprintf(&sb, "no %s", itemDesc)
+	}
+	for _, s := range items {
+		fmt.Fprintf(&sb, "<b>%s</b>: %s<br/>", s.item, s.detail)
+	}
+	return sb.String()
+}
+
 const (
 	EXTINF = "#EXTINF"
 )

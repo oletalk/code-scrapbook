@@ -1,15 +1,10 @@
+IMPLEMENT FEATURES:
+status page:
+- basic stats like songs played since startup
+- connections
+- any errors that occurred today
 
-PRE-DEPLOYMENT LIST:
- * gather list of panics - when is it valid for the service to panic?
-   - dbhandle.go: in getting a connection for any query <---
-        - (2026/02/10) now returns error which will propagate
-   - caching.go: calling manage_cache (separate thread) at startup
-   - main.go: failure to startup an http server at startup
- * record stat - check out record_stat.sql in streamv3 project
- * record only when we think 95% (or so) of the tune has played
 
- POST-DEPLOYMENT:
- * ensure no pruning if only 1 file in cache dir
  
 OLD LIST:
 * DONE create data model

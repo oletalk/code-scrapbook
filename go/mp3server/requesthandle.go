@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,24 @@ import (
 )
 
 type SongHandler struct {
+}
+
+func (s SongHandler) GetStatus(w http.ResponseWriter, r *http.Request) {
+	var status string
+	if allStats, gerr := getStats(); gerr != nil {
+		log.Printf("Error getting stats: %v\n", gerr)
+		http.Error(w, "Internal Error", http.StatusInternalServerError)
+		return
+	} else {
+		status = fmt.Sprintf("<h1>Quick stats</h1><p>%s</p><p>%s</p><p>%s</p>",
+			formatStatItems(allStats.songsToday, "songs played so far"),
+			formatStatItems(allStats.topArtists, "artists played so far"),
+			formatStatDetails(allStats.errors, "errors today"))
+	}
+	w.Header().Set("Content-Type", "text/html")
+	if _, err := w.Write([]byte(status)); err != nil {
+		log.Printf("Error outputting status: %v\n", err)
+	}
 }
 
 func (s SongHandler) GetAllSongs(w http.ResponseWriter, r *http.Request) {

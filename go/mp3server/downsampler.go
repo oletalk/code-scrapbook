@@ -59,6 +59,7 @@ func processDownsample(filetype string, filepath string) (string, error) {
 			duration := time.Since(dsStart).Milliseconds()
 			log.Printf("Downsample took %d milliseconds.\n", duration)
 		} else {
+			recordDiagnostic("downsample error", err.Error())
 			log.Println(string(output))
 			return "", err
 		}
