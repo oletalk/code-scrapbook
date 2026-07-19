@@ -9,6 +9,14 @@ import (
 	"time"
 )
 
+// get time the file was modified
+func modifiedTs(path string) (string, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+	return info.ModTime().Format("15:04"), nil
+}
 func needsDownload(path string) bool {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) {

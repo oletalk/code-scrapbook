@@ -5,6 +5,14 @@ type WaybarOutput struct {
 	Tooltip string `json:"tooltip"`
 }
 
+type AlertInfo struct {
+	Sender_name string
+	Event       string
+	Start       int64
+	End         int64
+	Description string
+}
+
 type Measurements struct {
 	Day   float32
 	Min   float32
@@ -29,6 +37,7 @@ type OneCallResult struct {
 	Current         CurrentForecast
 	Daily           []DailyForecastUnit
 	Hourly          []HourlyForecastUnit
+	Alerts          []AlertInfo
 }
 type CurrentForecast struct {
 	Dt         uint64
@@ -42,6 +51,7 @@ type CurrentForecast struct {
 	Clouds     int
 	Visibility uint64
 	Wind_speed float32
+	Wind_deg   int
 	Weather    []WeatherDisplay
 }
 

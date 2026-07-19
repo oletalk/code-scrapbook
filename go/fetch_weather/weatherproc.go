@@ -10,7 +10,7 @@ const (
 	deg = "°C"
 )
 
-func createForecast(input OneCallResult) (WaybarOutput, error) {
+func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput, error) {
 
 	now := time.Now()
 	var out WaybarOutput
@@ -20,7 +20,7 @@ func createForecast(input OneCallResult) (WaybarOutput, error) {
 
 	// CREATE TEXT IN MAIN DISPLAY
 	icon := weatherIcon(input.Current.Weather[0].Icon)
-	if feelsLike != currWeather {
+	if int64(feelsLike) != int64(currWeather) {
 		out.Text = fmt.Sprintf("%s %.0f%s (%.0f%s)", icon, currWeather, deg, feelsLike, deg)
 	} else {
 		out.Text = fmt.Sprintf("%s %.0f%s", icon, currWeather, deg)
@@ -29,7 +29,15 @@ func createForecast(input OneCallResult) (WaybarOutput, error) {
 	// CREATE TOOLTIP
 	// description e.g. 'broken clouds'
 	currWeatherDescrip := input.Current.Weather[0].Description
-	tooltip = append(tooltip, currWeatherDescrip)
+	windSpeed := input.Current.Wind_speed
+	windInfo := fmt.Sprintf("%s %.0f m/s %s", getWindIcon(windSpeed), windSpeed, getDirection(input.Current.Wind_deg))
+
+	firstLine := currWeatherDescrip
+
+	if windSpeed > 0.0 {
+		firstLine += " (" + windInfo + " )"
+	}
+	tooltip = append(tooltip, firstLine)
 	// min/max
 	tooltip = append(tooltip, fmt.Sprintf("🡙 %.0f / %.0f %s", input.Daily[0].Temp.Min, input.Daily[0].Temp.Max, deg))
 	sunset := input.Current.Sunset
@@ -46,7 +54,18 @@ func createForecast(input OneCallResult) (WaybarOutput, error) {
 		changeTime := timeToday(int64(unit.Dt))
 		tooltip = append(tooltip, fmt.Sprintf("%s at <b>%s</b>", changeDesc, changeTime))
 	}
-	tooltip = append(tooltip, fmt.Sprintf("⌚ upd. %s", timeToday(now.Unix())))
+	// tooltip = append(tooltip, fmt.Sprintf("⌚ upd. %s", timeToday(now.Unix())))
+	tooltip = append(tooltip, fmt.Sprintf("⌚ upd. %s", lastModifiedTime))
+	// alerts... WIP
+	if len(input.Alerts) > 0 {
+		// TODO: write alerts somewhere?
+		aldescr := input.Alerts[0].Event
+		if len(input.Alerts) > 1 {
+			aldescr = fmt.Sprintf("%s + %d", aldescr, len(input.Alerts)-1)
+		}
+		tooltip = append(tooltip, "⚠️ "+aldescr)
+	}
+
 	// join them all
 	out.Tooltip = strings.Join(tooltip, "\n")
 	return out, nil
@@ -71,6 +90,43 @@ func Find[T any](slice []T, predicate func(T) bool) (T, bool) {
 	}
 	var zero T
 	return zero, false
+}
+func getWindIcon(msec float32) string {
+	switch {
+	case msec > 0 && msec <= 5:
+		return "🍃"
+	case msec > 5 && msec <= 10:
+		return "🪁"
+	case msec > 10 && msec <= 15:
+		return "🌬️"
+	default:
+		return ""
+
+	}
+}
+func getDirection(deg int) string {
+	switch {
+	case deg > 0 && deg <= 22:
+		return "N"
+	case deg > 22 && deg <= 67:
+		return "NE"
+	case deg > 67 && deg <= 112:
+		return "E"
+	case deg > 112 && deg <= 157:
+		return "SW"
+	case deg > 157 && deg <= 202:
+		return "S"
+	case deg > 202 && deg <= 247:
+		return "SE"
+	case deg > 247 && deg <= 292:
+		return "W"
+	case deg > 292 && deg <= 337:
+		return "NW"
+	case deg > 337 && deg <= 360:
+		return "N"
+	default:
+		return "Unknown"
+	}
 }
 
 // given an epochSeconds value, show it in the form HH:MM
