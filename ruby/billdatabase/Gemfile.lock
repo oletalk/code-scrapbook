@@ -13,14 +13,14 @@ GEM
     net-sftp (4.0.0)
       net-ssh (>= 5.0.0, < 8.0.0)
     net-ssh (7.3.0)
-    nio4r (2.7.4)
+    nio4r (2.7.5)
     parallel (1.27.0)
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
     pg (1.5.9)
     prism (1.5.2)
-    puma (6.4.3)
+    puma (7.2.1)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.6)
@@ -83,7 +83,7 @@ PLATFORMS
 DEPENDENCIES
   net-sftp (~> 4.0.0)
   pg (~> 1.5.3)
-  puma (~> 6.4.3)
+  puma (~> 7.2.1)
   rackup (~> 2.2)
   rspec
   rubocop (~> 1.71, >= 1.71.1)
