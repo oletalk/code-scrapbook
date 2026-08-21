@@ -50,7 +50,7 @@ impl fmt::Display for EventEntry {
                 String::from("")
             }
         };
-        write!(f, "{} {}", disp_time, self.summary)
+        write!(f, "{} {}", self.summary, disp_time)
     }
 }
 
@@ -220,11 +220,6 @@ fn build_day_cell(
 
     if let Some(evts) = day_events {
         // Small marker dot to indicate "has events".
-        let marker = gtk::Label::new(Some("•"));
-        marker.add_css_class("accent");
-        marker.set_halign(gtk::Align::Center);
-        cell.append(&marker);
-
         let tooltip = evts
             .iter()
             // .map(|e| e.summary.clone() + &e.date_start.clone().to_string())
@@ -232,8 +227,18 @@ fn build_day_cell(
             .collect::<Vec<_>>()
             .join("\n");
         cell.set_tooltip_text(Some(&tooltip));
+
+        // let marker = gtk::Label::new(Some("•"));
+        let marker = gtk::Label::new(Some(&events_tooltip(&tooltip)));
+        marker.add_css_class("accent");
+        marker.set_halign(gtk::Align::Start);
+        cell.append(&marker);
     }
 
+    // let celltext = gtk::Label::new(Some("hh"));
+    // TODO: css
+    // celltext.set_halign(gtk::Align::End);
+    // cell.append(&celltext);
     cell.add_css_class("card");
     cell.set_margin_top(2);
     cell.set_margin_bottom(2);
@@ -243,6 +248,13 @@ fn build_day_cell(
 fn days_in_month(month_start: NaiveDate) -> u32 {
     let next = shift_month(month_start, 1);
     (next - month_start).num_days() as u32
+}
+
+fn events_tooltip(allevents: &str) -> String {
+    let mut lines = allevents.lines();
+    let mut tip = lines.next().unwrap_or("").to_string();
+    tip.truncate(10);
+    tip
 }
 
 /// Scan ~/.calendars/all/**/*.ics and return events that fall within
