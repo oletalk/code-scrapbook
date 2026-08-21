@@ -1,0 +1,26 @@
+[package]
+name = "cal-widget"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "cal-widget"
+path = "src/main.rs"
+
+[dependencies]
+# GTK4 bindings
+gtk = { version = "0.9", package = "gtk4" }
+glib = "0.20"
+
+# ICS parsing
+ical = "0.11"
+
+# Dates
+chrono = "0.4"
+
+# XDG-style home dir lookup
+dirs = "5"
+
+# Recursive directory walk (vdirsyncer lays events out as one .ics per file,
+# often in per-collection subfolders)
+walkdir = "2"
