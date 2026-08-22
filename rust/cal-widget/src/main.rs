@@ -6,15 +6,18 @@ use std::io::BufReader;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-/* TODO: parse out and display time in tooltip
+/* TODO: shrink font in main calendar so it's a sensible size
  *  format of DTSTART/DTEND seems to be 20190427T130000Z */
 use chrono::{Datelike, NaiveDate, NaiveTime};
+use gtk::gdk::Display;
 use gtk::glib;
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow};
+use gtk::{Application, ApplicationWindow, CssProvider};
 
 const APP_ID: &str = "uk.co.oletalk.cal-widget";
 const CALENDAR_DIR: &str = ".calendars/all";
+const CONFIG_SUBDIR: &str = "cal-widget";
+const STYLE_CSS_FILENAME: &str = "style.css";
 
 /// One parsed event, reduced to just what the widget needs.
 #[derive(Clone, Debug)]
@@ -24,6 +27,7 @@ struct EventEntry {
     time_start: Option<NaiveTime>,
     time_end: Option<NaiveTime>,
     summary: String,
+    location: Option<String>,
     all_day: bool,
 }
 
@@ -50,12 +54,59 @@ impl fmt::Display for EventEntry {
                 String::from("")
             }
         };
-        write!(f, "{} {}", self.summary, disp_time)
+        let disp_location = if let Some(loc) = &self.location {
+            format!(" ({})", loc)
+        } else {
+            String::from("")
+        };
+        write!(f, "{} {}\n{}", self.summary, disp_time, disp_location)
     }
+}
+
+/// Resolves the stylesheet path as `<config_dir>/cal-widget/style.css`
+/// (e.g. `~/.config/cal-widget/style.css` on Linux). Returns None if the
+/// platform has no config dir.
+fn style_css_path() -> Option<PathBuf> {
+    dirs::config_dir().map(|c| c.join(CONFIG_SUBDIR).join(STYLE_CSS_FILENAME))
+}
+
+fn load_css() {
+    let Some(path) = style_css_path() else {
+        eprintln!("cal-widget: couldn't resolve a config dir (continuing without custom styles)");
+        return;
+    };
+
+    let provider = CssProvider::new();
+    provider.connect_parsing_error(|_, section, error| {
+        eprintln!(
+            "cal-widget: CSS parse error: {} (line {})",
+            error,
+            section.start_location().lines()
+        );
+    });
+    match std::fs::read_to_string(&path) {
+        Ok(css) => provider.load_from_data(&css),
+        Err(err) => {
+            eprintln!(
+                "cal-widget: couldn't read {}: {} (continuing without custom styles)",
+                path.display(),
+                err
+            );
+            return;
+        }
+    }
+
+    gtk::style_context_add_provider_for_display(
+        &Display::default().expect("no display available"),
+        &provider,
+        // gtk::STYLE_PROVIDER_PRIORITY_APPLICATION,
+        gtk::STYLE_PROVIDER_PRIORITY_USER,
+    );
 }
 
 fn main() -> glib::ExitCode {
     let app = Application::builder().application_id(APP_ID).build();
+    app.connect_startup(|_| load_css());
     app.connect_activate(build_ui);
     app.run()
 }
@@ -91,6 +142,16 @@ fn build_ui(app: &Application) {
     root.append(&header);
     root.append(&gtk::Separator::new(gtk::Orientation::Horizontal));
     root.append(&grid_container);
+    let quit_row = gtk::Button::new();
+    quit_row.add_css_class("quit-button");
+    let quit_label = gtk::Label::new(Some("Quit"));
+    quit_label.set_halign(gtk::Align::Fill);
+    quit_row.set_child(Some(&quit_label));
+    let app_clone = app.clone();
+    quit_row.connect_clicked(move |_| {
+        app_clone.quit();
+    });
+    root.append(&quit_row);
 
     window.set_child(Some(&root));
 
@@ -211,10 +272,11 @@ fn build_day_cell(
     cell.set_halign(gtk::Align::Fill);
 
     let day_label = gtk::Label::new(Some(&date.day().to_string()));
-    day_label.set_halign(gtk::Align::Center);
+    day_label.set_halign(gtk::Align::Start);
     if is_today {
-        day_label.add_css_class("accent");
+        day_label.add_css_class("calendar-today");
         day_label.add_css_class("heading");
+        cell.add_css_class("day-today");
     }
     cell.append(&day_label);
 
@@ -230,7 +292,11 @@ fn build_day_cell(
 
         // let marker = gtk::Label::new(Some("•"));
         let marker = gtk::Label::new(Some(&events_tooltip(&tooltip)));
+        marker.set_wrap(true);
+        marker.set_width_chars(20);
+        marker.set_max_width_chars(20);
         marker.add_css_class("accent");
+        marker.add_css_class("calendar-entry");
         marker.set_halign(gtk::Align::Start);
         cell.append(&marker);
     }
@@ -253,8 +319,13 @@ fn days_in_month(month_start: NaiveDate) -> u32 {
 fn events_tooltip(allevents: &str) -> String {
     let mut lines = allevents.lines();
     let mut tip = lines.next().unwrap_or("").to_string();
-    tip.truncate(10);
-    tip
+    tip.truncate(50);
+    let remaining = lines.count();
+    if remaining > 0 {
+        format!("{} (+ {})", tip, remaining)
+    } else {
+        tip
+    }
 }
 
 /// Scan ~/.calendars/all/**/*.ics and return events that fall within
@@ -317,6 +388,7 @@ fn parse_ics_file(path: &PathBuf) -> Vec<EventEntry> {
             let mut dtstart_raw: Option<String> = None;
             let mut dtend_raw: Option<String> = None;
             let mut summary = String::from("(untitled)");
+            let mut location: Option<String> = None;
 
             for prop in &vevent.properties {
                 match prop.name.as_str() {
@@ -335,6 +407,11 @@ fn parse_ics_file(path: &PathBuf) -> Vec<EventEntry> {
                             summary = v.clone();
                         }
                     }
+                    "LOCATION" => {
+                        if let Some(v) = &prop.value {
+                            location = Some(v.clone());
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -348,6 +425,7 @@ fn parse_ics_file(path: &PathBuf) -> Vec<EventEntry> {
                     time_start: parseddate_start.time_part,
                     date_end: parseddate_end.date_part,
                     time_end: parseddate_end.time_part,
+                    location,
                     summary,
                     all_day: parseddate_start.all_day,
                 });
