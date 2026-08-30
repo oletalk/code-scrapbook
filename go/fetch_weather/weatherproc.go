@@ -1,13 +1,18 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 )
 
 const (
-	deg = "°C"
+	deg                = "°C"
+	ROUNDING           = 0.9
+	LARGE_DELTA        = 2.0
+	SHOW_TOMORROW_HOUR = 14
 )
 
 func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput, error) {
@@ -46,7 +51,12 @@ func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput,
 	}
 	// display range for tomorrow (if it's late enough)
 	if showTomorrowItems(now) {
-		tooltip = append(tooltip, fmt.Sprintf("tomorrow %.0f-%.0f %s", input.Daily[1].Temp.Min, input.Daily[1].Temp.Max, deg))
+		// work out trend
+		avgTemp0 := (input.Daily[0].Temp.Max + input.Daily[0].Temp.Min) / 2
+		avgTemp1 := (input.Daily[1].Temp.Max + input.Daily[1].Temp.Min) / 2
+		avgTemp2 := (input.Daily[2].Temp.Max + input.Daily[2].Temp.Min) / 2
+
+		tooltip = append(tooltip, fmt.Sprintf("tomorrow %.0f-%.0f %s %s", input.Daily[1].Temp.Min, input.Daily[1].Temp.Max, deg, trendIcon(avgTemp0, avgTemp1, avgTemp2)))
 	}
 	unit := firstDiff(currWeatherDescrip, input.Hourly)
 	if unit != nil {
@@ -106,7 +116,7 @@ func getWindIcon(msec float32) string {
 }
 func getDirection(deg int) string {
 	switch {
-	case deg > 0 && deg <= 22:
+	case deg >= 0 && deg <= 22:
 		return "N"
 	case deg > 22 && deg <= 67:
 		return "NE"
@@ -137,7 +147,45 @@ func timeToday(epochSeconds int64) string {
 
 // show items for tomorrow after 2pm
 func showTomorrowItems(now time.Time) bool {
-	return now.Hour() >= 14
+	return now.Hour() >= SHOW_TOMORROW_HOUR
+}
+
+func roundTo(v float32, step float32) float32 {
+	return float32(math.Round(float64(v/step))) * step
+}
+
+// return icon for temp trend
+func trendIcon(todayTemp, tomorrowTemp, dayAfterTemp float32) string {
+	// TODO: way to signal one of the temp differences is much larger than the other
+
+	retStr := changeIcon(todayTemp, tomorrowTemp) + changeIcon(tomorrowTemp, dayAfterTemp)
+
+	// if retStr == "➡️➡️" {
+	// 		return ""
+	// 	}
+	return retStr
+}
+
+func changeIcon(first float32, second float32) string {
+	ra := roundTo(first, ROUNDING)
+	rb := roundTo(second, ROUNDING)
+	delta1 := math.Abs(float64(rb - ra))
+	switch cmp.Compare(ra, rb) {
+	case -1:
+		if delta1 >= LARGE_DELTA {
+			return "⤴️"
+		} else {
+			return "↗️"
+		}
+	case 1:
+		if delta1 >= LARGE_DELTA {
+			return "⤵️"
+		} else {
+			return "↘️"
+		}
+	default:
+		return "➡️"
+	}
 }
 
 func isPast(epochSeconds int64, now time.Time) bool {
@@ -150,17 +198,17 @@ func weatherIcon(iconName string) string {
 	case "01n":
 		return "" // clear night
 	case "02d", "02n", "03d", "03n", "04d", "04n":
-		return "" // cloudy
+		return "☁️" // cloudy
 	case "09d", "09n":
-		return "" // shower rain
+		return "☔" // shower rain
 	case "10d", "10n":
-		return "" // rain
+		return "🌧️" // rain
 	case "11d", "11n":
-		return "" // thunderstorm
+		return "⛈️" // thunderstorm
 	case "13d", "13n":
-		return "" // snow
+		return "❄️" // snow
 	case "50d", "50n":
-		return "" // mist
+		return "🌫️" // mist
 	default:
 		return ""
 	}
