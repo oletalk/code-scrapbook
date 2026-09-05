@@ -10,6 +10,6 @@ require('overseer').setup({
   strategy = "toggleterm",
 })
 
--- setup refactoring
-require('refactoring').setup({
-})
+-- setup refactoring FIXME: broken 2026-04-21
+-- require('refactoring').setup({
+-- })

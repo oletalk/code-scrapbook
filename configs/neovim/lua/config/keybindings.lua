@@ -33,3 +33,8 @@ end, { desc = "Previous todo comment" })
 
 -- restart lsp if you need to
 vim.keymap.set('n', '<F5>', ':lsp restart<CR>' )
+
+-- navigate between diagnostics
+vim.keymap.set('n', '<F2>', function()
+	vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Go to the next error" })

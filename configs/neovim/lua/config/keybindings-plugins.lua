@@ -30,7 +30,30 @@ require('gitsigns').setup {
     end)
   end
 }
+-- setup keybindings for Haunt annotations
+local haunt = require("haunt.api")
+local haunt_picker = require("haunt.picker")
+vim.keymap.set('n', '<F6>a', function()
+  haunt.annotate()
+end, { desc = 'Add annotation' })
+vim.keymap.set('n', '<F6>d', function()
+  haunt.delete()
+end, { desc = 'Delete annotation' })
+vim.keymap.set('n', '<F6>k', function()
+  haunt.prev()
+end, { desc = 'Jump to previous annotation' })
+vim.keymap.set('n', '<F6>D', function()
+  haunt.clear_all()
+end, { desc = 'Clear all annotations' })
+vim.keymap.set('n', '<F6>j', function()
+  haunt.next()
+end, { desc = 'Jump to next annotation' })
+vim.keymap.set('n', '<F6>s', function()
+  haunt_picker.show({ prompt = "Bookmarks> " })
+end, { desc = 'Display all bookmarks' })
 
+-- setup keybindings for zk
+vim.keymap.set('n', '<F7>', '<cmd>ZkNotes<cr>')
 -- ssetup keybindings for dropbar TEST
 
 local dropbar_api = require('dropbar.api')

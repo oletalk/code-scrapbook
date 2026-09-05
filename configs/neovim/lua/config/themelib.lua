@@ -12,7 +12,7 @@ function themelib.get_scheme_for_now(current_time)
     start_min = 0,
   }
   local evening_chunk = {
-    colourscheme = 'vimbones',
+    colourscheme = 'oasis-moonlight',
     bg = 'light',
     lualine_theme = 'lualine.themes.gruvbox_light'
   }
