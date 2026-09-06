@@ -14,7 +14,7 @@ type WaybarOutput struct {
 }
 
 /* output a json string from the contents of the object */
-func (w WaybarOutput) toJson() (string, error) {
+func (w WaybarOutput) ToJson() (string, error) {
 
 	var outStr strings.Builder
 	enc := json.NewEncoder(&outStr)
@@ -28,6 +28,6 @@ func (w WaybarOutput) toJson() (string, error) {
 }
 
 /* assemble tooltip from an array of strings */
-func (w *WaybarOutput) setTooltip(tooltipLines []string) {
+func (w *WaybarOutput) SetTooltip(tooltipLines []string) {
 	w.Tooltip = strings.Join(tooltipLines[:], "\n")
 }
