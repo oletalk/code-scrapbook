@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/oletalk/code-scrapbook/waybarutil"
 	"os/exec"
 	"strings"
 	"time"
@@ -16,26 +17,23 @@ const (
 func main() {
 	now := time.Now()
 	isToday := false
-	var eventInText string
-	var waybarOutput WaybarOutput
+	eventInText := ""
+	var waybarOutput waybarutil.WaybarOutput
 	var tooltipText []string
 	appointments := 0
 
-	// TODO: tidier!
-	out, err := exec.Command("khal", "list", "now", "8days",
-		"--json", "title",
-		"--json", "start-date",
-		"--json", "start-time",
-		"--json", "end-date",
-		"--json", "end-time",
-		"--json", "location",
-		"--json", "duration",
-		"--json", "all-day",
-		"--json", "repeat-symbol",
-		"--json", "end").Output()
-	if err == nil {
-		for output := range strings.SplitSeq(string(out), "\n") {
+	fields := khalJSONFields(Event{})
+	args := []string{"list", "now", "8days"}
+	for _, f := range fields {
+		args = append(args, "--json", f)
+	}
 
+	out, err := exec.Command("khal", args...).Output()
+	if err == nil {
+		for dayNum, output := range strings.Split(string(out), "\n") {
+			// khal output is a sequential list of json arrays
+			// 1 per day
+			dte := time.Now().AddDate(0, 0, dayNum)
 			if strings.Contains(output, "{") {
 				var events []Event
 				var tooltipDay TooltipDetail
@@ -43,19 +41,26 @@ func main() {
 				if err == nil {
 					// fmt.Printf("Parsed events: %+v\n", events)
 					// TODO: error handling?
-					dayofwk, _ := dayofweek(events[0].StartDate, now)
+					// dayofwk, _ := dayofweek(events[len(events)-1].StartDate, now)
+					dayofwk, _ := dayofweek_time(dte, now)
 					isToday = (dayofwk == "Today")
-					tooltipDay.heading(fmt.Sprintf("%s, %s", dayofwk, events[0].StartDate))
+					tooltipDay.heading(fmt.Sprintf("%s, %s", dayofwk, events[len(events)-1].StartDate))
 					for _, event := range events {
 						if event.AllDay != "True" {
 							appointments += 1
-							dispText := fmt.Sprintf("%s-%s %s", event.StartTime, event.EndTime, event.Title)
+							// dispText := fmt.Sprintf("%s-%s %s", event.StartTime, event.EndTime, event.Title)
+							dispText := fmt.Sprintf("%s %s %s", event.StartEndTimeStyle, event.Title, event.RepeatSymbol)
 							if isToday && eventInText == "" {
 								eventInText = dispText
 							}
 							tooltipDay.add_entry(dispText)
 						} else {
-							tooltipDay.add_entry(fmt.Sprintf("%s (All Day)", event.Title))
+							// dispText := fmt.Sprintf("%s (All Day)", event.Title)
+							dispText := fmt.Sprintf("%s %s %s", event.StartEndTimeStyle, event.Title, event.RepeatSymbol)
+							if isToday && eventInText == "" {
+								eventInText = dispText
+							}
+							tooltipDay.add_entry(dispText)
 						}
 					}
 				} else {
@@ -64,7 +69,7 @@ func main() {
 				tooltipText = append(tooltipText, tooltipDay.stringify())
 			}
 		}
-		waybarOutput.Tooltip = strings.Join(tooltipText[:], "\n")
+		waybarOutput.SetTooltip(tooltipText)
 
 	} else {
 		fmt.Printf("Error occurred: %v\n", err)
@@ -78,13 +83,10 @@ func main() {
 		// else if at least one appointment...
 		waybarOutput.Text = fmt.Sprintf("%s (%d)", calendarIcon, appointments)
 	}
-	var outStr strings.Builder
-	enc := json.NewEncoder(&outStr)
-	enc.SetEscapeHTML(false) // not printing out to web so we're fine
-	eerr := enc.Encode(waybarOutput)
+	outStr, eerr := waybarOutput.ToJson()
 	if eerr != nil {
 		fmt.Printf(errorTemplate, "json error")
 	} else {
-		fmt.Print(outStr.String())
+		fmt.Print(outStr)
 	}
 }
