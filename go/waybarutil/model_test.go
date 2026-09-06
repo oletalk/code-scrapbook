@@ -24,3 +24,13 @@ func TestJson(t *testing.T) {
 		t.Errorf(`TestSimple() = %q, want %q, error`, str, expected)
 	}
 }
+func TestWithClass(t *testing.T) {
+	var w WaybarOutput
+	w.Text = "this is fun"
+	w.SetTooltip([]string{"first line", "last line!"})
+	w.Class = "shiny"
+	expected := "{\"text\":\"this is fun\",\"tooltip\":\"first line\\nlast line!\",\"class\":\"shiny\"}\n"
+	if str, _ := w.ToJson(); str != expected {
+		t.Errorf(`TestSimple() = %q, want %q, error`, str, expected)
+	}
+}

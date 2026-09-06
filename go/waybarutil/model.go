@@ -11,6 +11,7 @@ import (
 type WaybarOutput struct {
 	Text    string `json:"text"`
 	Tooltip string `json:"tooltip"`
+	Class   string `json:"class,omitempty"`
 }
 
 /* output a json string from the contents of the object */
