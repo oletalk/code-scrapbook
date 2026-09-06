@@ -1,8 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/oletalk/code-scrapbook/waybarutil"
+	"os"
 	"os/exec"
 	"slices"
 	"strconv"
@@ -11,7 +12,8 @@ import (
 
 const (
 	PACKAGE_ICON      = "📦"
-	errorTemplate     = "{ 'text': '📦 ?', 'tooltip': 'error: %v' }"
+	errorTemplate     = "{ \"text\": \"📦 ?\", \"tooltip\": \"error: %v\" }\n"
+	noUpdates         = "{ \"text\": \"📦 ✅\", \"tooltip\": \"system up-to-date!\" }"
 	sourceCommand     = "checkupdates"
 	MAX_LINES_TOOLTIP = 4
 )
@@ -21,13 +23,22 @@ func SpecialPackages() []string {
 }
 
 func main() {
-	var waybarOutput WaybarOutput
+	var waybarOutput waybarutil.WaybarOutput
 	var tooltipLines []string
 	packages := 0
 	highlight := false
 	out, err := exec.Command(sourceCommand).Output()
 	if err != nil {
-		fmt.Printf(errorTemplate, err)
+		// if exit status 2 use empty template
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			switch exitErr.ExitCode() {
+			case 2:
+				fmt.Println(noUpdates)
+			default:
+				fmt.Printf(errorTemplate, err)
+			}
+		}
+		os.Exit(0)
 	} else {
 		cuOut := strings.Split(string(out), "\n")
 		for lineNum, output := range cuOut {
@@ -53,17 +64,14 @@ func main() {
 		} else {
 			waybarOutput.Text = PACKAGE_ICON + " " + strconv.Itoa(packages)
 		}
-		waybarOutput.Tooltip = strings.Join(tooltipLines[:], "\n")
+		waybarOutput.SetTooltip(tooltipLines)
 	}
 
 	// spit out output
-	var outStr strings.Builder
-	enc := json.NewEncoder(&outStr)
-	enc.SetEscapeHTML(false) // not printing out to web so we're fine
-	eerr := enc.Encode(waybarOutput)
+	json, eerr := waybarOutput.ToJson()
 	if eerr != nil {
 		fmt.Printf(errorTemplate, "json error")
 	} else {
-		fmt.Print(outStr.String())
+		fmt.Print(json)
 	}
 }
