@@ -1,4 +1,4 @@
-require github.com/oletalk/code-scrapbook/waybarutil v0.0.0
+require github.com/oletalk/code-scrapbook/waybarutil v1.0.0
 
 go 1.26.2
 
