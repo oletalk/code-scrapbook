@@ -5,6 +5,34 @@ import (
 	"fmt"
 )
 
+type EventFlags struct {
+	PostfixNoqueue    bool
+	PostfixDelivery   bool
+	NftablesBlacklist bool
+	ApcupsdEvent      bool
+	VdirSyncerUpdate  bool
+}
+
+func (f EventFlags) display() string {
+	var str string
+	if f.PostfixNoqueue {
+		str = str + "↩️"
+	}
+	if f.PostfixDelivery {
+		str = str + "📥"
+	}
+	if f.NftablesBlacklist {
+		str = str + "🙅‍♀️"
+	}
+	if f.ApcupsdEvent {
+		str = str + "⚡"
+	}
+	if f.VdirSyncerUpdate {
+		str = str + "📆"
+	}
+	return str
+}
+
 type JournalMessage string
 
 // TODO: use test cases from ~/journal-json-extract.txt ok?

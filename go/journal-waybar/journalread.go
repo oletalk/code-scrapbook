@@ -27,3 +27,20 @@ func unixMicroTimestamptostring(timestampstr string) (string, error) {
 		return tm.Format("2006-01-02 15:04:05"), nil
 	}
 }
+func findArtifacts(entry JournalEntry, artifacts *EventFlags) {
+	if entry.Identifier == "apcupsd" {
+		artifacts.ApcupsdEvent = true
+	}
+	if strings.HasSuffix(entry.Identifier, "smtpd") && strings.Contains(string(entry.Message), "NOQUEUE") {
+		artifacts.PostfixNoqueue = true
+	}
+	if strings.HasSuffix(entry.Identifier, "local") && strings.Contains(string(entry.Message), "status=sent") {
+		artifacts.PostfixDelivery = true
+	}
+	if entry.Identifier == "kernel" && strings.Contains(string(entry.Message), "DROP:") {
+		artifacts.NftablesBlacklist = true
+	}
+	if entry.Identifier == "vdirsyncer" && strings.Contains(string(entry.Message), "updating") {
+		artifacts.VdirSyncerUpdate = true
+	}
+}
