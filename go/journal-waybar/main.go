@@ -51,7 +51,7 @@ func main() {
 			} else {
 				// keep count of number of consecutive lines with the same process
 				if currName != entry.Identifier {
-					currNameCount = 0
+					currNameCount = 1
 					currName = entry.Identifier
 				} else {
 					currNameCount++
