@@ -13,8 +13,20 @@ const (
 	errorTemplate = "{ \"text\": \"🪵 ?\", \"tooltip\": \"error: %v\" }\n"
 )
 
-func main() {
+func getWaybarOutput(entry JournalEntry) (waybarutil.WaybarOutput, error) {
 	var waybarOutput waybarutil.WaybarOutput
+	if logtime, terr := unixMicroTimestamptostring(entry.RealtimeTimestamp); terr != nil {
+		return waybarOutput, terr
+	} else {
+		waybarOutput.Text = fmt.Sprintf("%s %s", widgetIcon, entry.processDisplay())
+		waybarOutput.Tooltip = fmt.Sprintf("%s %s", logtime, entry.Message)
+		// the serious ones are 0..3 (emergency, alert, critical, error)
+		waybarOutput.Class = "priority-" + entry.Priority
+		return waybarOutput, nil
+	}
+}
+
+func main() {
 	out, err := exec.Command(sourceCommand, "-n", "1", "-o", "json").Output()
 	if err != nil {
 		fmt.Printf(errorTemplate, err)
@@ -25,14 +37,10 @@ func main() {
 		fmt.Printf(errorTemplate, eerr)
 		os.Exit(0)
 	}
-	logtime, terr := unixMicroTimestamptostring(entry.RealtimeTimestamp)
-	if terr != nil {
-		fmt.Printf(errorTemplate, terr)
+	wout, werr := getWaybarOutput(entry)
+	if werr != nil {
+		fmt.Printf(errorTemplate, werr)
 		os.Exit(0)
 	}
-	waybarOutput.Text = fmt.Sprintf("%s %s [%s]", widgetIcon, entry.Identifier, entry.ProcessId)
-	waybarOutput.Tooltip = fmt.Sprintf("%s %s", logtime, entry.Message)
-	// the serious ones are 0..3 (emergency, alert, critical, error)
-	waybarOutput.Class = "priority-" + entry.Priority
-	fmt.Print(waybarOutput.ToJson())
+	fmt.Print(wout.ToJson())
 }
