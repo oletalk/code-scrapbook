@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type EventFlags struct {
@@ -13,24 +14,43 @@ type EventFlags struct {
 	VdirSyncerUpdate  bool
 }
 
+type EmojiLookup struct {
+	flag    bool
+	emoji   string
+	details string
+}
+
+func eventFlagLookup(f EventFlags) []EmojiLookup {
+	return []EmojiLookup{
+		{f.PostfixNoqueue, "↩️", "smtpd-noqueue"},
+		{f.PostfixDelivery, "📥", "mail-delivery"},
+		{f.NftablesBlacklist, "🙅‍♀️", "ip-blacklist"},
+		{f.ApcupsdEvent, "⚡", "apcupsd-event"},
+		{f.VdirSyncerUpdate, "📆", "new-cal-event"},
+	}
+}
+
 func (f EventFlags) display() string {
-	var str string
-	if f.PostfixNoqueue {
-		str = str + "↩️"
+	var sb strings.Builder
+	for _, e := range eventFlagLookup(f) {
+		if e.flag {
+			sb.WriteString(e.emoji)
+		}
 	}
-	if f.PostfixDelivery {
-		str = str + "📥"
+	return sb.String()
+}
+func (f EventFlags) getFlags() string {
+	var flist []string
+	for _, e := range eventFlagLookup(f) {
+		if e.flag {
+			flist = append(flist, e.details)
+		}
 	}
-	if f.NftablesBlacklist {
-		str = str + "🙅‍♀️"
+	if len(flist) > 0 {
+		return "(" + strings.Join(flist, ",") + ")"
+	} else {
+		return ""
 	}
-	if f.ApcupsdEvent {
-		str = str + "⚡"
-	}
-	if f.VdirSyncerUpdate {
-		str = str + "📆"
-	}
-	return str
 }
 
 type JournalMessage string

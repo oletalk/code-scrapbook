@@ -70,6 +70,7 @@ func main() {
 	}
 	if artifacts.display() != "" {
 		wout.Text = wout.Text + artifacts.display()
+		wout.Tooltip = wout.Tooltip + "\n" + artifacts.getFlags()
 	}
 	if werr != nil {
 		fmt.Printf(errorTemplate, werr)
