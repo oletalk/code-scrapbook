@@ -37,11 +37,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	var artifacts EventFlags
-	currName := ""
-	currNameCount := 0
 	journalLines := strings.Split(string(lines), "\n")
-	var lastEntry JournalEntry
+	stats := new(JournalStats)
 	for _, line := range journalLines {
 		if line != "" {
 			entry, eerr := getJournalEntry(line)
@@ -49,25 +46,17 @@ func main() {
 				fmt.Printf(errorTemplate, eerr)
 				os.Exit(0)
 			} else {
-				// keep count of number of consecutive lines with the same process
-				if currName != entry.Identifier {
-					currNameCount = 1
-					currName = entry.Identifier
-				} else {
-					currNameCount++
-				}
-				// scan entry for any interesting artifacts
-				findArtifacts(entry, &artifacts)
-				lastEntry = entry
+				stats.processEntry(entry)
 			}
 		}
 
 	}
 
-	wout, werr := getWaybarOutput(lastEntry)
-	if currNameCount > 1 {
-		wout.Text = wout.Text + " " + strconv.Itoa(currNameCount) + "x,"
+	wout, werr := getWaybarOutput(stats.currEntry)
+	if stats.currNameCount > 1 {
+		wout.Text = wout.Text + " " + strconv.Itoa(stats.currNameCount) + "x,"
 	}
+	artifacts := stats.artifacts
 	if artifacts.display() != "" {
 		wout.Text = wout.Text + artifacts.display()
 		wout.Tooltip = wout.Tooltip + "\n" + artifacts.getFlags()

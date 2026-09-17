@@ -6,12 +6,36 @@ import (
 	"strings"
 )
 
+/* flags for interesting events in journal */
 type EventFlags struct {
 	PostfixNoqueue    bool
 	PostfixDelivery   bool
 	NftablesBlacklist bool
 	ApcupsdEvent      bool
 	VdirSyncerUpdate  bool
+	UsbConnect        bool
+	UsbDisconnect     bool
+	CoreDumped        bool
+}
+
+type JournalStats struct {
+	currNameCount int
+	currName      string
+	currEntry     JournalEntry
+	artifacts     EventFlags
+}
+
+/* keep track of current entry and number of journal entries so far with entry identifier, as well as any interesting artifacts  */
+func (j *JournalStats) processEntry(entry JournalEntry) {
+	processName := entry.Identifier
+	if processName != j.currName {
+		j.currName = processName
+		j.currNameCount = 1
+	} else {
+		j.currNameCount++
+	}
+	j.currEntry = entry
+	findArtifacts(entry, &(j.artifacts))
 }
 
 type EmojiLookup struct {
@@ -27,6 +51,9 @@ func eventFlagLookup(f EventFlags) []EmojiLookup {
 		{f.NftablesBlacklist, "🙅‍♀️", "ip-blacklist"},
 		{f.ApcupsdEvent, "⚡", "apcupsd-event"},
 		{f.VdirSyncerUpdate, "📆", "new-cal-event"},
+		{f.UsbConnect, "🤝", "new-usb-device"},
+		{f.UsbDisconnect, "🔌", "usb-disconnect"},
+		{f.CoreDumped, "💥", "core-dumped"},
 	}
 }
 
@@ -47,7 +74,7 @@ func (f EventFlags) getFlags() string {
 		}
 	}
 	if len(flist) > 0 {
-		return "(" + strings.Join(flist, ",") + ")"
+		return "(recently:" + strings.Join(flist, ",") + ")"
 	} else {
 		return ""
 	}
