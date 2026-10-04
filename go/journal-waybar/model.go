@@ -8,14 +8,18 @@ import (
 
 /* flags for interesting events in journal */
 type EventFlags struct {
-	PostfixNoqueue    bool
-	PostfixDelivery   bool
-	NftablesBlacklist bool
-	ApcupsdEvent      bool
-	VdirSyncerUpdate  bool
-	UsbConnect        bool
-	UsbDisconnect     bool
-	CoreDumped        bool
+	PostfixNoqueue      bool
+	PostfixNoRelay      bool
+	PostfixDelivery     bool
+	NftablesBlacklist   bool
+	ApcupsdEvent        bool
+	VdirSyncerUpdate    bool
+	DovecotAuthFailure  bool
+	UsbConnect          bool
+	UsbDisconnect       bool
+	CoreDumped          bool
+	ServiceFailed       bool
+	HighPriorityMessage bool
 }
 
 type JournalStats struct {
@@ -47,13 +51,17 @@ type EmojiLookup struct {
 func eventFlagLookup(f EventFlags) []EmojiLookup {
 	return []EmojiLookup{
 		{f.PostfixNoqueue, "↩️", "smtpd-noqueue"},
+		{f.PostfixNoRelay, "🙅‍♀️", "smtpd-norelay"},
 		{f.PostfixDelivery, "📥", "mail-delivery"},
-		{f.NftablesBlacklist, "🙅‍♀️", "ip-blacklist"},
+		{f.NftablesBlacklist, "🚫", "ip-blacklist"},
+		{f.DovecotAuthFailure, "👎", "dovecot-auth-failure"},
 		{f.ApcupsdEvent, "⚡", "apcupsd-event"},
 		{f.VdirSyncerUpdate, "📆", "new-cal-event"},
 		{f.UsbConnect, "🤝", "new-usb-device"},
 		{f.UsbDisconnect, "🔌", "usb-disconnect"},
 		{f.CoreDumped, "💥", "core-dumped"},
+		{f.ServiceFailed, "😵", "service-failed"},
+		{f.HighPriorityMessage, "❗", "high-prio-msg"},
 	}
 }
 
@@ -82,7 +90,7 @@ func (f EventFlags) getFlags() string {
 
 type JournalMessage string
 
-// TODO: use test cases from ~/journal-json-extract.txt ok?
+// TODO: get rid of non-printable characters (e.g formatting characters in some niri messages)
 func (m *JournalMessage) UnmarshalJSON(data []byte) error {
 	if len(data) > 0 && data[0] == '"' {
 		var s string
@@ -106,7 +114,7 @@ type JournalEntry struct {
 	Identifier        string         `json:"SYSLOG_IDENTIFIER"`
 	Message           JournalMessage `json:"MESSAGE"`
 	Priority          string         `json:"PRIORITY"`
-	CommandLine       string         `json:"CMDLINE"`
+	CommandLine       string         `json:"_CMDLINE"`
 	ProcessId         string         `json:"_PID"`
 	UserId            string         `json:"_UID"`
 	Hostname          string         `json:"_HOSTNAME"`
@@ -115,6 +123,17 @@ type JournalEntry struct {
 
 func (j JournalEntry) processDisplay() string {
 	processInd := j.Identifier
+	if processInd == "" {
+		// this journal json doesn't have a SYSLOG_IDENTIFIER element
+		// seen this happen with xwayland-satellite
+		// let's take the first word from the command line
+		if j.CommandLine != "" {
+			cmdLine := strings.Split(j.CommandLine, " ")
+			processInd = cmdLine[0]
+		} else {
+			processInd = "❔"
+		}
+	}
 	if j.ProcessId != "" {
 		processInd = processInd + " [" + j.ProcessId + "]"
 	}

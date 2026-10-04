@@ -33,7 +33,11 @@ func findArtifacts(entry JournalEntry, artifacts *EventFlags) {
 		artifacts.ApcupsdEvent = true
 	}
 	if strings.HasSuffix(entry.Identifier, "smtpd") && strings.Contains(message, "NOQUEUE") {
-		artifacts.PostfixNoqueue = true
+		if strings.Contains(message, "Relay access") {
+			artifacts.PostfixNoRelay = true
+		} else {
+			artifacts.PostfixNoqueue = true
+		}
 	}
 	if strings.HasSuffix(entry.Identifier, "local") && strings.Contains(message, "status=sent") {
 		artifacts.PostfixDelivery = true
@@ -41,7 +45,7 @@ func findArtifacts(entry JournalEntry, artifacts *EventFlags) {
 	if entry.Identifier == "kernel" && strings.Contains(message, "DROP:") {
 		artifacts.NftablesBlacklist = true
 	}
-	if entry.Identifier == "vdirsyncer" && strings.Contains(message, "updating") {
+	if entry.Identifier == "vdirsyncer" && (strings.Contains(message, "updating") || strings.Contains(message, "Copying")) {
 		artifacts.VdirSyncerUpdate = true
 	}
 	if entry.Identifier == "kernel" && strings.Contains(message, "USB device found") {
@@ -52,5 +56,14 @@ func findArtifacts(entry JournalEntry, artifacts *EventFlags) {
 	}
 	if entry.Identifier == "systemd-coredump" && strings.Contains(message, "dumped core") {
 		artifacts.CoreDumped = true
+	}
+	if entry.Identifier == "systemd" && strings.Contains(message, "Failed with") {
+		artifacts.ServiceFailed = true
+	}
+	if entry.Identifier == "auth" && strings.Contains(message, "fail") && strings.Contains(message, "dovecot") {
+		artifacts.DovecotAuthFailure = true
+	}
+	if entry.Priority == "3" || entry.Priority == "2" || entry.Priority == "1" {
+		artifacts.HighPriorityMessage = true
 	}
 }

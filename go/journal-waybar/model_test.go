@@ -4,6 +4,42 @@ import (
 	"testing"
 )
 
+type JournalEntryTestCase struct {
+	jentry         JournalEntry
+	expectedResult string
+}
+
+func TestProcessDisplay(t *testing.T) {
+	testcases := []JournalEntryTestCase{
+		{
+			jentry: JournalEntry{
+				Identifier: "kernel",
+				Message:    "a kernel message",
+			},
+			expectedResult: "kernel",
+		},
+		{
+			jentry: JournalEntry{
+				CommandLine: "cat /etc/fstab",
+				Message:     "some nonsense",
+			},
+			expectedResult: "cat",
+		},
+		{
+			jentry: JournalEntry{
+				Message: "worst case",
+			},
+			expectedResult: "❔",
+		},
+	}
+
+	for n, testcase := range testcases {
+		if actualName := testcase.jentry.processDisplay(); actualName != testcase.expectedResult {
+			t.Errorf(`TestProcessDisplay#%d = %q, want %q, error`, n, actualName, testcase.expectedResult)
+		}
+	}
+}
+
 func TestCompileStats(t *testing.T) {
 	js := new(JournalStats)
 	e1 := JournalEntry{

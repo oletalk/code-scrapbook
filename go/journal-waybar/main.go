@@ -12,7 +12,7 @@ import (
 
 const (
 	sourceCommand = "journalctl"
-	EXTRACT_SIZE  = "15"
+	EXTRACT_SIZE  = "20"
 	widgetIcon    = "🪵"
 	errorTemplate = "{ \"text\": \"🪵 ?\", \"tooltip\": \"error: %v\" }\n"
 )

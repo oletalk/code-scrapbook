@@ -21,7 +21,7 @@ func TestParseLine(t *testing.T) {
 
 func TestInterestingEvents(t *testing.T) {
 	var artifacts EventFlags
-	expectedArtifacts := "↩️"
+	expectedArtifacts := "🙅‍♀️"
 	for _, c := range allTestCases() {
 		entry, _ := getJournalEntry(c.input)
 		findArtifacts(entry, &artifacts)
