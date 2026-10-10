@@ -12,6 +12,7 @@ import (
 const (
 	errorTemplate = "{ 'text': '⏰ ?', 'tooltip': 'error: %v' }"
 	calendarIcon  = "📆"
+	DAYS          = "8"
 )
 
 func main() {
@@ -23,11 +24,12 @@ func main() {
 	appointments := 0
 
 	fields := khalJSONFields(Event{})
-	args := []string{"list", "now", "8days"}
+	args := []string{"list", "now", DAYS + "days"}
 	for _, f := range fields {
 		args = append(args, "--json", f)
 	}
 
+	noEvents := true
 	out, err := exec.Command("khal", args...).Output()
 	if err == nil {
 		for dayNum, output := range strings.Split(string(out), "\n") {
@@ -46,6 +48,7 @@ func main() {
 					isToday = (dayofwk == "Today")
 					tooltipDay.heading(fmt.Sprintf("%s, %s", dayofwk, events[len(events)-1].StartDate))
 					for _, event := range events {
+						noEvents = false
 						if event.AllDay != "True" {
 							appointments += 1
 							// dispText := fmt.Sprintf("%s-%s %s", event.StartTime, event.EndTime, event.Title)
@@ -82,6 +85,14 @@ func main() {
 	} else if appointments > 0 {
 		// else if at least one appointment...
 		waybarOutput.Text = fmt.Sprintf("%s (%d)", calendarIcon, appointments)
+	} else {
+		// fmt.Println("help!")
+		if noEvents {
+			var noevents []string
+			noevents = append(noevents, "No upcoming events in the next "+DAYS+" days")
+			waybarOutput.SetTooltip(noevents)
+			waybarOutput.Text = "🧺 none"
+		}
 	}
 	outStr, eerr := waybarOutput.ToJson()
 	if eerr != nil {
