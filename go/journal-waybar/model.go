@@ -90,11 +90,18 @@ func (f EventFlags) getFlags() string {
 
 type JournalMessage string
 
-// TODO: get rid of non-printable characters (e.g formatting characters in some niri messages)
 func (m *JournalMessage) UnmarshalJSON(data []byte) error {
 	if len(data) > 0 && data[0] == '"' {
 		var s string
-		if err := json.Unmarshal(data, &s); err != nil {
+		filtered := data[:0]
+		// get rid of non-printable characters
+		// (e.g formatting characters in some niri messages)
+		for _, b := range data {
+			if b >= 32 && b <= 126 {
+				filtered = append(filtered, b)
+			}
+		}
+		if err := json.Unmarshal(filtered, &s); err != nil {
 			return err
 		}
 		*m = JournalMessage(s)

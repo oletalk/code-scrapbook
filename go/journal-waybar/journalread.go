@@ -2,10 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var ansiRe = regexp.MustCompile(`\x1b\[[0-9;?]*[ -/]*[@-~]`)
+
+func stripANSI(s string) string {
+	return ansiRe.ReplaceAllString(s, "")
+}
 
 func getJournalEntry(str string) (JournalEntry, error) {
 	var data JournalEntry

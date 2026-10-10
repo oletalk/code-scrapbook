@@ -23,7 +23,13 @@ func getWaybarOutput(entry JournalEntry) (waybarutil.WaybarOutput, error) {
 		return waybarOutput, terr
 	} else {
 		waybarOutput.Text = fmt.Sprintf("%s %s", widgetIcon, entry.processDisplay())
-		waybarOutput.Tooltip = fmt.Sprintf("%s %s", logtime, entry.Message)
+		// fix issues where message contains angle brackets!
+		origMsg := fmt.Sprintf("%s %s", logtime, entry.Message)
+		newMsg := strings.ReplaceAll(origMsg, "<", "[")
+		newMsg = strings.ReplaceAll(newMsg, ">", "]")
+		// get rid of escape sequences e.g. colour changes in niri logs(!)
+		newMsg = stripCSIEscSequences(newMsg)
+		waybarOutput.Tooltip = newMsg
 		// the serious ones are 0..3 (emergency, alert, critical, error)
 		waybarOutput.Class = "priority-" + entry.Priority
 		return waybarOutput, nil
