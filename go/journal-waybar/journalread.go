@@ -10,7 +10,7 @@ import (
 
 var ansiRe = regexp.MustCompile(`\x1b\[[0-9;?]*[ -/]*[@-~]`)
 
-func stripANSI(s string) string {
+func stripCSIEscSequences(s string) string {
 	return ansiRe.ReplaceAllString(s, "")
 }
 
