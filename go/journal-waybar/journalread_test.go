@@ -13,7 +13,7 @@ type ParseTestCase struct {
 func TestAnsiString(t *testing.T) {
 	ansiStr := "2026-10-10 16:17:37 \u001b[2m2026-10-10T15:17:37.552654Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mniri::niri\u001b[0m\u001b[2m:\u001b[0m unlocking session"
 	expResult := "2026-10-10 16:17:37 2026-10-10T15:17:37.552654Z  INFO niri::niri: unlocking session"
-	if actual := stripANSI(ansiStr); actual != expResult {
+	if actual := stripCSIEscSequences(ansiStr); actual != expResult {
 		throwError(t, "TestAnsiString", "test 1", expResult, actual)
 	}
 }
