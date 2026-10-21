@@ -3,23 +3,24 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
 /* flags for interesting events in journal */
 type EventFlags struct {
-	PostfixNoqueue      bool
-	PostfixNoRelay      bool
-	PostfixDelivery     bool
-	NftablesBlacklist   bool
-	ApcupsdEvent        bool
-	VdirSyncerUpdate    bool
-	DovecotAuthFailure  bool
-	UsbConnect          bool
-	UsbDisconnect       bool
-	CoreDumped          bool
-	ServiceFailed       bool
-	HighPriorityMessage bool
+	PostfixNoqueue      int
+	PostfixNoRelay      int
+	PostfixDelivery     int
+	NftablesBlacklist   int
+	ApcupsdEvent        int
+	VdirSyncerUpdate    int
+	DovecotAuthFailure  int
+	UsbConnect          int
+	UsbDisconnect       int
+	CoreDumped          int
+	ServiceFailed       int
+	HighPriorityMessage int
 }
 
 type JournalStats struct {
@@ -43,7 +44,7 @@ func (j *JournalStats) processEntry(entry JournalEntry) {
 }
 
 type EmojiLookup struct {
-	flag    bool
+	flag    int
 	emoji   string
 	details string
 }
@@ -68,7 +69,7 @@ func eventFlagLookup(f EventFlags) []EmojiLookup {
 func (f EventFlags) display() string {
 	var sb strings.Builder
 	for _, e := range eventFlagLookup(f) {
-		if e.flag {
+		if e.flag > 0 {
 			sb.WriteString(e.emoji)
 		}
 	}
@@ -77,8 +78,12 @@ func (f EventFlags) display() string {
 func (f EventFlags) getFlags() string {
 	var flist []string
 	for _, e := range eventFlagLookup(f) {
-		if e.flag {
-			flist = append(flist, e.details)
+		if e.flag > 0 {
+			detailsStr := e.details
+			if e.flag > 1 {
+				detailsStr += " (" + strconv.Itoa(e.flag) + ")"
+			}
+			flist = append(flist, detailsStr)
 		}
 	}
 	if len(flist) > 0 {

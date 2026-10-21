@@ -37,40 +37,40 @@ func unixMicroTimestamptostring(timestampstr string) (string, error) {
 func findArtifacts(entry JournalEntry, artifacts *EventFlags) {
 	message := string(entry.Message)
 	if entry.Identifier == "apcupsd" {
-		artifacts.ApcupsdEvent = true
+		artifacts.ApcupsdEvent++
 	}
 	if strings.HasSuffix(entry.Identifier, "smtpd") && strings.Contains(message, "NOQUEUE") {
 		if strings.Contains(message, "Relay access") {
-			artifacts.PostfixNoRelay = true
+			artifacts.PostfixNoRelay++
 		} else {
-			artifacts.PostfixNoqueue = true
+			artifacts.PostfixNoqueue++
 		}
 	}
 	if strings.HasSuffix(entry.Identifier, "local") && strings.Contains(message, "status=sent") {
-		artifacts.PostfixDelivery = true
+		artifacts.PostfixDelivery++
 	}
 	if entry.Identifier == "kernel" && strings.Contains(message, "DROP:") {
-		artifacts.NftablesBlacklist = true
+		artifacts.NftablesBlacklist++
 	}
 	if entry.Identifier == "vdirsyncer" && (strings.Contains(message, "updating") || strings.Contains(message, "Copying")) {
-		artifacts.VdirSyncerUpdate = true
+		artifacts.VdirSyncerUpdate++
 	}
 	if entry.Identifier == "kernel" && strings.Contains(message, "USB device found") {
-		artifacts.UsbConnect = true
+		artifacts.UsbConnect++
 	}
 	if entry.Identifier == "kernel" && strings.Contains(message, "USB disconnect") {
-		artifacts.UsbDisconnect = true
+		artifacts.UsbDisconnect++
 	}
 	if entry.Identifier == "systemd-coredump" && strings.Contains(message, "dumped core") {
-		artifacts.CoreDumped = true
+		artifacts.CoreDumped++
 	}
 	if entry.Identifier == "systemd" && strings.Contains(message, "Failed with") {
-		artifacts.ServiceFailed = true
+		artifacts.ServiceFailed++
 	}
 	if entry.Identifier == "auth" && strings.Contains(message, "fail") && strings.Contains(message, "dovecot") {
-		artifacts.DovecotAuthFailure = true
+		artifacts.DovecotAuthFailure++
 	}
 	if entry.Priority == "3" || entry.Priority == "2" || entry.Priority == "1" {
-		artifacts.HighPriorityMessage = true
+		artifacts.HighPriorityMessage++
 	}
 }
