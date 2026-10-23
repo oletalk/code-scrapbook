@@ -13,6 +13,7 @@ const (
 	ROUNDING           = 0.9
 	LARGE_DELTA        = 2.0
 	SHOW_TOMORROW_HOUR = 14
+	TREND_DAYS         = 3
 )
 
 func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput, error) {
@@ -47,16 +48,28 @@ func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput,
 	tooltip = append(tooltip, fmt.Sprintf("🡙 %.0f / %.0f %s", input.Daily[0].Temp.Min, input.Daily[0].Temp.Max, deg))
 	sunset := input.Current.Sunset
 	if !isPast(int64(sunset), now) {
+		// before sunset? show its forecast
 		tooltip = append(tooltip, fmt.Sprintf("🌇 %s", timeToday(int64(sunset))))
+	} else {
+		// sunrise tomorrow
+		sunrise := input.Daily[1].Sunrise
+		tooltip = append(tooltip, fmt.Sprintf("🌄 %s", timeToday(int64(sunrise))))
 	}
 	// display range for tomorrow (if it's late enough)
 	if showTomorrowItems(now) {
 		// work out trend
-		avgTemp0 := (input.Daily[0].Temp.Max + input.Daily[0].Temp.Min) / 2
-		avgTemp1 := (input.Daily[1].Temp.Max + input.Daily[1].Temp.Min) / 2
-		avgTemp2 := (input.Daily[2].Temp.Max + input.Daily[2].Temp.Min) / 2
+		var avgTemp []float32
+		for i := 0; i < TREND_DAYS+1; i++ {
+			avgTemp = append(avgTemp, (input.Daily[i].Temp.Max+input.Daily[i].Temp.Min)/2)
+		}
 
-		tooltip = append(tooltip, fmt.Sprintf("tomorrow %.0f-%.0f %s %s", input.Daily[1].Temp.Min, input.Daily[1].Temp.Max, deg, trendIcon(avgTemp0, avgTemp1, avgTemp2)))
+		weatherTomorrow := input.Daily[1].Weather[0].Description
+		if weatherTomorrow == currWeatherDescrip {
+			weatherTomorrow = ""
+		} else {
+			weatherTomorrow = "<i>" + weatherTomorrow + "</i>,"
+		}
+		tooltip = append(tooltip, fmt.Sprintf("tomorrow %s %.0f-%.0f %s %s", weatherTomorrow, input.Daily[1].Temp.Min, input.Daily[1].Temp.Max, deg, trendIcon(avgTemp)))
 	}
 	unit := firstDiff(currWeatherDescrip, input.Hourly)
 	if unit != nil {
@@ -66,14 +79,20 @@ func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput,
 	}
 	// tooltip = append(tooltip, fmt.Sprintf("⌚ upd. %s", timeToday(now.Unix())))
 	tooltip = append(tooltip, fmt.Sprintf("⌚ upd. %s", lastModifiedTime))
-	// alerts... WIP
+	// alerts
 	if len(input.Alerts) > 0 {
-		// TODO: write alerts somewhere?
-		aldescr := input.Alerts[0].Event
-		if len(input.Alerts) > 1 {
-			aldescr = fmt.Sprintf("%s + %d", aldescr, len(input.Alerts)-1)
+		var allAlerts []AlertInfo
+		for _, a := range input.Alerts {
+			if isPast(a.Start, time.Now()) && isFuture(a.End, time.Now()) {
+				allAlerts = append(allAlerts, a)
+			}
+		}
+		aldescr := allAlerts[0].Event
+		if len(allAlerts) > 1 {
+			aldescr = fmt.Sprintf("%s + %d", aldescr, len(allAlerts)-1)
 		}
 		tooltip = append(tooltip, "⚠️ "+aldescr)
+		out.Text += "⚠️"
 	}
 
 	// join them all
@@ -109,6 +128,10 @@ func getWindIcon(msec float32) string {
 		return "🪁"
 	case msec > 10 && msec <= 15:
 		return "🌬️"
+	case msec < 15 && msec <= 20:
+		return "💨"
+	case msec > 20 && msec <= 30:
+		return "🌪️"
 	default:
 		return ""
 
@@ -155,10 +178,12 @@ func roundTo(v float32, step float32) float32 {
 }
 
 // return icon for temp trend
-func trendIcon(todayTemp, tomorrowTemp, dayAfterTemp float32) string {
+func trendIcon(avgTemps []float32) string {
 	// TODO: way to signal one of the temp differences is much larger than the other
-
-	retStr := changeIcon(todayTemp, tomorrowTemp) + changeIcon(tomorrowTemp, dayAfterTemp)
+	var retStr string
+	for i := 0; i < len(avgTemps)-1; i++ {
+		retStr += changeIcon(avgTemps[i], avgTemps[i+1])
+	}
 
 	// if retStr == "➡️➡️" {
 	// 		return ""
@@ -190,6 +215,9 @@ func changeIcon(first float32, second float32) string {
 
 func isPast(epochSeconds int64, now time.Time) bool {
 	return epochSeconds < now.Unix()
+}
+func isFuture(epochSeconds int64, now time.Time) bool {
+	return epochSeconds > now.Unix()
 }
 func weatherIcon(iconName string) string {
 	switch iconName {

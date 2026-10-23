@@ -28,7 +28,8 @@ func TestTrendIcons(t *testing.T) {
 		{today: 24.0, tomorrow: 23.0, dayafter: 26.0, output: "↘️⤴️"},
 	}
 	for _, c := range cases {
-		if actual := trendIcon(c.today, c.tomorrow, c.dayafter); actual != c.output {
+		var temps = []float32{c.today, c.tomorrow, c.dayafter}
+		if actual := trendIcon(temps); actual != c.output {
 			testname := fmt.Sprintf("%.1f-%.1f-%.1f", c.today, c.tomorrow, c.dayafter)
 			throwError(t, "TestTrendIcons", testname, c.output, actual)
 		}
