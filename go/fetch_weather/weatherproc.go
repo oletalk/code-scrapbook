@@ -85,12 +85,14 @@ func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput,
 				allAlerts = append(allAlerts, a)
 			}
 		}
-		aldescr := allAlerts[0].Event
-		if len(allAlerts) > 1 {
-			aldescr = fmt.Sprintf("%s + %d", aldescr, len(allAlerts)-1)
+		if len(allAlerts) > 0 {
+			aldescr := allAlerts[0].Event
+			if len(allAlerts) > 1 {
+				aldescr = fmt.Sprintf("%s + %d", aldescr, len(allAlerts)-1)
+			}
+			tooltip = append(tooltip, "⚠️ "+aldescr)
+			out.Text += "⚠️"
 		}
-		tooltip = append(tooltip, "⚠️ "+aldescr)
-		out.Text += "⚠️"
 	}
 
 	// join them all

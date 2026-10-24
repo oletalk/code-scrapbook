@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	jsonFilePath = "/home/colin/.cache/openweather-new.json"
-	downloadURL  = "https://api.openweathermap.org/data/3.0/onecall"
-	maxAge       = 9 * time.Minute
-	latitude     = "55.815"
-	longitude    = "-4.26"
-	units        = "metric"
-	lang         = "en"
-	exclusions   = "minutely"
-	errorString  = "{\"text\": \"error\", \"tooltip\": \"error\"}"
+	jsonFilePath  = "/home/colin/.cache/openweather-new.json"
+	downloadURL   = "https://api.openweathermap.org/data/3.0/onecall"
+	maxAge        = 9 * time.Minute
+	latitude      = "55.815"
+	longitude     = "-4.26"
+	units         = "metric"
+	lang          = "en"
+	exclusions    = "minutely"
+	errorTemplate = "{\"text\": \"error\", \"tooltip\": \"%v\"}"
 )
 
 func main() {
@@ -32,13 +32,13 @@ func main() {
 	var chkErr error
 	lastDownload, chkErr = modifiedTs(jsonFilePath)
 	if chkErr != nil {
-		fmt.Println(errorString)
+		fmt.Printf(errorTemplate, chkErr)
 		os.Exit(0)
 	}
 	data, err := parseJSON(jsonFilePath)
 	if err != nil {
 		//	log.Fatalf("Failed to parse JSON: %v", err)
-		fmt.Println(errorString)
+		fmt.Printf(errorTemplate, err)
 		os.Exit(0)
 	}
 
@@ -48,7 +48,7 @@ func main() {
 		enc.SetEscapeHTML(false)
 		eerr := enc.Encode(weatherJson)
 		if eerr != nil {
-			fmt.Println(errorString)
+			fmt.Printf(errorTemplate, eerr)
 		} else {
 			fmt.Print(outStr.String())
 		}
