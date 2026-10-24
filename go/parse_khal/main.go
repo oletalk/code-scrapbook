@@ -75,7 +75,7 @@ func main() {
 		waybarOutput.SetTooltip(tooltipText)
 
 	} else {
-		fmt.Printf("Error occurred: %v\n", err)
+		fmt.Printf(errorTemplate, err)
 	}
 
 	// finally put together the text
@@ -86,14 +86,19 @@ func main() {
 		// else if at least one appointment...
 		waybarOutput.Text = fmt.Sprintf("%s (%d)", calendarIcon, appointments)
 	} else {
-		// fmt.Println("help!")
 		if noEvents {
 			var noevents []string
 			noevents = append(noevents, "No upcoming events in the next "+DAYS+" days")
 			waybarOutput.SetTooltip(noevents)
-			waybarOutput.Text = "🧺 none"
+			waybarOutput.Text = "🧺 <i>clear</i>"
+		} else {
+			// if noEvents is false but we still have no event text,
+			// there *were* events, but none with times,
+			// i.e. only 'All Day' events
+			waybarOutput.Text = "🔛 <i>all day events</i>"
 		}
 	}
+
 	outStr, eerr := waybarOutput.ToJson()
 	if eerr != nil {
 		fmt.Printf(errorTemplate, "json error")
