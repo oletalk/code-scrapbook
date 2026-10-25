@@ -6,7 +6,6 @@ import (
 	"github.com/oletalk/code-scrapbook/waybarutil"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 const (
@@ -16,12 +15,8 @@ const (
 )
 
 func main() {
-	now := time.Now()
-	isToday := false
-	eventInText := ""
 	var waybarOutput waybarutil.WaybarOutput
 	var tooltipText []string
-	appointments := 0
 
 	fields := khalJSONFields(Event{})
 	args := []string{"list", "now", DAYS + "days"}
@@ -29,47 +24,24 @@ func main() {
 		args = append(args, "--json", f)
 	}
 
-	noEvents := true
 	out, err := exec.Command("khal", args...).Output()
+	ep := EventProcessor{}
+	ep.init()
 	if err == nil {
 		for dayNum, output := range strings.Split(string(out), "\n") {
 			// khal output is a sequential list of json arrays
 			// 1 per day
-			dte := time.Now().AddDate(0, 0, dayNum)
 			if strings.Contains(output, "{") {
 				var events []Event
-				var tooltipDay TooltipDetail
 				err := json.Unmarshal([]byte(output), &events)
 				if err == nil {
 					// fmt.Printf("Parsed events: %+v\n", events)
-					// TODO: error handling?
-					// dayofwk, _ := dayofweek(events[len(events)-1].StartDate, now)
-					dayofwk, _ := dayofweek_time(dte, now)
-					isToday = (dayofwk == "Today")
-					tooltipDay.heading(fmt.Sprintf("%s, %s", dayofwk, events[len(events)-1].StartDate))
-					for _, event := range events {
-						noEvents = false
-						if event.AllDay != "True" {
-							appointments += 1
-							// dispText := fmt.Sprintf("%s-%s %s", event.StartTime, event.EndTime, event.Title)
-							dispText := fmt.Sprintf("%s %s %s", event.StartEndTimeStyle, event.Title, event.RepeatSymbol)
-							if isToday && eventInText == "" {
-								eventInText = dispText
-							}
-							tooltipDay.add_entry(dispText)
-						} else {
-							// dispText := fmt.Sprintf("%s (All Day)", event.Title)
-							dispText := fmt.Sprintf("%s %s %s", event.StartEndTimeStyle, event.Title, event.RepeatSymbol)
-							if isToday && eventInText == "" {
-								eventInText = dispText
-							}
-							tooltipDay.add_entry(dispText)
-						}
-					}
+					ep.initDay()
+					ep.process(dayNum, events)
 				} else {
 					fmt.Printf(errorTemplate, err)
 				}
-				tooltipText = append(tooltipText, tooltipDay.stringify())
+				tooltipText = append(tooltipText, ep.tooltipDay.stringify())
 			}
 		}
 		waybarOutput.SetTooltip(tooltipText)
@@ -80,13 +52,13 @@ func main() {
 
 	// finally put together the text
 	// if a today event...
-	if eventInText != "" {
-		waybarOutput.Text = fmt.Sprintf("%s %s", calendarIcon, eventInText)
-	} else if appointments > 0 {
+	if ep.eventInText != "" {
+		waybarOutput.Text = fmt.Sprintf("%s %s", calendarIcon, ep.eventInText)
+	} else if ep.appointments > 0 {
 		// else if at least one appointment...
-		waybarOutput.Text = fmt.Sprintf("%s (%d)", calendarIcon, appointments)
+		waybarOutput.Text = fmt.Sprintf("%s (%d)", calendarIcon, ep.appointments)
 	} else {
-		if noEvents {
+		if ep.noEvents {
 			var noevents []string
 			noevents = append(noevents, "No upcoming events in the next "+DAYS+" days")
 			waybarOutput.SetTooltip(noevents)
