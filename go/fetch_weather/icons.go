@@ -74,7 +74,7 @@ func getWindIcon(msec float32) string {
 		return "🪁"
 	case msec > 10 && msec <= 15:
 		return "🌬️"
-	case msec < 15 && msec <= 20:
+	case msec > 15 && msec <= 20:
 		return "💨"
 	case msec > 20 && msec <= 30:
 		return "🌪️"

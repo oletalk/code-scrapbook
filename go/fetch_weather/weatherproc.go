@@ -44,13 +44,17 @@ func createForecast(input OneCallResult, lastModifiedTime string) (WaybarOutput,
 	tooltip = append(tooltip, firstLine)
 	// min/max
 	tooltip = append(tooltip, fmt.Sprintf("🡙 %.0f / %.0f %s", input.Daily[0].Temp.Min, input.Daily[0].Temp.Max, deg))
+	sunrise := input.Current.Sunrise
 	sunset := input.Current.Sunset
-	if !isPast(int64(sunset), now) {
+	if isFuture(int64(sunrise), now) {
+		// before sunrise today? show forecast
+		tooltip = append(tooltip, fmt.Sprintf("🌄 %s", timeToday(int64(sunrise))))
+	} else if isFuture(int64(sunset), now) {
 		// before sunset? show its forecast
 		tooltip = append(tooltip, fmt.Sprintf("🌇 %s", timeToday(int64(sunset))))
 	} else {
-		// sunrise tomorrow
-		sunrise := input.Daily[1].Sunrise
+		// show tomorrow's sunrise
+		sunrise = input.Daily[1].Sunrise
 		tooltip = append(tooltip, fmt.Sprintf("🌄 %s", timeToday(int64(sunrise))))
 	}
 	// display range for tomorrow (if it's late enough)
