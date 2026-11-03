@@ -61,7 +61,7 @@ func findArtifacts(entry JournalEntry, artifacts *EventFlags) {
 	if entry.Identifier == "kernel" && strings.Contains(message, "USB disconnect") {
 		artifacts.UsbDisconnect++
 	}
-	if entry.Identifier == "systemd-coredump" && strings.Contains(message, "dumped core") {
+	if entry.Identifier == "systemd-coredump" && (strings.Contains(message, "dumped core") || strings.Contains(message, "terminated abnormally")) {
 		artifacts.CoreDumped++
 	}
 	if entry.Identifier == "systemd" && strings.Contains(message, "Failed with") {

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -81,7 +80,7 @@ func (f EventFlags) getFlags() string {
 		if e.flag > 0 {
 			detailsStr := e.details
 			if e.flag > 1 {
-				detailsStr += " (" + strconv.Itoa(e.flag) + ")"
+				detailsStr += fmt.Sprintf(" (<b>%d</b>)", e.flag)
 			}
 			flist = append(flist, detailsStr)
 		}
@@ -145,9 +144,22 @@ func (j JournalEntry) processDisplay() string {
 		} else {
 			processInd = "❔"
 		}
+	} else {
+		processInd = nameAfterLastSlash(processInd)
 	}
-	if j.ProcessId != "" {
-		processInd = processInd + " [" + j.ProcessId + "]"
-	}
+	// if j.ProcessId != "" {
+	// 	processInd = processInd + " [" + j.ProcessId + "]"
+	// }
 	return processInd
+}
+
+// If Identifier contains slashes, return string after last one
+func nameAfterLastSlash(s string) string {
+	lastSlashIndex := strings.LastIndex(s, "/")
+
+	if lastSlashIndex == -1 {
+		return s
+	}
+
+	return s[lastSlashIndex+1:]
 }

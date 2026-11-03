@@ -13,8 +13,8 @@ import (
 const (
 	sourceCommand = "journalctl"
 	EXTRACT_SIZE  = "20"
-	widgetIcon    = "🪵"
-	errorTemplate = "{ \"text\": \"🪵 ?\", \"tooltip\": \"error: %v\" }\n"
+	widgetIcon    = "📜"
+	errorTemplate = "{ \"text\": \"📜 ?\", \"tooltip\": \"error: %v\" }\n"
 )
 
 func getWaybarOutput(entry JournalEntry) (waybarutil.WaybarOutput, error) {
@@ -25,6 +25,9 @@ func getWaybarOutput(entry JournalEntry) (waybarutil.WaybarOutput, error) {
 		waybarOutput.Text = fmt.Sprintf("%s %s", widgetIcon, entry.processDisplay())
 		// fix issues where message contains angle brackets!
 		origMsg := fmt.Sprintf("%s %s", logtime, entry.Message)
+		if entry.ProcessId != "" {
+			origMsg = fmt.Sprintf("%s [pid %s] %s", logtime, entry.ProcessId, entry.Message)
+		}
 		newMsg := strings.ReplaceAll(origMsg, "<", "[")
 		newMsg = strings.ReplaceAll(newMsg, ">", "]")
 		// get rid of escape sequences e.g. colour changes in niri logs(!)
