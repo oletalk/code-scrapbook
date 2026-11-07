@@ -38,6 +38,7 @@ func (t TooltipDetail) stringify() string {
 		fmt.Fprintln(&sb, " * No Events * ")
 	} else {
 		for _, s := range t.Entries {
+			s = strings.ReplaceAll(s, "&", "&amp;")
 			fmt.Fprintf(&sb, "%s\n", s)
 		}
 	}
