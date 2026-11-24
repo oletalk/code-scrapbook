@@ -31,6 +31,10 @@ func (t *TooltipDetail) add_entry(e string) {
 	t.Entries = append(t.Entries, e)
 }
 
+func safeText(s string) string {
+	return strings.ReplaceAll(s, "&", "&amp;")
+}
+
 func (t TooltipDetail) stringify() string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "<b>%s</b>\n", t.Heading)
@@ -38,8 +42,7 @@ func (t TooltipDetail) stringify() string {
 		fmt.Fprintln(&sb, " * No Events * ")
 	} else {
 		for _, s := range t.Entries {
-			s = strings.ReplaceAll(s, "&", "&amp;")
-			fmt.Fprintf(&sb, "%s\n", s)
+			fmt.Fprintf(&sb, "%s\n", safeText(s))
 		}
 	}
 	return sb.String()

@@ -4,17 +4,6 @@ import (
 	"time"
 )
 
-func dayofweek(datestr string, now time.Time) (string, error) {
-	// input format should be yyyy-mm-dd
-	t, err := time.Parse("2006-01-02", datestr)
-	if err != nil {
-		return "", err
-	} else {
-		return dayofweek_time(t, now)
-	}
-
-}
-
 func dayofweek_time(t time.Time, now time.Time) (string, error) {
 	// if today, tomorrow...
 	y1, m1, d1 := t.Date()

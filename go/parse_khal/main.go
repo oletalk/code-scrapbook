@@ -12,6 +12,7 @@ const (
 	errorTemplate = "{ 'text': '⏰ ?', 'tooltip': 'error: %v' }"
 	calendarIcon  = "📆"
 	DAYS          = "8"
+	MAX_DISPLAY   = 30
 )
 
 func main() {
@@ -53,7 +54,12 @@ func main() {
 	// finally put together the text
 	// if a today event...
 	if ep.eventInText != "" {
-		waybarOutput.Text = fmt.Sprintf("%s %s", calendarIcon, ep.eventInText)
+		todayText := ep.eventInText
+		if len(todayText) > MAX_DISPLAY {
+			todayText = todayText[:MAX_DISPLAY-2] + "..."
+		}
+		// todayText = safeText(todayText)
+		waybarOutput.SetText(fmt.Sprintf("%s %s", calendarIcon, todayText))
 	} else if ep.appointments > 0 {
 		// else if at least one appointment...
 		waybarOutput.Text = fmt.Sprintf("%s (%d)", calendarIcon, ep.appointments)
