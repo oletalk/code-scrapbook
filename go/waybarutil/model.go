@@ -28,6 +28,11 @@ func (w WaybarOutput) ToJson() (string, error) {
 	}
 }
 
+/* set text safely, so ampersand doesn't trip up Waybar */
+func (w *WaybarOutput) SetText(text string) {
+	w.Text = strings.ReplaceAll(text, "&", "&amp;")
+}
+
 /* assemble tooltip from an array of strings */
 func (w *WaybarOutput) SetTooltip(tooltipLines []string) {
 	w.Tooltip = strings.Join(tooltipLines[:], "\n")
